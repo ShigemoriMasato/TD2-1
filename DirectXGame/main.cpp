@@ -3,7 +3,7 @@
 
 int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-	std::unique_ptr<MySetup> setup = std::make_unique<MySetup>();
+	std::unique_ptr<MySetup> setup = std::make_unique<MySetup>(1280, 720);
 
 	setup->Initialize();
 
