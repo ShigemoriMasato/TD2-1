@@ -1,17 +1,7 @@
 #pragma once
 #include <Windows.h>
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <dbghelp.h>
 #include "Logger.h"
-
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "Dbghelp.lib")
-
-LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-static LONG WINAPI ExportDump(EXCEPTION_POINTERS *exception);
+#include "MyDirectX.h"
 
 class MySetup {
 public:
@@ -25,8 +15,7 @@ private:
 	//ウィンドウ作成
 	void SamonWindow();
 
-	//DirectX初期化
-	void InitializeDirectX();
+	std::unique_ptr<MyDirectX> dx = nullptr;
 
 	const int32_t kClientwidth;
 	const int32_t kClientheight;
@@ -34,7 +23,6 @@ private:
 	HWND hwnd = nullptr;	//ウィンドウハンドル
 
 	std::unique_ptr<Logger> masterLog;
-	std::unique_ptr<Logger> dxLog;
 
 };
 
