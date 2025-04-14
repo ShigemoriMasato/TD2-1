@@ -29,7 +29,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
+static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //取得した時間を名前にしたファイルを作成し、そのなかにDumpを出力する
     SYSTEMTIME time;
     GetLocalTime(&time);
@@ -48,7 +48,6 @@ LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
     //Dumpを出力。MiniDumpNormalは最低限の情報を出力するフラグ
     MiniDumpWriteDump(GetCurrentProcess(), processId, dumpFileHandle, MiniDumpNormal, &minidumpInformation, nullptr, nullptr);
     //他に関連付けられているSEH例外ハンドラがあれば実行。通常はプロセスを終了する
-
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
@@ -377,8 +376,6 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     assert(SUCCEEDED(hr));
 
 	MSG msg{};
-
-
 
 	//ウィンドウのxボタンが押されるまでループ
 	while (msg.message != WM_QUIT) {
