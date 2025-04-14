@@ -20,5 +20,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 	}
 
+	setup->Finalize();	//DirectXの解放
+
 	return 0;
 }

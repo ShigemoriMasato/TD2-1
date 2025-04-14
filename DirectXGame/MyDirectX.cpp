@@ -1,13 +1,12 @@
 #include "MyDirectX.h"
 #include <cassert>
 
-MyDirectX::MyDirectX() : dxLog(std::make_unique<Logger>("DirectX12")) {
+MyDirectX::MyDirectX() : dxLog(std::make_unique<Logger>("DirectX12")), fenceEvent(CreateEvent(NULL, FALSE, FALSE, NULL)) {
     Initialize();
 }
 
 void MyDirectX::Initialize() {
 #ifdef _DEBUG
-    ID3D12Debug1* debugController = nullptr;
     if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
         //デバッグレイヤーを有効化する
         debugController->EnableDebugLayer();
@@ -20,13 +19,12 @@ void MyDirectX::Initialize() {
 
 #ifdef _DEBUG
 
-    ID3D12InfoQueue* infoQueue = nullptr;
     if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
         //やばいエラーの時に止まる
         infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
         //エラーの時に止まる
         infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
-        //警告の時に止まる
+        //警告の時に止まる(これをコメントアウトすると解放していないObjectを特定できる(?))
         infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
 
         //抑制するメッセージのID
@@ -60,6 +58,39 @@ void MyDirectX::ClearWindow(HWND hwnd, uint32_t kClientWidth, uint32_t kClientHe
 	CreateRenderTargetView();	    //レンダーターゲットビューを生成する
 }
 
+void MyDirectX::Finalize() {
+
+	dxLog->Log("Finalize DirectX\n");
+
+    CloseHandle(fenceEvent);
+    fence->Release();
+    rtvDescriptorHeap->Release();
+    swapChainResources[0]->Release();
+    swapChainResources[1]->Release();
+    swapChain->Release();
+    commandList->Release();
+    commandAllocator->Release();
+    commandQueue->Release();
+    device->Release();
+    useAdapter->Release();
+    dxgiFactory->Release();
+#ifdef _DEBUG
+    debugController->Release();
+#endif
+
+    dxLog->Log("Complete Finalize DirectX\n");
+}
+
+void MyDirectX::ReleaseChecker() {
+    IDXGIDebug* debug;
+    if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
+        debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+        debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
+        debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
+        debug->Release();
+    }
+}
+
 
 
 void MyDirectX::CreateD3D12Device() {
@@ -69,8 +100,6 @@ void MyDirectX::CreateD3D12Device() {
     //初期化の根本的な部分でエラーが出た場合はプログラムが間違っているか、
     //どうにもできない場合が多いのでassertにしておく
     assert(SUCCEEDED(hr));
-    //使用するアダプタ用の変数。
-    IDXGIAdapter4* useAdapter = nullptr;
     //一番いいアダプタを頼む
     for (UINT i = 0; dxgiFactory->EnumAdapterByGpuPreference(i,
         DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND; ++i) {
@@ -169,7 +198,6 @@ void MyDirectX::CreateSwapChain(HWND hwnd, uint32_t kClientwidth, uint32_t kClie
 void MyDirectX::CreateDescriptorHeap() {
 
     //ディスクリプタヒープの生成
-    ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
     D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
     rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;	//レンダーターゲットビュー用
     rtvDescriptorHeapDesc.NumDescriptors = 2;	//ダブルバッファ用に2つ。多くてもよい
@@ -204,7 +232,6 @@ void MyDirectX::CreateDescriptorHeap() {
     device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
 
     dxLog->Log("Complete create RenderTargetView\n");
-
 }
 
 void MyDirectX::CreateRenderTargetView() {
@@ -232,11 +259,6 @@ void MyDirectX::CreateRenderTargetView() {
     //指定した色で画面全体をクリアする
     float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f }; //青っぽい色。RGBAの順番
     commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-    //コマンドリストの内容を確定させる。全てのコマンドを積んでからCloseすること
-    hr = commandList->Close();
-    assert(SUCCEEDED(hr));
-
-    dxLog->Log("Complete clear the screen\n");
 
     //画面に描く処理は全て終わり、画面に映すので、状態を遷移
     //今回はRenderTargetからPresentに遷移する
@@ -245,11 +267,40 @@ void MyDirectX::CreateRenderTargetView() {
     //TransitionBarrierを張る
     commandList->ResourceBarrier(1, &barrier);
 
+    //コマンドリストの内容を確定させる。全てのコマンドを積んでからCloseすること
+    hr = commandList->Close();
+    assert(SUCCEEDED(hr));
+
+    dxLog->Log("Complete clear the screen\n");
+
     // GPUにコマンドリストの実行を行わせる
     ID3D12CommandList* commandLists[] = { commandList };
     commandQueue->ExecuteCommandLists(1, commandLists);
     //GPUとOSに画面の交換を行うよう通知する
     swapChain->Present(1, 0);
+
+    //初期値0でフェンスを作る
+    uint64_t fenceValue = 0;
+	hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+    assert(SUCCEEDED(hr));
+
+    //FenceのSignalを待つためのイベントを作成する
+    assert(fenceEvent != nullptr);
+
+    //Fenceの値を更新
+    fenceValue++;
+    //GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
+	commandQueue->Signal(fence, fenceValue);
+
+    //Fenceの値が指定したSignal値にたどり着いてるかを確認する
+    //GetCompletedValueの初期値はFence作成時に渡した初期値
+	if (fence->GetCompletedValue() < fenceValue) {
+		//指定したSignalにたどり着いていないので、たどり着くまで待つようにイベントを設定する
+		fence->SetEventOnCompletion(fenceValue, fenceEvent);
+        //イベントを待つ
+		WaitForSingleObject(fenceEvent, INFINITE);
+	}
+
     //次のフレーム用のコマンドリストを準備
     hr = commandAllocator->Reset();
     assert(SUCCEEDED(hr));

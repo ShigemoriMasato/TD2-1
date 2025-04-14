@@ -61,6 +61,14 @@ void MySetup::Initialize() {
 
 }
 
+void MySetup::Finalize() {
+	masterLog->Log("Start Finalize");
+    dx->Finalize();
+    CloseWindow(hwnd);
+    dx->ReleaseChecker();
+    masterLog->Log("Comlpeted\n");
+}
+
 //==========================================以下private=============================================\\
 
 void MySetup::SamonWindow() {

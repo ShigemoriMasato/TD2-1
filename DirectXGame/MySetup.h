@@ -10,6 +10,8 @@ public:
 
 	void Initialize();
 
+	void Finalize();
+
 private:
 
 	//ウィンドウ作成
