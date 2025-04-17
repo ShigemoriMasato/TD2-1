@@ -1,5 +1,4 @@
 #pragma once
-#include <Windows.h>
 #include "Logger.h"
 #include "MyDirectX.h"
 
