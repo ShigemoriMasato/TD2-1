@@ -1,9 +1,18 @@
-struct PixcelShaderOutput {
-    float4 color : SV_Target0;
+struct Material
+{
+    float4 color;
 };
 
-PixcelShaderOutput main() {
-    PixcelShaderOutput output;
-    output.color = float1x4(1.0f, 1.0f, 1.0f, 1.0f); // White
+ConstantBuffer<Material> gMaterial : register(b0);
+
+struct PixelShaderOutput
+{
+    float4 color : SV_TARGET0;
+};
+
+PixelShaderOutput main()
+{
+    PixelShaderOutput output;
+    output.color = gMaterial.color;
     return output;
 }
