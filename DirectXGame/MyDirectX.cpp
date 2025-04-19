@@ -507,11 +507,11 @@ void MyDirectX::DrawTriangle() {
     //右下
     vertexData[2] = { -0.5f, -0.5f, 0.0f, 1.0f };
 
-    //マテリアルにデータを書き込む
+    //データを書き込む
     Matrix4x4* wvpData = nullptr;
     //書き込むためのアドレスを取得
     wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-    //今回は赤を書き込んでみる
+    //単位行列を書き込む
     *wvpData = MakeIdentity4x4();
 
     //ビューポート
