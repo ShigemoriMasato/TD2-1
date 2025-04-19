@@ -19,6 +19,7 @@
 
 #include "Logger.h"
 #include "Vector4.h"
+#include "Matrix4x4.h"
 
 class MyDirectX {
 public:
@@ -46,9 +47,9 @@ private:
 
 	Logger* logger;
 
-	const int32_t kClientWidth;		//ƒEƒBƒ“ƒhƒE•
-	const int32_t kClientHeight;	//ƒEƒBƒ“ƒhƒE‚‚³
-	float* clearColor;		//window‚ÌF
+	const int32_t kClientWidth;		//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å¹…
+	const int32_t kClientHeight;	//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦é«˜ã•
+	float* clearColor;		//windowã®è‰²
 
 	HWND hwnd;
 
@@ -63,15 +64,16 @@ private:
 	uint64_t fenceValue;
 
 
-	//ƒXƒƒbƒvƒ`ƒF[ƒ“‚Ìİ’è
+	//ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ãƒ¼ãƒ³ã®è¨­å®š
 	IDXGISwapChain4* swapChain = nullptr;
 	ID3D12Resource* swapChainResources[2] = { nullptr, nullptr };
 	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
 	ID3D12Fence* fence = nullptr;
 	HANDLE fenceEvent;
 
-	//OŠpŒ`•`‰æ—p
+	//ä¸‰è§’å½¢æç”»ç”¨
 	ID3D12Resource* vertexResource = nullptr;
+	ID3D12Resource* wvpResource = nullptr;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
 	ID3D10Blob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
