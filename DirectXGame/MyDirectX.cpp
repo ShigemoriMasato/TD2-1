@@ -130,12 +130,12 @@ namespace {
     }
 }
 
-MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) : 
-kClientWidth(kWindowWidth), 
-kClientHeight(kWindowHeight),
-clearColor(new float[4] {0.1f, 0.25f, 0.5f, 1.0f}),
-logger(new Logger("DirectX12")),
-fenceValue(0) {
+MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
+    kClientWidth(kWindowWidth),
+    kClientHeight(kWindowHeight),
+    clearColor(new float[4] {0.1f, 0.25f, 0.5f, 1.0f}),
+    logger(new Logger("DirectX12")),
+    fenceValue(0) {
     resourceStates[swapChainResources[0]] = D3D12_RESOURCE_STATE_PRESENT;
     resourceStates[swapChainResources[1]] = D3D12_RESOURCE_STATE_PRESENT;
 }
@@ -495,7 +495,7 @@ void MyDirectX::ClearScreen() {
 
 }
 
-void MyDirectX::DrawTriangle() {
+void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix) {
     //頂点リソースにデータを書き込む
     Vector4* vertexData = nullptr;
     //書き込むためのアドレスを取得
@@ -512,7 +512,7 @@ void MyDirectX::DrawTriangle() {
     //書き込むためのアドレスを取得
     wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
     //単位行列を書き込む
-    *wvpData = MakeIdentity4x4();
+    *wvpData = wvpMatrix;
 
     //データを書き込む
 	Vector4* materialData = nullptr;

@@ -30,7 +30,7 @@ public:
 
 	void ClearScreen();
 
-	void DrawTriangle();
+	void DrawTriangle(Matrix4x4 wvpMatrix);
 
 	void EndFrame();
 
