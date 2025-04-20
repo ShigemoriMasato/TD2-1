@@ -3,6 +3,11 @@
 namespace {
     //ウィンドウプロシージャ
     LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+		//imguiのウィンドウプロシージャを呼ぶ
+        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
+			return true;
+		}
+        
         //メッセージに応じてゲーム固有の処理を行う
         switch (msg) {
         case WM_DESTROY:
@@ -128,6 +133,18 @@ namespace {
 
         return bufferResource;
     }
+
+	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, UINT numDescriptors, bool shaderVisible) {
+		//ディスクリプタヒープの設定
+		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
+		descriptorHeapDesc.Type = type;	//ディスクリプタの種類
+		descriptorHeapDesc.NumDescriptors = numDescriptors;	//ディスクリプタの数
+		descriptorHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;	//シェーダーからアクセスできるようにする
+		ID3D12DescriptorHeap* descriptorHeap = nullptr;
+		HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+		assert(SUCCEEDED(hr));
+		return descriptorHeap;
+	}
 }
 
 MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
@@ -148,6 +165,12 @@ MyDirectX::~MyDirectX() {
 void MyDirectX::Initialize() {
     CreateWindowForApp();
 	InitDirectX();
+	InitImGui();
+}
+
+void MyDirectX::BeginFrame() {
+    BeginImGui();
+    ClearScreen();
 }
 
 void MyDirectX::CreateWindowForApp() {
@@ -330,11 +353,7 @@ void MyDirectX::InitDirectX() {
 
 
     //ディスクリプタヒープの生成
-    D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
-    rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;	//レンダーターゲットビュー用
-    rtvDescriptorHeapDesc.NumDescriptors = 2;	//ダブルバッファ用に2つ。多くてもよい
-    rtvDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;	//特にフラグはなし
-    hr = device->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap));
+	rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
     //ディスクリプタヒープの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
@@ -479,6 +498,23 @@ void MyDirectX::InitDirectX() {
     vertexResource = CreateBufferResource(device, sizeof(Vector4) * 3);
 
 	wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
+
+
+	srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+}
+
+void MyDirectX::InitImGui() {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_Init(hwnd);
+    ImGui_ImplDX12_Init(device,
+        2,                                              //swapchainのバッファ数
+		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,                //色の形式
+        srvDescriptorHeap,
+        srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+        srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart()
+        );
 }
 
 
@@ -493,9 +529,17 @@ void MyDirectX::ClearScreen() {
     //指定した色で画面全体をクリアする
     commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
+    ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
+    commandList->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
-void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix) {
+void MyDirectX::BeginImGui() {
+    ImGui_ImplDX12_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+}
+
+void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color) {
     //頂点リソースにデータを書き込む
     Vector4* vertexData = nullptr;
     //書き込むためのアドレスを取得
@@ -519,7 +563,7 @@ void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix) {
 	//書き込むためのアドレスを取得
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
     //赤
-	*materialData = { 1.0f, 0.0f, 0.0f, 1.0f };
+    *materialData = color;
 
     //ビューポート
     D3D12_VIEWPORT viewport{};
@@ -562,10 +606,13 @@ void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix) {
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
     commandList->DrawInstanced(3, 1, 0, 0);
-
 }
 
 void MyDirectX::EndFrame() {
+
+    ImGui::Render();
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
+
 	InsertBarrier(commandList, D3D12_RESOURCE_STATE_PRESENT, swapChainResources[swapChain->GetCurrentBackBufferIndex()]);
 
     HRESULT hr = commandList->Close();
@@ -597,6 +644,7 @@ void MyDirectX::EndFrame() {
 }
 
 void MyDirectX::Finalize() {
+    srvDescriptorHeap->Release();
     vertexResource->Release();
 	wvpResource->Release();
     graphicsPipelineState->Release();
@@ -624,6 +672,10 @@ void MyDirectX::Finalize() {
     debugController->Release();
 #endif
     CloseWindow(hwnd);
+
+    ImGui_ImplDX12_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
 
     IDXGIDebug* debug;
     if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {

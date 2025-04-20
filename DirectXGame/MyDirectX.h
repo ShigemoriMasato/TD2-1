@@ -10,6 +10,9 @@
 #include <memory>
 #include <dxcapi.h>
 #include <unordered_map>
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+#include "externals/imgui/imgui_impl_win32.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -21,6 +24,8 @@
 #include "Vector4.h"
 #include "Matrix4x4.h"
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 class MyDirectX {
 public:
 	MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight);
@@ -28,9 +33,9 @@ public:
 
 	void Initialize();
 
-	void ClearScreen();
+	void BeginFrame();
 
-	void DrawTriangle(Matrix4x4 wvpMatrix);
+	void DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color);
 
 	void EndFrame();
 
@@ -38,9 +43,15 @@ public:
 
 private:
 
+	void ClearScreen();
+
+	void BeginImGui();
+
 	void CreateWindowForApp();
 
 	void InitDirectX();
+
+	void InitImGui();
 
 	void InsertBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESOURCE_STATES stateAfter, ID3D12Resource* pResource,
 		D3D12_RESOURCE_BARRIER_TYPE type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION, D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE);
@@ -81,6 +92,9 @@ private:
 	IDxcBlob* pixelShaderBlob = nullptr;
 	IDxcBlob* vertexShaderBlob = nullptr;
 	ID3D12Resource* materialResource = nullptr;
+
+	//imgui用
+	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
 
 	ID3D12Resource* backBuffers[2] = { nullptr, nullptr };
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
