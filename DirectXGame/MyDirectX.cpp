@@ -111,7 +111,7 @@ namespace {
         D3D12_RESOURCE_DESC bufferResourceDesc{};
         //バッファリソース、テクスチャの場合はまた別の設定をする
         bufferResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-        bufferResourceDesc.Width = sizeof(Vector4) * 3;//リソースのサイズ。今回はVector4を3頂点文
+        bufferResourceDesc.Width = sizeInBytes;
         //バッファの場合はこれにする決まり
         bufferResourceDesc.Height = 1;
         bufferResourceDesc.DepthOrArraySize = 1;
@@ -514,6 +514,13 @@ void MyDirectX::DrawTriangle() {
     //単位行列を書き込む
     *wvpData = MakeIdentity4x4();
 
+    //データを書き込む
+	Vector4* materialData = nullptr;
+	//書き込むためのアドレスを取得
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+    //赤
+	*materialData = { 1.0f, 0.0f, 0.0f, 1.0f };
+
     //ビューポート
     D3D12_VIEWPORT viewport{};
     //クライアント領域のサイズと一緒にして画面全体に表示
@@ -550,10 +557,10 @@ void MyDirectX::DrawTriangle() {
     //マテリアルCBufferの場所を設定
     commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
     //wvp用のCBufferの場所を設定
-	commandList->SetGraphicsRootShaderResourceView(1, wvpResource->GetGPUVirtualAddress());
+	commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
     //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インすっタンスについては今後
+    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
     commandList->DrawInstanced(3, 1, 0, 0);
 
 }
@@ -587,11 +594,11 @@ void MyDirectX::EndFrame() {
 
     commandAllocator->Reset();
     commandList->Reset(commandAllocator, nullptr);
-
 }
 
 void MyDirectX::Finalize() {
     vertexResource->Release();
+	wvpResource->Release();
     graphicsPipelineState->Release();
     signatureBlob->Release();
     if (errorBlob) {
