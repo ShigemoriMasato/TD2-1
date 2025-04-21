@@ -43,7 +43,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Matrix4x4 wvpMatrix;
 	float imguiBuffer[3];
 	float imguiBuffer2[4];
-	Vector4 triangleColor = { 1.0f, 0.0f, 0.0f, 1.0f };
+	Vector4 triangleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	MSG msg{};
 
@@ -57,6 +57,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//ゲームの更新処理
 			myDirectX->BeginFrame();
 
+			//windowの大きさ(てきとうに)
 			ImGui::SetNextWindowSize(ImVec2(300, 400));
 			ImGui::Begin("Triangle");
 

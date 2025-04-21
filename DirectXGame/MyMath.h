@@ -1,4 +1,5 @@
 #pragma once
+#include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Matrix4x4.h"
@@ -7,7 +8,16 @@ struct Transform final {
 	Vector3 scale;
 	Vector3 rotation;
 	Vector3 position;
-};;
+};
+
+struct VertexData final {
+	Vector4 position;
+	Vector2 texcoord;
+};
+
+struct VertexMatrix final {
+	float m[4][4];
+};
 
 Matrix4x4 MakeTransformMatrix(const Transform& transform);
 

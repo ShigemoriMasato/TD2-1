@@ -23,6 +23,7 @@
 #include "Logger.h"
 #include "Vector4.h"
 #include "Matrix4x4.h"
+#include "MyMath.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -85,13 +86,15 @@ private:
 	//三角形描画用
 	ID3D12Resource* vertexResource = nullptr;
 	ID3D12Resource* wvpResource = nullptr;
+	ID3D12Resource* materialResource = nullptr;
+	ID3D12Resource* textureResource = nullptr;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
 	ID3D10Blob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
 	ID3D12RootSignature* rootSignature = nullptr;
 	IDxcBlob* pixelShaderBlob = nullptr;
 	IDxcBlob* vertexShaderBlob = nullptr;
-	ID3D12Resource* materialResource = nullptr;
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
 
 	//imgui用
 	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
