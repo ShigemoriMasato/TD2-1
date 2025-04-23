@@ -1,5 +1,4 @@
 #include "MyDirectX.h"
-#include "externals/DirectXTex/DirectXTex.h"
 
 namespace {
     //ウィンドウプロシージャ
@@ -177,7 +176,7 @@ namespace {
 		D3D12_HEAP_PROPERTIES heapProperties{};
 		heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;
         heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
-        heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+		heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
 
         //Resourceの生成
         ID3D12Resource* resource = nullptr;
@@ -189,24 +188,57 @@ namespace {
 		return resource;
     }
 
-    void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages) {
-        //Meta情報の取得
-		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-        //全MipMapについて
-        for (size_t miplevel = 0; miplevel < metadata.mipLevels; ++miplevel) {
-            //MipMapLevelを指定して各Imageを取得
-			const DirectX::Image* img = mipImages.GetImage(miplevel, 0, 0);
+    ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
+        //生成するResourceの設定
+        D3D12_RESOURCE_DESC resourceDesc{};
+		resourceDesc.Width = width;
+		resourceDesc.Height = height;
+		resourceDesc.MipLevels = 1;
+		resourceDesc.DepthOrArraySize = 1;
+		resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		resourceDesc.SampleDesc.Count = 1;
+		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+		
+        //利用するヒープの設定
+		D3D12_HEAP_PROPERTIES heapProperties{};
+		heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+        //深度値のクリア設定
+		D3D12_CLEAR_VALUE depthClearValue{};
+		depthClearValue.DepthStencil.Depth = 1.0f;
+        depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+        //Resourceの生成
+        ID3D12Resource* resource = nullptr;
+        HRESULT hr = device->CreateCommittedResource(
+            &heapProperties,
+            D3D12_HEAP_FLAG_NONE,
+            &resourceDesc,
+			D3D12_RESOURCE_STATE_DEPTH_WRITE,
+			&depthClearValue,
+			IID_PPV_ARGS(&resource));
+		assert(SUCCEEDED(hr));
+        
+        return resource;
+    }
+
+    void UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Device* device, ID3D12GraphicsCommandList* commandList) {
+        const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+        for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; ++mipLevel) {
+            const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
             //Textureに転送
             HRESULT hr = texture->WriteToSubresource(
-				UINT(miplevel),
+                UINT(mipLevel),
                 nullptr,            //全領域へコピー
                 img->pixels,        //元データアドレス
                 UINT(img->rowPitch),      //1ラインサイズ
                 UINT(img->slicePitch)     //1枚サイズ
             );
-			assert(SUCCEEDED(hr));
+            assert(SUCCEEDED(hr));
         }
     }
+
 }
 
 MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
@@ -225,7 +257,9 @@ MyDirectX::~MyDirectX() {
 }
 
 void MyDirectX::Initialize() {
-    CoInitializeEx(0, COINIT_MULTITHREADED);
+    HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+	assert(SUCCEEDED(hr));
+
     CreateWindowForApp();
 	InitDirectX();
 	InitImGui();
@@ -270,7 +304,7 @@ void MyDirectX::CreateWindowForApp() {
         wc.hInstance,				//インスタンスハンドル
         nullptr);					//オプション
 
-    ShowWindow(hwnd, SW_SHOW);	//ウィンドウを表示する
+    ShowWindow(hwnd, SW_SHOW);	    //ウィンドウを表示する
 }
 
 void MyDirectX::InitDirectX() {
@@ -583,13 +617,16 @@ void MyDirectX::InitDirectX() {
     assert(SUCCEEDED(hr));
 
     //実際に頂点リソースを作る
-    vertexResource = CreateBufferResource(device, sizeof(VertexData) * 3);
+    vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
+    vertexResource->SetName(L"VertexResource");
 
     //wvpMatrixのリソース作成
 	wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
+	wvpResource->SetName(L"WVPResource");
 
     //マテリアル用のリソースを作る。今回はcolor一つ分のサイズを用意する
     materialResource = CreateBufferResource(device, sizeof(Vector4));
+	materialResource->SetName(L"MaterialResource");
 
 	//SRV用のヒープを作成する
     srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
@@ -598,7 +635,7 @@ void MyDirectX::InitDirectX() {
 	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	textureResource = CreateTextureResource(device, metadata);
-	UploadTextureData(textureResource, mipImages);
+	UploadTextureData(textureResource, mipImages, device, commandList);
 
     //metaDataを基にSRVの設定
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -663,11 +700,20 @@ void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color) {
     vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
 	vertexData[0].texcoord = { 0.0f, 1.0f };
     //上
-    vertexData[1] = { 0.0f, 0.5f, 0.0f, 1.0f };
+    vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
 	vertexData[1].texcoord = { 0.5f, 0.0f };
     //右下
-    vertexData[2] = { 0.5f, -0.5f, 0.0f, 1.0f };
+    vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
     vertexData[2].texcoord = { 1.0f, 1.0f };
+
+    vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
+	vertexData[3].texcoord = { 0.0f, 1.0f };
+
+	vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+	vertexData[4].texcoord = { 0.5f, 0.0f };
+
+	vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
+	vertexData[5].texcoord = { 1.0f, 1.0f };
 
     //データを書き込む
     Matrix4x4* wvpData = nullptr;
@@ -698,7 +744,7 @@ void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color) {
     //リソースの先頭のアドレスから使う
     vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
     //使用するリソースのサイズは頂点3つ分のサイズ
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
     //1頂点当たりのサイズ
     vertexBufferView.StrideInBytes = sizeof(VertexData);
 
@@ -726,7 +772,7 @@ void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color) {
     //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-    commandList->DrawInstanced(3, 1, 0, 0);
+    commandList->DrawInstanced(6, 1, 0, 0);
 }
 
 void MyDirectX::EndFrame() {
@@ -813,10 +859,6 @@ void MyDirectX::Finalize() {
 
 void MyDirectX::InsertBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESOURCE_STATES stateAfter, ID3D12Resource* pResource,
     D3D12_RESOURCE_BARRIER_TYPE type, D3D12_RESOURCE_BARRIER_FLAGS flags) {
-    // 初期化されていなければ Present で初期化
-    if (resourceStates.find(pResource) == resourceStates.end()) {
-        resourceStates[pResource] = D3D12_RESOURCE_STATE_PRESENT;
-    }
 
     D3D12_RESOURCE_STATES stateBefore = resourceStates[pResource];
 
@@ -826,8 +868,7 @@ void MyDirectX::InsertBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESO
     barrier.Transition.pResource = pResource;
     barrier.Transition.StateBefore = stateBefore;
     barrier.Transition.StateAfter = stateAfter;
-    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
+    
     commandList->ResourceBarrier(1, &barrier);
 
     // 状態を更新

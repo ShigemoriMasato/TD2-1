@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <cstdint>
 #include <cassert>
+#include <vector>
 #include <strsafe.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -13,6 +14,8 @@
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
+#include "externals/DirectXTex/d3dx12.h"
+#include "externals/DirectXTex/DirectXTex.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -95,11 +98,11 @@ private:
 	IDxcBlob* pixelShaderBlob = nullptr;
 	IDxcBlob* vertexShaderBlob = nullptr;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
+	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 
 	//imgui用
 	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
 
-	ID3D12Resource* backBuffers[2] = { nullptr, nullptr };
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 
 	std::unordered_map<ID3D12Resource*, D3D12_RESOURCE_STATES> resourceStates;

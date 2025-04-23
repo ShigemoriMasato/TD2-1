@@ -57,6 +57,11 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//ゲームの更新処理
 			myDirectX->BeginFrame();
 
+			transform.rotation.y += 0.01f;
+			if (transform.rotation.y > 3.14) {
+				transform.rotation.y -= 6.28f;
+			}
+
 			//windowの大きさ(てきとうに)
 			ImGui::SetNextWindowSize(ImVec2(300, 400));
 			ImGui::Begin("Triangle");
