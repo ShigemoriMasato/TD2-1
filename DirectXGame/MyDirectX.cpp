@@ -3,11 +3,11 @@
 namespace {
     //ウィンドウプロシージャ
     LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-		//imguiのウィンドウプロシージャを呼ぶ
+        //imguiのウィンドウプロシージャを呼ぶ
         if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
-			return true;
-		}
-        
+            return true;
+        }
+
         //メッセージに応じてゲーム固有の処理を行う
         switch (msg) {
         case WM_DESTROY:
@@ -134,77 +134,77 @@ namespace {
         return bufferResource;
     }
 
-	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, UINT numDescriptors, bool shaderVisible) {
-		//ディスクリプタヒープの設定
-		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
-		descriptorHeapDesc.Type = type;	//ディスクリプタの種類
-		descriptorHeapDesc.NumDescriptors = numDescriptors;	//ディスクリプタの数
-		descriptorHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;	//シェーダーからアクセスできるようにする
-		ID3D12DescriptorHeap* descriptorHeap = nullptr;
-		HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
-		assert(SUCCEEDED(hr));
-		return descriptorHeap;
-	}
+    ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE type, UINT numDescriptors, bool shaderVisible) {
+        //ディスクリプタヒープの設定
+        D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
+        descriptorHeapDesc.Type = type;	//ディスクリプタの種類
+        descriptorHeapDesc.NumDescriptors = numDescriptors;	//ディスクリプタの数
+        descriptorHeapDesc.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;	//シェーダーからアクセスできるようにする
+        ID3D12DescriptorHeap* descriptorHeap = nullptr;
+        HRESULT hr = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(&descriptorHeap));
+        assert(SUCCEEDED(hr));
+        return descriptorHeap;
+    }
 
     DirectX::ScratchImage LoadTexture(const std::string& filePath) {
         //テクスチャファイルを読んでプログラムで扱えるようにする
         DirectX::ScratchImage image{};
-		std::wstring filePathW = ConvertString(filePath);
-		HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
-		assert(SUCCEEDED(hr));
+        std::wstring filePathW = ConvertString(filePath);
+        HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+        assert(SUCCEEDED(hr));
 
         //ミニマップの作製
         DirectX::ScratchImage mipImages{};
         hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
-		assert(SUCCEEDED(hr));
+        assert(SUCCEEDED(hr));
 
         return mipImages;
     }
 
     ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata) {
         //metadataを基にResourceの設定
-		D3D12_RESOURCE_DESC resourceDesc{};
-		resourceDesc.Width = UINT(metadata.width);
-		resourceDesc.Height = UINT(metadata.height);
+        D3D12_RESOURCE_DESC resourceDesc{};
+        resourceDesc.Width = UINT(metadata.width);
+        resourceDesc.Height = UINT(metadata.height);
         resourceDesc.MipLevels = UINT16(metadata.mipLevels);
-		resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
-		resourceDesc.Format = metadata.format;
-		resourceDesc.SampleDesc.Count = 1;
-		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
+        resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
+        resourceDesc.Format = metadata.format;
+        resourceDesc.SampleDesc.Count = 1;
+        resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
 
         //利用するHeapの設定。非常に特殊な運用。02-04exで一般的なケース版がある。
-		D3D12_HEAP_PROPERTIES heapProperties{};
-		heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+        D3D12_HEAP_PROPERTIES heapProperties{};
+        heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 
         //Resourceの生成
         ID3D12Resource* resource = nullptr;
         HRESULT hr = device->CreateCommittedResource(
-			&heapProperties, D3D12_HEAP_FLAG_NONE,
-			&resourceDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
-			IID_PPV_ARGS(&resource));
+            &heapProperties, D3D12_HEAP_FLAG_NONE,
+            &resourceDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
+            IID_PPV_ARGS(&resource));
         assert(SUCCEEDED(hr));
-		return resource;
+        return resource;
     }
 
     ID3D12Resource* CreateDepthStencilTextureResource(ID3D12Device* device, int32_t width, int32_t height) {
         //生成するResourceの設定
         D3D12_RESOURCE_DESC resourceDesc{};
-		resourceDesc.Width = width;
-		resourceDesc.Height = height;
-		resourceDesc.MipLevels = 1;
-		resourceDesc.DepthOrArraySize = 1;
-		resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		resourceDesc.SampleDesc.Count = 1;
-		resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-		
+        resourceDesc.Width = width;
+        resourceDesc.Height = height;
+        resourceDesc.MipLevels = 1;
+        resourceDesc.DepthOrArraySize = 1;
+        resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        resourceDesc.SampleDesc.Count = 1;
+        resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
         //利用するヒープの設定
-		D3D12_HEAP_PROPERTIES heapProperties{};
-		heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+        D3D12_HEAP_PROPERTIES heapProperties{};
+        heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 
         //深度値のクリア設定
-		D3D12_CLEAR_VALUE depthClearValue{};
-		depthClearValue.DepthStencil.Depth = 1.0f;
+        D3D12_CLEAR_VALUE depthClearValue{};
+        depthClearValue.DepthStencil.Depth = 1.0f;
         depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
         //Resourceの生成
@@ -213,28 +213,28 @@ namespace {
             &heapProperties,
             D3D12_HEAP_FLAG_NONE,
             &resourceDesc,
-			D3D12_RESOURCE_STATE_DEPTH_WRITE,
-			&depthClearValue,
-			IID_PPV_ARGS(&resource));
-		assert(SUCCEEDED(hr));
-        
+            D3D12_RESOURCE_STATE_DEPTH_WRITE,
+            &depthClearValue,
+            IID_PPV_ARGS(&resource));
+        assert(SUCCEEDED(hr));
+
         return resource;
     }
 
     [[nodiscard]]
     ID3D12Resource* UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, ID3D12Device* device, ID3D12GraphicsCommandList* commandList) {
         std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-		DirectX::PrepareUpload(device, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
+        DirectX::PrepareUpload(device, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
         uint64_t intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresources.size()));
         ID3D12Resource* intermediateResource = CreateBufferResource(device, intermediateSize);
         UpdateSubresources(commandList, texture, intermediateResource, 0, 0, UINT(subresources.size()), subresources.data());
 
         D3D12_RESOURCE_BARRIER barrier{};
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		barrier.Transition.pResource = texture;
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier.Transition.pResource = texture;
+        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+        barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
         barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
         commandList->ResourceBarrier(1, &barrier);
         return intermediateResource;
@@ -254,16 +254,16 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
 
 MyDirectX::~MyDirectX() {
     delete logger;
-	delete[] clearColor;
+    delete[] clearColor;
 }
 
 void MyDirectX::Initialize() {
     HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
-	assert(SUCCEEDED(hr));
+    assert(SUCCEEDED(hr));
 
     CreateWindowForApp();
-	InitDirectX();
-	InitImGui();
+    InitDirectX();
+    InitImGui();
 }
 
 void MyDirectX::BeginFrame() {
@@ -451,7 +451,7 @@ void MyDirectX::InitDirectX() {
 
 
     //ディスクリプタヒープの生成
-	rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+    rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
     //ディスクリプタヒープの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
@@ -490,7 +490,7 @@ void MyDirectX::InitDirectX() {
     fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
     assert(fenceEvent != nullptr);
 
-	//=======================================================
+    //=======================================================
 
     //dxcCompilerを初期化
     IDxcUtils* dxcUtils = nullptr;
@@ -521,27 +521,27 @@ void MyDirectX::InitDirectX() {
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     //PixelShaderで使う
     rootParameters[0].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
-	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;     //VertexShaderで使う
-	rootParameters[1].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
+    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
+    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;     //VertexShaderで使う
+    rootParameters[1].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
     rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
     rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
     rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;	//テーブルの中身
     rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);	//テーブルの数
     descriptionRootSignature.pParameters = rootParameters;                  //ルートパラメータ配列へのポインタ
     descriptionRootSignature.NumParameters = _countof(rootParameters);      //配列の長さ
-	
-	D3D12_STATIC_SAMPLER_DESC staticSampler[1] = {};
-	staticSampler[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;	//フィルタリングの方法
-	staticSampler[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-	staticSampler[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-	staticSampler[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-	staticSampler[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;	//比較しない
+
+    D3D12_STATIC_SAMPLER_DESC staticSampler[1] = {};
+    staticSampler[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;	//フィルタリングの方法
+    staticSampler[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
+    staticSampler[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
+    staticSampler[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
+    staticSampler[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;	//比較しない
     staticSampler[0].MaxLOD = D3D12_FLOAT32_MAX;    //ありったけのMipmapを使う
-	staticSampler[0].ShaderRegister = 0;    //レジスタ番号0
-	staticSampler[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;    //PixelShaderで使う
-	descriptionRootSignature.pStaticSamplers = staticSampler;              //StaticSamplerの配列へのポインタ
-	descriptionRootSignature.NumStaticSamplers = _countof(staticSampler);   //配列の長さ
+    staticSampler[0].ShaderRegister = 0;    //レジスタ番号0
+    staticSampler[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;    //PixelShaderで使う
+    descriptionRootSignature.pStaticSamplers = staticSampler;              //StaticSamplerの配列へのポインタ
+    descriptionRootSignature.NumStaticSamplers = _countof(staticSampler);   //配列の長さ
 
     //シリアライズしてバイナリにする
     hr = D3D12SerializeRootSignature(&descriptionRootSignature,
@@ -562,10 +562,10 @@ void MyDirectX::InitDirectX() {
     inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
     inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
-	inputElementDescs[1].SemanticName = "TEXCOORD";
-	inputElementDescs[1].SemanticIndex = 0;
-	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+    inputElementDescs[1].SemanticName = "TEXCOORD";
+    inputElementDescs[1].SemanticIndex = 0;
+    inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+    inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
     D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
     inputLayoutDesc.pInputElementDescs = inputElementDescs;
@@ -594,6 +594,24 @@ void MyDirectX::InitDirectX() {
     assert(pixelShaderBlob != nullptr);
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
+
+    dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+    dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+
+    depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+
+    device->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+    depthStencilDesc.DepthEnable = true;	//深度バッファを使う
+    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;	//全ての深度値を使う
+    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;	//深度値の比較方法
+
+    graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
+    graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
     graphicsPipelineStateDesc.pRootSignature = rootSignature;
     graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
     graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),
@@ -622,74 +640,79 @@ void MyDirectX::InitDirectX() {
     vertexResource->SetName(L"VertexResource");
 
     //wvpMatrixのリソース作成
-	wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
-	wvpResource->SetName(L"WVPResource");
+    wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
+    wvpResource->SetName(L"WVPResource");
 
     //マテリアル用のリソースを作る。今回はcolor一つ分のサイズを用意する
     materialResource = CreateBufferResource(device, sizeof(Vector4));
-	materialResource->SetName(L"MaterialResource");
+    materialResource->SetName(L"MaterialResource");
 
-	//SRV用のヒープを作成する
+    //SRV用のヒープを作成する
     srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
-	//Textureのリソースを作りたかった
-	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	textureResource = CreateTextureResource(device, metadata);
-	intermediateResource = UploadTextureData(textureResource, mipImages, device, commandList);
+    //Textureのリソースを作りたかった
+    DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
+    const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+    textureResource = CreateTextureResource(device, metadata);
+    intermediateResource = UploadTextureData(textureResource, mipImages, device, commandList);
 
     //metaDataを基にSRVの設定
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
+    srvDesc.Format = metadata.format;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
     //SRVを作成するDescriptorHeapの場所を決める
     D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+    textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
     //先頭はImGuiが使っているのでその次を使う
     textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	//SRVを作成する
+    //SRVを作成する
     device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
 }
 
 void MyDirectX::InitImGui() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(hwnd);
+    ImGui::StyleColorsDark();
+    ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX12_Init(device,
         2,                                              //swapchainのバッファ数
-		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,                //色の形式
+        DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,                //色の形式
         srvDescriptorHeap,
         srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
         srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart()
-        );
+    );
 }
 
 
 void MyDirectX::ClearScreen() {
     //これから書き込むバックバッファのインデックスを取得
     UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
 
-	InsertBarrier(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET, swapChainResources[backBufferIndex]);
+    //barrierをRenderTargetにする
+    InsertBarrier(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET, swapChainResources[backBufferIndex]);
+
+    ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
+    commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
     //描画先のRTVを設定する
     commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
     //指定した色で画面全体をクリアする
     commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
-    ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
-    commandList->SetDescriptorHeaps(1, descriptorHeaps);
+    commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 void MyDirectX::BeginImGui() {
     ImGui_ImplDX12_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
 }
 
 void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color) {
@@ -699,37 +722,55 @@ void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color) {
     vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
     //左下
     vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
-	vertexData[0].texcoord = { 0.0f, 1.0f };
+    vertexData[0].texcoord = { 0.0f, 1.0f };
     //上
     vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
-	vertexData[1].texcoord = { 0.5f, 0.0f };
+    vertexData[1].texcoord = { 0.5f, 0.0f };
     //右下
     vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
     vertexData[2].texcoord = { 1.0f, 1.0f };
 
+    ++drawTriangleCount;
+
     vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
-	vertexData[3].texcoord = { 0.0f, 1.0f };
+    vertexData[3].texcoord = { 0.0f, 1.0f };
 
-	vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
-	vertexData[4].texcoord = { 0.5f, 0.0f };
+    vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+    vertexData[4].texcoord = { 0.5f, 0.0f };
 
-	vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
-	vertexData[5].texcoord = { 1.0f, 1.0f };
+    vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
+    vertexData[5].texcoord = { 1.0f, 1.0f };
+
+    ++drawTriangleCount;
 
     //データを書き込む
     Matrix4x4* wvpData = nullptr;
     //書き込むためのアドレスを取得
     wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-    //単位行列を書き込む
+    //wvp行列を書き込む
     *wvpData = wvpMatrix;
 
     //データを書き込む
-	Vector4* materialData = nullptr;
-	//書き込むためのアドレスを取得
-	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-    //赤
+    Vector4* materialData = nullptr;
+    //書き込むためのアドレスを取得
+    materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+    //色指定
     *materialData = color;
+}
 
+void MyDirectX::EndFrame() {
+
+    UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+    //頂点のバッファビューを作成する
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+    //リソースの先頭のアドレスから使う
+    vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+    //使用するリソースのサイズは頂点3つ分のサイズ
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * drawTriangleCount * 3;
+    //1頂点当たりのサイズ
+    vertexBufferView.StrideInBytes = sizeof(VertexData);
+    
     //ビューポート
     D3D12_VIEWPORT viewport{};
     //クライアント領域のサイズと一緒にして画面全体に表示
@@ -740,15 +781,6 @@ void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color) {
     viewport.MinDepth = 0.0f;
     viewport.MaxDepth = 1.0f;
 
-    //頂点のバッファビューを作成する
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-    //リソースの先頭のアドレスから使う
-    vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-    //使用するリソースのサイズは頂点3つ分のサイズ
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
-    //1頂点当たりのサイズ
-    vertexBufferView.StrideInBytes = sizeof(VertexData);
-
     //シザー矩形
     D3D12_RECT scissorRect{};
     //基本的にビューポートと同じく刑が構成されるようにする
@@ -756,35 +788,32 @@ void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color) {
     scissorRect.right = kClientWidth;
     scissorRect.top = 0;
     scissorRect.bottom = kClientHeight;
-
+    
     commandList->RSSetViewports(1, &viewport);
     commandList->RSSetScissorRects(1, &scissorRect);
     //RootSignatureを設定、PSOに設定しているけど別途設定が必要
-    commandList->SetGraphicsRootSignature(rootSignature);
     commandList->SetPipelineState(graphicsPipelineState);
+    commandList->SetGraphicsRootSignature(rootSignature);
 
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
     //マテリアルCBufferの場所を設定
     commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
     //wvp用のCBufferの場所を設定
-	commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
     //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
     commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
     //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-    commandList->DrawInstanced(6, 1, 0, 0);
-}
-
-void MyDirectX::EndFrame() {
+    commandList->DrawInstanced(drawTriangleCount * 3, 1, 0, 0);
 
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 
-	InsertBarrier(commandList, D3D12_RESOURCE_STATE_PRESENT, swapChainResources[swapChain->GetCurrentBackBufferIndex()]);
+    InsertBarrier(commandList, D3D12_RESOURCE_STATE_PRESENT, swapChainResources[backBufferIndex]);
 
     HRESULT hr = commandList->Close();
-	assert(SUCCEEDED(hr));
+    assert(SUCCEEDED(hr));
 
 
     // GPUにコマンドリストの実行を行わせる
@@ -807,17 +836,20 @@ void MyDirectX::EndFrame() {
         WaitForSingleObject(fenceEvent, INFINITE);
     }
 
+    drawTriangleCount = 0;
     //次のフレームのためのcommandReset
     commandAllocator->Reset();
     commandList->Reset(commandAllocator, nullptr);
 }
 
 void MyDirectX::Finalize() {
-    srvDescriptorHeap->Release();
+    dsvDescriptorHeap->Release();
+    depthStencilResource->Release();
+    intermediateResource->Release();
     vertexResource->Release();
-	wvpResource->Release();
+    wvpResource->Release();
     materialResource->Release();
-	textureResource->Release();
+    textureResource->Release();
     graphicsPipelineState->Release();
     signatureBlob->Release();
     if (errorBlob) {
@@ -828,6 +860,7 @@ void MyDirectX::Finalize() {
     vertexShaderBlob->Release();
     CloseHandle(fenceEvent);
     fence->Release();
+    srvDescriptorHeap->Release();
     rtvDescriptorHeap->Release();
     swapChainResources[0]->Release();
     swapChainResources[1]->Release();
@@ -869,7 +902,7 @@ void MyDirectX::InsertBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESO
     barrier.Transition.pResource = pResource;
     barrier.Transition.StateBefore = stateBefore;
     barrier.Transition.StateAfter = stateAfter;
-    
+
     commandList->ResourceBarrier(1, &barrier);
 
     // 状態を更新

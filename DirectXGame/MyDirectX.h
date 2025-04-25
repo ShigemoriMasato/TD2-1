@@ -87,6 +87,8 @@ private:
 	HANDLE fenceEvent;
 
 	//三角形描画用
+	ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
+	ID3D12Resource* depthStencilResource = nullptr;
 	ID3D12Resource* vertexResource = nullptr;
 	ID3D12Resource* wvpResource = nullptr;
 	ID3D12Resource* materialResource = nullptr;
@@ -100,6 +102,8 @@ private:
 	IDxcBlob* vertexShaderBlob = nullptr;
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+
+	uint32_t drawTriangleCount = 0;
 
 	//imgui用
 	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
