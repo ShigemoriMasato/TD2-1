@@ -235,6 +235,7 @@ namespace {
 		barrier.Transition.pResource = texture;
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
         commandList->ResourceBarrier(1, &barrier);
         return intermediateResource;
     }
@@ -631,15 +632,11 @@ void MyDirectX::InitDirectX() {
 	//SRV用のヒープを作成する
     srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
-    //==============================================
-    //==============================================
-	//>>>>Textureのリソースを作りたかった<<<
-    //==============================================
-    //==============================================
+	//Textureのリソースを作りたかった
 	DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	textureResource = CreateTextureResource(device, metadata);
-	ID3D12Resource* intermediateResource = UploadTextureData(textureResource, mipImages, device, commandList);
+	intermediateResource = UploadTextureData(textureResource, mipImages, device, commandList);
 
     //metaDataを基にSRVの設定
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};

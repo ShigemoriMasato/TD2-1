@@ -91,6 +91,7 @@ private:
 	ID3D12Resource* wvpResource = nullptr;
 	ID3D12Resource* materialResource = nullptr;
 	ID3D12Resource* textureResource = nullptr;
+	ID3D12Resource* intermediateResource = nullptr;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
 	ID3D10Blob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
