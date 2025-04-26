@@ -39,7 +39,9 @@ public:
 
 	void BeginFrame();
 
-	void DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color);
+	void DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 wvpMatrix, Vector4 color);
+
+	void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpMatrix, Vector4 color);
 
 	void EndFrame();
 
@@ -103,7 +105,20 @@ private:
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 
+	const UINT alignedSize;
+
 	uint32_t drawTriangleCount = 0;
+	VertexData* vertexData = nullptr;
+	Matrix4x4* wvpData = nullptr;
+	Vector4* materialData = nullptr;
+
+	//sprite
+	ID3D12Resource* vertexResourceSprite = nullptr;
+	ID3D12Resource* transformationMatrixResourceSprite = nullptr;	//スプライト用の頂点バッファ
+
+	uint32_t drawSpriteCount = 0;
+	VertexData* vertexDataSprite = nullptr;
+	Matrix4x4* transformationMatrixDataSprite = nullptr;
 
 	//imgui用
 	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
