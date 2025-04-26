@@ -39,7 +39,7 @@ public:
 
 	void BeginFrame();
 
-	void DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color);
+	void DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 wvpMatrix, Vector4 color);
 
 	void EndFrame();
 
@@ -87,23 +87,37 @@ private:
 	HANDLE fenceEvent;
 
 	//三角形描画用
-	ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
-	ID3D12Resource* depthStencilResource = nullptr;
-	ID3D12Resource* vertexResource = nullptr;
-	ID3D12Resource* wvpResource = nullptr;
-	ID3D12Resource* materialResource = nullptr;
-	ID3D12Resource* textureResource = nullptr;
-	ID3D12Resource* intermediateResource = nullptr;
-	ID3D12PipelineState* graphicsPipelineState = nullptr;
-	ID3D10Blob* signatureBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-	ID3D12RootSignature* rootSignature = nullptr;
-	IDxcBlob* pixelShaderBlob = nullptr;
-	IDxcBlob* vertexShaderBlob = nullptr;
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
-	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+	ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;		//深度計算用
+	ID3D12Resource* depthStencilResource = nullptr;			//深度計算用
 
-	uint32_t drawTriangleCount = 0;
+	ID3D12Resource* vertexResource = nullptr;				//頂点データ
+	ID3D12Resource* wvpResource = nullptr;					//行列
+	ID3D12Resource* materialResource = nullptr;				//色
+	
+	ID3D12Resource* textureResource = nullptr;				//画像
+	ID3D12Resource* intermediateResource = nullptr;			//画像
+	
+	ID3D12PipelineState* graphicsPipelineState = nullptr;	//パイプライン
+	ID3D10Blob* signatureBlob = nullptr;					//
+	ID3DBlob* errorBlob = nullptr;							
+	ID3D12RootSignature* rootSignature = nullptr;			
+	
+	IDxcBlob* pixelShaderBlob = nullptr;					
+	IDxcBlob* vertexShaderBlob = nullptr;					
+	
+	VertexData* vertexData = nullptr;			//頂点データ
+	Matrix4x4* wvpData = NULL;					//行列データ
+	Vector4* materialData = nullptr;			//色データ
+
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;		
+	std::vector<D3D12_SUBRESOURCE_DATA> subresources;		
+
+	uint32_t drawTriangleCount = 0;							//そのフレームの三角形の描画数
+
+	//sprite用
+	ID3D12Resource* vertexResourceSprite = nullptr;
+	ID3D12Resource* transformationMatrixResourceSprite = nullptr;
+
 
 	//imgui用
 	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
