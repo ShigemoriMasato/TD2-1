@@ -693,6 +693,9 @@ void MyDirectX::ClearScreen() {
     //これから書き込むバックバッファのインデックスを取得
     UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    //RootSignatureを設定、PSOに設定しているけど別途設定が必要
+    commandList->SetPipelineState(graphicsPipelineState);
+    commandList->SetGraphicsRootSignature(rootSignature);
     commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
 
     //barrierをRenderTargetにする
@@ -701,8 +704,6 @@ void MyDirectX::ClearScreen() {
     ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
     commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
-    //描画先のRTVを設定する
-    commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
     //指定した色で画面全体をクリアする
     commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
@@ -791,9 +792,6 @@ void MyDirectX::EndFrame() {
     
     commandList->RSSetViewports(1, &viewport);
     commandList->RSSetScissorRects(1, &scissorRect);
-    //RootSignatureを設定、PSOに設定しているけど別途設定が必要
-    commandList->SetPipelineState(graphicsPipelineState);
-    commandList->SetGraphicsRootSignature(rootSignature);
 
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
     //マテリアルCBufferの場所を設定
