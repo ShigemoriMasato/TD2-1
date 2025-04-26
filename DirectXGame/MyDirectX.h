@@ -39,7 +39,7 @@ public:
 
 	void BeginFrame();
 
-	void DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 wvpMatrix, Vector4 color);
+	void DrawSphere(Matrix4x4 wvpMatrix, Vector4 color);
 
 	void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpMatrix, Vector4 color);
 

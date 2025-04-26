@@ -66,17 +66,6 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	MyDirectX* myDirectX = new MyDirectX(int(kWindowWidth), int(kWindowHeight));
 	myDirectX->Initialize();
 
-	TriangleData triangle1 = {
-		-0.5f, -0.5f, 0.0f, 1.0f, 
-		0.0f, 0.5f, 0.0f, 1.0f, 
-		0.5f, -0.5f, 0.0f, 1.0f 
-	};
-	TriangleData triangle2 = { 
-		-0.5f, -0.5f, 0.5f, 1.0f, 
-		0.0f, 0.0f, 0.0f, 1.0f, 
-		0.5f, -0.5f, -0.5f, 1.0f 
-	};
-
 	SpriteData sprite1 = {
 	0.0f, 0.0f, 0.0f, 1.0f,
 	640.0f, 0.0f, 0.0f, 1.0f,
@@ -94,6 +83,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
 
 	MSG msg{};
+	ImGui::SetNextWindowPos(ImVec2(900, 300));
 
 	//ウィンドウのxボタンが押されるまでループ
 	while (msg.message != WM_QUIT) {
@@ -106,37 +96,29 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//ゲームの更新処理
 			myDirectX->BeginFrame();
 
-			transform.rotation.y += 0.01f;
-			if (transform.rotation.y > 3.14) {
-				transform.rotation.y -= 6.28f;
-			}
-
 			//windowの大きさ(てきとうに)
-			ImGui::SetNextWindowPos(ImVec2(100, 400));
 			ImGui::SetNextWindowSize(ImVec2(300, 400));
-			ImGui::Begin("Sprite");
-			ImGui::SliderVector("Scale", tra.scale, 0.0f, 3.0f);
-			ImGui::SliderVector("Rotation", tra.rotation, -3.14f, 3.14f);
-			ImGui::SliderVector("Position", tra.position, 0.0f, 1280.0f);
-			ImGui::End();
-
-			ImGui::SetNextWindowPos(ImVec2(900, 300));
-			ImGui::SetNextWindowSize(ImVec2(300, 400));
-			ImGui::Begin("Triangle");
+			ImGui::Begin("Sphere");
 			ImGui::SliderVector("Scale", transform.scale, 0.0f, 10.0f);
 			ImGui::SliderVector("Rotation", transform.rotation, -3.14f, 3.14f);
 			ImGui::SliderVector("Position", transform.position, -10.0f, 10.0f);
 			ImGui::ColorEditVector("Color", triangleColor);
 			ImGui::End();
 
+			//ImGui::SetNextWindowSize(ImVec2(300, 400));
+			//ImGui::Begin("Sprite");
+			//ImGui::SliderVector("Scale", tra.scale, 0.0f, 3.0f);
+			//ImGui::SliderVector("Rotation", tra.rotation, -3.14f, 3.14f);
+			//ImGui::SliderVector("Position", tra.position, 0.0f, 1280.0f);
+			//ImGui::End();
+
 			Matrix4x4 worldMatrix = MakeTransformMatrix(transform);
 			wvpMatrix = worldMatrix * viewMatrix * projectionMatrix;
 			Matrix4x4 wvp = MakeTransformMatrix(tra) * MakeIdentity4x4() * MakeOrthographicMatrix(0.0f, 0.0f, float(kWindowWidth), float(kWindowHeight), 0.0f, 100.0f);
 
-			myDirectX->DrawTriangle(triangle1.left, triangle1.top, triangle1.right, wvpMatrix, triangleColor);
-			myDirectX->DrawTriangle(triangle2.left, triangle2.top, triangle2.right, wvpMatrix, triangleColor);
+			myDirectX->DrawSphere(wvpMatrix, triangleColor);
 
-			myDirectX->DrawSprite(sprite1.lt, sprite1.rt, sprite1.lb, sprite1.rb, wvp, Vector4());
+			//myDirectX->DrawSprite(sprite1.lt, sprite1.rt, sprite1.lb, sprite1.rb, wvp, Vector4());
 
 			myDirectX->EndFrame();
 		}

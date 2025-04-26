@@ -644,15 +644,15 @@ void MyDirectX::InitDirectX() {
     assert(SUCCEEDED(hr));
 
     //実際に頂点リソースを作る(50個)
-    vertexResource = CreateBufferResource(device, sizeof(VertexData) * 150);
+    vertexResource = CreateBufferResource(device, sizeof(VertexData) * 3 * 16384);
     vertexResource->SetName(L"VertexResource");
 
     //wvpMatrixのリソース作成
-    wvpResource = CreateBufferResource(device, alignedSize * 50);
+    wvpResource = CreateBufferResource(device, alignedSize * 16384);
     wvpResource->SetName(L"WVPResource");
 
     //マテリアル用のリソースを作る。今回はcolor一つ分のサイズを用意する
-    materialResource = CreateBufferResource(device, sizeof(Vector4) * 50);
+    materialResource = CreateBufferResource(device, sizeof(Vector4) * 16384);
     materialResource->SetName(L"MaterialResource");
 
     //SRV用のヒープを作成する
@@ -731,27 +731,160 @@ void MyDirectX::BeginImGui() {
     ImGui::NewFrame();
 }
 
-void MyDirectX::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 wvpMatrix, Vector4 color) {
-    //頂点リソースにデータを書き込む
-    //左下
-    vertexData[3 * drawTriangleCount].position = left;
-    vertexData[3 * drawTriangleCount].texcoord = { 0.0f, 1.0f };
-    //上
-    vertexData[3 * drawTriangleCount + 1].position = top;
-    vertexData[3 * drawTriangleCount + 1].texcoord = { 0.5f, 0.0f };
-    //右下
-    vertexData[3 * drawTriangleCount + 2].position = right;
-    vertexData[3 * drawTriangleCount + 2].texcoord = { 1.0f, 1.0f };
+void MyDirectX::DrawSphere(Matrix4x4 wvpMatrix, Vector4 color) {
+    
+    const float pie = 3.14159265358f;
+    const int vertical = 32;
+	const int horizontal = 16;
+
+    //頂点データを作成する
+    for (int i = 0; i < vertical; ++i) {
+
+        int buffer;
+
+        if (i == 0 || i == vertical - 1) {
+
+            float point;
+
+            if (i == 0) {
+                point = 0.5f;
+                buffer = 1;
+            } else {
+				point = -0.49f;
+				buffer = -1;
+            }
+            
+            for (int j = 0; j < horizontal; ++j) {
+                //球のさきっちょ
+                vertexData[drawTriangleCount * 3 + 1].position = { 0.0f, point, 0.0f, 1.0f };
+				vertexData[drawTriangleCount * 3 + 1].texcoord = { (float(horizontal - 1 - j)) / float(horizontal - 1), buffer == 1 ? 0.0f : 0.9999f};
+
+                //先っちょから一個離れた点たち
+				vertexData[drawTriangleCount * 3 + 1 - buffer].position = { 
+                    sinf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawTriangleCount * 3 + 1 - buffer].texcoord = {
+					float(horizontal - 1 - j - 1 + (8 * buffer) - 8) / float(horizontal - 1),
+                    float(i + 1) / float(vertical)
+                };
+
+                vertexData[drawTriangleCount * 3 + 1 - buffer * -1].position = {
+                    sinf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+				vertexData[drawTriangleCount * 3 + 1 - buffer * -1].texcoord = {
+					float(horizontal - 1 - j + (8 * buffer) - 8) / float(horizontal - 1),
+                    float(i + 1) / float(vertical)
+				};
+
+                ++drawTriangleCount;
+            }
+        }
+        else {
+
+            if (i > vertical / 2) {
+				buffer = 1;
+			}
+			else {
+				buffer = -1;
+            }
+
+            for (int j = 0; j < horizontal; ++j) {
+                //1つ目の三角形
+                //RightBottom
+                vertexData[drawTriangleCount * 3 + 2].position = {
+                    sinf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawTriangleCount * 3 + 2].texcoord = {
+                    float(horizontal - 1 - j) / float(horizontal - 1),
+                    float(i + 1) / float(vertical)
+                };
+
+                //RightTop
+                vertexData[drawTriangleCount * 3 + 1].position = {
+                    sinf(pie * (j) / float(horizontal - 1) * 2)* sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * (j) / float(horizontal - 1) * 2)* sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawTriangleCount * 3 + 1].texcoord = {
+                    float(horizontal - 1 - j) / float(horizontal - 1),
+                    float(i) / float(vertical)
+                };
+
+                //LeftTop
+                vertexData[drawTriangleCount * 3].position = {
+                    sinf(pie * (j + 1) / float(horizontal - 1) * 2)* sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * (j + 1) / float(horizontal - 1) * 2)* sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawTriangleCount * 3].texcoord = {
+                    float(horizontal - 1 - j - 1) / float(horizontal - 1),
+                    float(i) / float(vertical)
+                };
+
+                ++drawTriangleCount;
+
+                //2つ目の三角形
+                //RightBottom
+                vertexData[drawTriangleCount * 3 + 2].position = {
+                    sinf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawTriangleCount * 3 + 2].texcoord = {
+                    float(horizontal - 1 - j) / float(horizontal - 1),
+                    float(i + 1) / float(vertical)
+                };
+
+                //LeftTop
+                vertexData[drawTriangleCount * 3 + 1].position = {
+                    sinf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawTriangleCount * 3 + 1].texcoord = {
+                    float(horizontal - 1 - j - 1) / float(horizontal - 1),
+                    float(i) / float(vertical)
+                };
+
+                //LeftBottom
+                vertexData[drawTriangleCount * 3].position = {
+                    sinf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawTriangleCount * 3].texcoord = {
+                    float(horizontal - 1 - j - 1) / float(horizontal - 1),
+                    float(i + 1) / float(vertical)
+                };
+
+                ++drawTriangleCount;
+            }
+
+        }
+    }
 
     //データを書き込む
     //wvp行列を書き込む
-    wvpData[drawTriangleCount] = wvpMatrix;
+    *wvpData = wvpMatrix;
 
     //データを書き込む
     //色指定
-    materialData[drawTriangleCount] = color;
+    *materialData = color;
 
-    ++drawTriangleCount;
 }
 
 void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpMatrix, Vector4 color) {
