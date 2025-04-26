@@ -30,28 +30,6 @@ namespace {
 	}
 }
 
-namespace ImGui {
-	void SliderVector(const char* label, Vector3& vec, float min, float max) {
-		float buffer[3];
-		input(buffer, vec);
-		ImGui::SliderFloat3(label, buffer, min, max);
-		output(buffer, vec);
-	}
-
-	void EditColorVector(const char* label, Vector4& vec, float min, float max) {
-		float buffer[4];
-		input(buffer, vec);
-		ImGui::ColorEdit4(label, buffer);
-		output(buffer, vec);
-	}
-}
-
-struct TriangleData {
-	Vector4 left,
-		top,
-		right;
-};
-
 int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	const float kWindowWidth = 1280.0f;
@@ -60,12 +38,11 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	MyDirectX* myDirectX = new MyDirectX(int(kWindowWidth), int(kWindowHeight));
 	myDirectX->Initialize();
 
-	TriangleData triangle1 = { -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.5f, 0.0f, 1.0f, 0.5f, -0.5f, 0.0f, 1.0f };
-	TriangleData triangle2 = { -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.5f, -0.5f, -0.5f, 1.0f };
-
 	Transform transform = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-	Transform camera = {1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -5.0f };
+	Transform camera = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -5.0f };
 	Matrix4x4 wvpMatrix;
+	float imguiBuffer[3];
+	float imguiBuffer2[4];
 	Vector4 triangleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	MSG msg{};
@@ -76,7 +53,8 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
-		} else {
+		}
+		else {
 			//ゲームの更新処理
 			myDirectX->BeginFrame();
 
@@ -89,10 +67,21 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::SetNextWindowSize(ImVec2(300, 400));
 			ImGui::Begin("Triangle");
 
-			ImGui::SliderVector("Position", transform.position, -10.0f, 10.0f);
-			ImGui::SliderVector("Rotation", transform.rotation, -3.14f, 3.14f);
-			ImGui::SliderVector("Scale", transform.scale, 0.0f, 10.0f);
-			ImGui::EditColorVector("Color", triangleColor, 0.0f, 1.0f);
+			input(imguiBuffer, transform.scale);
+			ImGui::SliderFloat3("Scale", imguiBuffer, 0.0f, 10.0f);
+			output(imguiBuffer, transform.scale);
+
+			input(imguiBuffer, transform.rotation);
+			ImGui::SliderFloat3("Rotation", imguiBuffer, -3.14f, 3.14f);
+			output(imguiBuffer, transform.rotation);
+
+			input(imguiBuffer, transform.position);
+			ImGui::SliderFloat3("Position", imguiBuffer, -5.0f, 5.0f);
+			output(imguiBuffer, transform.position);
+
+			input(imguiBuffer2, triangleColor);
+			ImGui::ColorPicker4("Color", imguiBuffer2);
+			output(imguiBuffer2, triangleColor);
 
 			ImGui::End();
 
@@ -102,8 +91,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
 			wvpMatrix = worldMatrix * viewMatrix * projectionMatrix;
 
-			myDirectX->DrawTriangle(triangle1.left, triangle1.top, triangle1.right, wvpMatrix, triangleColor);
-			myDirectX->DrawTriangle(triangle2.left, triangle2.top, triangle2.right, wvpMatrix, triangleColor);
+			myDirectX->DrawTriangle(wvpMatrix, triangleColor);
 
 			myDirectX->EndFrame();
 		}

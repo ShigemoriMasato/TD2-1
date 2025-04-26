@@ -269,10 +269,6 @@ void MyDirectX::Initialize() {
 void MyDirectX::BeginFrame() {
     BeginImGui();
     ClearScreen();
-
-    vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-    wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-    materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 }
 
 void MyDirectX::CreateWindowForApp() {
@@ -639,16 +635,16 @@ void MyDirectX::InitDirectX() {
         IID_PPV_ARGS(&graphicsPipelineState));
     assert(SUCCEEDED(hr));
 
-    //実際に頂点リソースを作る(三角形50個ぶん)
-    vertexResource = CreateBufferResource(device, sizeof(VertexData) * 150);
+    //実際に頂点リソースを作る
+    vertexResource = CreateBufferResource(device, sizeof(VertexData) * 6);
     vertexResource->SetName(L"VertexResource");
 
     //wvpMatrixのリソース作成
-    wvpResource = CreateBufferResource(device, sizeof(Matrix4x4) * 50);
+    wvpResource = CreateBufferResource(device, sizeof(Matrix4x4));
     wvpResource->SetName(L"WVPResource");
 
     //マテリアル用のリソースを作る。今回はcolor一つ分のサイズを用意する
-    materialResource = CreateBufferResource(device, sizeof(Vector4) * 50);
+    materialResource = CreateBufferResource(device, sizeof(Vector4));
     materialResource->SetName(L"MaterialResource");
 
     //SRV用のヒープを作成する
@@ -720,27 +716,47 @@ void MyDirectX::BeginImGui() {
     ImGui::NewFrame();
 }
 
-void MyDirectX::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 wvpMatrix, Vector4 color) {
+void MyDirectX::DrawTriangle(Matrix4x4 wvpMatrix, Vector4 color) {
     //頂点リソースにデータを書き込む
+    VertexData* vertexData = nullptr;
+    //書き込むためのアドレスを取得
+    vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
     //左下
-    vertexData[drawTriangleCount].position = left;
-    vertexData[drawTriangleCount].texcoord = { 0.0f, 1.0f };
+    vertexData[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
+    vertexData[0].texcoord = { 0.0f, 1.0f };
     //上
-    vertexData[drawTriangleCount + 1].position = top;
-    vertexData[drawTriangleCount + 1].texcoord = { 0.5f, 0.0f };
+    vertexData[1].position = { 0.0f, 0.5f, 0.0f, 1.0f };
+    vertexData[1].texcoord = { 0.5f, 0.0f };
     //右下
-    vertexData[drawTriangleCount + 2].position = right;
-    vertexData[drawTriangleCount + 2].texcoord = { 1.0f, 1.0f };
-
-    //データを書き込む
-    //wvp行列を書き込む
-    wvpData[drawTriangleCount] = wvpMatrix;
-
-    //データを書き込む
-    //色指定
-    materialData[drawTriangleCount] = color;
+    vertexData[2].position = { 0.5f, -0.5f, 0.0f, 1.0f };
+    vertexData[2].texcoord = { 1.0f, 1.0f };
 
     ++drawTriangleCount;
+
+    vertexData[3].position = { -0.5f, -0.5f, 0.5f, 1.0f };
+    vertexData[3].texcoord = { 0.0f, 1.0f };
+
+    vertexData[4].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+    vertexData[4].texcoord = { 0.5f, 0.0f };
+
+    vertexData[5].position = { 0.5f, -0.5f, -0.5f, 1.0f };
+    vertexData[5].texcoord = { 1.0f, 1.0f };
+
+    ++drawTriangleCount;
+
+    //データを書き込む
+    Matrix4x4* wvpData = nullptr;
+    //書き込むためのアドレスを取得
+    wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+    //wvp行列を書き込む
+    *wvpData = wvpMatrix;
+
+    //データを書き込む
+    Vector4* materialData = nullptr;
+    //書き込むためのアドレスを取得
+    materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+    //色指定
+    *materialData = color;
 }
 
 void MyDirectX::EndFrame() {
@@ -773,7 +789,7 @@ void MyDirectX::EndFrame() {
     scissorRect.right = kClientWidth;
     scissorRect.top = 0;
     scissorRect.bottom = kClientHeight;
-    
+
     commandList->RSSetViewports(1, &viewport);
     commandList->RSSetScissorRects(1, &scissorRect);
 
