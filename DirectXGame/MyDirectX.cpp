@@ -287,7 +287,6 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     clearColor(new float[4] {0.1f, 0.25f, 0.5f, 1.0f}),
     logger(new Logger("DirectX12")),
     fenceValue(0),
-    drawTriangleCount(0),
     alignedSize((sizeof(Matrix4x4) + 255) & ~255) {
     resourceStates[swapChainResources[0]] = D3D12_RESOURCE_STATE_PRESENT;
     resourceStates[swapChainResources[1]] = D3D12_RESOURCE_STATE_PRESENT;
@@ -1025,8 +1024,6 @@ void MyDirectX::EndFrame() {
         WaitForSingleObject(fenceEvent, INFINITE);
     }
 
-    drawTriangleCount = 0;
-	drawSpriteCount = 0;
     //次のフレームのためのcommandReset
     commandAllocator->Reset();
     commandList->Reset(commandAllocator, nullptr);
