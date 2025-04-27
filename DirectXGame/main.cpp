@@ -82,6 +82,11 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Matrix4x4 viewMatrix = Inverse(MakeTransformMatrix(camera));
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
 
+	myDirectX->ReadTexture("resources/uvChecker.png");
+	myDirectX->ReadTexture("resources/cube.jpg");
+
+	bool textureHandle = 1;
+
 	MSG msg{};
 	ImGui::SetNextWindowPos(ImVec2(900, 300));
 
@@ -103,22 +108,23 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::SliderVector("Rotation", transform.rotation, -3.14f, 3.14f);
 			ImGui::SliderVector("Position", transform.position, -10.0f, 10.0f);
 			ImGui::ColorEditVector("Color", triangleColor);
+			ImGui::Checkbox("useCubeTexture", &textureHandle);
 			ImGui::End();
 
-			//ImGui::SetNextWindowSize(ImVec2(300, 400));
-			//ImGui::Begin("Sprite");
-			//ImGui::SliderVector("Scale", tra.scale, 0.0f, 3.0f);
-			//ImGui::SliderVector("Rotation", tra.rotation, -3.14f, 3.14f);
-			//ImGui::SliderVector("Position", tra.position, 0.0f, 1280.0f);
-			//ImGui::End();
+			ImGui::SetNextWindowSize(ImVec2(300, 400));
+			ImGui::Begin("Sprite");
+			ImGui::SliderVector("Scale", tra.scale, 0.0f, 3.0f);
+			ImGui::SliderVector("Rotation", tra.rotation, -3.14f, 3.14f);
+			ImGui::SliderVector("Position", tra.position, 0.0f, 1280.0f);
+			ImGui::End();
 
 			Matrix4x4 worldMatrix = MakeTransformMatrix(transform);
 			wvpMatrix = worldMatrix * viewMatrix * projectionMatrix;
 			Matrix4x4 wvp = MakeTransformMatrix(tra) * MakeIdentity4x4() * MakeOrthographicMatrix(0.0f, 0.0f, float(kWindowWidth), float(kWindowHeight), 0.0f, 100.0f);
 
-			myDirectX->DrawSphere(wvpMatrix, triangleColor);
+			myDirectX->DrawSphere(wvpMatrix, triangleColor, textureHandle);
 
-			//myDirectX->DrawSprite(sprite1.lt, sprite1.rt, sprite1.lb, sprite1.rb, wvp, Vector4());
+			myDirectX->DrawSprite(sprite1.lt, sprite1.rt, sprite1.lb, sprite1.rb, wvp, Vector4());
 
 			myDirectX->EndFrame();
 		}

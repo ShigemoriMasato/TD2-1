@@ -39,7 +39,9 @@ public:
 
 	void BeginFrame();
 
-	void DrawSphere(Matrix4x4 wvpMatrix, Vector4 color);
+	int ReadTexture(std::string path);
+
+	void DrawSphere(Matrix4x4 wvpMatrix, Vector4 color, int textureHandle);
 
 	void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpMatrix, Vector4 color);
 
@@ -94,20 +96,25 @@ private:
 	ID3D12Resource* vertexResource = nullptr;
 	ID3D12Resource* wvpResource = nullptr;
 	ID3D12Resource* materialResource = nullptr;
-	ID3D12Resource* textureResource = nullptr;
-	ID3D12Resource* intermediateResource = nullptr;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
 	ID3D10Blob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
 	ID3D12RootSignature* rootSignature = nullptr;
 	IDxcBlob* pixelShaderBlob = nullptr;
 	IDxcBlob* vertexShaderBlob = nullptr;
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 
-	const UINT alignedSize;
+	//画像の関数
+	std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> textureSrvHandleGPU;
+	uint32_t readTextureCount;
+	std::vector<ID3D12Resource*> textureResource;
+	std::vector<ID3D12Resource*> intermediateResource;
 
-	uint32_t drawTriangleCount = 0;
+	const UINT alignedSize;
+	uint32_t descriptorSizeSRV;
+	uint32_t descriptorSizeRTV;
+	uint32_t descriptorSizeDSV;
+
 	VertexData* vertexData = nullptr;
 	Matrix4x4* wvpData = nullptr;
 	Vector4* materialData = nullptr;
@@ -116,7 +123,6 @@ private:
 	ID3D12Resource* vertexResourceSprite = nullptr;
 	ID3D12Resource* transformationMatrixResourceSprite = nullptr;	//スプライト用の頂点バッファ
 
-	uint32_t drawSpriteCount = 0;
 	VertexData* vertexDataSprite = nullptr;
 	Matrix4x4* transformationMatrixDataSprite = nullptr;
 

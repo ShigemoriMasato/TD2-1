@@ -240,6 +240,45 @@ namespace {
         return intermediateResource;
     }
 
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDesscriptorHandle(ID3D12DescriptorHeap* heap,uint32_t descriptorSize , UINT index) {
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = heap->GetCPUDescriptorHandleForHeapStart();
+		handle.ptr += (descriptorSize * index);
+		return handle;
+	}
+
+    D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDesscriptorHandle(ID3D12DescriptorHeap* heap, uint32_t descriptorSize, UINT index) {
+        D3D12_GPU_DESCRIPTOR_HANDLE handle = heap->GetGPUDescriptorHandleForHeapStart();
+        handle.ptr += (descriptorSize * index);
+        return handle;
+    }
+}
+
+int MyDirectX::ReadTexture(std::string path) {
+    //TextureResourceを作成
+    DirectX::ScratchImage mipImages = LoadTexture(path);
+    const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+    textureResource.push_back(CreateTextureResource(device, metadata));
+    ID3D12Resource* resource = UploadTextureData(textureResource.back(), mipImages, device, commandList);
+	intermediateResource.push_back(resource);
+
+    //metadataをもとにSRVの設定
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.Format = metadata.format;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+    //SRVを作成するDescriptorHeapの場所を決める
+    D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    textureSrvHandleGPU.push_back(srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+    //先頭はImGuiが使っているのでその次を使う
+    textureSrvHandleCPU = GetCPUDesscriptorHandle(srvDescriptorHeap, descriptorSizeSRV, ++readTextureCount);
+    textureSrvHandleGPU.back() = GetGPUDesscriptorHandle(srvDescriptorHeap, descriptorSizeSRV, readTextureCount);
+
+    //SRVを作成する
+    device->CreateShaderResourceView(textureResource.back(), &srvDesc, textureSrvHandleCPU);
+
+    return readTextureCount;
 }
 
 MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
@@ -378,6 +417,10 @@ void MyDirectX::InitDirectX() {
     //デバイスの生成が上手くいかなかったので起動できない
     assert(device != nullptr);
     logger->Log("Complete create D3D12Device\n");
+
+	descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 #ifdef _DEBUG
 
@@ -658,30 +701,6 @@ void MyDirectX::InitDirectX() {
     //SRV用のヒープを作成する
     srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
-    //Textureのリソースを作りたかった
-    DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
-    const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-    textureResource = CreateTextureResource(device, metadata);
-    intermediateResource = UploadTextureData(textureResource, mipImages, device, commandList);
-
-    //metaDataを基にSRVの設定
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-    srvDesc.Format = metadata.format;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-
-    //SRVを作成するDescriptorHeapの場所を決める
-    D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-    //先頭はImGuiが使っているのでその次を使う
-    textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-    //SRVを作成する
-    device->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
-
-
     //Sprite用の頂点リソースを作る
     vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 6);
 
@@ -731,11 +750,13 @@ void MyDirectX::BeginImGui() {
     ImGui::NewFrame();
 }
 
-void MyDirectX::DrawSphere(Matrix4x4 wvpMatrix, Vector4 color) {
+void MyDirectX::DrawSphere(Matrix4x4 wvpMatrix, Vector4 color, int textureHandle) {
     
     const float pie = 3.14159265358f;
     const int vertical = 32;
 	const int horizontal = 16;
+
+	uint32_t drawTriangleCount = 0;
 
     //頂点データを作成する
     for (int i = 0; i < vertical; ++i) {
@@ -885,99 +906,95 @@ void MyDirectX::DrawSphere(Matrix4x4 wvpMatrix, Vector4 color) {
     //色指定
     *materialData = color;
 
+
+    //頂点のバッファビューを作成する
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+    //リソースの先頭のアドレスから使う
+    vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+    //使用するリソースのサイズは頂点3つ分のサイズ
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * 3 * drawTriangleCount;
+    //1頂点当たりのサイズ
+    vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+    //ビューポート
+    D3D12_VIEWPORT viewport{};
+    //クライアント領域のサイズと一緒にして画面全体に表示
+    viewport.Width = static_cast<float>(kClientWidth);
+    viewport.Height = static_cast<float>(kClientHeight);
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    //シザー矩形
+    D3D12_RECT scissorRect{};
+    //基本的にビューポートと同じ矩形が構成されるようにする
+    scissorRect.left = 0;
+    scissorRect.right = kClientWidth;
+    scissorRect.top = 0;
+    scissorRect.bottom = kClientHeight;
+
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+    //マテリアルCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+    //wvp用のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
+    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
+    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
+    commandList->DrawInstanced(drawTriangleCount * 3, 1, 0, 0);
 }
 
 void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpMatrix, Vector4 color) {
     //1つ目の三角形
-    vertexDataSprite[drawSpriteCount * 6].position = lb;
-    vertexDataSprite[drawSpriteCount * 6].texcoord = { 0.0f, 1.0f };
+    vertexDataSprite[0].position = lb;
+    vertexDataSprite[0].texcoord = { 0.0f, 1.0f };
     
-    vertexDataSprite[drawSpriteCount * 6 + 1].position = lt;
-    vertexDataSprite[drawSpriteCount * 6 + 1].texcoord = { 0.0f, 0.0f };
+    vertexDataSprite[1].position = lt;
+    vertexDataSprite[1].texcoord = { 0.0f, 0.0f };
 
-    vertexDataSprite[drawSpriteCount * 6 + 2].position = rb;
-    vertexDataSprite[drawSpriteCount * 6 + 2].texcoord = { 1.0f, 1.0f };
+    vertexDataSprite[2].position = rb;
+    vertexDataSprite[2].texcoord = { 1.0f, 1.0f };
 
     //2つ目の三角形
-    vertexDataSprite[drawSpriteCount * 6 + 3].position = lt;
-    vertexDataSprite[drawSpriteCount * 6 + 3].texcoord = { 0.0f, 0.0f };
+    vertexDataSprite[3].position = lt;
+    vertexDataSprite[3].texcoord = { 0.0f, 0.0f };
 
-    vertexDataSprite[drawSpriteCount * 6 + 4].position = rt;
-    vertexDataSprite[drawSpriteCount * 6 + 4].texcoord = { 1.0f, 0.0f };
+    vertexDataSprite[4].position = rt;
+    vertexDataSprite[4].texcoord = { 1.0f, 0.0f };
 
-    vertexDataSprite[drawSpriteCount * 6 + 5].position = rb;
-    vertexDataSprite[drawSpriteCount * 6 + 5].texcoord = { 1.0f, 1.0f };
+    vertexDataSprite[5].position = rb;
+    vertexDataSprite[5].texcoord = { 1.0f, 1.0f };
 
     *transformationMatrixDataSprite = wvpMatrix;
 
-    ++drawSpriteCount;
+    //頂点バッファビューを作成する
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
+    //リソースの先頭のアドレスから使う
+    vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
+    //使用するリソースのサイズは頂点6つ分のサイズ
+    vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
+    //1頂点当たりのサイズ
+    vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
+
+    //Spriteの描画。変更が必要なものだけ変更する
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
+    //TransformationMatrixCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+    //Texture
+    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[0]);
+    //描画
+    commandList->DrawInstanced(6, 1, 0, 0);
 }
 
 void MyDirectX::EndFrame() {
 
     UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
-    if (drawTriangleCount > 0) {
-        //頂点のバッファビューを作成する
-        D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-        //リソースの先頭のアドレスから使う
-        vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-        //使用するリソースのサイズは頂点3つ分のサイズ
-        vertexBufferView.SizeInBytes = sizeof(VertexData) * 3 * drawTriangleCount;
-        //1頂点当たりのサイズ
-        vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-        //ビューポート
-        D3D12_VIEWPORT viewport{};
-        //クライアント領域のサイズと一緒にして画面全体に表示
-        viewport.Width = static_cast<float>(kClientWidth);
-        viewport.Height = static_cast<float>(kClientHeight);
-        viewport.TopLeftX = 0;
-        viewport.TopLeftY = 0;
-        viewport.MinDepth = 0.0f;
-        viewport.MaxDepth = 1.0f;
-
-        //シザー矩形
-        D3D12_RECT scissorRect{};
-        //基本的にビューポートと同じ矩形が構成されるようにする
-        scissorRect.left = 0;
-        scissorRect.right = kClientWidth;
-        scissorRect.top = 0;
-        scissorRect.bottom = kClientHeight;
-
-        commandList->RSSetViewports(1, &viewport);
-        commandList->RSSetScissorRects(1, &scissorRect);
-        commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-
-        //マテリアルCBufferの場所を設定
-        commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-        //wvp用のCBufferの場所を設定
-        commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-        //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
-        commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-        //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
-        commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-        commandList->DrawInstanced(drawTriangleCount * 3, 1, 0, 0);
-    }
-
-    if (drawSpriteCount > 0) {
-        //頂点バッファビューを作成する
-        D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
-        //リソースの先頭のアドレスから使う
-        vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
-        //使用するリソースのサイズは頂点6つ分のサイズ
-        vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 6;
-        //1頂点当たりのサイズ
-        vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
-
-        //Spriteの描画。変更が必要なものだけ変更する
-        commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);
-        //TransformationMatrixCBufferの場所を設定
-        commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
-        //描画
-        commandList->DrawInstanced(6, 1, 0, 0);
-    }
 
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
@@ -1020,11 +1037,13 @@ void MyDirectX::Finalize() {
 	transformationMatrixResourceSprite->Release();
     dsvDescriptorHeap->Release();
     depthStencilResource->Release();
-    intermediateResource->Release();
+    for (uint32_t i = 0; i < readTextureCount; ++i) {
+        intermediateResource[i]->Release();
+        textureResource[i]->Release();
+    }
     vertexResource->Release();
     wvpResource->Release();
     materialResource->Release();
-    textureResource->Release();
     graphicsPipelineState->Release();
     signatureBlob->Release();
     if (errorBlob) {
