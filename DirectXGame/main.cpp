@@ -45,12 +45,6 @@ namespace ImGui {
 	}
 }
 
-struct TriangleData {
-	Vector4 left,
-		top,
-		right;
-};
-
 struct SpriteData {
 	Vector4 lt,
 		rt,
@@ -65,13 +59,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	MyDirectX* myDirectX = new MyDirectX(int(kWindowWidth), int(kWindowHeight));
 	myDirectX->Initialize();
-
-	SpriteData sprite1 = {
-	0.0f, 0.0f, 0.0f, 1.0f,
-	640.0f, 0.0f, 0.0f, 1.0f,
-	0.0f, 360.0f, 0.0f, 1.0f,
-	640.0f, 360.0f, 0.0f, 1.0f,
-	};
+	myDirectX->CreateDrawResource(MyDirectX::kTriangle3D, 300);
 
 	Transform transform = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 	Transform tra = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
@@ -79,8 +67,16 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Matrix4x4 wvpMatrix;
 	Vector4 triangleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
+	TriangleData3 triangle = {
+		{ -0.5f, -0.5f, 0.0f },
+		{ 0.0f, 0.5f, 0.0f },
+		{ 0.5f, -0.5f, 0.0f }
+	};
+
 	Matrix4x4 viewMatrix = Inverse(MakeTransformMatrix(camera));
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
+
+	TriangleData3 screentr[2];
 
 	myDirectX->ReadTexture("resources/uvChecker.png");
 	myDirectX->ReadTexture("resources/cube.jpg");
@@ -113,19 +109,27 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ImGui::SetNextWindowSize(ImVec2(300, 400));
 			ImGui::Begin("Sprite");
-			ImGui::SliderVector("Scale", tra.scale, 0.0f, 3.0f);
+			ImGui::SliderVector("Scale", tra.scale, 0.0f, 10.0f);
 			ImGui::SliderVector("Rotation", tra.rotation, -3.14f, 3.14f);
-			ImGui::SliderVector("Position", tra.position, 0.0f, 1280.0f);
+			ImGui::SliderVector("Position", tra.position, -10.0f, 10.0f);
 			ImGui::End();
 
 			Matrix4x4 worldMatrix = MakeTransformMatrix(transform);
 			wvpMatrix = worldMatrix * viewMatrix * projectionMatrix;
-			Matrix4x4 wvp = MakeTransformMatrix(tra) * MakeIdentity4x4() * MakeOrthographicMatrix(0.0f, 0.0f, float(kWindowWidth), float(kWindowHeight), 0.0f, 100.0f);
+			Matrix4x4 wvp = MakeTransformMatrix(tra) * viewMatrix * projectionMatrix;
 
-			myDirectX->DrawSphere(wvpMatrix, triangleColor, textureHandle);
+			screentr[0].left = TransForm(triangle.left, wvpMatrix);
+			screentr[0].top = TransForm(triangle.top, wvpMatrix);
+			screentr[0].right = TransForm(triangle.right, wvpMatrix);
 
-			myDirectX->DrawSprite(sprite1.lt, sprite1.rt, sprite1.lb, sprite1.rb, wvp, Vector4());
+			screentr[1].left = TransForm(triangle.left, wvp);
+			screentr[1].top = TransForm(triangle.top, wvp);
+			screentr[1].right = TransForm(triangle.right, wvp);
 
+			for (int i = 0; i < 2; i++) {
+				myDirectX->DrawTriangle(screentr[i], triangleColor, textureHandle);
+			}
+			
 			myDirectX->EndFrame();
 		}
 	}

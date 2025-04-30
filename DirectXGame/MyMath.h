@@ -32,3 +32,7 @@ Matrix4x4 MakeRotetaXMatrix(float radius);
 Matrix4x4 MakeRotateYMatrix(float radius);
 
 Matrix4x4 MakeRotateZMatrix(float radius);
+
+Vector3 TransForm(const Vector3& vector, const Matrix4x4& matrix);
+
+void ConvertVector(const Vector3& vec, Vector4& outVec);
