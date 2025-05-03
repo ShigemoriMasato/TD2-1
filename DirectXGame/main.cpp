@@ -60,12 +60,18 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	MyDirectX* myDirectX = new MyDirectX(int(kWindowWidth), int(kWindowHeight));
 	myDirectX->Initialize();
 	myDirectX->CreateDrawResource(MyDirectX::kTriangle3D, 300);
+	myDirectX->CreateDrawResource(MyDirectX::kSphere, 1);
 
 	Transform transform = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 	Transform tra = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 	Transform camera = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -5.0f };
-	Matrix4x4 wvpMatrix;
+	Matrix4x4 wvpMatrix{};
 	Vector4 triangleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	DirectionalLightData dLightData = {};
+
+	dLightData.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	dLightData.direction = { 0.0f, -1.0f, 0.0f };
+	dLightData.intensity = 1.0f;
 
 	TriangleData3 triangle = {
 		{ -0.5f, -0.5f, 0.0f },
@@ -76,15 +82,9 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Matrix4x4 viewMatrix = Inverse(MakeTransformMatrix(camera));
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
 
-	TriangleData3 screentr[2];
-
-	myDirectX->ReadTexture("resources/uvChecker.png");
-	myDirectX->ReadTexture("resources/cube.jpg");
-
-	bool textureHandle = 1;
+	TriangleData3 screentr[2]{};
 
 	MSG msg{};
-	ImGui::SetNextWindowPos(ImVec2(900, 300));
 
 	//ウィンドウのxボタンが押されるまでループ
 	while (msg.message != WM_QUIT) {
@@ -97,39 +97,22 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//ゲームの更新処理
 			myDirectX->BeginFrame();
 
-			//windowの大きさ(てきとうに)
-			ImGui::SetNextWindowSize(ImVec2(300, 400));
+			wvpMatrix = MakeTransformMatrix(transform) * viewMatrix * projectionMatrix;
+
 			ImGui::Begin("Sphere");
-			ImGui::SliderVector("Scale", transform.scale, 0.0f, 10.0f);
-			ImGui::SliderVector("Rotation", transform.rotation, -3.14f, 3.14f);
 			ImGui::SliderVector("Position", transform.position, -10.0f, 10.0f);
-			ImGui::ColorEditVector("Color", triangleColor);
-			ImGui::Checkbox("useCubeTexture", &textureHandle);
+			ImGui::SliderVector("Rotation", transform.rotation, -3.14f, 3.14f);
+			ImGui::SliderVector("Scale", transform.scale, 0.0f, 10.0f);
+			ImGui::ColorEditVector("Triangle Color", triangleColor);
+			ImGui::ColorEditVector("Directional Light Color", dLightData.color);
+			ImGui::SliderVector("Directional Light Direction", dLightData.direction, -1.0f, 1.0f);
+			ImGui::SliderFloat("Directional Light Intensity", &dLightData.intensity, 0.0f, 10.0f);
 			ImGui::End();
 
-			ImGui::SetNextWindowSize(ImVec2(300, 400));
-			ImGui::Begin("Sprite");
-			ImGui::SliderVector("Scale", tra.scale, 0.0f, 10.0f);
-			ImGui::SliderVector("Rotation", tra.rotation, -3.14f, 3.14f);
-			ImGui::SliderVector("Position", tra.position, -10.0f, 10.0f);
-			ImGui::End();
+			Normalize(dLightData.direction);
 
-			Matrix4x4 worldMatrix = MakeTransformMatrix(transform);
-			wvpMatrix = worldMatrix * viewMatrix * projectionMatrix;
-			Matrix4x4 wvp = MakeTransformMatrix(tra) * viewMatrix * projectionMatrix;
+			myDirectX->DrawSphere(wvpMatrix, MakeTransformMatrix(transform), triangleColor, dLightData, 0);
 
-			screentr[0].left = TransForm(triangle.left, wvpMatrix);
-			screentr[0].top = TransForm(triangle.top, wvpMatrix);
-			screentr[0].right = TransForm(triangle.right, wvpMatrix);
-
-			screentr[1].left = TransForm(triangle.left, wvp);
-			screentr[1].top = TransForm(triangle.top, wvp);
-			screentr[1].right = TransForm(triangle.right, wvp);
-
-			for (int i = 0; i < 2; i++) {
-				myDirectX->DrawTriangle(screentr[i], triangleColor, textureHandle);
-			}
-			
 			myDirectX->EndFrame();
 		}
 	}

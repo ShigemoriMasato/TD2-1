@@ -1,26 +1,18 @@
 #pragma once
 #include <Windows.h>
-#include <cstdint>
-#include <cassert>
-#include <vector>
-#include <strsafe.h>
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <dbghelp.h>
-#include <dxgidebug.h>
-#include <memory>
-#include <dxcapi.h>
 #include <unordered_map>
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
+#include <vector>
 #include "externals/imgui/imgui_impl_win32.h"
-#include "externals/DirectXTex/d3dx12.h"
-#include "externals/DirectXTex/DirectXTex.h"
 
+#include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
+#include <dxgi1_6.h>
 #pragma comment(lib, "dxgi.lib")
+#include <dbghelp.h>
 #pragma comment(lib, "Dbghelp.lib")
+#include <dxgidebug.h>
 #pragma comment(lib, "dxguid.lib")
+#include <dxcapi.h>
 #pragma comment(lib, "dxcompiler.lib")
 
 #include "Logger.h"
@@ -37,6 +29,8 @@ public:
 		kTriangle3D,
 		kTriangle2D,
 		kSphere,
+		kSprite3D,
+		kSprite2D,
 
 		MaxDrawKind
 	};
@@ -52,9 +46,11 @@ public:
 
 	int ReadTexture(std::string path);
 
-	void DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4 color, int textureHandle);
+	void DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 
-	void DrawTriangle(TriangleData3 vertexData, Vector4 color, int textureHandle);
+	void DrawTriangle(TriangleData3 vertexData, Vector4 color, DirectionalLightData dLightData, int textureHandle);
+
+	void DrawSphere(Matrix4x4 wvpMatrix, Matrix4x4 worldMatrix, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 
 	void EndFrame();
 
@@ -112,11 +108,15 @@ private:
 	IDxcBlob* vertexShaderBlob = nullptr;
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 
+	//1フレームに描画した数をカウントする
+	std::vector<uint32_t> drawCount;
 	uint32_t drawTriangle3DCount = 0;
+	uint32_t drawSphereCount = 0;
 
 	std::vector<std::vector<ID3D12Resource*>> vertexResource;
 	std::vector<std::vector<ID3D12Resource*>> wvpResource;
 	std::vector<std::vector<ID3D12Resource*>> materialResource;
+	std::vector<std::vector<ID3D12Resource*>> directionalLightResource;
 
 	//画像の関数
 	std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> textureSrvHandleGPU;

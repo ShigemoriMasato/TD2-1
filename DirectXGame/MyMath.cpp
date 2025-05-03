@@ -87,3 +87,20 @@ void ConvertVector(const Vector3& vec, Vector4& outVec) {
 	outVec.z = vec.z;
 	outVec.w = 1.0f;
 }
+
+void ConvertVector(const Vector4& vec, Vector3& outVec) {
+	outVec.x = vec.x;
+	outVec.y = vec.y;
+	outVec.z = vec.z;
+}
+
+void Normalize(Vector3& vec) {
+	float length = std::sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+	if (length == 0.0f) {
+		vec = {};
+		return;
+	}
+	vec.x /= length;
+	vec.y /= length;
+	vec.z /= length;
+}

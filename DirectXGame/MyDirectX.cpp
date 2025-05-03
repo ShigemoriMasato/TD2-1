@@ -1,4 +1,13 @@
 #include "MyDirectX.h"
+#include <cstdint>
+#include <cassert>
+#include <strsafe.h>
+#include <memory>
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+#include "externals/imgui/imgui_impl_win32.h"
+#include "externals/DirectXTex/d3dx12.h"
+#include "externals/DirectXTex/DirectXTex.h"
 
 namespace {
     //ウィンドウプロシージャ
@@ -153,11 +162,15 @@ namespace {
         HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
         assert(SUCCEEDED(hr));
 
-        //ミニマップの作製
         DirectX::ScratchImage mipImages{};
-        hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
-        assert(SUCCEEDED(hr));
-
+        //ミニマップの作成(画像サイズが最小の場合、作成手順を飛ばす)
+        if (image.GetMetadata().mipLevels > 1) {
+            hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+            assert(SUCCEEDED(hr));
+        }
+        else {
+			mipImages = std::move(image);
+        }
         return mipImages;
     }
 
@@ -304,6 +317,7 @@ void MyDirectX::Initialize() {
     CreateWindowForApp();
     InitDirectX();
     InitImGui();
+    ReadTexture("resources/uvChecker.png");
 }
 
 void MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
@@ -319,9 +333,11 @@ void MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
             break;
         }
 		//wvpMatrixのリソース作成
-		wvpResource[drawKind].push_back(CreateBufferResource(device, sizeof(Matrix4x4)));
+		wvpResource[drawKind].push_back(CreateBufferResource(device, sizeof(TramsformMatrixData)));
 		//マテリアル用のリソースリソース作成
-		materialResource[drawKind].push_back(CreateBufferResource(device, sizeof(Vector4)));
+		materialResource[drawKind].push_back(CreateBufferResource(device, sizeof(MaterialData)));
+        //DirectionalLight用のリソース作成
+		directionalLightResource[drawKind].push_back(CreateBufferResource(device, sizeof(DirectionalLightData)));
     }
 }
 
@@ -580,17 +596,25 @@ void MyDirectX::InitDirectX() {
     descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
     //RootParameter作成。複数設定できるので配列
-    D3D12_ROOT_PARAMETER rootParameters[3] = {};
+    D3D12_ROOT_PARAMETER rootParameters[4] = {};
     rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
     rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     //PixelShaderで使う
     rootParameters[0].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
+
     rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
     rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;     //VertexShaderで使う
     rootParameters[1].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
+
     rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
     rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
     rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;	//テーブルの中身
     rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);	//テーブルの数
+
+    //光
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;	//CBVを使う
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
+	rootParameters[3].Descriptor.ShaderRegister = 1;	//レジスタ番号1とバインド
+
     descriptionRootSignature.pParameters = rootParameters;                  //ルートパラメータ配列へのポインタ
     descriptionRootSignature.NumParameters = _countof(rootParameters);      //配列の長さ
 
@@ -619,7 +643,7 @@ void MyDirectX::InitDirectX() {
     assert(SUCCEEDED(hr));
 
     //InputLayout
-    D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
+    D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
     inputElementDescs[0].SemanticName = "POSITION";
     inputElementDescs[0].SemanticIndex = 0;
     inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -629,6 +653,11 @@ void MyDirectX::InitDirectX() {
     inputElementDescs[1].SemanticIndex = 0;
     inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
     inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescs[2].SemanticName = "NORMAL";
+	inputElementDescs[2].SemanticIndex = 0;
+	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
     D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
     inputLayoutDesc.pInputElementDescs = inputElementDescs;
@@ -702,10 +731,13 @@ void MyDirectX::InitDirectX() {
 		vertexResource.push_back({});
 		wvpResource.push_back({});
 		materialResource.push_back({});
+		directionalLightResource.push_back({});
+        drawCount.push_back(0);
     }
 
     //SRV用のヒープを作成する
     srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+
 }
 
 void MyDirectX::InitImGui() {
@@ -748,40 +780,46 @@ void MyDirectX::ClearScreen() {
     commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 
     commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
 }
 
-void MyDirectX::DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4 color, int textureHandle) {
-	if (drawTriangle3DCount >= vertexResource[kTriangle3D].size()) {
+void MyDirectX::DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4 color, DirectionalLightData dLightData, int textureHandle) {
+	if (drawCount[kTriangle3D] >= vertexResource[kTriangle3D].size()) {
 		assert(false && "三角形の描画上限の超過");
 	}
 
     //頂点リソースにデータを書き込む
     VertexData* vertexData = nullptr;
     //書き込むためのアドレスを取得
-    vertexResource[kTriangle3D][drawTriangle3DCount]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+    vertexResource[kTriangle3D][drawCount[kTriangle3D]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
     //左下
     vertexData[0].position = left;
     vertexData[0].texcoord = { 0.0f, 1.0f };
+	vertexData[0].normal = { 0.0f, 0.0f, -1.0f };
+
     //上
     vertexData[1].position = top;
     vertexData[1].texcoord = { 0.5f, 0.0f };
+    vertexData[1].normal = { 0.0f, 0.0f, -1.0f };
     //右下
     vertexData[2].position = right;
     vertexData[2].texcoord = { 1.0f, 1.0f };
+    vertexData[2].normal = { 0.0f, 0.0f, -1.0f };
 
     //データを書き込む
-    Matrix4x4* wvpData = nullptr;
+    TramsformMatrixData* wvpData = nullptr;
     //書き込むためのアドレスを取得
-    wvpResource[kTriangle3D][drawTriangle3DCount]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+    wvpResource[kTriangle3D][drawCount[kTriangle3D]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
     //単位行列を書き込む
-    *wvpData = MakeIdentity4x4();
+    wvpData->wvp = MakeIdentity4x4();
 
     //データを書き込む
-    Vector4* materialData = nullptr;
+    MaterialData* materialData = nullptr;
     //書き込むためのアドレスを取得
-    materialResource[kTriangle3D][drawTriangle3DCount]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-    //赤
-    *materialData = color;
+    materialResource[kTriangle3D][drawCount[kTriangle3D]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+    
+    materialData->color = color;
+    materialData->enableLighting = false;
 
     //ビューポート
     D3D12_VIEWPORT viewport{};
@@ -796,7 +834,7 @@ void MyDirectX::DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4
     //頂点のバッファビューを作成する
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
     //リソースの先頭のアドレスから使う
-    vertexBufferView.BufferLocation = vertexResource[kTriangle3D][drawTriangle3DCount]->GetGPUVirtualAddress();
+    vertexBufferView.BufferLocation = vertexResource[kTriangle3D][drawCount[kTriangle3D]]->GetGPUVirtualAddress();
     //使用するリソースのサイズは頂点3つ分のサイズ
     vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
     //1頂点当たりのサイズ
@@ -818,9 +856,9 @@ void MyDirectX::DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4
 
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
     //マテリアルCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kTriangle3D][drawTriangle3DCount]->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kTriangle3D][drawCount[kTriangle3D]]->GetGPUVirtualAddress());
     //wvp用のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kTriangle3D][drawTriangle3DCount]->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kTriangle3D][drawCount[kTriangle3D]]->GetGPUVirtualAddress());
     //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
     commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[0]);
     //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
@@ -828,10 +866,10 @@ void MyDirectX::DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4
     //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
     commandList->DrawInstanced(3, 1, 0, 0);
 
-    ++drawTriangle3DCount;
+    ++drawCount[kTriangle3D];
 }
 
-void MyDirectX::DrawTriangle(TriangleData3 vertexData, Vector4 color, int textureHandle) {
+void MyDirectX::DrawTriangle(TriangleData3 vertexData, Vector4 color, DirectionalLightData dLightData, int textureHandle) {
     Vector4 vec[3];
     ConvertVector(vertexData.left, vec[0]);
     ConvertVector(vertexData.top, vec[1]);
@@ -841,7 +879,238 @@ void MyDirectX::DrawTriangle(TriangleData3 vertexData, Vector4 color, int textur
         vec[1],
         vec[2],
         color,
+        dLightData,
         textureHandle);
+}
+
+void MyDirectX::DrawSphere(Matrix4x4 wvpMatrix, Matrix4x4 worldMatrix, Vector4 color, DirectionalLightData dLightData, int textureHandle) {
+
+	if (drawCount[kSphere] >= vertexResource[kSphere].size()) {
+		assert(false && "球の描画上限の超過");
+	}
+
+    const float pie = 3.14159265358f;
+    const int vertical = 32;
+    const int horizontal = 16;
+
+    uint32_t drawInTriangleCountInstance = 0;
+
+	VertexData* vertexData = nullptr;
+	vertexResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+
+    //頂点データを作成する
+    for (int i = 0; i < vertical; ++i) {
+
+        int buffer;
+
+        if (i == 0 || i == vertical - 1) {
+
+            float point;
+
+            if (i == 0) {
+                point = 0.5f;
+                buffer = 1;
+            }
+            else {
+                point = -0.49f;
+                buffer = -1;
+            }
+
+            for (int j = 0; j < horizontal; ++j) {
+                //球のさきっちょ
+                vertexData[drawInTriangleCountInstance * 3 + 1].position = { 0.0f, point, 0.0f, 1.0f };
+                vertexData[drawInTriangleCountInstance * 3 + 1].texcoord = { (float(horizontal - 1 - j)) / float(horizontal - 1), buffer == 1 ? 0.0f : 0.9999f };
+
+                //先っちょから一個離れた点たち
+                vertexData[drawInTriangleCountInstance * 3 + 1 - buffer].position = {
+                    sinf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawInTriangleCountInstance * 3 + 1 - buffer].texcoord = {
+                    float(horizontal - 1 - j - 1 + (8 * buffer) - 8) / float(horizontal - 1),
+                    float(i + 1) / float(vertical)
+                };
+
+                vertexData[drawInTriangleCountInstance * 3 + 1 - buffer * -1].position = {
+                    sinf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawInTriangleCountInstance * 3 + 1 - buffer * -1].texcoord = {
+                    float(horizontal - 1 - j + (8 * buffer) - 8) / float(horizontal - 1),
+                    float(i + 1) / float(vertical)
+                };
+
+				ConvertVector(vertexData[drawInTriangleCountInstance * 3 + 1].position, vertexData[drawInTriangleCountInstance * 3 + 1].normal);
+
+                ++drawInTriangleCountInstance;
+            }
+        }
+        else {
+
+            if (i > vertical / 2) {
+                buffer = 1;
+            }
+            else {
+                buffer = -1;
+            }
+
+            for (int j = 0; j < horizontal; ++j) {
+                //1つ目の三角形
+                //RightBottom
+                vertexData[drawInTriangleCountInstance * 3 + 2].position = {
+                    sinf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawInTriangleCountInstance * 3 + 2].texcoord = {
+                    float(horizontal - 1 - j) / float(horizontal - 1),
+                    float(i + 1) / float(vertical)
+                };
+
+                //RightTop
+                vertexData[drawInTriangleCountInstance * 3 + 1].position = {
+                    sinf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawInTriangleCountInstance * 3 + 1].texcoord = {
+                    float(horizontal - 1 - j) / float(horizontal - 1),
+                    float(i) / float(vertical)
+                };
+
+                //LeftTop
+                vertexData[drawInTriangleCountInstance * 3].position = {
+                    sinf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawInTriangleCountInstance * 3].texcoord = {
+                    float(horizontal - 1 - j - 1) / float(horizontal - 1),
+                    float(i) / float(vertical)
+                };
+
+                ++drawInTriangleCountInstance;
+
+                ConvertVector(vertexData[drawInTriangleCountInstance * 3 + 1].position, vertexData[drawInTriangleCountInstance * 3 + 1].normal);
+
+                //2つ目の三角形
+                //RightBottom
+                vertexData[drawInTriangleCountInstance * 3 + 2].position = {
+                    sinf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawInTriangleCountInstance * 3 + 2].texcoord = {
+                    float(horizontal - 1 - j) / float(horizontal - 1),
+                    float(i + 1) / float(vertical)
+                };
+
+                //LeftTop
+                vertexData[drawInTriangleCountInstance * 3 + 1].position = {
+                    sinf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i) / float(vertical - 1)) / 2,
+                    cosf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawInTriangleCountInstance * 3 + 1].texcoord = {
+                    float(horizontal - 1 - j - 1) / float(horizontal - 1),
+                    float(i) / float(vertical)
+                };
+
+                //LeftBottom
+                vertexData[drawInTriangleCountInstance * 3].position = {
+                    sinf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    cosf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
+                    1.0f
+                };
+                vertexData[drawInTriangleCountInstance * 3].texcoord = {
+                    float(horizontal - 1 - j - 1) / float(horizontal - 1),
+                    float(i + 1) / float(vertical)
+                };
+
+                ConvertVector(vertexData[drawInTriangleCountInstance * 3 + 1].position, vertexData[drawInTriangleCountInstance * 3 + 1].normal);
+
+                ++drawInTriangleCountInstance;
+            }
+
+        }
+    }
+
+    TramsformMatrixData* wvpData = nullptr;
+	//書き込むためのアドレスを取得
+	wvpResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+    //wvp行列を書き込む
+    wvpData->wvp = wvpMatrix;
+	wvpData->world = worldMatrix;
+
+	MaterialData* materialData = nullptr;
+	//書き込むためのアドレスを取得
+	materialResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+    //色指定
+    materialData->color = color;
+	//常に光っている->true / 光源の影響を受ける->false
+	materialData->enableLighting = false;
+
+	DirectionalLightData* directionalLightData = nullptr;
+	//書き込むためのアドレスを取得
+	directionalLightResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+    //光の入力
+    *directionalLightData = dLightData;
+
+    //頂点のバッファビューを作成する
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+    //リソースの先頭のアドレスから使う
+    vertexBufferView.BufferLocation = vertexResource[kSphere][drawCount[kSphere]]->GetGPUVirtualAddress();
+    //使用するリソースのサイズは頂点3つ分のサイズ
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * 3 * drawInTriangleCountInstance;
+    //1頂点当たりのサイズ
+    vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+    //ビューポート
+    D3D12_VIEWPORT viewport{};
+    //クライアント領域のサイズと一緒にして画面全体に表示
+    viewport.Width = static_cast<float>(kClientWidth);
+    viewport.Height = static_cast<float>(kClientHeight);
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    //シザー矩形
+    D3D12_RECT scissorRect{};
+    //基本的にビューポートと同じ矩形が構成されるようにする
+    scissorRect.left = 0;
+    scissorRect.right = kClientWidth;
+    scissorRect.top = 0;
+    scissorRect.bottom = kClientHeight;
+
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+    //マテリアルCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kSphere][drawCount[kSphere]]->GetGPUVirtualAddress());
+    //wvp用のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kSphere][drawCount[kSphere]]->GetGPUVirtualAddress());
+    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
+    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
+	//光のCBufferの場所を設定
+	commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kSphere][drawCount[kSphere]]->GetGPUVirtualAddress());
+    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
+    commandList->DrawInstanced(drawInTriangleCountInstance * 3, 1, 0, 0);
+
+    ++drawCount[kSphere];
 }
 
 void MyDirectX::EndFrame() {
@@ -877,7 +1146,10 @@ void MyDirectX::EndFrame() {
         WaitForSingleObject(fenceEvent, INFINITE);
     }
 
-    drawTriangle3DCount = 0;
+	for (uint32_t& count : drawCount) {
+		count = 0;
+	}
+    
     //次のフレームのためのcommandReset
     commandAllocator->Reset();
     commandList->Reset(commandAllocator, nullptr);
@@ -895,6 +1167,7 @@ void MyDirectX::Finalize() {
             vertexResource[i][j]->Release();
             wvpResource[i][j]->Release();
             materialResource[i][j]->Release();
+			directionalLightResource[i][j]->Release();
         }
     }
     graphicsPipelineState->Release();
