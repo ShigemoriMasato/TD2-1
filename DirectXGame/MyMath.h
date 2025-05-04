@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
@@ -13,10 +14,23 @@ struct Transform final {
 struct VertexData final {
 	Vector4 position;
 	Vector2 texcoord;
+	Vector3 normal;
 };
 
-struct VertexMatrix final {
-	float m[4][4];
+struct MaterialData final {
+	Vector4 color;
+	int32_t enableLighting;
+};
+
+struct TramsformMatrixData final {
+	Matrix4x4 wvp;
+	Matrix4x4 world;
+};
+
+struct DirectionalLightData final {
+	Vector4 color;
+	Vector3 direction;
+	float intensity;
 };
 
 Matrix4x4 MakeTransformMatrix(const Transform& transform);
@@ -32,3 +46,11 @@ Matrix4x4 MakeRotetaXMatrix(float radius);
 Matrix4x4 MakeRotateYMatrix(float radius);
 
 Matrix4x4 MakeRotateZMatrix(float radius);
+
+Vector3 TransForm(const Vector3& vector, const Matrix4x4& matrix);
+
+void ConvertVector(const Vector3& vec, Vector4& outVec);
+
+void ConvertVector(const Vector4& vec, Vector3& outVec);
+
+void Normalize(Vector3& vec);

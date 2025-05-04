@@ -1,49 +1,56 @@
 #pragma once
 #include <Windows.h>
-#include <cstdint>
-#include <cassert>
-#include <vector>
-#include <strsafe.h>
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <dbghelp.h>
-#include <dxgidebug.h>
-#include <memory>
-#include <dxcapi.h>
 #include <unordered_map>
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
+#include <vector>
 #include "externals/imgui/imgui_impl_win32.h"
-#include "externals/DirectXTex/d3dx12.h"
-#include "externals/DirectXTex/DirectXTex.h"
 
+#include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
+#include <dxgi1_6.h>
 #pragma comment(lib, "dxgi.lib")
+#include <dbghelp.h>
 #pragma comment(lib, "Dbghelp.lib")
+#include <dxgidebug.h>
 #pragma comment(lib, "dxguid.lib")
+#include <dxcapi.h>
 #pragma comment(lib, "dxcompiler.lib")
 
 #include "Logger.h"
 #include "Vector4.h"
 #include "Matrix4x4.h"
 #include "MyMath.h"
+#include "VertexData.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 class MyDirectX {
 public:
+	enum DrawKind {
+		kTriangle3D,
+		kTriangle2D,
+		kSphere,
+		kSprite3D,
+		kSprite2D,
+
+		MaxDrawKind
+	};
+
 	MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight);
 	~MyDirectX();
 
 	void Initialize();
 
+	void CreateDrawResource(DrawKind drawKind, uint32_t createNum);
+
 	void BeginFrame();
 
 	int ReadTexture(std::string path);
 
-	void DrawSphere(Matrix4x4 wvpMatrix, Vector4 color, int textureHandle);
+	void DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 
-	void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpMatrix, Vector4 color);
+	void DrawTriangle(TriangleData3 vertexData, Vector4 color, DirectionalLightData dLightData, int textureHandle);
+
+	void DrawSphere(Matrix4x4 wvpMatrix, Matrix4x4 worldMatrix, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 
 	void EndFrame();
 
@@ -93,9 +100,6 @@ private:
 	//三角形描画用
 	ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
 	ID3D12Resource* depthStencilResource = nullptr;
-	ID3D12Resource* vertexResource = nullptr;
-	ID3D12Resource* wvpResource = nullptr;
-	ID3D12Resource* materialResource = nullptr;
 	ID3D12PipelineState* graphicsPipelineState = nullptr;
 	ID3D10Blob* signatureBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
@@ -104,27 +108,25 @@ private:
 	IDxcBlob* vertexShaderBlob = nullptr;
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 
+	//1フレームに描画した数をカウントする
+	std::vector<uint32_t> drawCount;
+	uint32_t drawTriangle3DCount = 0;
+	uint32_t drawSphereCount = 0;
+
+	std::vector<std::vector<ID3D12Resource*>> vertexResource;
+	std::vector<std::vector<ID3D12Resource*>> wvpResource;
+	std::vector<std::vector<ID3D12Resource*>> materialResource;
+	std::vector<std::vector<ID3D12Resource*>> directionalLightResource;
+
 	//画像の関数
 	std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> textureSrvHandleGPU;
 	uint32_t readTextureCount;
 	std::vector<ID3D12Resource*> textureResource;
 	std::vector<ID3D12Resource*> intermediateResource;
 
-	const UINT alignedSize;
 	uint32_t descriptorSizeSRV;
 	uint32_t descriptorSizeRTV;
 	uint32_t descriptorSizeDSV;
-
-	VertexData* vertexData = nullptr;
-	Matrix4x4* wvpData = nullptr;
-	Vector4* materialData = nullptr;
-
-	//sprite
-	ID3D12Resource* vertexResourceSprite = nullptr;
-	ID3D12Resource* transformationMatrixResourceSprite = nullptr;	//スプライト用の頂点バッファ
-
-	VertexData* vertexDataSprite = nullptr;
-	Matrix4x4* transformationMatrixDataSprite = nullptr;
 
 	//imgui用
 	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
