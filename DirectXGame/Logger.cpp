@@ -13,7 +13,7 @@ Logger::Logger(std::string logName) {
 	//formatを使って年月日_時分秒の文字列型に変換
 	std::string dataString = std::format("{:%Y%m%d_%H.%M.%S}", localTime);
 	//ファイル名の決定
-	std::string logFileName = "Log/" + logName + "/" + dataString + ".log";
+	std::string logFileName = "Logs/" + logName + "/" + dataString + ".log";
 	//ファイルを作成して書き込み準備
 	logStream = std::ofstream(logFileName);
 

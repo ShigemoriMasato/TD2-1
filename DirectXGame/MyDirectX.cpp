@@ -109,7 +109,7 @@ namespace {
         hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
         assert(SUCCEEDED(hr));
         //成功したログを出す
-        logger->Log(ConvertString(std::format(L"Compile Successd, path: {}, profile{}\n", filePath, profile)));
+        logger->Log(ConvertString(std::format(L"Compile Successd, path: {}, profile: {}\n", filePath, profile)));
         //もう使わないリソースを開放
         shaderSource->Release();
         shaderResult->Release();
@@ -298,7 +298,7 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     kClientWidth(kWindowWidth),
     kClientHeight(kWindowHeight),
     clearColor(new float[4] {0.1f, 0.25f, 0.5f, 1.0f}),
-    logger(new Logger("DirectX12")),
+    logger(new Logger("master")),
     fenceValue(0),
     readTextureCount(0) {
     resourceStates[swapChainResources[0]] = D3D12_RESOURCE_STATE_PRESENT;
@@ -944,7 +944,9 @@ void MyDirectX::DrawSphere(Matrix4x4 wvpMatrix, Matrix4x4 worldMatrix, Vector4 c
                     float(i + 1) / float(vertical)
                 };
 
+                ConvertVector(vertexData[drawInTriangleCountInstance * 3].position, vertexData[drawInTriangleCountInstance * 3].normal);
 				ConvertVector(vertexData[drawInTriangleCountInstance * 3 + 1].position, vertexData[drawInTriangleCountInstance * 3 + 1].normal);
+                ConvertVector(vertexData[drawInTriangleCountInstance * 3 + 2].position, vertexData[drawInTriangleCountInstance * 3 + 2].normal);
 
                 ++drawInTriangleCountInstance;
             }
@@ -996,9 +998,11 @@ void MyDirectX::DrawSphere(Matrix4x4 wvpMatrix, Matrix4x4 worldMatrix, Vector4 c
                     float(i) / float(vertical)
                 };
 
-                ++drawInTriangleCountInstance;
-
+                ConvertVector(vertexData[drawInTriangleCountInstance * 3].position, vertexData[drawInTriangleCountInstance * 3].normal);
                 ConvertVector(vertexData[drawInTriangleCountInstance * 3 + 1].position, vertexData[drawInTriangleCountInstance * 3 + 1].normal);
+                ConvertVector(vertexData[drawInTriangleCountInstance * 3 + 2].position, vertexData[drawInTriangleCountInstance * 3 + 2].normal);
+
+                ++drawInTriangleCountInstance;
 
                 //2つ目の三角形
                 //RightBottom
@@ -1037,7 +1041,9 @@ void MyDirectX::DrawSphere(Matrix4x4 wvpMatrix, Matrix4x4 worldMatrix, Vector4 c
                     float(i + 1) / float(vertical)
                 };
 
+                ConvertVector(vertexData[drawInTriangleCountInstance * 3].position, vertexData[drawInTriangleCountInstance * 3].normal);
                 ConvertVector(vertexData[drawInTriangleCountInstance * 3 + 1].position, vertexData[drawInTriangleCountInstance * 3 + 1].normal);
+                ConvertVector(vertexData[drawInTriangleCountInstance * 3 + 2].position, vertexData[drawInTriangleCountInstance * 3 + 2].normal);
 
                 ++drawInTriangleCountInstance;
             }
