@@ -31,6 +31,7 @@ public:
 		kSphere,
 		kSprite3D,
 		kSprite2D,
+		kPrism,
 
 		MaxDrawKind
 	};
@@ -51,6 +52,10 @@ public:
 	void DrawTriangle(TriangleData3 vertexData, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 
 	void DrawSphere(Matrix4x4 wvpMatrix, Matrix4x4 worldMatrix, Vector4 color, DirectionalLightData dLightData, int textureHandle);
+
+	void DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, Vector4 color, DirectionalLightData dLightData, int textureHandle);
+
+	void DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 
 	void EndFrame();
 
@@ -117,6 +122,7 @@ private:
 	std::vector<std::vector<ID3D12Resource*>> wvpResource;
 	std::vector<std::vector<ID3D12Resource*>> materialResource;
 	std::vector<std::vector<ID3D12Resource*>> directionalLightResource;
+	std::vector<std::vector<ID3D12Resource*>> indexResource;
 
 	//画像の関数
 	std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> textureSrvHandleGPU;

@@ -58,9 +58,9 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	const float kWindowHeight = 720.0f;
 
 	MyDirectX* myDirectX = new MyDirectX(int(kWindowWidth), int(kWindowHeight));
-	myDirectX->Initialize();
 	myDirectX->CreateDrawResource(MyDirectX::kTriangle3D, 300);
 	myDirectX->CreateDrawResource(MyDirectX::kSphere, 1);
+	myDirectX->CreateDrawResource(MyDirectX::kSprite3D, 20);
 
 	Transform transform = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 	Transform tra = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
@@ -97,8 +97,6 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//ゲームの更新処理
 			myDirectX->BeginFrame();
 
-			wvpMatrix = MakeTransformMatrix(transform) * viewMatrix * projectionMatrix;
-
 			ImGui::Begin("Sphere");
 			ImGui::SliderVector("Position", transform.position, -10.0f, 10.0f);
 			ImGui::SliderVector("Rotation", transform.rotation, -3.14f, 3.14f);
@@ -111,13 +109,25 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			Normalize(dLightData.direction);
 
+			wvpMatrix = MakeTransformMatrix(transform) * viewMatrix * projectionMatrix;
+
 			myDirectX->DrawSphere(wvpMatrix, MakeTransformMatrix(transform), triangleColor, dLightData, 0);
+
+			myDirectX->DrawSprite3D(
+				{ -0.5f, 0.5f, 2.0f },
+				{ 0.5f, 0.5f, 2.0f },
+				{ -0.5f, -0.5f, 2.0f },
+				{ 0.5f, -0.5f, 2.0f },
+				wvpMatrix,
+				MakeTransformMatrix(transform),
+				triangleColor,
+				dLightData,
+				0);
 
 			myDirectX->EndFrame();
 		}
 	}
 
-	myDirectX->Finalize();
 	delete myDirectX;
 
 	return 0;
