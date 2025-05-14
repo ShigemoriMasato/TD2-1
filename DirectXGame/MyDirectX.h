@@ -51,7 +51,7 @@ public:
 
 	void DrawTriangle(TriangleData3 vertexData, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 
-	void DrawSphere(Matrix4x4 wvpMatrix, Matrix4x4 worldMatrix, Vector4 color, DirectionalLightData dLightData, int textureHandle);
+	void DrawSphere(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData color, DirectionalLightData dLightData, int textureHandle);
 
 	void DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 

@@ -58,20 +58,32 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	const float kWindowHeight = 720.0f;
 
 	MyDirectX* myDirectX = new MyDirectX(int(kWindowWidth), int(kWindowHeight));
-	myDirectX->CreateDrawResource(MyDirectX::kTriangle3D, 300);
+	myDirectX->CreateDrawResource(MyDirectX::kPrism, 1);
 	myDirectX->CreateDrawResource(MyDirectX::kSphere, 1);
-	myDirectX->CreateDrawResource(MyDirectX::kSprite3D, 20);
 
-	Transform transform = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+	myDirectX->ReadTexture("resources/white1x1.png");
+
+	const float pie = 3.14159265358f;
+
+	Transform transform = { 0.0000001f, 0.0000001f, 0.0000001f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+
 	Transform tra = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-	Transform camera = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -5.0f };
+	tra.position.z = 5.0f;
+	Transform camera = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f };
+	//camera.position.y = 4.0f;
+	//camera.position.z = -1000.0f;
+	//camera.rotation.x = 0.7f;
 	Matrix4x4 wvpMatrix{};
-	Vector4 triangleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	MaterialData material = {};
+	material.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	material.enableLighting = true;
 	DirectionalLightData dLightData = {};
 
 	dLightData.color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	dLightData.direction = { 0.0f, -1.0f, 0.0f };
 	dLightData.intensity = 1.0f;
+
+	const Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
 
 	TriangleData3 triangle = {
 		{ -0.5f, -0.5f, 0.0f },
@@ -79,12 +91,11 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		{ 0.5f, -0.5f, 0.0f }
 	};
 
-	Matrix4x4 viewMatrix = Inverse(MakeTransformMatrix(camera));
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
-
 	TriangleData3 screentr[2]{};
 
 	MSG msg{};
+
+	bool enableLighting = true;
 
 	//ウィンドウのxボタンが押されるまでループ
 	while (msg.message != WM_QUIT) {
@@ -96,33 +107,36 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		else {
 			//ゲームの更新処理
 			myDirectX->BeginFrame();
-
-			ImGui::Begin("Sphere");
+			ImGui::Begin("Prism");
 			ImGui::SliderVector("Position", transform.position, -10.0f, 10.0f);
 			ImGui::SliderVector("Rotation", transform.rotation, -3.14f, 3.14f);
-			ImGui::SliderVector("Scale", transform.scale, 0.0f, 10.0f);
-			ImGui::ColorEditVector("Triangle Color", triangleColor);
+			ImGui::SliderVector("Scale", transform.scale, 0.0f, 2.0f);
+			ImGui::ColorEditVector("Triangle Color", material.color);
 			ImGui::ColorEditVector("Directional Light Color", dLightData.color);
 			ImGui::SliderVector("Directional Light Direction", dLightData.direction, -1.0f, 1.0f);
 			ImGui::SliderFloat("Directional Light Intensity", &dLightData.intensity, 0.0f, 10.0f);
+			ImGui::Checkbox("EnableLight", &enableLighting);
 			ImGui::End();
+
+			material.enableLighting = enableLighting;
+
+			ImGui::Begin("Camera");
+			ImGui::SliderVector("Position", camera.position, -10.0f, 10.0f);
+			ImGui::SliderVector("Rotation", camera.rotation, -3.14f, 3.14f);
+			ImGui::SliderVector("Scale", camera.scale, 0.1f, 10.0f);
+			ImGui::End();
+
+			Matrix4x4 viewMatrix = Inverse(MakeTransformMatrix(camera));
 
 			Normalize(dLightData.direction);
 
-			wvpMatrix = MakeTransformMatrix(transform) * viewMatrix * projectionMatrix;
+			wvpMatrix = MakeIdentity4x4() * viewMatrix * projectionMatrix;
 
-			myDirectX->DrawSphere(wvpMatrix, MakeTransformMatrix(transform), triangleColor, dLightData, 0);
+			Matrix4x4 traMatrix = MakeTransformMatrix(tra) * viewMatrix * projectionMatrix;
 
-			myDirectX->DrawSprite3D(
-				{ -0.5f, 0.5f, 2.0f },
-				{ 0.5f, 0.5f, 2.0f },
-				{ -0.5f, -0.5f, 2.0f },
-				{ 0.5f, -0.5f, 2.0f },
-				wvpMatrix,
-				MakeTransformMatrix(transform),
-				triangleColor,
-				dLightData,
-				0);
+			myDirectX->DrawPrism(MakeTransformMatrix(tra), traMatrix, material.color, dLightData, 1);
+
+			myDirectX->DrawSphere(MakeTransformMatrix(transform), wvpMatrix, material, dLightData, 0);
 
 			myDirectX->EndFrame();
 		}
