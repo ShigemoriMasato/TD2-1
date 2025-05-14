@@ -16,6 +16,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{231f3a29-1e23-4adb-8343-c8f6d9396245}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Prism">
+      <UniqueIdentifier>{e2361ba4-9e39-455a-8e32-555888c08900}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logger.cpp">

@@ -59,13 +59,13 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	MyDirectX* myDirectX = new MyDirectX(int(kWindowWidth), int(kWindowHeight));
 	myDirectX->CreateDrawResource(MyDirectX::kPrism, 1);
-	myDirectX->CreateDrawResource(MyDirectX::kSphere, 1);
+	myDirectX->CreateDrawResource(MyDirectX::kSphere, 6);
 
 	myDirectX->ReadTexture("resources/white1x1.png");
 
 	const float pie = 3.14159265358f;
 
-	Transform transform = { 0.0000001f, 0.0000001f, 0.0000001f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+	Transform transform = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 
 	Transform tra = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 	tra.position.z = 5.0f;
@@ -85,6 +85,18 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	const Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
 
+	Vector4 lineVertexlist[5]{};
+	//上段
+	lineVertexlist[0] = { 0.0f, 2.0f, 0.0f, 1.0f };
+
+	//中段
+	for (int i = 1; i < 4; ++i) {
+		lineVertexlist[i] = { cosf(pie * 2.0f * (i - 1) / 3.0f) / 2.0f, 0.0f, sinf(pie * 2.0f * (i - 1) / 3.0f) / 2.0f, 1.0f };
+	}
+	//下段
+	lineVertexlist[4] = { 0.0f, -2.0f, 0.0f, 1.0f };
+
+
 	TriangleData3 triangle = {
 		{ -0.5f, -0.5f, 0.0f },
 		{ 0.0f, 0.5f, 0.0f },
@@ -95,7 +107,13 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	MSG msg{};
 
-	bool enableLighting = true;
+	const float ratioSphereToPrism = 10.0f;
+
+	bool enableLighting = false;
+
+	bool isDrawSphere = false;
+
+	const Vector4 lineBuffer = { 0.01f, 0.0f, 0.01f, 0.0f };
 
 	//ウィンドウのxボタンが押されるまでループ
 	while (msg.message != WM_QUIT) {
@@ -116,6 +134,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::SliderVector("Directional Light Direction", dLightData.direction, -1.0f, 1.0f);
 			ImGui::SliderFloat("Directional Light Intensity", &dLightData.intensity, 0.0f, 10.0f);
 			ImGui::Checkbox("EnableLight", &enableLighting);
+			ImGui::Checkbox("IsDrawSphere", &isDrawSphere);
 			ImGui::End();
 
 			material.enableLighting = enableLighting;
@@ -130,13 +149,27 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			Normalize(dLightData.direction);
 
-			wvpMatrix = MakeIdentity4x4() * viewMatrix * projectionMatrix;
+			wvpMatrix = MakeTransformMatrix(transform) * viewMatrix * projectionMatrix;
 
-			Matrix4x4 traMatrix = MakeTransformMatrix(tra) * viewMatrix * projectionMatrix;
+			myDirectX->DrawPrism(MakeTransformMatrix(transform), wvpMatrix, material, dLightData, 1);
 
-			myDirectX->DrawPrism(MakeTransformMatrix(tra), traMatrix, material.color, dLightData, 1);
+			tra = transform;
+			tra.scale.x *= 1.0f / ratioSphereToPrism;
+			tra.scale.y *= 1.0f / ratioSphereToPrism;
+			tra.scale.z *= 1.0f / ratioSphereToPrism;
 
-			myDirectX->DrawSphere(MakeTransformMatrix(transform), wvpMatrix, material, dLightData, 0);
+			Matrix4x4 worldMatrix = MakeTransformMatrix(tra);
+			Matrix4x4 wvptraMatrix = worldMatrix * viewMatrix * projectionMatrix;
+
+			myDirectX->DrawSphere(lineVertexlist[0] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, MaterialData({ 0.0f, 0.0f, 0.0f, 0.0f }, enableLighting), dLightData, 1);
+
+			myDirectX->DrawSphere(lineVertexlist[1] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, {0.0f, 0.0f, 0.0f, 0.0f, enableLighting}, dLightData, 1);
+
+			myDirectX->DrawSphere(lineVertexlist[2] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, {0.0f, 0.0f, 0.0f, 0.0f, enableLighting}, dLightData, 1);
+
+			myDirectX->DrawSphere(lineVertexlist[3] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, {0.0f, 0.0f, 0.0f, 0.0f, enableLighting}, dLightData, 1);
+
+			myDirectX->DrawSphere(lineVertexlist[4] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, {0.0f, 0.0f, 0.0f, 0.0f, enableLighting}, dLightData, 1);
 
 			myDirectX->EndFrame();
 		}
