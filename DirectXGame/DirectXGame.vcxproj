@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Center.cpp" />
+    <ClCompile Include="Circle.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -18,14 +20,19 @@
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Field.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix4x4.cpp" />
     <ClCompile Include="MyDirectX.cpp" />
     <ClCompile Include="MyEngine.cpp" />
     <ClCompile Include="MyMath.cpp" />
+    <ClCompile Include="Prism.cpp" />
+    <ClCompile Include="Rain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Center.h" />
+    <ClInclude Include="Circle.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -34,11 +41,14 @@
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
+    <ClInclude Include="Field.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Matrix4x4.h" />
     <ClInclude Include="MyDirectX.h" />
     <ClInclude Include="MyEngine.h" />
     <ClInclude Include="MyMath.h" />
+    <ClInclude Include="Prism.h" />
+    <ClInclude Include="Rain.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />

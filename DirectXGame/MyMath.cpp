@@ -104,3 +104,7 @@ void Normalize(Vector3& vec) {
 	vec.y /= length;
 	vec.z /= length;
 }
+
+bool Transform::operator==(const Transform& other) const {
+	return scale == other.scale || rotation == other.rotation || position == other.position;
+}

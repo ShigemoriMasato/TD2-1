@@ -19,6 +19,18 @@
     <Filter Include="Prism">
       <UniqueIdentifier>{e2361ba4-9e39-455a-8e32-555888c08900}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Center">
+      <UniqueIdentifier>{e67c8e96-c8e2-4f1a-b019-9689b7510bb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rain">
+      <UniqueIdentifier>{4a1aeb33-9544-4b33-8579-9815bf56bb24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Circle">
+      <UniqueIdentifier>{1288d6bd-416e-4c61-ad8d-228bb278e58d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Field">
+      <UniqueIdentifier>{ee62f79a-6380-4b2a-8f20-b67a4b8aa7ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logger.cpp">
@@ -59,6 +71,21 @@
     </ClCompile>
     <ClCompile Include="MyEngine.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Prism.cpp">
+      <Filter>Prism</Filter>
+    </ClCompile>
+    <ClCompile Include="Center.cpp">
+      <Filter>Center</Filter>
+    </ClCompile>
+    <ClCompile Include="Rain.cpp">
+      <Filter>Rain</Filter>
+    </ClCompile>
+    <ClCompile Include="Circle.cpp">
+      <Filter>Circle</Filter>
+    </ClCompile>
+    <ClCompile Include="Field.cpp">
+      <Filter>Field</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +139,21 @@
     </ClInclude>
     <ClInclude Include="MyEngine.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Prism.h">
+      <Filter>Prism</Filter>
+    </ClInclude>
+    <ClInclude Include="Center.h">
+      <Filter>Center</Filter>
+    </ClInclude>
+    <ClInclude Include="Rain.h">
+      <Filter>Rain</Filter>
+    </ClInclude>
+    <ClInclude Include="Circle.h">
+      <Filter>Circle</Filter>
+    </ClInclude>
+    <ClInclude Include="Field.h">
+      <Filter>Field</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

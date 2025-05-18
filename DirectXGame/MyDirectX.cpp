@@ -155,12 +155,12 @@ namespace {
         return descriptorHeap;
     }
 
-    DirectX::ScratchImage LoadTexture(const std::string& filePath) {
+    DirectX::ScratchImage MakeMipmapImages(const std::string& filePath) {
         //テクスチャファイルを読んでプログラムで扱えるようにする
         DirectX::ScratchImage image{};
         std::wstring filePathW = ConvertString(filePath);
         HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
-        assert(SUCCEEDED(hr));
+        assert(SUCCEEDED(hr) && "Not Found Texture Resource");
 
         DirectX::ScratchImage mipImages{};
         //ミニマップの作成(画像サイズが最小の場合、作成手順を飛ばす)
@@ -266,9 +266,9 @@ namespace {
     }
 }
 
-int MyDirectX::ReadTexture(std::string path) {
+int MyDirectX::LoadTexture(std::string path) {
     //TextureResourceを作成
-    DirectX::ScratchImage mipImages = LoadTexture(path);
+    DirectX::ScratchImage mipImages = MakeMipmapImages(path);
     const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
     textureResource.push_back(CreateTextureResource(device, metadata));
     ID3D12Resource* resource = UploadTextureData(textureResource.back(), mipImages, device, commandList);
@@ -284,7 +284,7 @@ int MyDirectX::ReadTexture(std::string path) {
     //SRVを作成するDescriptorHeapの場所を決める
     D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
     textureSrvHandleGPU.push_back(srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-    //先頭はImGuiが使っているのでその次を使う
+    //先頭はImGuiが使っているのでその次を使う(UnloadTextureを作成するとき、readTextureCountを見直す)
     textureSrvHandleCPU = GetCPUDesscriptorHandle(srvDescriptorHeap, descriptorSizeSRV, ++readTextureCount);
     textureSrvHandleGPU.back() = GetGPUDesscriptorHandle(srvDescriptorHeap, descriptorSizeSRV, readTextureCount);
 
@@ -297,7 +297,7 @@ int MyDirectX::ReadTexture(std::string path) {
 MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     kClientWidth(kWindowWidth),
     kClientHeight(kWindowHeight),
-    clearColor(new float[4] {0.1f, 0.25f, 0.5f, 1.0f}),
+    clearColor(new float[4] {0.05f, 0.03f, 0.04f, 1.0f}),
     logger(new Logger("master")),
     fenceValue(0),
     readTextureCount(0) {
@@ -319,7 +319,7 @@ void MyDirectX::Initialize() {
     CreateWindowForApp();
     InitDirectX();
     InitImGui();
-    ReadTexture("resources/uvChecker.png");
+    LoadTexture("resources/uvChecker.png");
 }
 
 void MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
@@ -327,7 +327,7 @@ void MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
 		//頂点リソース用のリソース作成
         switch (drawKind) {
         case kSphere:
-			vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 992 * 3));
+			vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 336));
             break;
 
         case kSprite2D:
@@ -337,9 +337,14 @@ void MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
 			break;
 
         case kPrism:
-			vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 5));
-			indexResource[drawKind].push_back(CreateBufferResource(device, sizeof(uint32_t) * 18));
+			vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 6));
+			indexResource[drawKind].push_back(CreateBufferResource(device, sizeof(uint32_t) * 24));
             break;
+
+        case kBox:
+			vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 8));
+			indexResource[drawKind].push_back(CreateBufferResource(device, sizeof(uint32_t) * 36));
+			break;
 
         default:
             vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 3));
@@ -914,8 +919,8 @@ void MyDirectX::DrawSphere(Vector4 center, Matrix4x4 worldMatrix, Matrix4x4 wvpM
     }
 
     const float pie = 3.14159265358f;
-    const int vertical = 32;
-    const int horizontal = 16;
+    const int vertical = 8;
+    const int horizontal = 8;
 
     uint32_t drawTriangleCountInstance = 0;
 
@@ -1235,7 +1240,7 @@ void MyDirectX::DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Mat
     //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
     commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-    ++drawCount[kSphere];
+    ++drawCount[kSprite3D];
 }
 
 void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
@@ -1250,34 +1255,34 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
 
     float pie = 3.14159265358f;
     //中段
-    for (int i = 1; i < 4; ++i) {
-        vertexData[i].position = { cosf(pie * 2.0f * (i - 1) / 3.0f) / 4.0f, 0.0f, sinf(pie * 2.0f * (i - 1) / 3.0f) / 4.0f, 1.0f };
-        vertexData[i].texcoord = { static_cast<float>(i - 1) / 3.0f, 0.5f };
-        vertexData[i].normal = { cosf(pie * 2.0f * (i - 1) / 3.0f), 0.0f, sinf(pie * 2.0f * (i - 1) / 3.0f) };
+    for (int i = 1; i < 5; ++i) {
+        vertexData[i].position = { cosf(pie * 2.0f * (i - 1) / 4.0f) / 1.0f, 0.0f, sinf(pie * 2.0f * (i - 1) / 4.0f) / 1.0f, 1.0f };
+        vertexData[i].texcoord = { static_cast<float>(i - 1) / 4.0f, 0.5f };
+        vertexData[i].normal = { cosf(pie * 2.0f * (i - 1) / 4.0f), 0.0f, sinf(pie * 2.0f * (i - 1) / 4.0f) };
     }
 
     //下段
-    vertexData[4].position = { 0.0f, -1.0f, 0.0f, 1.0f };
-    vertexData[4].texcoord = { 0.5f, 1.0f };
-    vertexData[4].normal = { 0.0f, -1.0f, 0.0f };
+    vertexData[5].position = { 0.0f, -1.0f, 0.0f, 1.0f };
+    vertexData[5].texcoord = { 0.5f, 1.0f };
+    vertexData[5].normal = { 0.0f, -1.0f, 0.0f };
 
 	uint32_t* indexData = nullptr;
 	indexResource[kPrism][drawCount[kPrism]]->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 	
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
 		indexData[i * 3] = 0;
 		indexData[i * 3 + 1] = i + 2;
         indexData[i * 3 + 2] = i + 1;
-        if (i == 2) {
+        if (i == 3) {
 			indexData[i * 3 + 1] = 1;
         }
     }
 
-    for (int i = 3; i < 6; ++i) {
-		indexData[i * 3] = 4;
-		indexData[i * 3 + 1] = i + 1 - 3;
-		indexData[i * 3 + 2] = i + 2 - 3;
-        if (i == 5) {
+    for (int i = 4; i < 8; ++i) {
+		indexData[i * 3] = 5;
+		indexData[i * 3 + 1] = i + 1 - 4;
+		indexData[i * 3 + 2] = i + 2 - 4;
+        if (i == 7) {
             indexData[i * 3 + 2] = 1;
         }
     }
@@ -1300,14 +1305,14 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     //リソースの先頭のアドレスから使う
     vertexBufferView.BufferLocation = vertexResource[kPrism][drawCount[kPrism]]->GetGPUVirtualAddress();
     //使用するリソースのサイズは頂点3つ分のサイズ
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 5;
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
     //1頂点当たりのサイズ
     vertexBufferView.StrideInBytes = sizeof(VertexData);
 
     //インデックスのバッファビューを作成する
     D3D12_INDEX_BUFFER_VIEW indexBufferView{};
     indexBufferView.BufferLocation = indexResource[kPrism][drawCount[kPrism]]->GetGPUVirtualAddress();
-    indexBufferView.SizeInBytes = sizeof(uint32_t) * 18;
+    indexBufferView.SizeInBytes = sizeof(uint32_t) * 24;
     indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 
     //ビューポート
@@ -1344,9 +1349,164 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-    commandList->DrawIndexedInstanced(18, 1, 0, 0, 0);
+    commandList->DrawIndexedInstanced(24, 1, 0, 0, 0);
 
     ++drawCount[kPrism];
+}
+
+void MyDirectX::DrawBox(Vector4 center, Matrix4x4 wvpMatrix, Matrix4x4 worldMatrix, MaterialData material, DirectionalLightData dLightData) {
+	VertexData* vertexData = nullptr;
+	vertexResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+
+	const float pie = 3.14159265358f;
+
+	vertexData[0].position = { -0.5f, 0.5f, -0.5f, 1.0f };
+	vertexData[0].texcoord = { 0.0f, 0.0f };
+	vertexData[0].normal = { -1.0f, 1.0f, -1.0f };
+
+	vertexData[1].position = { 0.5f, 0.5f, -0.5f, 1.0f };
+	vertexData[1].texcoord = { 1.0f, 0.0f };
+	vertexData[1].normal = { 1.0f, 1.0f, -1.0f };
+
+	vertexData[2].position = { -0.5f, -0.5f, -0.5f, 1.0f };
+	vertexData[2].texcoord = { 0.0f, 1.0f };
+	vertexData[2].normal = { -1.0f, -1.0f, -1.0f };
+
+	vertexData[3].position = { 0.5f, -0.5f, -0.5f, 1.0f };
+	vertexData[3].texcoord = { 1.0f, 1.0f };
+	vertexData[3].normal = { 1.0f, -1.0f, -1.0f };
+
+    vertexData[4].position = { -0.5f, 0.5f, 0.5f, 1.0f };
+	vertexData[4].texcoord = { 0.0f, 0.0f };
+	vertexData[4].normal = { -1.0f, 1.0f, 1.0f };
+
+	vertexData[5].position = { 0.5f, 0.5f, 0.5f, 1.0f };
+	vertexData[5].texcoord = { 1.0f, 0.0f };
+	vertexData[5].normal = { 1.0f, 1.0f, 1.0f };
+
+	vertexData[6].position = { -0.5f, -0.5f, 0.5f, 1.0f };
+	vertexData[6].texcoord = { 0.0f, 1.0f };
+	vertexData[6].normal = { -1.0f, -1.0f, 1.0f };
+
+	vertexData[7].position = { 0.5f, -0.5f, 0.5f, 1.0f };
+	vertexData[7].texcoord = { 1.0f, 1.0f };
+	vertexData[7].normal = { 1.0f, -1.0f, 1.0f };
+
+	uint32_t* indexData = nullptr;
+	indexResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	//奥
+    indexData[0] = 0;
+	indexData[1] = 1;
+	indexData[2] = 2;
+	indexData[3] = 1;
+	indexData[4] = 3;
+	indexData[5] = 2;
+
+    //上
+	indexData[6] = 0;
+	indexData[7] = 4;
+	indexData[8] = 5;
+	indexData[9] = 0;
+	indexData[10] = 5;
+	indexData[11] = 1;
+
+	//左
+	indexData[12] = 0;
+	indexData[13] = 6;
+	indexData[14] = 4;
+	indexData[15] = 0;
+	indexData[16] = 2;
+	indexData[17] = 6;
+
+    //右
+	indexData[18] = 1;
+	indexData[19] = 5;
+	indexData[20] = 3;
+	indexData[21] = 5;
+	indexData[22] = 7;
+	indexData[23] = 3;
+
+	//下
+	indexData[24] = 2;
+	indexData[25] = 3;
+	indexData[26] = 7;
+	indexData[27] = 2;
+	indexData[28] = 7;
+	indexData[29] = 6;
+
+    //手前
+	indexData[30] = 4;
+	indexData[31] = 6;
+	indexData[32] = 5;
+	indexData[33] = 5;
+	indexData[34] = 6;
+	indexData[35] = 7;
+
+    TramsformMatrixData* wvpData = nullptr;
+    wvpResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+    wvpData->world = worldMatrix;
+    wvpData->wvp = wvpMatrix;
+
+    MaterialData* materialData = nullptr;
+    materialResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+    *materialData = material;
+
+    DirectionalLightData* directionalLightData = nullptr;
+    directionalLightResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+    *directionalLightData = dLightData;
+
+    //頂点のバッファビューを作成する
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+    //リソースの先頭のアドレスから使う
+    vertexBufferView.BufferLocation = vertexResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress();
+    //使用するリソースのサイズは頂点3つ分のサイズ
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * 8;
+    //1頂点当たりのサイズ
+    vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+    //インデックスのバッファビューを作成する
+    D3D12_INDEX_BUFFER_VIEW indexBufferView{};
+    indexBufferView.BufferLocation = indexResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress();
+    indexBufferView.SizeInBytes = sizeof(uint32_t) * 36;
+    indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+
+    //ビューポート
+    D3D12_VIEWPORT viewport{};
+    //クライアント領域のサイズと一緒にして画面全体に表示
+    viewport.Width = static_cast<float>(kClientWidth);
+    viewport.Height = static_cast<float>(kClientHeight);
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    //シザー矩形
+    D3D12_RECT scissorRect{};
+    //基本的にビューポートと同じ矩形が構成されるようにする
+    scissorRect.left = 0;
+    scissorRect.right = kClientWidth;
+    scissorRect.top = 0;
+    scissorRect.bottom = kClientHeight;
+
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+    commandList->IASetIndexBuffer(&indexBufferView);
+
+    //マテリアルCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress());
+    //wvp用のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress());
+    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
+    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[1]);
+    //光のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress());
+    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
+    commandList->DrawIndexedInstanced(36, 1, 0, 0, 0);
+
+    ++drawCount[kBox];
 }
 
 void MyDirectX::EndFrame() {

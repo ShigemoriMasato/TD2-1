@@ -32,6 +32,7 @@ public:
 		kSprite3D,
 		kSprite2D,
 		kPrism,
+		kBox,
 
 		MaxDrawKind
 	};
@@ -45,7 +46,7 @@ public:
 
 	void BeginFrame();
 
-	int ReadTexture(std::string path);
+	int LoadTexture(std::string path);
 
 	void DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 
@@ -56,6 +57,8 @@ public:
 	void DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
 	void DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
+
+	void DrawBox(Vector4 center, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData);
 
 	void EndFrame();
 

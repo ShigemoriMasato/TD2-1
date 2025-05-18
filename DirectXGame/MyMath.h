@@ -9,6 +9,8 @@ struct Transform final {
 	Vector3 scale;
 	Vector3 rotation;
 	Vector3 position;
+
+	bool operator==(const Transform& other) const;
 };
 
 struct VertexData final {
