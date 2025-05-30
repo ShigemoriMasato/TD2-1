@@ -42,16 +42,21 @@ public:
 	void Initialize();
 
 	void CreateDrawResource(DrawKind drawKind, uint32_t createNum);
+	void CreateModelDrawResource(uint32_t modelHandle, uint32_t createNum);
 
 	void BeginFrame();
 
-	int ReadTexture(std::string path);
+	int LoadTexture(std::string path);
+
+	uint32_t LoadObjFile(const std::string& directoryPath, const std::string& filename);
 
 	void DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 
 	void DrawTriangle(TriangleData3 vertexData, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 
 	void DrawSphere(Vector4 center, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
+
+	void DrawModel(ModelData modelData, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
 	void DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
@@ -115,14 +120,16 @@ private:
 
 	//1フレームに描画した数をカウントする
 	std::vector<uint32_t> drawCount;
-	uint32_t drawTriangle3DCount = 0;
-	uint32_t drawSphereCount = 0;
 
 	std::vector<std::vector<ID3D12Resource*>> vertexResource;
 	std::vector<std::vector<ID3D12Resource*>> wvpResource;
 	std::vector<std::vector<ID3D12Resource*>> materialResource;
 	std::vector<std::vector<ID3D12Resource*>> directionalLightResource;
 	std::vector<std::vector<ID3D12Resource*>> indexResource;
+
+	//Model管理用
+	std::vector<ModelData> modelList_;
+	std::vector<uint32_t> resourceCount_;
 
 	//画像の関数
 	std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> textureSrvHandleGPU;

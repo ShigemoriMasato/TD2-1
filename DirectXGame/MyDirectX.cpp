@@ -3,6 +3,7 @@
 #include <cassert>
 #include <strsafe.h>
 #include <memory>
+#include <sstream>
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
@@ -155,7 +156,7 @@ namespace {
         return descriptorHeap;
     }
 
-    DirectX::ScratchImage LoadTexture(const std::string& filePath) {
+    DirectX::ScratchImage CreateMipImages(const std::string& filePath) {
         //テクスチャファイルを読んでプログラムで扱えるようにする
         DirectX::ScratchImage image{};
         std::wstring filePathW = ConvertString(filePath);
@@ -266,9 +267,9 @@ namespace {
     }
 }
 
-int MyDirectX::ReadTexture(std::string path) {
+int MyDirectX::LoadTexture(std::string path) {
     //TextureResourceを作成
-    DirectX::ScratchImage mipImages = LoadTexture(path);
+    DirectX::ScratchImage mipImages = CreateMipImages(path);
     const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
     textureResource.push_back(CreateTextureResource(device, metadata));
     ID3D12Resource* resource = UploadTextureData(textureResource.back(), mipImages, device, commandList);
@@ -292,6 +293,63 @@ int MyDirectX::ReadTexture(std::string path) {
     device->CreateShaderResourceView(textureResource.back(), &srvDesc, textureSrvHandleCPU);
 
     return readTextureCount;
+}
+
+ModelData MyDirectX::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
+    ModelData modelData;                    //構築するデータ
+    std::vector<Vector4> positions;         //位置
+	std::vector<Vector3> normals;           //法線
+    std::vector<Vector2> texcoords;         //テクスチャ座標
+    std::string line;                       //ファイルから読んだ行を格納するバッファ
+
+	std::ifstream file(directoryPath + "/" + filename); //ファイルを開く
+    assert(file.is_open() && "MyDirectX::LoadObjFile / cannot open obj file");
+
+    while (std::getline(file, line)) {
+        std::string identifier;
+        std::istringstream s(line);
+        s >> identifier; //行の先頭の文字列を取得
+
+        if (identifier == "v") {
+            Vector4 position;
+            s >> position.x >> position.y >> position.z;
+            position.w = 1.0f;
+            positions.push_back(position); //位置を格納
+        } else if (identifier == "vt") {
+            Vector2 texcoord;
+            s >> texcoord.x >> texcoord.y; //テクスチャ座標を格納
+            texcoords.push_back(texcoord);
+        } else if (identifier == "vn") {
+            Vector3 normal;
+			s >> normal.x >> normal.y >> normal.z; //法線を格納
+			normals.push_back(normal);
+        } else if (identifier == "f") {
+            //面は三角形限定なので、読み込む前にEditor等で三角化させること。そのほかは未対応
+            for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
+                std::string vertexDefinition;
+				s >> vertexDefinition; //頂点の定義を取得
+                //頂点の要素へのIndexは。「位置/UV/法線」で格納されているので、分解してIndexを取得する
+                std::istringstream v(vertexDefinition);
+                uint32_t elementIndices[3];
+                for (int32_t element = 0; element < 3; ++element) {
+                    std::string index;
+                    std::getline(v, index, '/');// /区切りでインデックスを読む
+                    elementIndices[element] = std::stoi(index);
+                }
+                //要素へのIndexから、実際の要素の値を取得して頂点を構築する
+                Vector4 position = positions[elementIndices[0] - 1];
+				Vector2 texcoord = texcoords[elementIndices[1] - 1];
+				Vector3 normal = normals[elementIndices[2] - 1];
+                VertexData vertex = { position, texcoord, normal };
+				modelData.vertices.push_back(vertex); //頂点を格納
+            }
+        }
+    }
+
+	modelList_.push_back(modelData); //モデルデータをリストに追加
+	drawCount.push_back(0); //描画数を初期化
+
+    return ;
 }
 
 MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
@@ -319,7 +377,7 @@ void MyDirectX::Initialize() {
     CreateWindowForApp();
     InitDirectX();
     InitImGui();
-    ReadTexture("resources/uvChecker.png");
+    LoadTexture("resources/uvChecker.png");
 }
 
 void MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
@@ -1141,6 +1199,18 @@ void MyDirectX::DrawSphere(Vector4 center, Matrix4x4 worldMatrix, Matrix4x4 wvpM
     commandList->DrawInstanced(drawTriangleCountInstance * 3, 1, 0, 0);
 
     ++drawCount[kSphere];
+}
+
+void MyDirectX::DrawModel(ModelData modelData, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData) {
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+	vertexBufferView.BufferLocation = vertexResource[kModel][drawCount[kModel]]->GetGPUVirtualAddress();
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * modelData.vertices.size();
+	vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+    //頂点リソースにデータを書き込む
+	VertexData* vertexData = nullptr;
+	vertexResource[kModel][drawCount[kModel]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+    std::memcpy
 }
 
 void MyDirectX::DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData, int textureHandle) {

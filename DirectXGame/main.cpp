@@ -61,7 +61,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	myDirectX->CreateDrawResource(MyDirectX::kPrism, 1);
 	myDirectX->CreateDrawResource(MyDirectX::kSphere, 6);
 
-	myDirectX->ReadTexture("resources/white1x1.png");
+	myDirectX->LoadTexture("resources/white1x1.png");
 
 	const float pie = 3.14159265358f;
 
@@ -88,6 +88,8 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector4 spherePosList[6]{};
 	//上段
 	spherePosList[0] = { 0.0f, 2.0f, 0.0f, 1.0f };
+
+	ModelData modelData = LoadObjFile("resources/Sample", "plane.obj");
 
 	//中段
 	for (int i = 1; i < 5; ++i) {
