@@ -328,6 +328,7 @@ void MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
         switch (drawKind) {
         case kSphere:
 			vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 992 * 3));
+			indexResource[drawKind].push_back(CreateBufferResource(device, sizeof(uint32_t) * 1984 * 3));
             break;
 
         case kSprite2D:
@@ -337,8 +338,8 @@ void MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
 			break;
 
         case kPrism:
-			vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 5));
-			indexResource[drawKind].push_back(CreateBufferResource(device, sizeof(uint32_t) * 18));
+			vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 7));
+			indexResource[drawKind].push_back(CreateBufferResource(device, sizeof(uint32_t) * 24));
             break;
 
         default:
@@ -1249,37 +1250,33 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     vertexData[0].normal = { 0.0f, 1.0f, 0.0f };
 
     float pie = 3.14159265358f;
+    float thickness = 0.33f;
+    float seperation = 4.0f;
     //中段
-    for (int i = 1; i < 4; ++i) {
-        vertexData[i].position = { cosf(pie * 2.0f * (i - 1) / 3.0f) / 4.0f, 0.0f, sinf(pie * 2.0f * (i - 1) / 3.0f) / 4.0f, 1.0f };
-        vertexData[i].texcoord = { static_cast<float>(i - 1) / 3.0f, 0.5f };
-        vertexData[i].normal = { cosf(pie * 2.0f * (i - 1) / 3.0f), 0.0f, sinf(pie * 2.0f * (i - 1) / 3.0f) };
+    for (int i = 1; i < 6; ++i) {
+        vertexData[i].position = { cosf(pie * 2.0f * (i - 1) / seperation) * thickness, 0.0f, sinf(pie * 2.0f * (i - 1) / seperation) * thickness, 1.0f };
+        vertexData[i].texcoord = { static_cast<float>(i - 1) / (seperation + 1), 0.5f };
+        vertexData[i].normal = { cosf(pie * 2.0f * (i - 1) / seperation), 0.0f, sinf(pie * 2.0f * (i - 1) / seperation) };
     }
 
     //下段
-    vertexData[4].position = { 0.0f, -1.0f, 0.0f, 1.0f };
-    vertexData[4].texcoord = { 0.5f, 1.0f };
-    vertexData[4].normal = { 0.0f, -1.0f, 0.0f };
+    vertexData[6].position = { 0.0f, -1.0f, 0.0f, 1.0f };
+    vertexData[6].texcoord = { 0.5f, 1.0f };
+    vertexData[6].normal = { 0.0f, -1.0f, 0.0f };
 
 	uint32_t* indexData = nullptr;
 	indexResource[kPrism][drawCount[kPrism]]->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 	
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
 		indexData[i * 3] = 0;
 		indexData[i * 3 + 1] = i + 2;
         indexData[i * 3 + 2] = i + 1;
-        if (i == 2) {
-			indexData[i * 3 + 1] = 1;
-        }
     }
 
-    for (int i = 3; i < 6; ++i) {
-		indexData[i * 3] = 4;
-		indexData[i * 3 + 1] = i + 1 - 3;
-		indexData[i * 3 + 2] = i + 2 - 3;
-        if (i == 5) {
-            indexData[i * 3 + 2] = 1;
-        }
+    for (int i = 4; i < 8; ++i) {
+		indexData[i * 3] = 6;
+		indexData[i * 3 + 1] = i + 1 - 4;
+		indexData[i * 3 + 2] = i + 2 - 4;
     }
 
     TramsformMatrixData* wvpData = nullptr;
@@ -1300,7 +1297,7 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     //リソースの先頭のアドレスから使う
     vertexBufferView.BufferLocation = vertexResource[kPrism][drawCount[kPrism]]->GetGPUVirtualAddress();
     //使用するリソースのサイズは頂点3つ分のサイズ
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 5;
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * 7;
     //1頂点当たりのサイズ
     vertexBufferView.StrideInBytes = sizeof(VertexData);
 

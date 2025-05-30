@@ -4,6 +4,7 @@
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Matrix4x4.h"
+#include "Matrix3x3.h"
 
 struct Transform final {
 	Vector3 scale;
@@ -20,6 +21,12 @@ struct VertexData final {
 struct MaterialData final {
 	Vector4 color;
 	int32_t enableLighting;
+	float padding[3];
+	Matrix4x4 uvTransform = {
+		1.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f 
+	};
 };
 
 struct TramsformMatrixData final {

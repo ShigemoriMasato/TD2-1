@@ -70,9 +70,9 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Transform tra = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 	tra.position.z = 5.0f;
 	Transform camera = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f };
-	//camera.position.y = 4.0f;
-	//camera.position.z = -1000.0f;
-	//camera.rotation.x = 0.7f;
+	camera.position.y = 4.0f;
+	camera.position.z = -4.0f;
+	camera.rotation.x = 0.7f;
 	Matrix4x4 wvpMatrix{};
 	MaterialData material = {};
 	material.color = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -85,16 +85,16 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	const Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
 
-	Vector4 lineVertexlist[5]{};
+	Vector4 spherePosList[6]{};
 	//上段
-	lineVertexlist[0] = { 0.0f, 2.0f, 0.0f, 1.0f };
+	spherePosList[0] = { 0.0f, 2.0f, 0.0f, 1.0f };
 
 	//中段
-	for (int i = 1; i < 4; ++i) {
-		lineVertexlist[i] = { cosf(pie * 2.0f * (i - 1) / 3.0f) / 2.0f, 0.0f, sinf(pie * 2.0f * (i - 1) / 3.0f) / 2.0f, 1.0f };
+	for (int i = 1; i < 5; ++i) {
+		spherePosList[i] = { cosf(pie * 2.0f * (i - 1) / 4.0f) / 2.0f, 0.0f, sinf(pie * 2.0f * (i - 1) / 4.0f) / 2.0f, 1.0f };
 	}
 	//下段
-	lineVertexlist[4] = { 0.0f, -2.0f, 0.0f, 1.0f };
+	spherePosList[5] = { 0.0f, -2.0f, 0.0f, 1.0f };
 
 
 	TriangleData3 triangle = {
@@ -114,6 +114,13 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	bool isDrawSphere = false;
 
 	const Vector4 lineBuffer = { 0.01f, 0.0f, 0.01f, 0.0f };
+
+	static int textureSelectionIndex = 0;
+
+	const char* items[] = { "white1x1", "uvChecker" };
+	int itemCount = IM_ARRAYSIZE(items);
+	static int textureHandle = 1;
+
 
 	//ウィンドウのxボタンが押されるまでループ
 	while (msg.message != WM_QUIT) {
@@ -135,6 +142,16 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ImGui::SliderFloat("Directional Light Intensity", &dLightData.intensity, 0.0f, 10.0f);
 			ImGui::Checkbox("EnableLight", &enableLighting);
 			ImGui::Checkbox("IsDrawSphere", &isDrawSphere);
+			ImGui::SliderFloat3("uvTransform0", material.uvTransform.m[0], 0.0f, 1.0f);
+			ImGui::SliderFloat3("uvTransform1", material.uvTransform.m[1], 0.0f, 1.0f);
+			ImGui::SliderFloat3("uvTransform2", material.uvTransform.m[2], 0.0f, 1.0f);
+			if (ImGui::Combo("Select Texture", &textureSelectionIndex, items, itemCount)) {
+				if (textureSelectionIndex == 0) {
+					textureHandle = 1;
+				} else if (textureSelectionIndex == 1) {
+					textureHandle = 0;
+				}
+			}
 			ImGui::End();
 
 			material.enableLighting = enableLighting;
@@ -151,7 +168,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			wvpMatrix = MakeTransformMatrix(transform) * viewMatrix * projectionMatrix;
 
-			myDirectX->DrawPrism(MakeTransformMatrix(transform), wvpMatrix, material, dLightData, 1);
+			myDirectX->DrawPrism(MakeTransformMatrix(transform), wvpMatrix, material, dLightData, textureHandle);
 
 			tra = transform;
 			tra.scale.x *= 1.0f / ratioSphereToPrism;
@@ -161,15 +178,9 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			Matrix4x4 worldMatrix = MakeTransformMatrix(tra);
 			Matrix4x4 wvptraMatrix = worldMatrix * viewMatrix * projectionMatrix;
 
-			myDirectX->DrawSphere(lineVertexlist[0] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, MaterialData({ 0.0f, 0.0f, 0.0f, 0.0f }, enableLighting), dLightData, 1);
-
-			myDirectX->DrawSphere(lineVertexlist[1] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, {0.0f, 0.0f, 0.0f, 0.0f, enableLighting}, dLightData, 1);
-
-			myDirectX->DrawSphere(lineVertexlist[2] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, {0.0f, 0.0f, 0.0f, 0.0f, enableLighting}, dLightData, 1);
-
-			myDirectX->DrawSphere(lineVertexlist[3] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, {0.0f, 0.0f, 0.0f, 0.0f, enableLighting}, dLightData, 1);
-
-			myDirectX->DrawSphere(lineVertexlist[4] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, {0.0f, 0.0f, 0.0f, 0.0f, enableLighting}, dLightData, 1);
+			for (int i = 0; i < 6; ++i) {
+				myDirectX->DrawSphere(spherePosList[i] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, MaterialData({ 0.0f, 0.0f, 0.0f, 0.0f }, enableLighting), dLightData, 1);
+			}
 
 			myDirectX->EndFrame();
 		}
