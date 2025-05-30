@@ -70,9 +70,9 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Transform tra = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 	tra.position.z = 5.0f;
 	Transform camera = { 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f };
-	camera.position.y = 4.0f;
-	camera.position.z = -4.0f;
-	camera.rotation.x = 0.7f;
+	camera.position.y = 2.0f;
+	camera.position.z = -10.0f;
+	camera.rotation.x = 0.2f;
 	Matrix4x4 wvpMatrix{};
 	MaterialData material = {};
 	material.color = { 1.0f, 1.0f, 1.0f, 1.0f };

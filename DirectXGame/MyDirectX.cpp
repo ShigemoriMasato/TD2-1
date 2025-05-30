@@ -1250,13 +1250,12 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     vertexData[0].normal = { 0.0f, 1.0f, 0.0f };
 
     float pie = 3.14159265358f;
-    float thickness = 0.33f;
-    float seperation = 4.0f;
+
     //中段
     for (int i = 1; i < 6; ++i) {
-        vertexData[i].position = { cosf(pie * 2.0f * (i - 1) / seperation) * thickness, 0.0f, sinf(pie * 2.0f * (i - 1) / seperation) * thickness, 1.0f };
-        vertexData[i].texcoord = { static_cast<float>(i - 1) / (seperation + 1), 0.5f };
-        vertexData[i].normal = { cosf(pie * 2.0f * (i - 1) / seperation), 0.0f, sinf(pie * 2.0f * (i - 1) / seperation) };
+        vertexData[i].position = { cosf(pie * 2.0f * (i - 1) / 4.0f) / 1.0f, 0.0f, sinf(pie * 2.0f * (i - 1) / 4.0f) / 1.0f, 1.0f };
+        vertexData[i].texcoord = { static_cast<float>(i - 1) / 5.0f, 0.5f };
+        vertexData[i].normal = { cosf(pie * 2.0f * (i - 1) / 4.0f), 0.0f, sinf(pie * 2.0f * (i - 1) / 4.0f) };
     }
 
     //下段
@@ -1264,19 +1263,19 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     vertexData[6].texcoord = { 0.5f, 1.0f };
     vertexData[6].normal = { 0.0f, -1.0f, 0.0f };
 
-	uint32_t* indexData = nullptr;
-	indexResource[kPrism][drawCount[kPrism]]->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-	
+    uint32_t* indexData = nullptr;
+    indexResource[kPrism][drawCount[kPrism]]->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+
     for (int i = 0; i < 4; ++i) {
-		indexData[i * 3] = 0;
-		indexData[i * 3 + 1] = i + 2;
+        indexData[i * 3] = 0;
+        indexData[i * 3 + 1] = i + 2;
         indexData[i * 3 + 2] = i + 1;
     }
 
     for (int i = 4; i < 8; ++i) {
-		indexData[i * 3] = 6;
-		indexData[i * 3 + 1] = i + 1 - 4;
-		indexData[i * 3 + 2] = i + 2 - 4;
+        indexData[i * 3] = 6;
+        indexData[i * 3 + 1] = i + 1 - 4;
+        indexData[i * 3 + 2] = i + 2 - 4;
     }
 
     TramsformMatrixData* wvpData = nullptr;
@@ -1304,7 +1303,7 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     //インデックスのバッファビューを作成する
     D3D12_INDEX_BUFFER_VIEW indexBufferView{};
     indexBufferView.BufferLocation = indexResource[kPrism][drawCount[kPrism]]->GetGPUVirtualAddress();
-    indexBufferView.SizeInBytes = sizeof(uint32_t) * 18;
+    indexBufferView.SizeInBytes = sizeof(uint32_t) * 24;
     indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 
     //ビューポート
@@ -1341,7 +1340,7 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-    commandList->DrawIndexedInstanced(18, 1, 0, 0, 0);
+    commandList->DrawIndexedInstanced(24, 1, 0, 0, 0);
 
     ++drawCount[kPrism];
 }

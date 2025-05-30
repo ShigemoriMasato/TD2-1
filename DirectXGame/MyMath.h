@@ -23,9 +23,9 @@ struct MaterialData final {
 	int32_t enableLighting;
 	float padding[3];
 	Matrix4x4 uvTransform = {
-		1.0f, 1.0f, 1.0f,
-		0.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f 
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f ,0.0f, 1.0f, 0.0f
 	};
 };
 
