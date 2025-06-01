@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <unordered_map>
 #include <vector>
+#include <wrl.h>
 #include "externals/imgui/imgui_impl_win32.h"
 
 #include <d3d12.h>
@@ -22,6 +23,17 @@
 #include "VertexData.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+struct D3DResourceLeakChecker {
+	~D3DResourceLeakChecker() {
+		Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
+		if(SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
+			debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+			debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
+			debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
+		}
+	}
+};
 
 class MyDirectX {
 public:
@@ -91,32 +103,33 @@ private:
 	HWND hwnd;
 
 	//DirectXCommon
-	ID3D12Debug1* debugController = nullptr;
-	IDXGIFactory7* dxgiFactory = nullptr;
-	IDXGIAdapter4* useAdapter = nullptr;
-	ID3D12Device* device = nullptr;
-	ID3D12CommandQueue* commandQueue = nullptr;
-	ID3D12CommandAllocator* commandAllocator = nullptr;
-	ID3D12GraphicsCommandList* commandList = nullptr;
+	D3DResourceLeakChecker leakChecker;
+	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Device> device = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
 	uint64_t fenceValue;
 
 
 	//スワップチェーンの設定
-	IDXGISwapChain4* swapChain = nullptr;
-	ID3D12Resource* swapChainResources[2] = { nullptr, nullptr };
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[2] = { nullptr, nullptr };
 	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
-	ID3D12Fence* fence = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
 	HANDLE fenceEvent;
 
 	//三角形描画用
 	ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
 	ID3D12Resource* depthStencilResource = nullptr;
-	ID3D12PipelineState* graphicsPipelineState = nullptr;
-	ID3D10Blob* signatureBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-	ID3D12RootSignature* rootSignature = nullptr;
-	IDxcBlob* pixelShaderBlob = nullptr;
-	IDxcBlob* vertexShaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D10Blob> signatureBlob = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 
 	//1フレームに描画した数をカウントする

@@ -271,8 +271,8 @@ int MyDirectX::LoadTexture(std::string path) {
     //TextureResourceを作成
     DirectX::ScratchImage mipImages = CreateMipImages(path);
     const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-    textureResource.push_back(CreateTextureResource(device, metadata));
-    ID3D12Resource* resource = UploadTextureData(textureResource.back(), mipImages, device, commandList);
+    textureResource.push_back(CreateTextureResource(device.Get(), metadata));
+    ID3D12Resource* resource = UploadTextureData(textureResource.back(), mipImages, device.Get(), commandList.Get());
 	intermediateResource.push_back(resource);
 
     //metadataをもとにSRVの設定
@@ -376,8 +376,8 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     fenceValue(0),
     readTextureCount(0),
     modelCount_(-1) {
-    resourceStates[swapChainResources[0]] = D3D12_RESOURCE_STATE_PRESENT;
-    resourceStates[swapChainResources[1]] = D3D12_RESOURCE_STATE_PRESENT;
+    resourceStates[swapChainResources[0].Get()] = D3D12_RESOURCE_STATE_PRESENT;
+    resourceStates[swapChainResources[1].Get()] = D3D12_RESOURCE_STATE_PRESENT;
     Initialize();
 }
 
@@ -402,31 +402,31 @@ int MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
 		//頂点リソース用のリソース作成
         switch (drawKind) {
         case kSphere:
-			vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 992 * 3));
-			indexResource[drawKind].push_back(CreateBufferResource(device, sizeof(uint32_t) * 1984 * 3));
+			vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 992 * 3));
+			indexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(uint32_t) * 1984 * 3));
             break;
 
         case kSprite2D:
 		case kSprite3D:
-			vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 4));
-			indexResource[drawKind].push_back(CreateBufferResource(device, sizeof(uint32_t) * 6));
+			vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 4));
+			indexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(uint32_t) * 6));
 			break;
 
         case kPrism:
-			vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 7));
-			indexResource[drawKind].push_back(CreateBufferResource(device, sizeof(uint32_t) * 24));
+			vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 7));
+			indexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(uint32_t) * 24));
             break;
 
         default:
-            vertexResource[drawKind].push_back(CreateBufferResource(device, sizeof(VertexData) * 3));
+            vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 3));
             break;
         }
 		//wvpMatrixのリソース作成
-		wvpResource[drawKind].push_back(CreateBufferResource(device, sizeof(TramsformMatrixData)));
+		wvpResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(TramsformMatrixData)));
 		//マテリアル用のリソースリソース作成
-		materialResource[drawKind].push_back(CreateBufferResource(device, sizeof(MaterialData)));
+		materialResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(MaterialData)));
         //DirectionalLight用のリソース作成
-		directionalLightResource[drawKind].push_back(CreateBufferResource(device, sizeof(DirectionalLightData)));
+		directionalLightResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(DirectionalLightData)));
     }
 
 	return int(vertexResource[drawKind].size()); //描画できる最大数を返す
@@ -436,10 +436,10 @@ int MyDirectX::CreateModelDrawResource(uint32_t modelHandle, uint32_t createNum)
     uint32_t index = DrawKindCount + modelHandle;
 
     for (uint32_t i = 0; i < createNum; ++i) {
-		vertexResource[index].push_back(CreateBufferResource(device, sizeof(VertexData) * modelList_[modelHandle].vertices.size()));
-		materialResource[index].push_back(CreateBufferResource(device, sizeof(MaterialData)));
-		directionalLightResource[index].push_back(CreateBufferResource(device, sizeof(DirectionalLightData)));
-		wvpResource[index].push_back(CreateBufferResource(device, sizeof(TramsformMatrixData)));
+		vertexResource[index].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * modelList_[modelHandle].vertices.size()));
+		materialResource[index].push_back(CreateBufferResource(device.Get(), sizeof(MaterialData)));
+		directionalLightResource[index].push_back(CreateBufferResource(device.Get(), sizeof(DirectionalLightData)));
+		wvpResource[index].push_back(CreateBufferResource(device.Get(), sizeof(TramsformMatrixData)));
     }
 
 	return int(vertexResource[index].size()); //描画できる最大数を返す
@@ -560,7 +560,7 @@ void MyDirectX::InitDirectX() {
     //高い順に生成できるか試していく
     for (size_t i = 0; i < _countof(featureLevels); ++i) {
         //採用したアダプタでデバイスを生成
-        hr = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device));
+        hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(&device));
         //指定した機能レベルでデバイスが生成できたか確認
         if (SUCCEEDED(hr)) {
             //生成できたのでログを出力してループを抜ける
@@ -627,7 +627,7 @@ void MyDirectX::InitDirectX() {
 
     logger->Log("Complete create CommandAllocator\n");
 
-    hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList));
+    hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
     //コマンドリストの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
 
@@ -645,19 +645,19 @@ void MyDirectX::InitDirectX() {
 
     //コマンドキュー、ウィンドウハンドル、設定を渡して生成する
     hr = dxgiFactory->CreateSwapChainForHwnd(
-        commandQueue,		        		//コマンドキュー
+        commandQueue.Get(),		        		//コマンドキュー
         hwnd,			           			//ウィンドウハンドル
         &swapChainDesc,	        		    //設定
         nullptr,		    	    		//モニタの設定
         nullptr,			    		    //出力の設定
-        (IDXGISwapChain1**)&swapChain);	//スワップチェーンのポインタ
+        reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));	//スワップチェーンのポインタ
 
     assert(SUCCEEDED(hr));
     logger->Log("Complete create SwapChain\n");
 
 
     //ディスクリプタヒープの生成
-    rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+    rtvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
     //ディスクリプタヒープの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
@@ -680,11 +680,11 @@ void MyDirectX::InitDirectX() {
     D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
     //まず一つ目をつくる。一つ目は最初のところに作る。作る場所をこちらで指定してあげる必要がある。
     rtvHandles[0] = rtvStartHandle;
-    device->CreateRenderTargetView(swapChainResources[0], &rtvDesc, rtvHandles[0]);
+    device->CreateRenderTargetView(swapChainResources[0].Get(), &rtvDesc, rtvHandles[0]);
     //二つ目のディスクリプタハンドルを得る(自力で)
     rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     //二つ目を作る
-    device->CreateRenderTargetView(swapChainResources[1], &rtvDesc, rtvHandles[1]);
+    device->CreateRenderTargetView(swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
 
     logger->Log("Complete create RenderTargetView\n");
 
@@ -815,12 +815,12 @@ void MyDirectX::InitDirectX() {
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
-    dsvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+    dsvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
     dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 
-    depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+    depthStencilResource = CreateDepthStencilTextureResource(device.Get(), kClientWidth, kClientHeight);
 
     device->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
@@ -832,7 +832,7 @@ void MyDirectX::InitDirectX() {
     graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
     graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-    graphicsPipelineStateDesc.pRootSignature = rootSignature;
+    graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();
     graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;
     graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),
         vertexShaderBlob->GetBufferSize() };
@@ -865,7 +865,7 @@ void MyDirectX::InitDirectX() {
     }
 
     //SRV用のヒープを作成する
-    srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+    srvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
 }
 
@@ -874,7 +874,7 @@ void MyDirectX::InitImGui() {
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
     ImGui_ImplWin32_Init(hwnd);
-    ImGui_ImplDX12_Init(device,
+    ImGui_ImplDX12_Init(device.Get(),
         2,                                              //swapchainのバッファ数
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,                //色の形式
         srvDescriptorHeap,
@@ -895,12 +895,12 @@ void MyDirectX::ClearScreen() {
     UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
     //RootSignatureを設定、PSOに設定しているけど別途設定が必要
-    commandList->SetPipelineState(graphicsPipelineState);
-    commandList->SetGraphicsRootSignature(rootSignature);
+    commandList->SetPipelineState(graphicsPipelineState.Get());
+    commandList->SetGraphicsRootSignature(rootSignature.Get());
     commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
 
     //barrierをRenderTargetにする
-    InsertBarrier(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET, swapChainResources[backBufferIndex]);
+    InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, swapChainResources[backBufferIndex].Get());
 
     ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
     commandList->SetDescriptorHeaps(1, descriptorHeaps);
@@ -987,8 +987,8 @@ void MyDirectX::DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4
     commandList->RSSetViewports(1, &viewport);
     commandList->RSSetScissorRects(1, &scissorRect);
     //RootSignatureを設定、PSOに設定しているけど別途設定が必要
-    commandList->SetGraphicsRootSignature(rootSignature);
-    commandList->SetPipelineState(graphicsPipelineState);
+    commandList->SetGraphicsRootSignature(rootSignature.Get());
+    commandList->SetPipelineState(graphicsPipelineState.Get());
 
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
     //マテリアルCBufferの場所を設定
@@ -1534,16 +1534,16 @@ void MyDirectX::EndFrame() {
     UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
     ImGui::Render();
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
 
-    InsertBarrier(commandList, D3D12_RESOURCE_STATE_PRESENT, swapChainResources[backBufferIndex]);
+    InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_PRESENT, swapChainResources[backBufferIndex].Get());
 
     HRESULT hr = commandList->Close();
     assert(SUCCEEDED(hr));
 
 
     // GPUにコマンドリストの実行を行わせる
-    ID3D12CommandList* commandLists[] = { commandList };
+    ID3D12CommandList* commandLists[] = { commandList.Get() };
     commandQueue->ExecuteCommandLists(1, commandLists);
     //GPUとOSに画面の交換を行うよう通知する
     swapChain->Present(1, 0);
@@ -1551,7 +1551,7 @@ void MyDirectX::EndFrame() {
     //Fenceの値を更新
     fenceValue++;
     //GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
-    commandQueue->Signal(fence, fenceValue);
+    commandQueue->Signal(fence.Get(), fenceValue);
 
     //Fenceの値が指定したSignal値にたどり着いてるかを確認する
     //GetCompletedValueの初期値はFence作成時に渡した初期値
@@ -1568,16 +1568,19 @@ void MyDirectX::EndFrame() {
     
     //次のフレームのためのcommandReset
     commandAllocator->Reset();
-    commandList->Reset(commandAllocator, nullptr);
+    commandList->Reset(commandAllocator.Get(), nullptr);
 }
 
 void MyDirectX::Finalize() {
     dsvDescriptorHeap->Release();
     depthStencilResource->Release();
+
+    //UnLoad実装時見直し
     for (uint32_t i = 0; i < readTextureCount; ++i) {
         intermediateResource[i]->Release();
         textureResource[i]->Release();
     }
+
     for (uint32_t i = 0; i < DrawKindCount + modelCount_ + 1; ++i){
         for (uint32_t j = 0; j < vertexResource[i].size(); ++j) {
             vertexResource[i][j]->Release();
@@ -1589,43 +1592,15 @@ void MyDirectX::Finalize() {
 			}
         }
     }
-    graphicsPipelineState->Release();
-    signatureBlob->Release();
-    if (errorBlob) {
-        errorBlob->Release();
-    }
-    rootSignature->Release();
-    pixelShaderBlob->Release();
-    vertexShaderBlob->Release();
+    
     CloseHandle(fenceEvent);
-    fence->Release();
     srvDescriptorHeap->Release();
     rtvDescriptorHeap->Release();
-    swapChainResources[0]->Release();
-    swapChainResources[1]->Release();
-    swapChain->Release();
-    commandList->Release();
-    commandAllocator->Release();
-    commandQueue->Release();
-    device->Release();
-    useAdapter->Release();
-    dxgiFactory->Release();
-#ifdef _DEBUG
-    debugController->Release();
-#endif
     CloseWindow(hwnd);
 
     ImGui_ImplDX12_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
-
-    IDXGIDebug* debug;
-    if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-        debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-        debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
-        debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-        debug->Release();
-    }
 
     CoUninitialize();
 }
