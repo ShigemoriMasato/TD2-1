@@ -295,7 +295,7 @@ int MyDirectX::LoadTexture(std::string path) {
     return readTextureCount;
 }
 
-ModelData MyDirectX::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
+int MyDirectX::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
     ModelData modelData;                    //構築するデータ
     std::vector<Vector4> positions;         //位置
 	std::vector<Vector3> normals;           //法線
@@ -314,14 +314,18 @@ ModelData MyDirectX::LoadObjFile(const std::string& directoryPath, const std::st
             Vector4 position;
             s >> position.x >> position.y >> position.z;
             position.w = 1.0f;
+			position.x *= -1.0f; //y軸も反転
             positions.push_back(position); //位置を格納
         } else if (identifier == "vt") {
             Vector2 texcoord;
             s >> texcoord.x >> texcoord.y; //テクスチャ座標を格納
+            texcoord.x = 1.0f - texcoord.x;
+			texcoord.y = 1.0f - texcoord.y;
             texcoords.push_back(texcoord);
         } else if (identifier == "vn") {
             Vector3 normal;
 			s >> normal.x >> normal.y >> normal.z; //法線を格納
+            normal.x *= -1.0f; //y軸も反転
 			normals.push_back(normal);
         } else if (identifier == "f") {
             //面は三角形限定なので、読み込む前にEditor等で三角化させること。そのほかは未対応
@@ -343,13 +347,25 @@ ModelData MyDirectX::LoadObjFile(const std::string& directoryPath, const std::st
                 VertexData vertex = { position, texcoord, normal };
 				modelData.vertices.push_back(vertex); //頂点を格納
             }
+        } else if (identifier == "mtllib") {
+            std::string materialFilename;
+            s >> materialFilename;
+			modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename); //マテリアルファイルを読み込む
         }
     }
-
+    
 	modelList_.push_back(modelData); //モデルデータをリストに追加
 	drawCount.push_back(0); //描画数を初期化
+	
+    vertexResource.push_back(std::vector<ID3D12Resource*>()); //頂点リソースの初期化
+	indexResource.push_back(std::vector<ID3D12Resource*>()); //インデックスリソースの初期化
+	materialResource.push_back(std::vector<ID3D12Resource*>()); //マテリアルリソースの初期化
+	wvpResource.push_back(std::vector<ID3D12Resource*>()); //ワールドビュー投影行列リソースの初期化
+	directionalLightResource.push_back(std::vector<ID3D12Resource*>()); //DirectionalLightリソースの初期化
 
-    return ;
+    modelCount_++;
+
+    return int(modelList_.size() - 1);
 }
 
 MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
@@ -358,7 +374,8 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     clearColor(new float[4] {0.1f, 0.25f, 0.5f, 1.0f}),
     logger(new Logger("master")),
     fenceValue(0),
-    readTextureCount(0) {
+    readTextureCount(0),
+    modelCount_(-1) {
     resourceStates[swapChainResources[0]] = D3D12_RESOURCE_STATE_PRESENT;
     resourceStates[swapChainResources[1]] = D3D12_RESOURCE_STATE_PRESENT;
     Initialize();
@@ -380,7 +397,7 @@ void MyDirectX::Initialize() {
     LoadTexture("resources/uvChecker.png");
 }
 
-void MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
+int MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
     for (uint32_t i = 0; i < createNum; ++i) {
 		//頂点リソース用のリソース作成
         switch (drawKind) {
@@ -411,6 +428,44 @@ void MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
         //DirectionalLight用のリソース作成
 		directionalLightResource[drawKind].push_back(CreateBufferResource(device, sizeof(DirectionalLightData)));
     }
+
+	return int(vertexResource[drawKind].size()); //描画できる最大数を返す
+}
+
+int MyDirectX::CreateModelDrawResource(uint32_t modelHandle, uint32_t createNum) {
+    uint32_t index = DrawKindCount + modelHandle;
+
+    for (uint32_t i = 0; i < createNum; ++i) {
+		vertexResource[index].push_back(CreateBufferResource(device, sizeof(VertexData) * modelList_[modelHandle].vertices.size()));
+		materialResource[index].push_back(CreateBufferResource(device, sizeof(MaterialData)));
+		directionalLightResource[index].push_back(CreateBufferResource(device, sizeof(DirectionalLightData)));
+		wvpResource[index].push_back(CreateBufferResource(device, sizeof(TramsformMatrixData)));
+    }
+
+	return int(vertexResource[index].size()); //描画できる最大数を返す
+}
+
+ModelMaterial MyDirectX::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
+    ModelMaterial materialData;
+    std::string line;
+	std::ifstream file(directoryPath + "/" + filename); //ファイルを開く
+    assert(file.is_open() && "MyDirectX::LoadMaterialTemplateFile cannot open the mtlFile");
+
+    while (std::getline(file, line)) {
+        std::string identifier;
+        std::stringstream s(line);
+		s >> identifier;
+
+        //identifierに応じて処理
+        if (identifier == "map_Kd") {
+            std::string textureFilename;
+			s >> textureFilename;
+            //連結してファイルパスにする
+			materialData.textureFilePath = directoryPath + "/" + textureFilename;
+        }
+    }
+
+    return materialData;
 }
 
 void MyDirectX::BeginFrame() {
@@ -800,7 +855,7 @@ void MyDirectX::InitDirectX() {
         IID_PPV_ARGS(&graphicsPipelineState));
     assert(SUCCEEDED(hr));
 
-    for (int i = 0; i < MaxDrawKind; ++i) {
+    for (int i = 0; i < DrawKindCount; ++i) {
 		vertexResource.push_back({});
 		wvpResource.push_back({});
 		materialResource.push_back({});
@@ -1201,16 +1256,75 @@ void MyDirectX::DrawSphere(Vector4 center, Matrix4x4 worldMatrix, Matrix4x4 wvpM
     ++drawCount[kSphere];
 }
 
-void MyDirectX::DrawModel(ModelData modelData, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData) {
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-	vertexBufferView.BufferLocation = vertexResource[kModel][drawCount[kModel]]->GetGPUVirtualAddress();
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * modelData.vertices.size();
-	vertexBufferView.StrideInBytes = sizeof(VertexData);
+void MyDirectX::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData) {
+    uint32_t index = DrawKindCount + modelHandle;
+
 
     //頂点リソースにデータを書き込む
 	VertexData* vertexData = nullptr;
-	vertexResource[kModel][drawCount[kModel]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-    std::memcpy
+	vertexResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	std::memcpy(vertexData, modelList_[modelHandle].vertices.data(), sizeof(VertexData) * modelList_[modelHandle].vertices.size());
+
+    TramsformMatrixData* wvpData = nullptr;
+    //書き込むためのアドレスを取得
+    wvpResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+    //wvp行列を書き込む
+    wvpData->wvp = wvpMatrix;
+    wvpData->world = worldMatrix;
+
+    MaterialData* materialData = nullptr;
+    //書き込むためのアドレスを取得
+    materialResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+    //色指定
+    *materialData = material;
+
+    DirectionalLightData* directionalLightData = nullptr;
+    //書き込むためのアドレスを取得
+    directionalLightResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+    //光の入力
+    *directionalLightData = dLightData;
+
+    //頂点のバッファビューを作成する
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+    vertexBufferView.BufferLocation = vertexResource[index][drawCount[index]]->GetGPUVirtualAddress();
+    vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelList_[modelHandle].vertices.size());
+    vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+    //ビューポート
+    D3D12_VIEWPORT viewport{};
+    //クライアント領域のサイズと一緒にして画面全体に表示
+    viewport.Width = static_cast<float>(kClientWidth);
+    viewport.Height = static_cast<float>(kClientHeight);
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    //シザー矩形
+    D3D12_RECT scissorRect{};
+    //基本的にビューポートと同じ矩形が構成されるようにする
+    scissorRect.left = 0;
+    scissorRect.right = kClientWidth;
+    scissorRect.top = 0;
+    scissorRect.bottom = kClientHeight;
+
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+    //マテリアルCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource[index][drawCount[index]]->GetGPUVirtualAddress());
+    //wvp用のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[index][drawCount[index]]->GetGPUVirtualAddress());
+    //光のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[index][drawCount[index]]->GetGPUVirtualAddress());
+    //テクスチャの設定
+    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[0]);
+    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->DrawInstanced(UINT(modelList_[modelHandle].vertices.size()), 1, 0, 0);
+
+	drawCount[index]++;
 }
 
 void MyDirectX::DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
@@ -1306,7 +1420,7 @@ void MyDirectX::DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Mat
     //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
     commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-    ++drawCount[kSphere];
+    ++drawCount[kSprite3D];
 }
 
 void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
@@ -1464,7 +1578,7 @@ void MyDirectX::Finalize() {
         intermediateResource[i]->Release();
         textureResource[i]->Release();
     }
-    for (uint32_t i = 0; i < MaxDrawKind; ++i) {
+    for (uint32_t i = 0; i < DrawKindCount + modelCount_ + 1; ++i){
         for (uint32_t j = 0; j < vertexResource[i].size(); ++j) {
             vertexResource[i][j]->Release();
             wvpResource[i][j]->Release();

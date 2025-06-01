@@ -33,7 +33,7 @@ public:
 		kSprite2D,
 		kPrism,
 
-		MaxDrawKind
+		DrawKindCount
 	};
 
 	MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight);
@@ -41,14 +41,15 @@ public:
 
 	void Initialize();
 
-	void CreateDrawResource(DrawKind drawKind, uint32_t createNum);
-	void CreateModelDrawResource(uint32_t modelHandle, uint32_t createNum);
+	int CreateDrawResource(DrawKind drawKind, uint32_t createNum);
+	int CreateModelDrawResource(uint32_t modelHandle, uint32_t createNum);
+	ModelMaterial LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 	void BeginFrame();
 
 	int LoadTexture(std::string path);
 
-	uint32_t LoadObjFile(const std::string& directoryPath, const std::string& filename);
+	int LoadObjFile(const std::string& directoryPath, const std::string& filename);
 
 	void DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4 color, DirectionalLightData dLightData, int textureHandle);
 
@@ -56,7 +57,7 @@ public:
 
 	void DrawSphere(Vector4 center, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
-	void DrawModel(ModelData modelData, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
+	void DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData);
 
 	void DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
@@ -129,7 +130,7 @@ private:
 
 	//Model管理用
 	std::vector<ModelData> modelList_;
-	std::vector<uint32_t> resourceCount_;
+	uint32_t modelCount_ = -1; //モデルの数
 
 	//画像の関数
 	std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> textureSrvHandleGPU;

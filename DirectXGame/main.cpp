@@ -53,7 +53,6 @@ struct SpriteData {
 };
 
 int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-
 	const float kWindowWidth = 1280.0f;
 	const float kWindowHeight = 720.0f;
 
@@ -89,7 +88,8 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//上段
 	spherePosList[0] = { 0.0f, 2.0f, 0.0f, 1.0f };
 
-	ModelData modelData = LoadObjFile("resources/Sample", "plane.obj");
+	int modelHandle = myDirectX->LoadObjFile("resources/Sample", "plane.obj");
+	myDirectX->CreateModelDrawResource(modelHandle, 1);
 
 	//中段
 	for (int i = 1; i < 5; ++i) {
@@ -132,7 +132,9 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			DispatchMessage(&msg);
 		}
 		else {
-			//ゲームの更新処理
+			
+			//更新処理
+
 			myDirectX->BeginFrame();
 			ImGui::Begin("Prism");
 			ImGui::SliderVector("Position", transform.position, -10.0f, 10.0f);
@@ -170,19 +172,13 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			wvpMatrix = MakeTransformMatrix(transform) * viewMatrix * projectionMatrix;
 
-			myDirectX->DrawPrism(MakeTransformMatrix(transform), wvpMatrix, material, dLightData, textureHandle);
+			//更新処理
 
-			tra = transform;
-			tra.scale.x *= 1.0f / ratioSphereToPrism;
-			tra.scale.y *= 1.0f / ratioSphereToPrism;
-			tra.scale.z *= 1.0f / ratioSphereToPrism;
+			//描画処理
 
-			Matrix4x4 worldMatrix = MakeTransformMatrix(tra);
-			Matrix4x4 wvptraMatrix = worldMatrix * viewMatrix * projectionMatrix;
+			myDirectX->DrawModel(modelHandle, MakeTransformMatrix(transform), wvpMatrix, material, dLightData);
 
-			for (int i = 0; i < 6; ++i) {
-				myDirectX->DrawSphere(spherePosList[i] * ratioSphereToPrism, MakeTransformMatrix(tra), wvptraMatrix, MaterialData({ 0.0f, 0.0f, 0.0f, 0.0f }, enableLighting), dLightData, 1);
-			}
+			//描画処理
 
 			myDirectX->EndFrame();
 		}

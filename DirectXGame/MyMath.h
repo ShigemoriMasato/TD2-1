@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include <vector>
+#include <string>
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
@@ -29,6 +31,10 @@ struct MaterialData final {
 	};
 };
 
+struct ModelMaterial final {
+	std::string textureFilePath;
+};
+
 struct TramsformMatrixData final {
 	Matrix4x4 wvp;
 	Matrix4x4 world;
@@ -42,6 +48,7 @@ struct DirectionalLightData final {
 
 struct ModelData {
 	std::vector<VertexData> vertices;
+	ModelMaterial material;
 };
 
 Matrix4x4 MakeTransformMatrix(const Transform& transform);
