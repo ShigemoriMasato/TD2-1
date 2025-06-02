@@ -21,6 +21,7 @@
 #include "Matrix4x4.h"
 #include "MyMath.h"
 #include "VertexData.h"
+#include "Audio.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -78,6 +79,10 @@ public:
 	void EndFrame();
 
 	void Finalize();
+
+	Audio* GetAudioInstance() {
+		return audio;
+	}
 
 private:
 
@@ -159,6 +164,8 @@ private:
 	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+
+	Audio* audio;
 
 	std::unordered_map<ID3D12Resource*, D3D12_RESOURCE_STATES> resourceStates;
 };

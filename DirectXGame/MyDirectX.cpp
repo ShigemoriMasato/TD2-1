@@ -375,7 +375,8 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     logger(new Logger("master")),
     fenceValue(0),
     readTextureCount(0),
-    modelCount_(-1) {
+    modelCount_(-1),
+    audio(new Audio()) {
     resourceStates[swapChainResources[0].Get()] = D3D12_RESOURCE_STATE_PRESENT;
     resourceStates[swapChainResources[1].Get()] = D3D12_RESOURCE_STATE_PRESENT;
     Initialize();
@@ -394,6 +395,7 @@ void MyDirectX::Initialize() {
     CreateWindowForApp();
     InitDirectX();
     InitImGui();
+    audio->Initialize();
     LoadTexture("resources/uvChecker.png");
 }
 
