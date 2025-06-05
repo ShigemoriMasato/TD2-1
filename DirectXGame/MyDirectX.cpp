@@ -397,6 +397,7 @@ void MyDirectX::Initialize() {
     InitImGui();
     audio->Initialize();
     LoadTexture("resources/uvChecker.png");
+    LoadTexture("resources/white1x1.png");
 }
 
 int MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
