@@ -1,13 +1,11 @@
-#include "MyDirectX.h"
-#include "MyMath.h"
-#include "MyEngine.h"
+#include "Engine/SceneManager.h"
 
 int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	const float kWindowWidth = 1280.0f;
-	const float kWindowHeight = 720.0f;
+	const int32_t kWindowWidth = 1280;
+	const int32_t kWindowHeight = 720;
 
-	MyDirectX* myDirectX = new MyDirectX(int(kWindowWidth), int(kWindowHeight));
-
+	SceneManager* sceneManager = new SceneManager(kWindowWidth, kWindowHeight);
+	
 	MSG msg{};
 
 	//ウィンドウのxボタンが押されるまでループ
@@ -21,17 +19,17 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			
 			//更新処理
 
+			sceneManager->Update();
+
 			//更新処理
 
 			//描画処理
 
-			//描画処理
+			sceneManager->Render();
 
-			myDirectX->EndFrame();
+			//描画処理
 		}
 	}
-
-	delete myDirectX;
 
 	return 0;
 }

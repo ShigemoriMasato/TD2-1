@@ -2,6 +2,35 @@
 #include <cmath>
 #include <cassert>
 
+Matrix4x4 operator*(const Matrix4x4& mat1, const Matrix4x4& mat2) {
+	Matrix4x4 ans = {};
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			for (int k = 0; k < 4; ++k) {
+				ans.m[i][j] += mat1.m[i][k] * mat2.m[k][j];
+			}
+		}
+	}
+	return ans;
+}
+
+Vector3 operator*(const Matrix4x4& mat, const Vector3& vec) {
+	Vector3 ans;
+	ans.x = vec.x * mat.m[0][0] + vec.y * mat.m[1][0] + vec.z * mat.m[2][0] + mat.m[3][0];
+	ans.y = vec.x * mat.m[0][1] + vec.y * mat.m[1][1] + vec.z * mat.m[2][1] + mat.m[3][1];
+	ans.z = vec.x * mat.m[0][2] + vec.y * mat.m[1][2] + vec.z * mat.m[2][2] + mat.m[3][2];
+	float w = vec.x * mat.m[0][3] + vec.y * mat.m[1][3] + vec.z * mat.m[2][3] + mat.m[3][3];
+	assert(w != 0.0f);
+	ans.x /= w;
+	ans.y /= w;
+	ans.z /= w;
+	return ans;
+}
+
+Vector3 operator*(const Vector3& vec, const Matrix4x4& mat) {
+	return mat * vec;
+}
+
 Matrix4x4 MakeTransformMatrix(const Transform& transform) {
 	return MakeScaleMatrix(transform.scale) *
 		MakeRotateMatrix(transform.rotation) *

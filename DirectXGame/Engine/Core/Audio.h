@@ -46,4 +46,3 @@ private:
 
 	std::vector<SoundData> sdList_;
 };
-

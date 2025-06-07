@@ -11,9 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="DebugCamera.cpp" />
+    <ClCompile Include="Engine\Core\Audio.cpp" />
+    <ClCompile Include="Engine\Core\MyDirectX.cpp" />
+    <ClCompile Include="Engine\Core\MyWindow.cpp" />
+    <ClCompile Include="Engine\Core\Renderer.cpp" />
+    <ClCompile Include="Engine\SceneManager.cpp" />
+    <ClCompile Include="Engine\Struct\Matrix4x4.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -21,18 +24,28 @@
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Matrix4x4.cpp" />
-    <ClCompile Include="MyDirectX.cpp" />
-    <ClCompile Include="MyEngine.cpp" />
-    <ClCompile Include="MyMath.cpp" />
+    <ClCompile Include="Scene\Common\CommonData.cpp" />
+    <ClCompile Include="Scene\Common\Scene.cpp" />
+    <ClCompile Include="Scene\TitleScene.cpp" />
+    <ClCompile Include="Tools\Camera.cpp" />
+    <ClCompile Include="Tools\DebugCamera.cpp" />
+    <ClCompile Include="Tools\Input.cpp" />
+    <ClCompile Include="Tools\Logger.cpp" />
+    <ClCompile Include="Tools\MyMath.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Audio.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="DebugCamera.h" />
+    <ClInclude Include="Engine\Core\Audio.h" />
+    <ClInclude Include="Engine\Core\MyDirectX.h" />
+    <ClInclude Include="Engine\Core\MyWindow.h" />
+    <ClInclude Include="Engine\Core\Renderer.h" />
+    <ClInclude Include="Engine\SceneManager.h" />
+    <ClInclude Include="Engine\Struct\Matrix3x3.h" />
+    <ClInclude Include="Engine\Struct\Matrix4x4.h" />
+    <ClInclude Include="Engine\Struct\Transform.h" />
+    <ClInclude Include="Engine\Struct\Vector2.h" />
+    <ClInclude Include="Engine\Struct\Vector3.h" />
+    <ClInclude Include="Engine\Struct\Vector4.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -41,28 +54,14 @@
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Logger.h" />
-    <ClInclude Include="Matrix3x3.h" />
-    <ClInclude Include="Matrix4x4.h" />
-    <ClInclude Include="MyDirectX.h" />
-    <ClInclude Include="MyEngine.h" />
-    <ClInclude Include="MyMath.h" />
-    <ClInclude Include="Transform.h" />
-    <ClInclude Include="Vector2.h" />
-    <ClInclude Include="Vector3.h" />
-    <ClInclude Include="Vector4.h" />
-    <ClInclude Include="VertexData.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Object3d.PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Object3d.VS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
+    <ClInclude Include="Scene\Common\CommonData.h" />
+    <ClInclude Include="Scene\Common\Scene.h" />
+    <ClInclude Include="Scene\TitleScene.h" />
+    <ClInclude Include="Tools\Camera.h" />
+    <ClInclude Include="Tools\DebugCamera.h" />
+    <ClInclude Include="Tools\Input.h" />
+    <ClInclude Include="Tools\Logger.h" />
+    <ClInclude Include="Tools\MyMath.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -73,9 +72,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Object3d.hlsli">
+    <None Include="Engine\HLSL\Object3d.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Engine\HLSL\Object3d.PS.hlsl">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Engine\HLSL\Object3d.VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

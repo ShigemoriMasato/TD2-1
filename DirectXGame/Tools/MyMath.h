@@ -2,11 +2,11 @@
 #include <cstdint>
 #include <vector>
 #include <string>
-#include "Vector2.h"
-#include "Vector3.h"
-#include "Vector4.h"
-#include "Matrix4x4.h"
-#include "Matrix3x3.h"
+#include "../Engine/Struct/Vector2.h"
+#include "../Engine/Struct/Vector3.h"
+#include "../Engine/Struct/Vector4.h"
+#include "../Engine/Struct/Matrix4x4.h"
+#include "../Engine/Struct/Matrix3x3.h"
 
 struct Transform final {
 	Vector3 scale;
@@ -50,6 +50,10 @@ struct ModelData {
 	std::vector<VertexData> vertices;
 	ModelMaterial material;
 };
+
+Matrix4x4 operator*(const Matrix4x4& mat1, const Matrix4x4& mat2);
+Vector3 operator*(const Matrix4x4& mat, const Vector3& vec);
+Vector3 operator*(const Vector3& vec, const Matrix4x4& mat);
 
 Matrix4x4 MakeTransformMatrix(const Transform& transform);
 

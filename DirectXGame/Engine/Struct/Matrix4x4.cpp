@@ -17,41 +17,6 @@ Matrix4x4 MakeIdentity4x4() {
 	};
 }
 
-Matrix4x4 Matrix4x4::operator*(const Matrix4x4& mat) const {
-	Matrix4x4 ans;
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			ans.m[i][j] = 0;
-			for (int k = 0; k < 4; k++) {
-				ans.m[i][j] += m[i][k] * mat.m[k][j];
-			}
-		}
-	}
-	return ans;
-}
-
-Vector3 Matrix4x4::operator*(const Vector3& vec) const {
-	Vector3 ans;
-	ans.x = m[0][0] * vec.x + m[1][0] * vec.y + m[2][0] * vec.z + m[3][0];
-	ans.y = m[0][1] * vec.x + m[1][1] * vec.y + m[2][1] * vec.z + m[3][1];
-	ans.z = m[0][2] * vec.x + m[1][2] * vec.y + m[2][2] * vec.z + m[3][2];
-	float w = m[0][3] * vec.x + m[1][3] * vec.y + m[2][3] * vec.z + m[3][3];
-	assert(fabsf(w) > 1e-6);
-	ans.x /= w;
-	ans.y /= w;
-	ans.z /= w;
-	return ans;
-}
-
-Vector4 Matrix4x4::operator*(const Vector4& vec) const {
-	Vector4 ans;
-	ans.x = m[0][0] * vec.x + m[1][0] * vec.y + m[2][0] * vec.z + m[3][0] * vec.w;
-	ans.y = m[0][1] * vec.x + m[1][1] * vec.y + m[2][1] * vec.z + m[3][1] * vec.w;
-	ans.z = m[0][2] * vec.x + m[1][2] * vec.y + m[2][2] * vec.z + m[3][2] * vec.w;
-	ans.w = m[0][3] * vec.x + m[1][3] * vec.y + m[2][3] * vec.z + m[3][3] * vec.w;
-	return ans;
-}
-
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
 	return {
 		cot(fovY / 2) / aspectRatio, 0, 0, 0,

@@ -12,31 +12,34 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{231f3a29-1e23-4adb-8343-c8f6d9396245}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Prism">
-      <UniqueIdentifier>{e2361ba4-9e39-455a-8e32-555888c08900}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ヘッダー ファイル">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Core">
-      <UniqueIdentifier>{1054987d-12e7-4b36-8f56-1d5700d87d7d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MyEngine">
       <UniqueIdentifier>{d932f52b-6fa5-4668-96d5-9180925a90b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{562124d6-ea1b-4de1-83cb-5498ef6b2cb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{4624f498-9b0a-4218-9435-ea5f987e99a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyEngine\Core">
+      <UniqueIdentifier>{1054987d-12e7-4b36-8f56-1d5700d87d7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyEngine\Struct">
+      <UniqueIdentifier>{6ea883f2-3b2f-41d5-886f-1d1c1522f7db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyEngine\HLSL">
+      <UniqueIdentifier>{724ccedd-0eaf-4897-b885-e2c82199681a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Common">
+      <UniqueIdentifier>{effecf80-c0e7-4065-8587-119179c4e461}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Logger.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Matrix4x4.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="MyMath.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -60,41 +63,50 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Audio.cpp">
-      <Filter>Core</Filter>
+    <ClCompile Include="Engine\Core\Audio.cpp">
+      <Filter>MyEngine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Core</Filter>
+    <ClCompile Include="Engine\Core\MyDirectX.cpp">
+      <Filter>MyEngine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="MyDirectX.cpp">
-      <Filter>Core</Filter>
+    <ClCompile Include="Engine\Core\MyWindow.cpp">
+      <Filter>MyEngine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="MyEngine.cpp">
+    <ClCompile Include="Engine\Core\Renderer.cpp">
+      <Filter>MyEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Struct\Matrix4x4.cpp">
+      <Filter>MyEngine\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\SceneManager.cpp">
       <Filter>MyEngine</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Tools\Camera.cpp">
+      <Filter>Tools</Filter>
     </ClCompile>
-    <ClCompile Include="DebugCamera.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Tools\DebugCamera.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Logger.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\MyMath.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Input.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Common\CommonData.cpp">
+      <Filter>Scene\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Common\Scene.cpp">
+      <Filter>Scene\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\TitleScene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Logger.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrix4x4.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector4.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="MyMath.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
@@ -119,44 +131,63 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Vector2.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Engine\Core\Audio.h">
+      <Filter>MyEngine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="VertexData.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Engine\Core\MyDirectX.h">
+      <Filter>MyEngine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Matrix3x3.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Engine\Core\MyWindow.h">
+      <Filter>MyEngine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Audio.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="Engine\Core\Renderer.h">
+      <Filter>MyEngine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="Engine\Struct\Matrix3x3.h">
+      <Filter>MyEngine\Struct</Filter>
     </ClInclude>
-    <ClInclude Include="MyDirectX.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="Engine\Struct\Matrix4x4.h">
+      <Filter>MyEngine\Struct</Filter>
     </ClInclude>
-    <ClInclude Include="MyEngine.h">
+    <ClInclude Include="Engine\Struct\Transform.h">
+      <Filter>MyEngine\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Struct\Vector2.h">
+      <Filter>MyEngine\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Struct\Vector3.h">
+      <Filter>MyEngine\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Struct\Vector4.h">
+      <Filter>MyEngine\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\SceneManager.h">
       <Filter>MyEngine</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Tools\Camera.h">
+      <Filter>Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Tools\DebugCamera.h">
+      <Filter>Tools</Filter>
     </ClInclude>
-    <ClInclude Include="DebugCamera.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Tools\Logger.h">
+      <Filter>Tools</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Object3d.PS.hlsl">
-      <Filter>リソース ファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="Object3d.VS.hlsl">
-      <Filter>リソース ファイル</Filter>
-    </FxCompile>
+    <ClInclude Include="Tools\MyMath.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Input.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Common\CommonData.h">
+      <Filter>Scene\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Common\Scene.h">
+      <Filter>Scene\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\TitleScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -164,8 +195,16 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Object3d.hlsli">
-      <Filter>リソース ファイル</Filter>
+    <None Include="Engine\HLSL\Object3d.hlsli">
+      <Filter>MyEngine\HLSL</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Engine\HLSL\Object3d.PS.hlsl">
+      <Filter>MyEngine\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="Engine\HLSL\Object3d.VS.hlsl">
+      <Filter>MyEngine\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

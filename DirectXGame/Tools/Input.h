@@ -3,19 +3,12 @@
 #include <dinput.h>
 #include <wrl.h>
 
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
-
 #include "MyMath.h"
 
 class Input {
 public:
-	Input() = default;
+	Input(HINSTANCE hInstance, HWND hwnd) : hInstance_(hInstance), hwnd_(hwnd) {}
 	~Input() = default;
-
-	void SetHInstance(HINSTANCE hInstance) {
-		hInstance_ = hInstance;
-	}
 
 	void SetHWND(HWND hwnd) {
 		hwnd_ = hwnd;
@@ -25,13 +18,9 @@ public:
 
 	void Update();
 
-	static BYTE* GetKeyState() {
-		return keyState;
-	}
+	static BYTE* GetKeyState();
 
-	static BYTE* GetPreKeyState() {
-		return preKeyState;
-	}
+	static BYTE* GetPreKeyState();
 
 	static BYTE GetKeyState(int keyCode);
 
@@ -49,12 +38,17 @@ private:
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard_ = nullptr;
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse_ = nullptr;
 
+	//どこからでもGetできるようにstaticにする
 	static BYTE keyState[256];
 	static BYTE preKeyState[256];
 
 	static DIMOUSESTATE preMouseState;
 	static DIMOUSESTATE mouseState;
 
+	//Initializeをしてないとstatic関数を使えなくする
+	static bool isInitialized_;
+
 	HINSTANCE hInstance_ = nullptr;
 	HWND hwnd_ = nullptr;
+
 };

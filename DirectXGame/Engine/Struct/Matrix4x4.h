@@ -5,10 +5,6 @@ struct Vector3;
 
 struct Matrix4x4 final {
 	float m[4][4];
-
-	Matrix4x4 operator* (const Matrix4x4& mat) const;
-	Vector3 operator* (const Vector3& vec) const;
-	Vector4 operator* (const Vector4& vec) const;
 };
 
 float cot(float radian);

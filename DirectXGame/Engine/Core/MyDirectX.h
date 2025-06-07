@@ -2,26 +2,18 @@
 #include <Windows.h>
 #include <unordered_map>
 #include <vector>
-#include <wrl.h>
-#include "externals/imgui/imgui_impl_win32.h"
+#include "../../externals/imgui/imgui_impl_win32.h"
 
 #include <d3d12.h>
-#pragma comment(lib, "d3d12.lib")
 #include <dxgi1_6.h>
-#pragma comment(lib, "dxgi.lib")
 #include <dbghelp.h>
-#pragma comment(lib, "Dbghelp.lib")
 #include <dxgidebug.h>
-#pragma comment(lib, "dxguid.lib")
 #include <dxcapi.h>
-#pragma comment(lib, "dxcompiler.lib")
 
-#include "Logger.h"
-#include "Vector4.h"
-#include "Matrix4x4.h"
-#include "MyMath.h"
-#include "VertexData.h"
+#include "../../Tools/Logger.h"
+#include "../../Tools/MyMath.h"
 #include "Audio.h"
+#include "MyWindow.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -39,11 +31,9 @@ struct D3DResourceLeakChecker {
 class MyDirectX {
 public:
 	enum DrawKind {
-		kTriangle3D,
-		kTriangle2D,
+		kTriangle,
 		kSphere,
-		kSprite3D,
-		kSprite2D,
+		kSprite,
 		kPrism,
 
 		DrawKindCount
@@ -64,15 +54,13 @@ public:
 
 	int LoadObjFile(const std::string& directoryPath, const std::string& filename);
 
-	void DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4 color, DirectionalLightData dLightData, int textureHandle);
+	void DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 worldMatirx, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
-	void DrawTriangle(TriangleData3 vertexData, Vector4 color, DirectionalLightData dLightData, int textureHandle);
-
-	void DrawSphere(Vector4 center, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
+	void DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
 	void DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData);
 
-	void DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData, int textureHandle);
+	void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
 	void DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
@@ -80,17 +68,17 @@ public:
 
 	void Finalize();
 
-	Audio* GetAudioInstance() {
-		return audio;
-	}
+	HWND GetMyHwnd() const { return myWindow_->GetHwnd(wndHandle_); }
+
+	WNDCLASS GetMyWndClass() const { return myWindow_->GetWndClass(wndHandle_); }
+
+	bool* GetIsCanDraw() const { return isCanDraw_; }
 
 private:
 
 	void ClearScreen();
 
 	void BeginImGui();
-
-	void CreateWindowForApp();
 
 	void InitDirectX();
 
@@ -105,7 +93,8 @@ private:
 	const int32_t kClientHeight;	//ウィンドウ高さ
 	float* clearColor;		//windowの色
 
-	HWND hwnd;
+	MyWindow* myWindow_ = nullptr;
+	int wndHandle_;
 
 	//DirectXCommon
 	D3DResourceLeakChecker leakChecker;
@@ -165,8 +154,8 @@ private:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 
-	Audio* audio;
-
 	std::unordered_map<ID3D12Resource*, D3D12_RESOURCE_STATES> resourceStates;
+
+	bool* isCanDraw_ = nullptr; //描画可能かどうかのフラグ
 };
 

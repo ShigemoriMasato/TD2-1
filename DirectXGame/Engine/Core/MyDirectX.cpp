@@ -4,11 +4,17 @@
 #include <strsafe.h>
 #include <memory>
 #include <sstream>
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
-#include "externals/DirectXTex/d3dx12.h"
-#include "externals/DirectXTex/DirectXTex.h"
+#include "../../externals/imgui/imgui.h"
+#include "../../externals/imgui/imgui_impl_dx12.h"
+#include "../../externals/imgui/imgui_impl_win32.h"
+#include "../../externals/DirectXTex/d3dx12.h"
+#include "../../externals/DirectXTex/DirectXTex.h"
+
+#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "Dbghelp.lib")
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "dxcompiler.lib")
 
 namespace {
     //ウィンドウプロシージャ
@@ -267,6 +273,7 @@ namespace {
     }
 }
 
+[[nodiscard]]
 int MyDirectX::LoadTexture(std::string path) {
     //TextureResourceを作成
     DirectX::ScratchImage mipImages = CreateMipImages(path);
@@ -295,6 +302,7 @@ int MyDirectX::LoadTexture(std::string path) {
     return readTextureCount;
 }
 
+[[nodiscard]]
 int MyDirectX::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
     ModelData modelData;                    //構築するデータ
     std::vector<Vector4> positions;         //位置
@@ -376,14 +384,17 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     fenceValue(0),
     readTextureCount(0),
     modelCount_(-1),
-    audio(new Audio()) {
+    isCanDraw_(new bool(false)) {
     resourceStates[swapChainResources[0].Get()] = D3D12_RESOURCE_STATE_PRESENT;
     resourceStates[swapChainResources[1].Get()] = D3D12_RESOURCE_STATE_PRESENT;
+	myWindow_ = new MyWindow(kWindowWidth, kWindowHeight);
     Initialize();
 }
 
 MyDirectX::~MyDirectX() {
     Finalize();
+    delete myWindow_;
+	delete isCanDraw_;
     delete logger;
     delete[] clearColor;
 }
@@ -392,12 +403,12 @@ void MyDirectX::Initialize() {
     HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
     assert(SUCCEEDED(hr));
 
-    CreateWindowForApp();
+    wndHandle_ = myWindow_->CreateWindowForApp();
     InitDirectX();
     InitImGui();
-    audio->Initialize();
-    LoadTexture("resources/uvChecker.png");
-    LoadTexture("resources/white1x1.png");
+    //0と1の固定番号として扱うためここだけ返り値を破棄
+    int a = LoadTexture("resources/uvChecker.png");
+    a = LoadTexture("resources/white1x1.png");
 }
 
 int MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
@@ -409,8 +420,7 @@ int MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
 			indexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(uint32_t) * 1984 * 3));
             break;
 
-        case kSprite2D:
-		case kSprite3D:
+		case kSprite:
 			vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 4));
 			indexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(uint32_t) * 6));
 			break;
@@ -474,43 +484,7 @@ ModelMaterial MyDirectX::LoadMaterialTemplateFile(const std::string& directoryPa
 void MyDirectX::BeginFrame() {
     BeginImGui();
     ClearScreen();
-}
-
-void MyDirectX::CreateWindowForApp() {
-    WNDCLASS wc{};
-    //ウィンドウプロシージャ
-    wc.lpfnWndProc = windowProc;
-    //ウィンドウクラス名
-    wc.lpszClassName = L"CG2WindowClass";
-    //インスタンスハンドル
-    wc.hInstance = GetModuleHandleA(nullptr);
-    //カーソル
-    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-
-    //ウィンドウクラスの登録
-    RegisterClass(&wc);
-
-    //ウィンドウサイズを表す構造体にクライアント領域を入れる
-    RECT wrc = { 0, 0, kClientWidth, kClientHeight };
-
-    //クライアント領域をもとに実際のサイズにwrcに変更してもらう
-    AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-    //ウィンドウの作成
-    hwnd = CreateWindow(
-        wc.lpszClassName,			//利用するクラスの名前
-        L"CG2",						//タイトルバーの文字
-        WS_OVERLAPPEDWINDOW,		//よく見るウィンドウスタイル
-        CW_USEDEFAULT,				//表示x座標
-        CW_USEDEFAULT,				//表示y座標
-        wrc.right - wrc.left,		//ウィンドウ幅
-        wrc.bottom - wrc.top,		//ウィンドウ高さ
-        nullptr,					//親ウィンドウハンドル
-        nullptr,					//メニューハンドル
-        wc.hInstance,				//インスタンスハンドル
-        nullptr);					//オプション
-
-    ShowWindow(hwnd, SW_SHOW);	    //ウィンドウを表示する
+    *isCanDraw_ = true;
 }
 
 void MyDirectX::InitDirectX() {
@@ -649,7 +623,7 @@ void MyDirectX::InitDirectX() {
     //コマンドキュー、ウィンドウハンドル、設定を渡して生成する
     hr = dxgiFactory->CreateSwapChainForHwnd(
         commandQueue.Get(),		        		//コマンドキュー
-        hwnd,			           			//ウィンドウハンドル
+        myWindow_->GetHwnd(wndHandle_),			           			//ウィンドウハンドル
         &swapChainDesc,	        		    //設定
         nullptr,		    	    		//モニタの設定
         nullptr,			    		    //出力の設定
@@ -808,11 +782,11 @@ void MyDirectX::InitDirectX() {
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
     //Shaderをコンパイルする
-    vertexShaderBlob = CompileShader(L"Object3D.VS.hlsl",
+    vertexShaderBlob = CompileShader(L"./Engine/HLSL/Object3D.VS.hlsl",
         L"vs_6_0", dxcUtils, dxcCompiler, includeHandler, logger);
     assert(vertexShaderBlob != nullptr);
 
-    pixelShaderBlob = CompileShader(L"Object3D.PS.hlsl",
+    pixelShaderBlob = CompileShader(L"./Engine/HLSL/Object3D.PS.hlsl",
         L"ps_6_0", dxcUtils, dxcCompiler, includeHandler, logger);
     assert(pixelShaderBlob != nullptr);
 
@@ -876,7 +850,7 @@ void MyDirectX::InitImGui() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
-    ImGui_ImplWin32_Init(hwnd);
+    ImGui_ImplWin32_Init(myWindow_->GetHwnd(wndHandle_));
     ImGui_ImplDX12_Init(device.Get(),
         2,                                              //swapchainのバッファ数
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,                //色の形式
@@ -915,15 +889,15 @@ void MyDirectX::ClearScreen() {
 
 }
 
-void MyDirectX::DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4 color, DirectionalLightData dLightData, int textureHandle) {
-	if (drawCount[kTriangle3D] >= vertexResource[kTriangle3D].size()) {
-		assert(false && "三角形の描画上限の超過");
+void MyDirectX::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 worldMatirx, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
+	if (drawCount[kTriangle] >= vertexResource[kTriangle].size()) {
+		assert(false && "over drawcount");
 	}
 
     //頂点リソースにデータを書き込む
     VertexData* vertexData = nullptr;
     //書き込むためのアドレスを取得
-    vertexResource[kTriangle3D][drawCount[kTriangle3D]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+    vertexResource[kTriangle][drawCount[kTriangle]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
     //左下
     vertexData[0].position = left;
     vertexData[0].texcoord = { 0.0f, 1.0f };
@@ -942,22 +916,22 @@ void MyDirectX::DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4
     //データを書き込む
     TramsformMatrixData* wvpData = nullptr;
     //書き込むためのアドレスを取得
-    wvpResource[kTriangle3D][drawCount[kTriangle3D]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+    wvpResource[kTriangle][drawCount[kTriangle]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
     //単位行列を書き込む
-    wvpData->wvp = MakeIdentity4x4();
+    wvpData->wvp = wvpMatrix;
+	wvpData->world = worldMatirx;
 
     //データを書き込む
     MaterialData* materialData = nullptr;
     //書き込むためのアドレスを取得
-    materialResource[kTriangle3D][drawCount[kTriangle3D]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+    materialResource[kTriangle][drawCount[kTriangle]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
     
     //光を考慮しない
-    materialData->color = color;
-    materialData->enableLighting = true;
+    *materialData = material;
 
 	//データを書き込む
 	DirectionalLightData* directionalLightData = nullptr;
-	directionalLightResource[kTriangle3D][drawCount[kTriangle3D]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+	directionalLightResource[kTriangle][drawCount[kTriangle]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
     *directionalLightData = DirectionalLightData();
 
     //ビューポート
@@ -973,7 +947,7 @@ void MyDirectX::DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4
     //頂点のバッファビューを作成する
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
     //リソースの先頭のアドレスから使う
-    vertexBufferView.BufferLocation = vertexResource[kTriangle3D][drawCount[kTriangle3D]]->GetGPUVirtualAddress();
+    vertexBufferView.BufferLocation = vertexResource[kTriangle][drawCount[kTriangle]]->GetGPUVirtualAddress();
     //使用するリソースのサイズは頂点3つ分のサイズ
     vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
     //1頂点当たりのサイズ
@@ -995,39 +969,25 @@ void MyDirectX::DrawTriangle3D(Vector4 left, Vector4 top, Vector4 right, Vector4
 
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
     //マテリアルCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kTriangle3D][drawCount[kTriangle3D]]->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kTriangle][drawCount[kTriangle]]->GetGPUVirtualAddress());
     //wvp用のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kTriangle3D][drawCount[kTriangle3D]]->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kTriangle][drawCount[kTriangle]]->GetGPUVirtualAddress());
 	//テクスチャの場所を設定
     commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
 	//光のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kTriangle3D][drawCount[kTriangle3D]]->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kTriangle][drawCount[kTriangle]]->GetGPUVirtualAddress());
     //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
     commandList->DrawInstanced(3, 1, 0, 0);
 
-    ++drawCount[kTriangle3D];
+    ++drawCount[kTriangle];
 }
 
-void MyDirectX::DrawTriangle(TriangleData3 vertexData, Vector4 color, DirectionalLightData dLightData, int textureHandle) {
-    Vector4 vec[3];
-    ConvertVector(vertexData.left, vec[0]);
-    ConvertVector(vertexData.top, vec[1]);
-    ConvertVector(vertexData.right, vec[2]);
-
-    this->DrawTriangle3D(vec[0],
-        vec[1],
-        vec[2],
-        color,
-        dLightData,
-        textureHandle);
-}
-
-void MyDirectX::DrawSphere(Vector4 center, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
+void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
 
     if (drawCount[kSphere] >= vertexResource[kSphere].size()) {
-        assert(false && "球の描画上限の超過");
+        assert(false && "over drawcount");
     }
 
     const float pie = 3.14159265358f;
@@ -1189,10 +1149,6 @@ void MyDirectX::DrawSphere(Vector4 center, Matrix4x4 worldMatrix, Matrix4x4 wvpM
         }
     }
 
-	for (uint32_t i = 0; i < drawTriangleCountInstance * 3; ++i) {
-		vertexData[i].position = vertexData[i].position + center;
-	}
-
     TramsformMatrixData* wvpData = nullptr;
     //書き込むためのアドレスを取得
     wvpResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
@@ -1262,6 +1218,9 @@ void MyDirectX::DrawSphere(Vector4 center, Matrix4x4 worldMatrix, Matrix4x4 wvpM
 void MyDirectX::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData) {
     uint32_t index = DrawKindCount + modelHandle;
 
+    if (drawCount[index] >= vertexResource[index].size()) {
+        assert(false && "over drawcount");
+    }
 
     //頂点リソースにデータを書き込む
 	VertexData* vertexData = nullptr;
@@ -1330,9 +1289,13 @@ void MyDirectX::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpM
 	drawCount[index]++;
 }
 
-void MyDirectX::DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
-	VertexData* vertexData = nullptr;
-	vertexResource[kSprite3D][drawCount[kSprite3D]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
+    if (drawCount[kSprite] >= vertexResource[kSprite].size()) {
+        assert(false && "over drawcount");
+    }
+
+    VertexData* vertexData = nullptr;
+	vertexResource[kSprite][drawCount[kSprite]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
 	//左下
     vertexData[0].position = lb;
@@ -1351,22 +1314,22 @@ void MyDirectX::DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Mat
     vertexData[3].texcoord = { 1.0f, 0.0f };
 
 	TramsformMatrixData* wvpData = nullptr;
-	wvpResource[kSprite3D][drawCount[kSprite3D]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+	wvpResource[kSprite][drawCount[kSprite]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
 	wvpData->world = worldmat;
 	wvpData->wvp = wvpmat;
 
 	MaterialData* materialData = nullptr;
-	materialResource[kSprite3D][drawCount[kSprite3D]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	materialResource[kSprite][drawCount[kSprite]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
     *materialData = material;
 
 	DirectionalLightData* directionalLightData = nullptr;
-	directionalLightResource[kSprite3D][drawCount[kSprite3D]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+	directionalLightResource[kSprite][drawCount[kSprite]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
 	*directionalLightData = dLightData;
 
     //頂点のバッファビューを作成する
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
     //リソースの先頭のアドレスから使う
-    vertexBufferView.BufferLocation = vertexResource[kSprite3D][drawCount[kSprite3D]]->GetGPUVirtualAddress();
+    vertexBufferView.BufferLocation = vertexResource[kSprite][drawCount[kSprite]]->GetGPUVirtualAddress();
     //使用するリソースのサイズは頂点3つ分のサイズ
     vertexBufferView.SizeInBytes = sizeof(VertexData) * 4;
     //1頂点当たりのサイズ
@@ -1374,12 +1337,12 @@ void MyDirectX::DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Mat
 
     //インデックスのバッファビューを作成する
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
-	indexBufferView.BufferLocation = indexResource[kSprite3D][drawCount[kSprite3D]]->GetGPUVirtualAddress();
+	indexBufferView.BufferLocation = indexResource[kSprite][drawCount[kSprite]]->GetGPUVirtualAddress();
 	indexBufferView.SizeInBytes = sizeof(uint32_t) * 6;
 	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 
 	uint32_t* indexData = nullptr;
-	indexResource[kSprite3D][drawCount[kSprite3D]]->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	indexResource[kSprite][drawCount[kSprite]]->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 	indexData[0] = 0;
 	indexData[1] = 1;
 	indexData[2] = 2;
@@ -1411,22 +1374,25 @@ void MyDirectX::DrawSprite3D(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Mat
 	commandList->IASetIndexBuffer(&indexBufferView);
 
     //マテリアルCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kSprite3D][drawCount[kSprite3D]]->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kSprite][drawCount[kSprite]]->GetGPUVirtualAddress());
     //wvp用のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kSprite3D][drawCount[kSprite3D]]->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kSprite][drawCount[kSprite]]->GetGPUVirtualAddress());
     //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
     commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
     //光のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kSprite3D][drawCount[kSprite3D]]->GetGPUVirtualAddress());
+    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kSprite][drawCount[kSprite]]->GetGPUVirtualAddress());
     //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
     commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
     commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-    ++drawCount[kSprite3D];
+    ++drawCount[kSprite];
 }
 
 void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
+    if (drawCount[kPrism] >= vertexResource[kPrism].size()) {
+        assert(false && "over drawcount");
+    }
 
     VertexData* vertexData = nullptr;
     vertexResource[kPrism][drawCount[kPrism]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
@@ -1534,6 +1500,8 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
 
 void MyDirectX::EndFrame() {
 
+    *isCanDraw_ = false;
+
     UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
     ImGui::Render();
@@ -1599,7 +1567,6 @@ void MyDirectX::Finalize() {
     CloseHandle(fenceEvent);
     srvDescriptorHeap->Release();
     rtvDescriptorHeap->Release();
-    CloseWindow(hwnd);
 
     ImGui_ImplDX12_Shutdown();
     ImGui_ImplWin32_Shutdown();
