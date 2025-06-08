@@ -44,12 +44,6 @@ void DebugCamera::Update() {
 
 	transform_.position += centerVelocity * MakeRotationMatrix(transform_.rotation);
 
-	ImGui::Begin("DebugCamera");
-	ImGui::Text("Camera Position: (%.2f, %.2f, %.2f)", transform_.position.x, transform_.position.y, transform_.position.z);
-	ImGui::Text("Camera Rotation: (%.2f, %.2f, %.2f)", transform_.rotation.x, transform_.rotation.y, transform_.rotation.z);
-	ImGui::Text("Camera Scale: (%.2f, %.2f, %.2f)", transform_.scale.x, transform_.scale.y, transform_.scale.z);
-	ImGui::End();
-
 	//===================
 	//子の移動
 	//===================

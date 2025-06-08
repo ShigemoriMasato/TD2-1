@@ -20,15 +20,6 @@ Scene* TitleScene::Update() {
 		isDebugCamera = !isDebugCamera; // Toggle camera mode
 	}
 
-	ImGui::Begin("Mouse");
-	Vector2 mousePos = Input::GetMouseMove();
-	ImGui::Text("Mouse Position: (%.2f, %.2f)", mousePos.x, mousePos.y);
-	float mouseWheel = Input::GetMouseWheel();
-	ImGui::Text("Mouse Wheel: %.2f", mouseWheel);
-	ImGui::Text("Mouse Click	%d, %d, %d", Input::GetMouseButtonState()[0], Input::GetMouseButtonState()[2], Input::GetMouseButtonState()[1]);
-	ImGui::Text("LSHIFT : %d", Input::GetKeyState()[DIK_LSHIFT]);
-	ImGui::End();
-
 	if (isDebugCamera) {
 		debugCamera->Update();
 		*camera = debugCamera->GetCamera();
