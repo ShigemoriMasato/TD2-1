@@ -601,19 +601,16 @@ void MyDirectX::InitDirectX() {
     hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
     //コマンドキューの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
-
     logger->Log("Complete create CommandQueue\n");
 
     hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
     //コマンドアロケータの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
-
     logger->Log("Complete create CommandAllocator\n");
 
     hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
     //コマンドリストの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
-
     logger->Log("Complete create CommandList\n");
 
     //スワップチェーンを生成する
@@ -634,17 +631,14 @@ void MyDirectX::InitDirectX() {
         nullptr,		    	    		//モニタの設定
         nullptr,			    		    //出力の設定
         reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));	//スワップチェーンのポインタ
-
     assert(SUCCEEDED(hr));
     logger->Log("Complete create SwapChain\n");
 
 
     //ディスクリプタヒープの生成
     rtvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
-
     //ディスクリプタヒープの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
-
     logger->Log("Complete create DescriptorHeap\n");
 
     //SwapChainからResourceを取得する
@@ -668,7 +662,6 @@ void MyDirectX::InitDirectX() {
     rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     //二つ目を作る
     device->CreateRenderTargetView(swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
-
     logger->Log("Complete create RenderTargetView\n");
 
     //初期値0でフェンスを作る

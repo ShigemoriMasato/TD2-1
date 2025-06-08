@@ -28,6 +28,8 @@ struct D3DResourceLeakChecker {
 	}
 };
 
+//必要な時に必要なクラスを作成して、ここにポインタを集中させるようにする
+
 class MyDirectX {
 public:
 	enum DrawKind {
