@@ -1,6 +1,6 @@
 #pragma once
 #include "CommonData.h"
-#include "../../Engine/Core/Renderer.h"
+#include "../../Engine/Core/Render.h"
 
 class Scene {
 public:
@@ -9,13 +9,13 @@ public:
 
 	[[nodiscard]]
 	virtual Scene* Update() = 0;
-	virtual void Render() = 0;
+	virtual void Draw() const = 0;
 
-	void SetRenderer(Renderer* render) { renderer_ = render; }
+	void SetRenderer(Render* render) { render_ = render; }
 
 protected:
 
 	CommonData* commonData_;
-	Renderer* renderer_ = nullptr;
+	Render* render_ = nullptr;
 
 };

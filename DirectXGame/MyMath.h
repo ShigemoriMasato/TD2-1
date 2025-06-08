@@ -1,55 +1,13 @@
-#pragma once
+﻿#pragma once
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Vector4.h"
+#include "Matrix3x3.h"
+#include "Matrix4x4.h"
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#include <cmath>
 #include <cstdint>
-#include <vector>
-#include <string>
-#include "../Engine/Struct/Vector2.h"
-#include "../Engine/Struct/Vector3.h"
-#include "../Engine/Struct/Vector4.h"
-#include "../Engine/Struct/Matrix4x4.h"
-#include "../Engine/Struct/Matrix3x3.h"
-
-struct Transform final {
-	Vector3 scale;
-	Vector3 rotation;
-	Vector3 position;
-};
-
-struct VertexData final {
-	Vector4 position;
-	Vector2 texcoord;
-	Vector3 normal;
-};
-
-struct MaterialData final {
-	Vector4 color;
-	int32_t enableLighting;
-	float padding[3];
-	Matrix4x4 uvTransform = {
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f ,0.0f, 1.0f, 0.0f
-	};
-};
-
-struct ModelMaterial final {
-	std::string textureFilePath;
-};
-
-struct TramsformMatrixData final {
-	Matrix4x4 wvp;
-	Matrix4x4 world;
-};
-
-struct DirectionalLightData final {
-	Vector4 color;
-	Vector3 direction;
-	float intensity;
-};
-
-struct ModelData {
-	std::vector<VertexData> vertices;
-	ModelMaterial material;
-};
 
 Vector2 operator+(const Vector2& a, const Vector2& b);
 Vector2 operator-(const Vector2& a, const Vector2& b);
@@ -125,24 +83,38 @@ Matrix4x4 operator/=(Matrix4x4& a, const Matrix4x4& b);
 bool operator==(const Matrix4x4& a, const Matrix4x4& b);
 bool operator!=(const Matrix4x4& a, const Matrix4x4& b);
 
-namespace Matrix {
+namespace TwoDimension {
+	struct Translate {
+		Vector2 pos;
+		float angle; // in radians
+		Vector2 scale;
+	};;
 
-	Matrix4x4 Inverse(const Matrix4x4& m);
-	Matrix3x3 Inverse(const Matrix3x3& m);
-
-	Matrix4x4 MakeTranslationMatrix(const Vector3& pos);
-	Matrix4x4 MakeRotationMatrix(Vector3 angle);
-	Matrix4x4 MakeScaleMatrix(const Vector3& scale);
-	Matrix4x4 MakeAffineMatrix(const Vector3& pos, const Vector3& angle, const Vector3& scale);
-	Matrix4x4 MakeAffineMatrix(Transform transform);
+	Matrix3x3 MakeInverseMatrix(const Matrix3x3& m);
+	Matrix3x3 MakeIdentity();
 
 	Matrix3x3 MakeTranslationMatrix(const Vector2& pos);
 	Matrix3x3 MakeRotationMatrix(float angle);
 	Matrix3x3 MakeScaleMatrix(const Vector2& scale);
 	Matrix3x3 MakeAffineMatrix(const Vector2& pos, float angle, const Vector2& scale);
+	Matrix3x3 MakeAffineMatrix(const Translate& t);
+}
 
-	Matrix3x3 MakeIdentity3x3();
-	Matrix4x4 MakeIdentity4x4();
+namespace ThreeDimension {
+	struct Translate {
+		Vector3 pos;
+		Vector3 angle;
+		Vector3 scale;
+	};
+	Matrix4x4 MakeInverseMatrix(const Matrix4x4& m);
+	Matrix4x4 MakeIdentity();
+
+	Matrix4x4 MakeTranslationMatrix(const Vector3& pos);
+	Matrix4x4 MakeRotationMatrix(Vector3 angle);
+	Matrix4x4 MakeScaleMatrix(const Vector3& scale);
+	Matrix4x4 MakeAffineMatrix(const Vector3& pos, const Vector3& angle, const Vector3& scale);
+	Matrix4x4 MakeAffineMatrix(const Translate& t);
+
 }
 
 namespace MyMath {
@@ -156,6 +128,4 @@ namespace MyMath {
 	/// <param name="t"></param>
 	/// <returns></returns>
 	uint32_t lerp(uint32_t a, uint32_t b, float t);
-
-	Vector3 ConvertVector(const Vector4& v);
 }

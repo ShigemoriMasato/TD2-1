@@ -50,6 +50,8 @@ public:
 
 	void BeginFrame();
 
+	void PreDraw();
+
 	int LoadTexture(std::string path);
 
 	int LoadObjFile(const std::string& directoryPath, const std::string& filename);
@@ -64,7 +66,7 @@ public:
 
 	void DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
-	void EndFrame();
+	void PostDraw();
 
 	void Finalize();
 

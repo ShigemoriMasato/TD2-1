@@ -2,7 +2,6 @@
 #include "../Scene/Common/CommonData.h"
 #include "../Scene/TitleScene.h"
 #include "../Tools/Input.h"
-#include "Core/Renderer.h"
 
 SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeight) {
 
@@ -15,13 +14,14 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 
 	myDirectX_ = new MyDirectX(kWindowWidth, kWindowHeight);
 
-	renderer_ = new Renderer(myDirectX_);
+	renderer_ = new Render(myDirectX_);
 	scene_->SetRenderer(renderer_);
 
 	input_ = new Input(myDirectX_->GetMyWndClass().hInstance, myDirectX_->GetMyHwnd());
 	input_->Initialize();
 
-	myDirectX_->CreateDrawResource(MyDirectX::kTriangle, 1);
+	myDirectX_->CreateDrawResource(MyDirectX::kPrism, 1);
+	myDirectX_->CreateDrawResource(MyDirectX::kSphere, 1);
 }
 
 SceneManager::~SceneManager() {
@@ -37,6 +37,8 @@ SceneManager::~SceneManager() {
 
 void SceneManager::Update() {
 
+	myDirectX_->BeginFrame();
+
 	input_->Update();
 
 	if (nextScene_ != nullptr) {
@@ -49,12 +51,12 @@ void SceneManager::Update() {
 	nextScene_ = scene_->Update();
 }
 
-void SceneManager::Render() {
+void SceneManager::Draw() const{
 	if (scene_ == nullptr) {
 		assert(false && "SceneController::Render() Scene is nullptr.");
 	}
 
-	myDirectX_->BeginFrame();
-	scene_->Render();
-	myDirectX_->EndFrame();
+	myDirectX_->PreDraw();
+	scene_->Draw();
+	myDirectX_->PostDraw();
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "MyMath.h"
 
+using namespace Matrix;
 struct Transform;
 
 //初期値を画面サイズ1280*720と仮定して設定
@@ -27,21 +28,20 @@ public:
 	Camera() = default;
 	~Camera() = default;
 	
-	void SetPerspectiveFovMatrix(PerspectiveFovDesc desc);
-	void SetOrthographicMatrix(OrthographicDesc desc);
+	void SetProjectionMatrix(PerspectiveFovDesc desc);
+	void SetProjectionMatrix(OrthographicDesc desc);
 
 	void MakeMatrix();
 
-	void SetTransform(const Transform& transform) {
-		this->transform = transform;
-	}
+	void SetTransform(const Transform& transform);
+	void SetTransform(const Matrix4x4& matrix);
 
 	Matrix4x4 GetViewportMatrix() const;
 
 private:
 
-	Matrix4x4 projectionMatrix = MakeIdentity4x4();		//ワールド行列にこれをかけると正射影になる
-	Matrix4x4 vpMatrix = MakeIdentity4x4();			//w抜きviewport変換行列
+	Matrix4x4 projectionMatrix = Matrix::MakeIdentity4x4();		//ワールド行列にこれをかけると正射影になる
+	Matrix4x4 vpMatrix = Matrix::MakeIdentity4x4();			//w抜きviewport変換行列
 
-	Transform transform = {};							//カメラ座標
+	Matrix4x4 transform = {};							//カメラ座標
 };

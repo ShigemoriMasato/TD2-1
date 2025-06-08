@@ -28,6 +28,8 @@ public:
 
 	static Vector2 GetMouseMove();
 
+	static float GetMouseWheel();
+
 	static BYTE* GetMouseButtonState();
 
 	static BYTE* GetPreMouseButtonState();

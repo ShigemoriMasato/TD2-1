@@ -72,7 +72,7 @@
     <ClCompile Include="Engine\Core\MyWindow.cpp">
       <Filter>MyEngine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Renderer.cpp">
+    <ClCompile Include="Engine\Core\Render.cpp">
       <Filter>MyEngine\Core</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Struct\Matrix4x4.cpp">
@@ -140,7 +140,7 @@
     <ClInclude Include="Engine\Core\MyWindow.h">
       <Filter>MyEngine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Renderer.h">
+    <ClInclude Include="Engine\Core\Render.h">
       <Filter>MyEngine\Core</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Struct\Matrix3x3.h">

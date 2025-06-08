@@ -2,6 +2,7 @@
 #include "Common/Scene.h"
 #include "Common/CommonData.h"
 #include "../Tools/Camera.h"
+#include "../Tools/DebugCamera.h"
 
 class TitleScene : public Scene {
 public:
@@ -9,10 +10,13 @@ public:
 	~TitleScene();
 
 	Scene* Update() override;
-	void Render() override;
+	void Draw() const override;
 
 private:
 
 	Camera* camera;
+	DebugCamera* debugCamera;
+
+	bool isDebugCamera = false;
 
 };

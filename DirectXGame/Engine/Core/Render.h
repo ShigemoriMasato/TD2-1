@@ -4,10 +4,10 @@
 
 class Camera;
 
-class Renderer {
+class Render {
 public:
-	Renderer(MyDirectX* myDirectX) : myDirectX_(myDirectX), isCanDraw_(myDirectX_->GetIsCanDraw()) {}
-	~Renderer() = default;
+	Render(MyDirectX* myDirectX) : myDirectX_(myDirectX), isCanDraw_(myDirectX_->GetIsCanDraw()) {}
+	~Render() = default;
 
 	void DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 

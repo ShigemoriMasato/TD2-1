@@ -4,7 +4,7 @@
 class Scene;
 struct CommonData;
 class Input;
-class Renderer;
+class Render;
 
 class SceneManager final {
 public:
@@ -12,7 +12,7 @@ public:
 	SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeight);
 	~SceneManager();
 	void Update();
-	void Render();
+	void Draw() const;
 	
 private:
 
@@ -22,7 +22,7 @@ private:
 	CommonData* commonData_ = nullptr;
 
 	MyDirectX* myDirectX_ = nullptr;
-	Renderer* renderer_ = nullptr;
+	Render* renderer_ = nullptr;
 
 	Input* input_ = nullptr;
 };

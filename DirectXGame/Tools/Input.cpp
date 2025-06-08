@@ -102,11 +102,18 @@ Vector2 Input::GetMouseMove() {
 	return Vector2(float(mouseState.lX), float(mouseState.lY));
 }
 
+float Input::GetMouseWheel() {
+	if(!isInitialized_) {
+		return 0.0f;
+	}
+	return float(mouseState.lZ);
+}
+
 BYTE* Input::GetMouseButtonState() {
 	if (!isInitialized_) {
 		return nullptr;
 	}
-	return reinterpret_cast<BYTE*>(&mouseState);
+	return mouseState.rgbButtons;
 }
 
 BYTE* Input::GetPreMouseButtonState() {

@@ -1,19 +1,34 @@
 #pragma once
 #include "MyMath.h"
-
-class Camera;
+#include "Camera.h"
+#include "../Engine/Core/Render.h"
 
 class DebugCamera {
 public:
 
+	void Initialize(Camera* camera = nullptr);
+
 	void Update();
+
+	/// <summary>
+	/// カメラの視点を描画
+	/// </summary>
+	void Draw(Render* render, Camera* camera);
+
+	Camera GetCamera();
 
 private:
 
-	Camera* camera = nullptr;
+	Camera camera_;
 
-	Transform transform;
+	//カメラの親座標
+	Vector3 center_;
 
-	Vector2 mousePosition = { 0.0f, 0.0f };
-	Vector2 preMousePosition = { 0.0f, 0.0f };
+	//親からの距離
+	float distance_ = -10.0f;
+
+	//最終的なカメラの位置
+	Transform transform_;
+
+	const float speed_ = 0.01f;
 };

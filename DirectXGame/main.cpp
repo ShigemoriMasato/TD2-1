@@ -25,7 +25,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			//描画処理
 
-			sceneManager->Render();
+			sceneManager->Draw();
 
 			//描画処理
 		}

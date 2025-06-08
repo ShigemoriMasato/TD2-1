@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cassert>
 #include <strsafe.h>
+#include "../../Tools/MyMath.h"
 #include <memory>
 #include <sstream>
 #include "../../externals/imgui/imgui.h"
@@ -15,6 +16,8 @@
 #pragma comment(lib, "Dbghelp.lib")
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dxcompiler.lib")
+
+using namespace MyMath;
 
 namespace {
     //ウィンドウプロシージャ
@@ -483,6 +486,9 @@ ModelMaterial MyDirectX::LoadMaterialTemplateFile(const std::string& directoryPa
 
 void MyDirectX::BeginFrame() {
     BeginImGui();
+}
+
+void MyDirectX::PreDraw() {
     ClearScreen();
     *isCanDraw_ = true;
 }
@@ -1019,7 +1025,7 @@ void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMat
             for (int j = 0; j < horizontal; ++j) {
                 //球のさきっちょ
                 vertexData[drawTriangleCountInstance * 3 + 1].position = { 0.0f, point, 0.0f, 1.0f };
-                vertexData[drawTriangleCountInstance * 3 + 1].texcoord = { (float(horizontal - 1 - j)) / float(horizontal - 1), buffer == 1 ? 0.0f : 0.9999f };
+                vertexData[drawTriangleCountInstance * 3 + 1].texcoord = { (float(horizontal - 1 - j)) / float(horizontal - 1), buffer == 1 ? 0.0f : 1.0f };
 
                 //先っちょから一個離れた点たち
                 vertexData[drawTriangleCountInstance * 3 + 1 - buffer].position = {
@@ -1044,9 +1050,9 @@ void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMat
                     float(i + 1) / float(vertical)
                 };
 
-                ConvertVector(vertexData[drawTriangleCountInstance * 3].position, vertexData[drawTriangleCountInstance * 3].normal);
-                ConvertVector(vertexData[drawTriangleCountInstance * 3 + 1].position, vertexData[drawTriangleCountInstance * 3 + 1].normal);
-                ConvertVector(vertexData[drawTriangleCountInstance * 3 + 2].position, vertexData[drawTriangleCountInstance * 3 + 2].normal);
+                vertexData[drawTriangleCountInstance * 3].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3].position);
+                vertexData[drawTriangleCountInstance * 3 + 1].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 1].position);
+                vertexData[drawTriangleCountInstance * 3 + 2].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 2].position);
 
                 ++drawTriangleCountInstance;
             }
@@ -1096,9 +1102,9 @@ void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMat
                     float(i) / float(vertical)
                 };
 
-                ConvertVector(vertexData[drawTriangleCountInstance * 3].position, vertexData[drawTriangleCountInstance * 3].normal);
-                ConvertVector(vertexData[drawTriangleCountInstance * 3 + 1].position, vertexData[drawTriangleCountInstance * 3 + 1].normal);
-                ConvertVector(vertexData[drawTriangleCountInstance * 3 + 2].position, vertexData[drawTriangleCountInstance * 3 + 2].normal);
+                vertexData[drawTriangleCountInstance * 3].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3].position);
+                vertexData[drawTriangleCountInstance * 3 + 1].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 1].position);
+                vertexData[drawTriangleCountInstance * 3 + 2].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 2].position);
 
                 ++drawTriangleCountInstance;
 
@@ -1139,15 +1145,19 @@ void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMat
                     float(i + 1) / float(vertical)
                 };
 
-                ConvertVector(vertexData[drawTriangleCountInstance * 3].position, vertexData[drawTriangleCountInstance * 3].normal);
-                ConvertVector(vertexData[drawTriangleCountInstance * 3 + 1].position, vertexData[drawTriangleCountInstance * 3 + 1].normal);
-                ConvertVector(vertexData[drawTriangleCountInstance * 3 + 2].position, vertexData[drawTriangleCountInstance * 3 + 2].normal);
+                vertexData[drawTriangleCountInstance * 3].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3].position);
+                vertexData[drawTriangleCountInstance * 3 + 1].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 1].position);
+                vertexData[drawTriangleCountInstance * 3 + 2].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 2].position);
 
                 ++drawTriangleCountInstance;
             }
 
         }
     }
+
+    for(uint32_t i = 0; i < drawTriangleCountInstance * 3; ++i) {
+        vertexData[i].position *= radius;
+	}
 
     TramsformMatrixData* wvpData = nullptr;
     //書き込むためのアドレスを取得
@@ -1498,7 +1508,7 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     ++drawCount[kPrism];
 }
 
-void MyDirectX::EndFrame() {
+void MyDirectX::PostDraw() {
 
     *isCanDraw_ = false;
 
