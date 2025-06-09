@@ -5,6 +5,7 @@ class Scene;
 struct CommonData;
 class Input;
 class Render;
+class Sound;
 
 class SceneManager final {
 public:
@@ -25,4 +26,5 @@ private:
 	Render* renderer_ = nullptr;
 
 	Input* input_ = nullptr;
+	Sound* sound_ = nullptr;
 };

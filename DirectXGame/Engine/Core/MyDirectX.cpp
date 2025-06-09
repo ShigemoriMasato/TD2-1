@@ -420,7 +420,6 @@ int MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
         switch (drawKind) {
         case kSphere:
 			vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 992 * 3));
-			indexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(uint32_t) * 1984 * 3));
             break;
 
 		case kSprite:
@@ -431,6 +430,11 @@ int MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
         case kPrism:
 			vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 7));
 			indexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(uint32_t) * 24));
+            break;
+
+        case kBox:
+			vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 24));
+			indexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(uint32_t) * 36));
             break;
 
         default:
@@ -986,7 +990,7 @@ void MyDirectX::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4
 void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
 
     if (drawCount[kSphere] >= vertexResource[kSphere].size()) {
-        assert(false && "over drawcount");
+        assert(false && "球の描画上限の超過");
     }
 
     const float pie = 3.14159265358f;
@@ -1018,7 +1022,7 @@ void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMat
             for (int j = 0; j < horizontal; ++j) {
                 //球のさきっちょ
                 vertexData[drawTriangleCountInstance * 3 + 1].position = { 0.0f, point, 0.0f, 1.0f };
-                vertexData[drawTriangleCountInstance * 3 + 1].texcoord = { (float(horizontal - 1 - j)) / float(horizontal - 1), buffer == 1 ? 0.0f : 1.0f };
+                vertexData[drawTriangleCountInstance * 3 + 1].texcoord = { (float(horizontal - 1 - j)) / float(horizontal - 1), buffer == 1 ? 0.0f : 0.9999f };
 
                 //先っちょから一個離れた点たち
                 vertexData[drawTriangleCountInstance * 3 + 1 - buffer].position = {
@@ -1148,9 +1152,9 @@ void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMat
         }
     }
 
-    for(uint32_t i = 0; i < drawTriangleCountInstance * 3; ++i) {
-        vertexData[i].position *= radius;
-	}
+    for (uint32_t i = 0; i < drawTriangleCountInstance * 3; ++i) {
+		vertexData[i].position *= radius;
+    }
 
     TramsformMatrixData* wvpData = nullptr;
     //書き込むためのアドレスを取得
@@ -1499,6 +1503,159 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     commandList->DrawIndexedInstanced(24, 1, 0, 0, 0);
 
     ++drawCount[kPrism];
+}
+
+void MyDirectX::DrawBox(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
+    if (drawCount[kBox] >= vertexResource[kBox].size()) {
+        assert(false && "over drawcount");
+    }
+
+	VertexData* vertexData = nullptr;
+	vertexResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+
+    Vector3 normals[6] = {
+        { 0,  0,  1}, { 0,  0, -1}, {-1,  0,  0},
+        { 1,  0,  0}, { 0,  1,  0}, { 0, -1,  0}
+    };
+
+    Vector4 facePositions[4] = {
+        {0, 0, 0, 1},
+        {1, 0, 0, 1},
+        {1, 1, 0, 1},
+        {0, 1, 0, 1}
+    };
+
+    Vector2 faceUVs[4] = {
+        {0, 0}, {1, 0}, {1, 1}, {0, 1}
+    };
+
+    for (int face = 0; face < 6; ++face) {
+        for (int i = 0; i < 4; ++i) {
+            int index = face * 4 + i;
+            VertexData& vert = vertexData[index];
+            vert.normal = normals[face];
+            vert.texcoord = faceUVs[i];
+
+            switch (face) {
+            case 0: // 前面 
+                vert.position = { facePositions[i].x, facePositions[i].y, 1.0f, 1.0f };
+                break;
+            case 1: // 後面
+                vert.position = { 1.0f - facePositions[i].x, facePositions[i].y, 0.0f, 1.0f };
+                break;
+            case 2: // 左面 
+                switch (i) {
+                case 0: 
+                    vert.position = { 0.0f, 0.0f, 0.0f, 1.0f }; 
+                    break; // facePositions[1]
+                case 1: 
+                    vert.position = { 0.0f, 0.0f, 1.0f, 1.0f };
+                    break; // facePositions[0]
+                case 2: 
+                    vert.position = { 0.0f, 1.0f, 1.0f, 1.0f }; 
+                    break; // facePositions[3]
+                case 3: 
+                    vert.position = { 0.0f, 1.0f, 0.0f, 1.0f }; 
+                    break; // facePositions[2]
+                }
+                break;
+            case 3: // 右面 
+                vert.position = { 1.0f, facePositions[i].y, facePositions[i].x, 1.0f };
+                break;
+            case 4: // 上面 
+                vert.position = { facePositions[i].x, 1.0f, 1.0f - facePositions[i].y, 1.0f };
+                break;
+            case 5: // 底面 
+                vert.position = { facePositions[i].x, 0.0f, facePositions[i].y, 1.0f };
+                break;
+            }
+        }
+    }
+
+	uint32_t* indexData = nullptr;
+	indexResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+
+    for (int face = 0; face < 6; ++face) {
+        int base = face * 4;
+        int idx = face * 6;
+
+        // 三角形1（0,1,2）
+        indexData[idx + 0] = base + 0;
+        indexData[idx + 1] = base + 1;
+        indexData[idx + 2] = base + 2;
+
+        // 三角形2（2,3,0）
+        indexData[idx + 3] = base + 2;
+        indexData[idx + 4] = base + 3;
+        indexData[idx + 5] = base + 0;
+    }
+
+
+    TramsformMatrixData* wvpData = nullptr;
+    wvpResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+    wvpData->world = worldMatrix;
+    wvpData->wvp = wvpMatrix;
+
+    MaterialData* materialData = nullptr;
+    materialResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+    *materialData = material;
+
+    DirectionalLightData* directionalLightData = nullptr;
+    directionalLightResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+    *directionalLightData = dLightData;
+
+    //頂点のバッファビューを作成する
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+    //リソースの先頭のアドレスから使う
+    vertexBufferView.BufferLocation = vertexResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress();
+    //使用するリソースのサイズは頂点3つ分のサイズ
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * 24;
+    //1頂点当たりのサイズ
+    vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+    //インデックスのバッファビューを作成する
+    D3D12_INDEX_BUFFER_VIEW indexBufferView{};
+    indexBufferView.BufferLocation = indexResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress();
+    indexBufferView.SizeInBytes = sizeof(uint32_t) * 36;
+    indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+
+    //ビューポート
+    D3D12_VIEWPORT viewport{};
+    //クライアント領域のサイズと一緒にして画面全体に表示
+    viewport.Width = static_cast<float>(kClientWidth);
+    viewport.Height = static_cast<float>(kClientHeight);
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    //シザー矩形
+    D3D12_RECT scissorRect{};
+    //基本的にビューポートと同じ矩形が構成されるようにする
+    scissorRect.left = 0;
+    scissorRect.right = kClientWidth;
+    scissorRect.top = 0;
+    scissorRect.bottom = kClientHeight;
+
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+    commandList->IASetIndexBuffer(&indexBufferView);
+
+    //マテリアルCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress());
+    //wvp用のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress());
+    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
+    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
+    //光のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress());
+    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
+    commandList->DrawIndexedInstanced(36, 1, 0, 0, 0);
+
+    ++drawCount[kBox];
 }
 
 void MyDirectX::PostDraw() {

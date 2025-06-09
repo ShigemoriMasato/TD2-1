@@ -52,6 +52,6 @@ void Camera::SetTransform(const Matrix4x4& matrix) {
 	transform = matrix;
 }
 
-Matrix4x4 Camera::GetViewportMatrix() const {
+Matrix4x4 Camera::VPMatrix() const {
 	return vpMatrix;
 }

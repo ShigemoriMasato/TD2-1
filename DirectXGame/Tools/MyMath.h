@@ -46,7 +46,7 @@ struct DirectionalLightData final {
 	float intensity;
 };
 
-struct ModelData {
+struct ModelData final {
 	std::vector<VertexData> vertices;
 	ModelMaterial material;
 };

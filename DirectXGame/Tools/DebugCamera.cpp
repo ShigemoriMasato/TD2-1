@@ -22,7 +22,7 @@ void DebugCamera::Update() {
 	//===================
 	//親の移動
 	//===================
-	if (Input::GetMouseButtonState()[2]) {
+	if (Input::GetMouseButtonState()[0]) {
 
 		Vector2 mouseMove = Input::GetMouseMove();
 

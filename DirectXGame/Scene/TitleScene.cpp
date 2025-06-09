@@ -39,7 +39,7 @@ Scene* TitleScene::Update() {
 
 void TitleScene::Draw() const {
 	
-	render_->DrawPrism(MakeIdentity4x4(), camera, { 1.0f, 1.0f, 1.0f, 1.0f, true }, {}, 1);
+	render_->DrawBox(MakeIdentity4x4(), camera, { 1.0f, 1.0f, 1.0f, 1.0f, true }, {}, 1);
 
 	debugCamera->Draw(render_, camera);
 

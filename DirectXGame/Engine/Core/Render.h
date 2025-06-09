@@ -19,6 +19,8 @@ public:
 
 	void DrawPrism(Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
+	void DrawBox(Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle);
+
 private:
 
 	bool IsCanDraw() const {

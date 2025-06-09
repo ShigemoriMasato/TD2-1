@@ -2,6 +2,7 @@
 #include "../Scene/Common/CommonData.h"
 #include "../Scene/TitleScene.h"
 #include "../Tools/Input.h"
+#include "../Tools/Sound.h"
 
 SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeight) {
 
@@ -20,8 +21,22 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	input_ = new Input(myDirectX_->GetMyWndClass().hInstance, myDirectX_->GetMyHwnd());
 	input_->Initialize();
 
+	sound_ = new Sound();
+	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい音↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい音↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+
+
+	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい画像↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい画像↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい量↓↓↓↓↓↓↓↓↓↓↓↓↓
 	myDirectX_->CreateDrawResource(MyDirectX::kPrism, 1);
 	myDirectX_->CreateDrawResource(MyDirectX::kSphere, 1);
+	myDirectX_->CreateDrawResource(MyDirectX::kBox, 1);
+	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい量↑↑↑↑↑↑↑↑↑↑↑↑↑
 }
 
 SceneManager::~SceneManager() {

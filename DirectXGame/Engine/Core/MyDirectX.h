@@ -37,6 +37,7 @@ public:
 		kSphere,
 		kSprite,
 		kPrism,
+		kBox,
 
 		DrawKindCount
 	};
@@ -67,6 +68,8 @@ public:
 	void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
 	void DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
+
+	void DrawBox(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
 	void PostDraw();
 

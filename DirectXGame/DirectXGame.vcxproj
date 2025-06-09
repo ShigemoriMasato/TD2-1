@@ -33,6 +33,7 @@
     <ClCompile Include="Tools\Input.cpp" />
     <ClCompile Include="Tools\Logger.cpp" />
     <ClCompile Include="Tools\MyMath.cpp" />
+    <ClCompile Include="Tools\Sound.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Audio.h" />
@@ -62,6 +63,7 @@
     <ClInclude Include="Tools\Input.h" />
     <ClInclude Include="Tools\Logger.h" />
     <ClInclude Include="Tools\MyMath.h" />
+    <ClInclude Include="Tools\Sound.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

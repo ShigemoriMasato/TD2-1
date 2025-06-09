@@ -469,6 +469,10 @@ bool operator!=(const Matrix4x4& a, const Matrix4x4& b) {
 	return !(a == b);
 }
 
+float MyMath::lerp(float a, float b, float t) {
+	return 0.0f;
+}
+
 uint32_t MyMath::lerp(uint32_t start, uint32_t end, float t) {
 	int sa = start & 0xff;
 	start >>= 8;

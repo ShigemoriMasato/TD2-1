@@ -36,7 +36,7 @@ public:
 	void SetTransform(const Transform& transform);
 	void SetTransform(const Matrix4x4& matrix);
 
-	Matrix4x4 GetViewportMatrix() const;
+	Matrix4x4 VPMatrix() const;
 
 private:
 
