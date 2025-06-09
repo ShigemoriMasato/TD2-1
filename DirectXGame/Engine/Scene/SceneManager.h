@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/MyDirectX.h"
+#include "../Render/MyDirectX.h"
 
 class Scene;
 struct CommonData;

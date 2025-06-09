@@ -1,5 +1,5 @@
 #include "DebugCamera.h"
-#include "Input.h"
+#include "../Input/Input.h"
 #include "Camera.h"
 
 using namespace Matrix;

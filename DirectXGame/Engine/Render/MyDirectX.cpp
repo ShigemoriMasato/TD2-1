@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <cassert>
 #include <strsafe.h>
-#include "../../Tools/MyMath.h"
+#include "../Math/MyMath.h"
 #include <memory>
 #include <sstream>
 #include "../../externals/imgui/imgui.h"
@@ -785,11 +785,11 @@ void MyDirectX::InitDirectX() {
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
     //Shaderをコンパイルする
-    vertexShaderBlob = CompileShader(L"./Engine/HLSL/Object3D.VS.hlsl",
+    vertexShaderBlob = CompileShader(L"./Engine/Shader/Object3D.VS.hlsl",
         L"vs_6_0", dxcUtils, dxcCompiler, includeHandler, logger);
     assert(vertexShaderBlob != nullptr);
 
-    pixelShaderBlob = CompileShader(L"./Engine/HLSL/Object3D.PS.hlsl",
+    pixelShaderBlob = CompileShader(L"./Engine/Shader/Object3D.PS.hlsl",
         L"ps_6_0", dxcUtils, dxcCompiler, includeHandler, logger);
     assert(pixelShaderBlob != nullptr);
 

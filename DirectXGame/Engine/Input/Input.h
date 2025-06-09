@@ -3,7 +3,7 @@
 #include <dinput.h>
 #include <wrl.h>
 
-#include "MyMath.h"
+#include "../Math/MyMath.h"
 
 class Input {
 public:

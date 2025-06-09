@@ -1,8 +1,7 @@
 #pragma once
 #include "Common/Scene.h"
 #include "Common/CommonData.h"
-#include "../Tools/Camera.h"
-#include "../Tools/DebugCamera.h"
+#include "../Engine/Camera/DebugCamera.h"
 
 class TitleScene : public Scene {
 public:

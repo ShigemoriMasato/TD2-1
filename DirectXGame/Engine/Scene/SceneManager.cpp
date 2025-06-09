@@ -1,8 +1,8 @@
 #include "SceneManager.h"
-#include "../Scene/Common/CommonData.h"
-#include "../Scene/TitleScene.h"
-#include "../Tools/Input.h"
-#include "../Tools/Sound.h"
+#include "../../Scene/Common/CommonData.h"
+#include "../../Scene/TitleScene.h"
+#include "../Input/Input.h"
+#include "../Sound/Sound.h"
 
 SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeight) {
 

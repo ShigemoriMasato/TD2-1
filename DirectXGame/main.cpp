@@ -1,4 +1,4 @@
-#include "Engine/SceneManager.h"
+#include "Engine/Scene/SceneManager.h"
 
 int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	const int32_t kWindowWidth = 1280;

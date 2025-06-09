@@ -1,6 +1,6 @@
 #pragma once
 #include "CommonData.h"
-#include "../../Engine/Core/Render.h"
+#include "../../Engine/Render/Render.h"
 
 class Scene {
 public:

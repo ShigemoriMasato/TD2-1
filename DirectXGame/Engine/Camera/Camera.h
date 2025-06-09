@@ -1,5 +1,5 @@
 #pragma once
-#include "MyMath.h"
+#include "../Math/MyMath.h"
 
 using namespace Matrix;
 struct Transform;

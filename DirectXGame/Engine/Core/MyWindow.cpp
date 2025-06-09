@@ -1,5 +1,5 @@
 #include "MyWindow.h"
-#include "MyDirectX.h"
+#include "../Render/MyDirectX.h"
 
 std::vector<HWND> MyWindow::hwndList_;
 std::vector<WNDCLASS> MyWindow::wcList_;

@@ -1,7 +1,7 @@
 #pragma once
-#include "MyMath.h"
+#include "../Math/MyMath.h"
 #include "Camera.h"
-#include "../Engine/Core/Render.h"
+#include "../Render/Render.h"
 
 class DebugCamera {
 public:

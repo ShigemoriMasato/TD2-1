@@ -10,10 +10,10 @@
 #include <dxgidebug.h>
 #include <dxcapi.h>
 
-#include "../../Tools/Logger.h"
-#include "../../Tools/MyMath.h"
-#include "Audio.h"
-#include "MyWindow.h"
+#include "../Log/Logger.h"
+#include "../Math/MyMath.h"
+#include "../Sound/Audio.h"
+#include "../Core/MyWindow.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

@@ -1,7 +1,8 @@
 #include "Camera.h"
-#include "../externals/imgui/imgui.h"
+#include "../../externals/imgui/imgui.h"
 
 using namespace Matrix;
+using namespace MyMath;
 
 namespace {
 	Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {

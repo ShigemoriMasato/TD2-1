@@ -1,5 +1,5 @@
 #include "Render.h"
-#include "../../Tools/Camera.h"
+#include "../Camera/Camera.h"
 
 void Render::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
 	if (!IsCanDraw()) {
