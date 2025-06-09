@@ -30,6 +30,7 @@
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene\Common\CommonData.cpp" />
     <ClCompile Include="Scene\Common\Scene.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Scene\Common\CommonData.h" />
     <ClInclude Include="Scene\Common\Scene.h" />
     <ClInclude Include="Scene\TitleScene.h" />

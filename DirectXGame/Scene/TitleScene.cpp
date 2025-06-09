@@ -7,11 +7,14 @@ using namespace Matrix;
 TitleScene::TitleScene(CommonData* commonData) : Scene(commonData) {
 	camera = new Camera();
 	debugCamera = new DebugCamera();
+	player_ = new Player();
+	player_->Initialize(camera);
 	debugCamera->Initialize();
 }
 
 TitleScene::~TitleScene() {
 	delete camera;
+	delete player_;
 }
 
 Scene* TitleScene::Update() {
@@ -19,6 +22,8 @@ Scene* TitleScene::Update() {
 	if (Input::GetKeyState(DIK_SPACE) && !Input::GetPreKeyState(DIK_SPACE)) {
 		isDebugCamera = !isDebugCamera; // Toggle camera mode
 	}
+
+	player_->Update();
 
 	if (isDebugCamera) {
 		debugCamera->Update();
@@ -38,5 +43,5 @@ Scene* TitleScene::Update() {
 }
 
 void TitleScene::Draw() const {
-	
+	player_->Draw();
 }

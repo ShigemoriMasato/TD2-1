@@ -2,6 +2,7 @@
 #include "Common/Scene.h"
 #include "Common/CommonData.h"
 #include "../Engine/Camera/DebugCamera.h"
+#include "../Player.h"
 
 class TitleScene : public Scene {
 public:
@@ -12,6 +13,8 @@ public:
 	void Draw() const override;
 
 private:
+
+	Player* player_ = nullptr;
 
 	Camera* camera;
 	DebugCamera* debugCamera;
