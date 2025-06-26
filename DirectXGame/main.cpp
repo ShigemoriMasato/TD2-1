@@ -18,18 +18,14 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		else {
 			
 			//更新処理
-
 			sceneManager->Update();
 
-			//更新処理
-
 			//描画処理
-
 			sceneManager->Draw();
-
-			//描画処理
 		}
 	}
+
+	delete sceneManager;
 
 	return 0;
 }

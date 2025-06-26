@@ -1,5 +1,5 @@
 #include "Scene.h"
 
-Scene::Scene(CommonData* commonData) {
+Scene::Scene(std::shared_ptr<CommonData> commonData) {
 	commonData_ = commonData;
 }

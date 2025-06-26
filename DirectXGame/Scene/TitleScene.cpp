@@ -1,47 +1,38 @@
 #include "TitleScene.h"
+#include "GameScene.h"
 #include "../Engine/Input/Input.h"
-#include "../externals/imgui/imgui.h"
+#include "../Engine/Camera/Camera.h"
+#include "../Engine/Math/MyMath.h"
 
-using namespace Matrix;
+using namespace MyMath;
 
-TitleScene::TitleScene(CommonData* commonData) : Scene(commonData) {
-	camera = new Camera();
-	debugCamera = new DebugCamera();
-	player_ = new Player();
-	player_->Initialize(camera);
-	debugCamera->Initialize();
+TitleScene::TitleScene(std::shared_ptr<CommonData> commonData) : Scene(commonData),
+camera_(new Camera()),
+debugCamera(new DebugCamera()){
 }
 
 TitleScene::~TitleScene() {
-	delete camera;
-	delete player_;
+}
+
+void TitleScene::Initialize() {
+	camera_->SetProjectionMatrix(PerspectiveFovDesc());
+	Transform cameraTransform{};
+	cameraTransform.position = { 0.0f, 0.0f, -10.0f };
+	camera_->SetTransform(cameraTransform);
+	camera_->MakeMatrix();
+	debugCamera->Initialize();
 }
 
 Scene* TitleScene::Update() {
 
-	if (Input::GetKeyState(DIK_SPACE) && !Input::GetPreKeyState(DIK_SPACE)) {
-		isDebugCamera = !isDebugCamera; // Toggle camera mode
-	}
-
-	player_->Update();
-
-	if (isDebugCamera) {
-		debugCamera->Update();
-		*camera = debugCamera->GetCamera();
-	} else {
-		Transform transform;
-		transform.position = { 0.0f, 0.0f, -10.0f };
-		transform.rotation = { 0.0f, 0.0f, 0.0f };
-		transform.scale = { 1.0f, 1.0f, 1.0f };
-
-		camera->SetTransform(transform);
-		camera->SetProjectionMatrix(PerspectiveFovDesc());
-	}
-	camera->MakeMatrix();
+	debugCamera->Update();
+	*camera_ = debugCamera->GetCamera();
 
 	return nullptr;
 }
 
 void TitleScene::Draw() const {
-	player_->Draw();
+
+	Render::DrawBox(MakeAffineMatrix(Transform()), camera_, {}, {}, 0);
+
 }

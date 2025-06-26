@@ -12,6 +12,7 @@ void DebugCamera::Initialize(Camera* camera) {
 	center_ = {};
 
 	transform_.scale = Vector3(1.0f, 1.0f, 1.0f);
+	transform_.position = Vector3(0.0f, 0.0f, -20.0f);
 }
 
 void DebugCamera::Update() {
@@ -47,8 +48,9 @@ void DebugCamera::Update() {
 	//===================
 	//子の移動
 	//===================
-	camera_.SetTransform(MakeRotationMatrix(transform_.rotation) * MakeTranslationMatrix(transform_.position));
+	camera_.SetTransform(transform_);
 	camera_.SetProjectionMatrix(PerspectiveFovDesc());
+	camera_.MakeMatrix();
 }
 
 void DebugCamera::Draw(Render* render, Camera* camera) {

@@ -9,11 +9,13 @@
 #include <dbghelp.h>
 #include <dxgidebug.h>
 #include <dxcapi.h>
+#include <wrl.h>
 
 #include "../Log/Logger.h"
 #include "../Math/MyMath.h"
 #include "../Sound/Audio.h"
 #include "../Core/MyWindow.h"
+#include "../Core/MyPSO.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -65,7 +67,7 @@ public:
 
 	void DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData);
 
-	void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 wvpmat, Matrix4x4 worldmat, MaterialData material, DirectionalLightData dLightData, int textureHandle);
+	void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldmat, Matrix4x4 wvpmat, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
 	void DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
@@ -83,6 +85,13 @@ public:
 
 private:
 
+	enum class PSOType {
+		kOpaqueTriangle,		//不透明三角形
+		kTransparentTriangle,	//透明三角形
+
+		PSOTypeCount
+	};
+
 	void ClearScreen();
 
 	void BeginImGui();
@@ -93,6 +102,8 @@ private:
 
 	void InsertBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESOURCE_STATES stateAfter, ID3D12Resource* pResource,
 		D3D12_RESOURCE_BARRIER_TYPE type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION, D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE);
+
+	void SetPSO(PSOType requirePSO);
 
 	Logger* logger;
 
@@ -112,6 +123,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils = nullptr;
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 	uint64_t fenceValue;
 
 
@@ -125,7 +139,7 @@ private:
 	//三角形描画用
 	ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
 	ID3D12Resource* depthStencilResource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
+	MyPSO* pso = nullptr;
 	Microsoft::WRL::ComPtr<ID3D10Blob> signatureBlob = nullptr;
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
@@ -164,5 +178,10 @@ private:
 	std::unordered_map<ID3D12Resource*, D3D12_RESOURCE_STATES> resourceStates;
 
 	bool* isCanDraw_ = nullptr; //描画可能かどうかのフラグ
+
+	uint32_t frame_ = 0; //フレーム数
+
+	//PSO管理用
+	PSOType nowPSO;
 };
 

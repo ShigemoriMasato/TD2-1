@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
+    <ClCompile Include="Engine\Core\MyPSO.cpp" />
     <ClCompile Include="Engine\Core\MyWindow.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Log\Logger.cpp" />
@@ -30,14 +31,17 @@
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Object\Actor.cpp" />
+    <ClCompile Include="Object\Object.cpp" />
     <ClCompile Include="Scene\Common\CommonData.cpp" />
     <ClCompile Include="Scene\Common\Scene.cpp" />
+    <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
+    <ClInclude Include="Engine\Core\MyPSO.h" />
     <ClInclude Include="Engine\Core\MyWindow.h" />
     <ClInclude Include="Engine\Data\Matrix.h" />
     <ClInclude Include="Engine\Data\Transform.h" />
@@ -58,18 +62,16 @@
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="Player.h" />
+    <ClInclude Include="Object\Action.h" />
+    <ClInclude Include="Object\Actor.h" />
+    <ClInclude Include="Object\Object.h" />
     <ClInclude Include="Scene\Common\CommonData.h" />
     <ClInclude Include="Scene\Common\Scene.h" />
+    <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Scene\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
-      <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Engine\Shader\Object3d.hlsli">
@@ -86,6 +88,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\CG2\DirectXGame\DirectXGame\externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
+      <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

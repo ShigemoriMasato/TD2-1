@@ -41,6 +41,14 @@ void Render::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x
 	myDirectX_->DrawSprite(lt, rt, lb, rb, worldMatrix, camera->VPMatrix(), material, dLightData, textureHandle);
 }
 
+void Render::DrawSprite(Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
+	if (!isCanDraw_) {
+		return;
+	}
+
+	myDirectX_->DrawSprite({-0.5f, 0.5f, 0.0f, 1.0f}, {0.5f, 0.5f, 0.0f, 1.0f}, {-0.5f, -0.5f, 0.0f, 1.0f}, {0.5f, -0.5f, 0.0f, 1.0f}, worldMatrix, camera->VPMatrix(), material, dLightData, textureHandle);
+}
+
 void Render::DrawPrism(Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
 	if (!isCanDraw_) {
 		return;

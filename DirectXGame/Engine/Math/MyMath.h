@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <cmath>
 #include "../Data/Vector.h"
 #include "../Data/Matrix.h"
 #include "../Data/Transform.h"
@@ -112,7 +113,21 @@ namespace MyMath {
 	/// <returns></returns>
 	uint32_t lerp(uint32_t a, uint32_t b, float t);
 
+	float EaseIn(float a, float b, float t);
+	Vector3 EaseIn(Vector3 a, Vector3 b, float t);
+
+	float EaseOut(float a, float b, float t);
+	Vector3 EaseOut(Vector3 a, Vector3 b, float t);
+
+
+
 	Vector3 ConvertVector(const Vector4& v);
 
 	float cot(float radian);
+
+	Vector3 Normalize(Vector3 vec);
+}
+
+namespace Collision {
+	bool AABBtoAABB(AABB a, AABB b);
 }
