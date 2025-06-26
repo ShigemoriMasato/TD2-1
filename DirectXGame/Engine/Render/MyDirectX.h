@@ -40,6 +40,7 @@ public:
 		kSprite,
 		kPrism,
 		kBox,
+		kLine,
 
 		DrawKindCount
 	};
@@ -73,6 +74,8 @@ public:
 
 	void DrawBox(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
+	void DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
+
 	void PostDraw();
 
 	void Finalize();
@@ -88,6 +91,8 @@ private:
 	enum class PSOType {
 		kOpaqueTriangle,		//不透明三角形
 		kTransparentTriangle,	//透明三角形
+
+		kOpaqueLine,			//不透明線
 
 		PSOTypeCount
 	};

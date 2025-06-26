@@ -10,7 +10,7 @@ Render::Render(MyDirectX* myDirectX) {
 }
 
 void Render::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
-	if (!isCanDraw_) {
+	if (!*isCanDraw_) {
 		return;
 	}
 
@@ -18,7 +18,7 @@ void Render::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 wo
 }
 
 void Render::DrawSphere(float radius , Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
-	if (!isCanDraw_) {
+	if (!*isCanDraw_) {
 		return;
 	}
 
@@ -26,7 +26,7 @@ void Render::DrawSphere(float radius , Matrix4x4 worldMatrix, Camera* camera, Ma
 }
 
 void Render::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData) {
-	if (!isCanDraw_) {
+	if (!*isCanDraw_) {
 		return;
 	}
 
@@ -34,7 +34,7 @@ void Render::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Camera* camera, M
 }
 
 void Render::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
-	if (!isCanDraw_) {
+	if (!*isCanDraw_) {
 		return;
 	}
 
@@ -42,7 +42,7 @@ void Render::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x
 }
 
 void Render::DrawSprite(Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
-	if (!isCanDraw_) {
+	if (!*isCanDraw_) {
 		return;
 	}
 
@@ -50,7 +50,7 @@ void Render::DrawSprite(Matrix4x4 worldMatrix, Camera* camera, MaterialData mate
 }
 
 void Render::DrawPrism(Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
-	if (!isCanDraw_) {
+	if (!*isCanDraw_) {
 		return;
 	}
 
@@ -58,6 +58,11 @@ void Render::DrawPrism(Matrix4x4 worldMatrix, Camera* camera, MaterialData mater
 }
 
 void Render::DrawBox(Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
-	if (!isCanDraw_) return;
+	if (!*isCanDraw_) return;
 	myDirectX_->DrawBox(worldMatrix, camera->VPMatrix(), material, dLightData, textureHandle);
+}
+
+void Render::DrawLine(Vector3 start, Vector3 end, Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
+	if (!*isCanDraw_) return;
+	myDirectX_->DrawLine({ start.x, start.y, start.z, 1.0f }, { end.x, end.y, end.z, 1.0f }, worldMatrix, camera->VPMatrix(), material, dLightData, textureHandle);
 }

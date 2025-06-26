@@ -14,7 +14,9 @@ public:
 
 private:
 	Camera* camera_ = nullptr;
-	DebugCamera* debugCamera = nullptr;
+	DebugCamera* debugCamera_ = nullptr;
 
-	bool isDebugCamera = false;
+	bool isDebugCamera_ = false;
+
+	Transform transform_;
 };

@@ -23,6 +23,8 @@ public:
 
 	static void DrawBox(Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 1);
 
+	static void DrawLine(Vector3 start, Vector3 end, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = { 1.0f, 1.0f, 1.0f, 1.0f, true }, DirectionalLightData dLightData = {}, int textureHandle = 1);
+
 private:
 
 	static MyDirectX* myDirectX_;

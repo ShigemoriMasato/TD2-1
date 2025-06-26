@@ -920,6 +920,9 @@ void MyDirectX::InitDirectX() {
 	pso->SetDevice(device.Get());
     pso->CreatePSO(int(PSOType::kOpaqueTriangle));
 
+	pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+	pso->CreatePSO(int(PSOType::kOpaqueLine));
+
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc2{};
     depthStencilDesc2.DepthEnable = true;	//深度バッファを使う
     depthStencilDesc2.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;	//深度地を書き込まない
@@ -930,6 +933,7 @@ void MyDirectX::InitDirectX() {
     depthStencilDesc2.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK; // デフォルト値
 
     pso->SetDsvDesc(depthStencilDesc2);
+	pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
 	pso->CreatePSO(int(PSOType::kTransparentTriangle));
 
     for (int i = 0; i < DrawKindCount; ++i) {
@@ -1792,6 +1796,82 @@ void MyDirectX::DrawBox(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData
 
     ++drawCount[kBox];
 }
+
+void MyDirectX::DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
+
+	VertexData* vertexData = nullptr;
+	vertexResource[kLine][drawCount[kLine]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexData[0].position = start;
+	vertexData[0].texcoord = { 0.0f, 0.0f };
+	vertexData[0].normal = { Normalize({start.x, start.y, start.z}) };
+
+	vertexData[1].position = end;
+	vertexData[1].texcoord = { 0.0f, 1.0f };
+	vertexData[1].normal = { 0.0f, 0.0f, 0.0f };
+
+	TramsformMatrixData* wvpData = nullptr;
+	wvpResource[kLine][drawCount[kLine]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+	wvpData->world = worldMatrix;
+	wvpData->wvp = wvpMatrix;
+
+	MaterialData* materialData = nullptr;
+	materialResource[kLine][drawCount[kLine]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	*materialData = material;
+
+	DirectionalLightData* directionalLightData = nullptr;
+	directionalLightResource[kLine][drawCount[kLine]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+    *directionalLightData = dLightData;
+
+    //頂点のバッファビューを作成する
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+    //リソースの先頭のアドレスから使う
+    vertexBufferView.BufferLocation = vertexResource[kLine][drawCount[kLine]]->GetGPUVirtualAddress();
+    //使用するリソースのサイズは頂点3つ分のサイズ
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * 2;
+    //1頂点当たりのサイズ
+    vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+    //ビューポート
+    D3D12_VIEWPORT viewport{};
+    //クライアント領域のサイズと一緒にして画面全体に表示
+    viewport.Width = static_cast<float>(kClientWidth);
+    viewport.Height = static_cast<float>(kClientHeight);
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    //シザー矩形
+    D3D12_RECT scissorRect{};
+    //基本的にビューポートと同じ矩形が構成されるようにする
+    scissorRect.left = 0;
+    scissorRect.right = kClientWidth;
+    scissorRect.top = 0;
+    scissorRect.bottom = kClientHeight;
+
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+	SetPSO(PSOType::kOpaqueLine);
+
+    //マテリアルCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kLine][drawCount[kLine]]->GetGPUVirtualAddress());
+    //wvp用のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kLine][drawCount[kLine]]->GetGPUVirtualAddress());
+    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
+    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
+    //光のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kLine][drawCount[kLine]]->GetGPUVirtualAddress());
+    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
+	commandList->DrawInstanced(2, 1, 0, 0);
+
+    ++drawCount[kLine];
+}
+
+
 
 #pragma endregion
 

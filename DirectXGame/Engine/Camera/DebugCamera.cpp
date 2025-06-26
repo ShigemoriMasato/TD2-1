@@ -13,6 +13,14 @@ void DebugCamera::Initialize(Camera* camera) {
 
 	transform_.scale = Vector3(1.0f, 1.0f, 1.0f);
 	transform_.position = Vector3(0.0f, 0.0f, -20.0f);
+
+	spherical_.x = 20.0f;
+	spherical_.y = 1.57f;
+	spherical_.z = -1.57f;
+
+	transform_.position.x = std::sinf(spherical_.y) * std::cosf(spherical_.z);
+	transform_.position.y = std::cosf(spherical_.y);
+	transform_.position.z = std::sinf(spherical_.y) * std::sinf(spherical_.z);
 }
 
 void DebugCamera::Update() {
@@ -21,32 +29,35 @@ void DebugCamera::Update() {
 	Vector3 centerVelocity{};
 
 	//===================
-	//親の移動
+	//球面座標系
 	//===================
+	Vector2 mouseMove{};
 	if (Input::GetMouseButtonState()[0]) {
+		mouseMove = Input::GetMouseMove();
+	}
+	float mouseWheel = -Input::GetMouseWheel();
 
-		Vector2 mouseMove = Input::GetMouseMove();
-
-		//LSHIFTで移動
-		if (Input::GetKeyState()[DIK_LSHIFT]) {
-
-			centerVelocity = Vector3(-mouseMove.x, mouseMove.y, 0.0f) * speed_;
-
-		}
-		//なにも押してないと視点を回転
-		else {
-
-			transform_.rotation += Vector3(mouseMove.y, mouseMove.x, 0.0f) * speed_ * 0.1f;
-
-		}
+	if (Input::GetKeyState(DIK_LSHIFT)) {
+		center_ += Vector3(-mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f) * MakeRotationMatrix(transform_.rotation);
+	} else {
+		spherical_ += Vector3(mouseWheel * 0.05f, -mouseMove.y * speed_, -mouseMove.x * speed_);
 	}
 
-	centerVelocity.z += Input::GetMouseWheel() * speed_ * 0.1f;
+	spherical_.x = max(0.01f, spherical_.x); // マイナスにならないようにする
 
-	transform_.position += centerVelocity * MakeRotationMatrix(transform_.rotation);
+	transform_.rotation = Vector3(spherical_.y, spherical_.z, 0.0f); // 球面座標系から回転を適用
+
+	transform_.position *= spherical_.x; // 半径を適用
+
+	transform_.position += center_; // 中心を適用
+
+	ImGui::Begin("Camera");
+	ImGui::DragFloat3("rotation", &transform_.rotation.x, 0.01f);
+	ImGui::Text("spherical: (%f, %f, %f)", spherical_.x, spherical_.y, spherical_.z);
+	ImGui::End();
 
 	//===================
-	//子の移動
+	//座標の適用
 	//===================
 	camera_.SetTransform(transform_);
 	camera_.SetProjectionMatrix(PerspectiveFovDesc());
@@ -58,4 +69,8 @@ void DebugCamera::Draw(Render* render, Camera* camera) {
 
 Camera DebugCamera::GetCamera() {
 	return camera_;
+}
+
+Transform DebugCamera::GetTransform() {
+	return transform_;
 }
