@@ -25,6 +25,14 @@ void GameScene::Initialize() {
 
 Scene* GameScene::Update() {
 
+	ImGui::Begin("Debug Tutorial");
+	ImGui::Text("This is a test of a Spherical Camera");
+	ImGui::Text("Press LCLICK to move Camera's Rotation");
+	ImGui::Text("Roll MouseWheel to move Camera's Distance");
+	ImGui::Text("Press LSHIFT to move the camera center");
+	ImGui::Text("Press Space to go to Test of Spherical Coordinate");
+	ImGui::End();
+
 	Transform a = debugCamera_->GetTransform();
 
 	ImGui::Begin("Camera");
@@ -32,6 +40,9 @@ Scene* GameScene::Update() {
 	ImGui::DragFloat3("Rotation", &transform_.rotation.x, 0.1f);
 	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.1f);
 	ImGui::Checkbox("Debug Camera", &isDebugCamera_);
+	ImGui::End();
+
+	ImGui::Begin("Debug Camera");
 	ImGui::Text("Position: (%.2f, %.2f, %.2f)", a.position.x, a.position.y, a.position.z);
 	ImGui::Text("Rotation: (%.2f, %.2f, %.2f)", a.rotation.x, a.rotation.y, a.rotation.z);
 	ImGui::Text("Scale: (%.2f, %.2f, %.2f)", a.scale.x, a.scale.y, a.scale.z);
@@ -58,6 +69,17 @@ Scene* GameScene::Update() {
 
 void GameScene::Draw() const {
 	
-	Render::DrawBox(MakeIdentity4x4(), camera_, {}, {}, 0);
+	Transform t{};
+
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			for (int k = 0; k < 3; ++k) {
+				if (i != 1 && j != 1 && k != 1) {
+					t.position = { float(i) - 1.0f, float(j) - 1.0f, float(k) - 1.0f };
+					Render::DrawBox(MakeAffineMatrix(t), camera_, {}, {}, 0);
+				}
+			}
+		}
+	}
 
 }

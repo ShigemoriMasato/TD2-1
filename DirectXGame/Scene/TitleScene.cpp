@@ -32,11 +32,13 @@ Scene* TitleScene::Update() {
 	camera_->SetTransform(cameraTransform_);
 	camera_->MakeMatrix();
 
-	Vector2 mouseMove{};
-	float mouseWheel{};
-
 	ImGui::Begin("sphere");
 	ImGui::DragFloat3("spherical", &spherical_.x, 0.05f);
+	ImGui::End();
+
+	ImGui::Begin("Debug Tutorial");
+	ImGui::Text("This is a test of a Spherical Coordinate");
+	ImGui::Text("Press Space to go to MoveCamera");
 	ImGui::End();
 
 	spherical_.x = max(0.01f, spherical_.x); // マイナスにならないようにする
