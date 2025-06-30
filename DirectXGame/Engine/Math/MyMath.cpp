@@ -470,7 +470,7 @@ bool operator!=(const Matrix4x4& a, const Matrix4x4& b) {
 }
 
 float MyMath::lerp(float a, float b, float t) {
-	return 0.0f;
+	return a + (b - a) * t;
 }
 
 uint32_t MyMath::lerp(uint32_t start, uint32_t end, float t) {
@@ -498,12 +498,43 @@ uint32_t MyMath::lerp(uint32_t start, uint32_t end, float t) {
 	return aa | ab | ag | ar;
 }
 
+float MyMath::EaseIn(float a, float b, float t) {
+	return a + (b - a) * t * t * t; // Cubic ease-in
+}
+
+Vector3 MyMath::EaseIn(Vector3 a, Vector3 b, float t) {
+	return Vector3(
+		a.x + (b.x - a.x) * t * t * t,
+		a.y + (b.y - a.y) * t * t * t,
+		a.z + (b.z - a.z) * t * t * t
+	);
+}
+
+float MyMath::EaseOut(float a, float b, float t) {
+	t = 1.0f - t; // Invert t for ease-out
+	return a + (b - a) * (1.0f - t * t * t); // Cubic ease-out
+}
+
+Vector3 MyMath::EaseOut(Vector3 a, Vector3 b, float t) {
+	t = 1.0f - t; // Invert t for ease-out
+	return Vector3(
+		a.x + (b.x - a.x) * (1.0f - t * t * t),
+		a.y + (b.y - a.y) * (1.0f - t * t * t),
+		a.z + (b.z - a.z) * (1.0f - t * t * t)
+	);
+}
+
 Vector3 MyMath::ConvertVector(const Vector4& v) {
 	return Vector3(v.x, v.y, v.z);
 }
 
 float MyMath::cot(float radian) {
 	return std::cosf(radian) / std::sinf(radian);
+}
+
+Vector3 MyMath::Normalize(Vector3 vec) {
+	float length = std::sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+	return { vec.x / length, vec.y / length, vec.z / length };
 }
 
 Matrix3x3 Matrix::Inverse(const Matrix3x3& mat) {
@@ -678,11 +709,17 @@ Matrix4x4 Matrix::MakeScaleMatrix(const Vector3& scale) {
 }
 
 Matrix4x4 Matrix::MakeAffineMatrix(const Vector3& translation, const Vector3& rotation, const Vector3& scale) {
-	return MakeTranslationMatrix(translation) *
+	return MakeScaleMatrix(scale) *
 		MakeRotationMatrix(rotation) *
-		Matrix::MakeScaleMatrix(scale);
+		MakeTranslationMatrix(translation);
 }
 
 Matrix4x4 Matrix::MakeAffineMatrix(Transform transform) {
 	return MakeAffineMatrix(transform.position, transform.rotation, transform.scale);
+}
+
+bool Collision::AABBtoAABB(AABB a, AABB b) {
+	return (a.min.x <= b.max.x && a.max.x >= b.min.x &&
+		a.min.y <= b.max.y && a.max.y >= b.min.y &&
+		a.min.z <= b.max.z && a.max.z >= b.min.z);
 }

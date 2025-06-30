@@ -21,8 +21,8 @@ struct VertexData final {
 };
 
 struct MaterialData final {
-	Vector4 color;
-	int32_t enableLighting;
+	Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	int32_t enableLighting = true;
 	float padding[3];
 	Matrix4x4 uvTransform = {
 		1.0f, 0.0f, 0.0f, 0.0f,
@@ -32,7 +32,7 @@ struct MaterialData final {
 };
 
 struct ModelMaterial final {
-	std::string textureFilePath;
+	int textureHandle;
 };
 
 struct TramsformMatrixData final {
@@ -49,4 +49,9 @@ struct DirectionalLightData final {
 struct ModelData final {
 	std::vector<VertexData> vertices;
 	ModelMaterial material;
+};
+
+struct AABB final {
+	Vector3 min{ 0.0f, 0.0f, 0.0f };
+	Vector3 max{ 0.0f, 0.0f, 0.0f };
 };

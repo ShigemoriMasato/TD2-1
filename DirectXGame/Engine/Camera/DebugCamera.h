@@ -16,6 +16,7 @@ public:
 	void Draw(Render* render, Camera* camera);
 
 	Camera GetCamera();
+	Transform GetTransform();
 
 private:
 
@@ -24,11 +25,16 @@ private:
 	//カメラの親座標
 	Vector3 center_;
 
+	//カメラの球面座標系
+	Vector3 spherical_;
+
 	//親からの距離
 	float distance_ = -10.0f;
 
 	//最終的なカメラの位置
 	Transform transform_;
 
-	const float speed_ = 0.01f;
+	const float speed_ = 0.003f;
+
+	bool adjustRotation = true;
 };

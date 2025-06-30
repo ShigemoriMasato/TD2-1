@@ -55,11 +55,11 @@
     <Filter Include="MyEngine\Log">
       <UniqueIdentifier>{87707572-8692-443e-a2ec-223c7eb23df9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object">
+      <UniqueIdentifier>{0c7a170f-de2d-45bf-bfc4-e22ba0affd4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
@@ -90,7 +90,7 @@
     <ClCompile Include="Scene\Common\Scene.cpp">
       <Filter>Scene\Common</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\TitleScene.cpp">
+    <ClCompile Include="Scene\GameScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Camera\Camera.cpp">
@@ -122,6 +122,21 @@
     </ClCompile>
     <ClCompile Include="Engine\Log\Logger.cpp">
       <Filter>MyEngine\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\TitleScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\MyPSO.cpp">
+      <Filter>MyEngine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Actor.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Object.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -158,7 +173,7 @@
     <ClInclude Include="Scene\Common\Scene.h">
       <Filter>Scene\Common</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\TitleScene.h">
+    <ClInclude Include="Scene\GameScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Camera\Camera.h">
@@ -199,6 +214,21 @@
     </ClInclude>
     <ClInclude Include="Engine\Log\Logger.h">
       <Filter>MyEngine\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\TitleScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\MyPSO.h">
+      <Filter>MyEngine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Action.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Actor.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Object.h">
+      <Filter>Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

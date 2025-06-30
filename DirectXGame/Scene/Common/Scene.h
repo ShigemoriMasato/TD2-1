@@ -1,21 +1,20 @@
 #pragma once
 #include "CommonData.h"
 #include "../../Engine/Render/Render.h"
+#include <memory>
 
 class Scene {
 public:
-	Scene(CommonData* commonData);
+	Scene(std::shared_ptr<CommonData> commonData);
 	~Scene() = default;
 
+	virtual void Initialize() = 0;
 	[[nodiscard]]
 	virtual Scene* Update() = 0;
 	virtual void Draw() const = 0;
 
-	void SetRenderer(Render* render) { render_ = render; }
-
 protected:
 
-	CommonData* commonData_;
-	Render* render_ = nullptr;
+	std::shared_ptr<CommonData> commonData_;
 
 };

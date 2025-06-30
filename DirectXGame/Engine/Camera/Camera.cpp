@@ -42,17 +42,21 @@ void Camera::SetProjectionMatrix(OrthographicDesc desc) {
 }
 
 void Camera::MakeMatrix() {
-	vpMatrix = Inverse(transform) * projectionMatrix;
+	vpMatrix = transform_ * projectionMatrix;
 }
 
 void Camera::SetTransform(const Transform& transform) {
-	this->transform = MakeAffineMatrix(transform);
+	this->transform_ = MakeScaleMatrix(transform.scale) * MakeRotationMatrix(transform.rotation) * Inverse(MakeTranslationMatrix(transform.position));
 }
 
 void Camera::SetTransform(const Matrix4x4& matrix) {
-	transform = matrix;
+	transform_ = matrix;
 }
 
 Matrix4x4 Camera::VPMatrix() const {
 	return vpMatrix;
+}
+
+Vector3 Camera::GetPosition() const {
+	return Vector3(-transform_.m[3][0], -transform_.m[3][1], -transform_.m[3][2]);
 }
