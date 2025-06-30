@@ -35,6 +35,4 @@ private:
 	Transform transform_;
 
 	const float speed_ = 0.003f;
-
-	bool adjustRotation = true;
 };
