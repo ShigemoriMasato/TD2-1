@@ -36,7 +36,7 @@ void DebugCamera::Update() {
 	float mouseWheel = -Input::GetMouseWheel();
 
 	if (Input::GetKeyState(DIK_LSHIFT)) {
-		center_ += Vector3(-mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f) * MakeRotationMatrix(transform_.rotation);
+		center_ += Vector3(mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f);
 	} else {
 		spherical_ += Vector3(mouseWheel * 0.05f, mouseMove.y * speed_, -mouseMove.x * speed_);
 	}
