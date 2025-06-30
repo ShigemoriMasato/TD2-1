@@ -29,7 +29,7 @@ void DebugCamera::Update() {
 	//球面座標系
 	//===================
 	Vector2 mouseMove{};
-	if (Input::GetMouseButtonState()[0]) {
+	if (Input::GetMouseButtonState()[2]) {
 		mouseMove = Input::GetMouseMove();
 		mouseMove.y *= -1.0f; // Y軸を反転
 	}

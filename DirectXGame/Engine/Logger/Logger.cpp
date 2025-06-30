@@ -17,7 +17,7 @@ Logger::Logger(std::string logName) {
 	//ファイルを作成して書き込み準備
 	logStream = std::ofstream(logFileName);
 
-	Log("Process started.\n");
+	Log("Process started\n");
 }
 
 void Logger::Log(const std::string &message) {
