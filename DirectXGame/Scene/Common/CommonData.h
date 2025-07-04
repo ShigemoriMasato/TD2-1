@@ -2,19 +2,11 @@
 #include <vector>
 
 enum class ModelType {
-	Block,
-	skydome,
-	player,
-	skull,
-	Title,
 
 	ModelCount
 };
 
 enum class TextureType {
-	block,
-	AttackEffect,
-	HitEffect,
 
 	TextureCount
 };

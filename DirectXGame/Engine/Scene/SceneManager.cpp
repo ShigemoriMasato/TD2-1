@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 #include "../../Scene/Common/CommonData.h"
 #include "../../Scene/TitleScene.h"
+#include "../../Scene/GameScene.h"
 #include "../Input/Input.h"
 #include "../Sound/Sound.h"
 #include <random>
@@ -12,14 +13,14 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 
 	nextScene_ = nullptr;
 
-	myDirectX_ = new MyDirectX(kWindowWidth, kWindowHeight);
+	myDirectX_ = std::make_shared<MyDirectX>(kWindowWidth, kWindowHeight);
 
-	render_ = new Render(myDirectX_);
+	render_ = std::make_unique<Render>(myDirectX_.get());
 
-	input_ = new Input(myDirectX_->GetMyWndClass().hInstance, myDirectX_->GetMyHwnd());
+	input_ = std::make_unique<Input>(myDirectX_->GetMyWndClass().hInstance, myDirectX_->GetMyHwnd());
 	input_->Initialize();
 
-	sound_ = new Sound();
+	sound_ = std::make_unique<Sound>();
 
 	std::srand(uint32_t(time(nullptr)));
 
@@ -27,34 +28,46 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい音↑↑↑↑↑↑↑↑↑↑↑↑↑
 
+	commonData_->textureHandle_.resize(int(TextureType::TextureCount));
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい画像↓↓↓↓↓↓↓↓↓↓↓↓↓
 	
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい画像↑↑↑↑↑↑↑↑↑↑↑↑↑
 
+	commonData_->modelHandle_.resize(int(ModelType::ModelCount));
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたいモデル↓↓↓↓↓↓↓↓↓↓↓↓↓
-	
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたいモデル↑↑↑↑↑↑↑↑↑↑↑↑↑
 
-	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい量↓↓↓↓↓↓↓↓↓↓↓↓↓
-	myDirectX_->CreateDrawResource(MyDirectX::kBox, 1000);
+	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓描画したい量↓↓↓↓↓↓↓↓↓↓↓↓↓
+	myDirectX_->CreateDrawResource(MyDirectX::kBox, 100);
 	myDirectX_->CreateDrawResource(MyDirectX::kSprite, 100);
-	myDirectX_->CreateDrawResource(MyDirectX::kSphere, 10);
-	myDirectX_->CreateDrawResource(MyDirectX::kLine, 1000);
-	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい量↑↑↑↑↑↑↑↑↑↑↑↑↑
+	myDirectX_->CreateDrawResource(MyDirectX::kLine, 100);
+	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑描画したい量↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//最初のシーンを挿入
-	scene_ = new TitleScene(commonData_);
+	scene_ = std::make_unique<TitleScene>(commonData_);
 	scene_->Initialize();
 }
 
 SceneManager::~SceneManager() {
-	delete input_;
-	delete myDirectX_;
-	delete render_;
-	delete scene_;
-	if (nextScene_) {
-		delete nextScene_;
+}
+
+bool SceneManager::IsRoop() {
+
+	while (msg.message != WM_QUIT) {
+
+		//メッセージがあれば処理する
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		} else {
+			//メッセージがなければ処理を始める
+			return true;
+		}
+
 	}
+
+	//ウィンドウのxボタンが押されたらfalseを返す
+	return false;
 }
 
 void SceneManager::Update() {
@@ -63,14 +76,13 @@ void SceneManager::Update() {
 
 	input_->Update();
 
-	if (nextScene_ != nullptr) {
-		delete scene_;
-		scene_ = nextScene_;
-		nextScene_ = nullptr;
+	if (nextScene_ != nullptr && scene_.get() != nextScene_.get()) {
+		scene_.reset();
+		scene_ = std::move(nextScene_);
 		scene_->Initialize();
 	}
 
-	nextScene_ = scene_->Update();
+	nextScene_ = std::move(scene_->Update());
 }
 
 void SceneManager::Draw() const{

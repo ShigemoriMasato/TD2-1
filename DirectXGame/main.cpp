@@ -1,31 +1,16 @@
 #include "Engine/Scene/SceneManager.h"
 
 int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	const int32_t kWindowWidth = 1280;
-	const int32_t kWindowHeight = 720;
-
-	SceneManager* sceneManager = new SceneManager(kWindowWidth, kWindowHeight);
+	std::unique_ptr<SceneManager> sceneManager = std::make_unique<SceneManager>(1280, 720);
 	
-	MSG msg{};
-
 	//ウィンドウのxボタンが押されるまでループ
-	while (msg.message != WM_QUIT) {
-		//メッセージがあれば処理する
-		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-		else {
-			
-			//更新処理
-			sceneManager->Update();
+	while (sceneManager->IsRoop()) {
+		//更新処理
+		sceneManager->Update();
 
-			//描画処理
-			sceneManager->Draw();
-		}
+		//描画処理
+		sceneManager->Draw();
 	}
-
-	delete sceneManager;
 
 	return 0;
 }

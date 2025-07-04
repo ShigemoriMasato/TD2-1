@@ -1,7 +1,6 @@
 #pragma once
 #include "Common/Scene.h"
-#include "../Engine/Camera/DebugCamera.h"
-#include <array>
+#include "../Object/Object.h"
 
 class TitleScene : public Scene {
 public:
@@ -9,19 +8,12 @@ public:
 	TitleScene(std::shared_ptr<CommonData> commonData);
 	~TitleScene();
 	void Initialize() override;
-	Scene* Update() override;
+	std::unique_ptr<Scene> Update() override;
 	void Draw() const override;
 
 private:
+
 	Camera* camera_ = nullptr;
-	Transform cameraTransform_;
+	Transform* cameraTrans_ = new Transform{ {0.0f, 0.0f, -5.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f} };
 
-	Vector3 pos;
-
-	std::array<std::array<Vector3, 32>, 2> start_;
-	std::array<std::array<Vector3, 32>, 2> end_;
-
-	Transform transform_;
-	Vector3 spherical_ = {};
-	float speed_ = 0.01f;
 };

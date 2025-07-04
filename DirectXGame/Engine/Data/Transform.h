@@ -55,3 +55,8 @@ struct AABB final {
 	Vector3 min{ 0.0f, 0.0f, 0.0f };
 	Vector3 max{ 0.0f, 0.0f, 0.0f };
 };
+
+struct Sphere {
+	Vector3 center;
+	float radius;
+};

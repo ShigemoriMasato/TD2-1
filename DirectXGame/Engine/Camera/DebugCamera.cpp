@@ -36,7 +36,7 @@ void DebugCamera::Update() {
 	float mouseWheel = -Input::GetMouseWheel();
 
 	if (Input::GetKeyState(DIK_LSHIFT)) {
-		center_ += Vector3(mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f);
+		center_ += Vector3(mouseMove.x * speed_ * 3.0f, mouseMove.y * speed_ * 3.0f, mouseWheel * 0.05f);
 	} else {
 		spherical_ += Vector3(mouseWheel * 0.05f, mouseMove.y * speed_, -mouseMove.x * speed_);
 	}
@@ -51,21 +51,12 @@ void DebugCamera::Update() {
 
 	transform_.rotation = { -spherical_.y + 1.57f, -spherical_.z - 1.57f, 0.0f };
 
-	ImGui::Begin("Debug Camera");
-	ImGui::Text("mouse move : (%.2f, %.2f)", mouseMove.x, mouseMove.y);
-	ImGui::DragFloat3("rotation", &transform_.rotation.x, 0.01f);
-	ImGui::Text("spherical: (%f, %f, %f)", spherical_.x, spherical_.y, spherical_.z);
-	ImGui::End();
-
 	//===================
 	//座標の適用
 	//===================
 	camera_.SetTransform(MakeScaleMatrix(transform_.scale) * Inverse(MakeTranslationMatrix(transform_.position)) * Inverse(MakeRotationMatrix(transform_.rotation)) * MakeTranslationMatrix(center_));
 	camera_.SetProjectionMatrix(PerspectiveFovDesc());
 	camera_.MakeMatrix();
-}
-
-void DebugCamera::Draw(Render* render, Camera* camera) {
 }
 
 Camera DebugCamera::GetCamera() {

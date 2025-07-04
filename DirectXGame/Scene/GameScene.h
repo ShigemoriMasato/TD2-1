@@ -9,14 +9,13 @@ public:
 	~GameScene();
 
 	void Initialize() override;
-	Scene* Update() override;
+	std::unique_ptr<Scene> Update() override;
 	void Draw() const override;
 
 private:
-	Camera* camera_ = nullptr;
-	DebugCamera* debugCamera_ = nullptr;
 
-	bool isDebugCamera_ = false;
+	Camera* camera_;
+	DebugCamera* debugCamera_;
 
-	Transform transform_;
+	bool isDebugCamera = false;
 };

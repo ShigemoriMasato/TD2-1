@@ -138,6 +138,9 @@
     <ClCompile Include="Engine\Logger\Logger.cpp">
       <Filter>MyEngine\Logger</Filter>
     </ClCompile>
+    <ClCompile Include="BeatManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -229,6 +232,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Logger\Logger.h">
       <Filter>MyEngine\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="BeatManager.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
