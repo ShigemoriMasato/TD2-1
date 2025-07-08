@@ -1,6 +1,7 @@
 #include "BPMMeasure.h"
 #include "Engine/Sound/Sound.h"
 #include <numeric>
+#include <fftw3.h>
 
 void BPMMeasure::Measure() {
 
@@ -36,21 +37,59 @@ void BPMMeasure::Measure() {
         }
     }
 
-    std::vector<float> autocorr(maxLag);
-
 	// 自己相関を計算する
-    for (int lag = minLag; lag < maxLag; ++lag) {
-        float sum = 0.0f;
-        for (int i = 0; i + lag < waveformSample_.size(); ++i) {
-            sum += waveformSample_[i] * waveformSample_[i + lag];
-        }
-        autocorr[lag] = sum;
+    int N = static_cast<int>(waveformSample_.size());
+    int paddedSize = 2 * N;
+
+    // 入力をゼロパディング
+    std::vector<double> input(paddedSize, 0.0);
+    for (int i = 0; i < N; ++i) {
+        input[i] = static_cast<double>(waveformSample_[i]);
     }
 
-	// 最大の自己相関を見つける
+    // FFTWの入力・出力バッファ
+    fftw_complex* freq = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * (paddedSize / 2 + 1));
+    double* autocorr_raw = (double*)fftw_malloc(sizeof(double) * paddedSize);
+
+    // FFTと逆FFTのプラン作成
+    fftw_plan forward = fftw_plan_dft_r2c_1d(paddedSize, input.data(), freq, FFTW_ESTIMATE);
+    fftw_plan backward = fftw_plan_dft_c2r_1d(paddedSize, freq, autocorr_raw, FFTW_ESTIMATE);
+
+    // FFT実行
+    fftw_execute(forward);
+
+    // パワースペクトル（自己相関の周波数領域表現）を作る
+    for (int i = 0; i < paddedSize / 2 + 1; ++i) {
+        double real = freq[i][0];
+        double imag = freq[i][1];
+        freq[i][0] = real * real + imag * imag; // 実部にパワーを格納
+        freq[i][1] = 0.0; // 虚部はゼロに
+    }
+
+    // 逆FFTで自己相関を得る
+    fftw_execute(backward);
+
+    // 正規化（FFTWはスケーリングしないので）
+    for (int i = 0; i < paddedSize; ++i) {
+        autocorr_raw[i] /= paddedSize;
+    }
+
+    // 自己相関の有効範囲だけ取り出す
+    std::vector<double> autocorr(maxLag);
+    for (int lag = minLag; lag < maxLag; ++lag) {
+        autocorr[lag] = autocorr_raw[lag];
+    }
+
+    // ピークを探してBPMを計算
     int bestLag = static_cast<int>(std::distance(autocorr.begin(), std::max_element(autocorr.begin() + minLag, autocorr.begin() + maxLag)));
     float bpm = 60.0f * sampleRate_ / bestLag;
-	bpmBuffer_.push_back(bpm);
+    bpmBuffer_.push_back(bpm);
+
+    // FFTWの終了処理
+    fftw_destroy_plan(forward);
+    fftw_destroy_plan(backward);
+    fftw_free(freq);
+    fftw_free(autocorr_raw);
 
     // 測定回数の上限に達していない場合は終了
 	if (++measureCount_ < measureMaxCount_) {
