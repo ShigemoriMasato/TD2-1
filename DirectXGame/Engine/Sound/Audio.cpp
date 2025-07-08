@@ -87,3 +87,7 @@ void Audio::SoundPlayWave(int soundHandle) {
 	assert(SUCCEEDED(hr) && "Audio::SoundPlayWave SubmitSourceBuffer failed");
 	hr = pSourceVoice->Start();
 }
+
+int Audio::GetSampleRate(int index) {
+	return sdList_[index].wfex.nSamplesPerSec;
+}

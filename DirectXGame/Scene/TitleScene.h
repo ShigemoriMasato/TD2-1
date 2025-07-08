@@ -1,6 +1,8 @@
 #pragma once
 #include "Common/Scene.h"
 #include "../Object/Object.h"
+#include "../BeatManager.h"
+#include "../SoundWave.h"
 
 class TitleScene : public Scene {
 public:
@@ -15,5 +17,6 @@ private:
 
 	Camera* camera_ = nullptr;
 	Transform* cameraTrans_ = new Transform{ {0.0f, 0.0f, -5.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f} };
+	BeatManager* beatManager_;
 
 };

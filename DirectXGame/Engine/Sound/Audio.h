@@ -38,6 +38,8 @@ public:
 
 	void SoundPlayWave(int soundHandle);
 
+	int GetSampleRate(int index);
+
 private:
 
 	//Audio

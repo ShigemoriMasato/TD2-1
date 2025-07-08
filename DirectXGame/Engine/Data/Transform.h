@@ -48,7 +48,7 @@ struct DirectionalLightData final {
 
 struct ModelData final {
 	std::vector<VertexData> vertices;
-	ModelMaterial material;
+	ModelMaterial material{};
 };
 
 struct AABB final {

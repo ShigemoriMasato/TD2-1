@@ -11,8 +11,9 @@ public:
 	void PlayAudio();
 
 	static std::vector<bool> isPlay_;
+	static int GetSampleRate(int index);
 
 private:
-	Audio* audio_;
+	static Audio* audio_;
 };
 

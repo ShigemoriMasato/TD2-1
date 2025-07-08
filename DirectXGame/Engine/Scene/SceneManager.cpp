@@ -6,6 +6,7 @@
 #include "../Sound/Sound.h"
 #include <random>
 #include <time.h>
+#include <fftw3.h>
 
 SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeight) {
 
@@ -25,7 +26,8 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	std::srand(uint32_t(time(nullptr)));
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい音↓↓↓↓↓↓↓↓↓↓↓↓↓
-
+	sound_->LoadAudio("resources/TitleBGM.wav");
+	sound_->LoadAudio("resources/fanfare.wav");
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい音↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	commonData_->textureHandle_.resize(int(TextureType::TextureCount));
@@ -38,14 +40,14 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたいモデル↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓描画したい量↓↓↓↓↓↓↓↓↓↓↓↓↓
-	myDirectX_->CreateDrawResource(MyDirectX::kBox, 100);
-	myDirectX_->CreateDrawResource(MyDirectX::kSprite, 100);
+	myDirectX_->CreateDrawResource(MyDirectX::kSprite, 2000);
 	myDirectX_->CreateDrawResource(MyDirectX::kLine, 100);
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑描画したい量↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//最初のシーンを挿入
 	scene_ = std::make_unique<TitleScene>(commonData_);
 	scene_->Initialize();
+
 }
 
 SceneManager::~SceneManager() {
@@ -93,4 +95,6 @@ void SceneManager::Draw() const{
 	myDirectX_->PreDraw();
 	scene_->Draw();
 	myDirectX_->PostDraw();
+
+	sound_->PlayAudio();
 }

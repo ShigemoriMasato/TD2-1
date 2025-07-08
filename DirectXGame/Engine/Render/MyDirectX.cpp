@@ -386,6 +386,10 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     readTextureCount(0),
     modelCount_(-1),
     isCanDraw_(new bool(false)) {
+    HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+    assert(SUCCEEDED(hr));
+    frame_ = 0;
+
     resourceStates[swapChainResources[0].Get()] = D3D12_RESOURCE_STATE_PRESENT;
     resourceStates[swapChainResources[1].Get()] = D3D12_RESOURCE_STATE_PRESENT;
 	myWindow_ = new MyWindow(kWindowWidth, kWindowHeight);
@@ -403,10 +407,6 @@ MyDirectX::~MyDirectX() {
 }
 
 void MyDirectX::Initialize() {
-    HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
-    assert(SUCCEEDED(hr));
-    frame_ = 0;
-
     wndHandle_ = myWindow_->CreateWindowForApp();
     InitDirectX();
     InitImGui();

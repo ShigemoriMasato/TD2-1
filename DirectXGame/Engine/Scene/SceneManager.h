@@ -17,8 +17,10 @@ public:
 
 	void Update();
 	void Draw() const;
-	
+
 private:
+
+	Logger* logger = nullptr;
 
 	std::unique_ptr<Scene> scene_ = nullptr;
 	std::unique_ptr<Scene> nextScene_ = nullptr;

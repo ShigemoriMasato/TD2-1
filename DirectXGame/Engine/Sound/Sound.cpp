@@ -1,6 +1,7 @@
 #include "Sound.h"
 
-std::vector<bool>Sound::isPlay_ = {};
+std::vector<bool> Sound::isPlay_ = {};
+Audio* Sound::audio_ = nullptr;
 
 Sound::Sound() {
 	audio_ = new Audio();
@@ -24,4 +25,12 @@ void Sound::PlayAudio() {
 			return;
 		}
 	}
+}
+
+int Sound::GetSampleRate(int index) {
+	if (!audio_) {
+		return -1;
+	}
+
+	return audio_->GetSampleRate(index);
 }
