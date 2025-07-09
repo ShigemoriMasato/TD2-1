@@ -2,6 +2,7 @@
 #include "Common/Scene.h"
 #include "../Engine/Camera/DebugCamera.h"
 #include <array>
+#include "../GridMaker.h"
 
 class TitleScene : public Scene {
 public:
@@ -14,14 +15,8 @@ public:
 
 private:
 	Camera* camera_ = nullptr;
+	DebugCamera* debugCamera_;
 	Transform cameraTransform_;
 
-	Vector3 pos;
-
-	std::array<std::array<Vector3, 32>, 2> start_;
-	std::array<std::array<Vector3, 32>, 2> end_;
-
-	Transform transform_;
-	Vector3 spherical_ = {};
-	float speed_ = 0.01f;
+	GridMaker* gridMaker_;
 };

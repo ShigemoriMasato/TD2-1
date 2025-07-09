@@ -60,10 +60,6 @@ Scene* GameScene::Update() {
 		isDebugCamera_ = !isDebugCamera_;
 	}
 
-	if (Input::GetKeyState(DIK_SPACE) && !Input::GetPreKeyState(DIK_SPACE)) {
-		return new TitleScene(commonData_);
-	}
-
 	return nullptr;
 }
 

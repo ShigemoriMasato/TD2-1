@@ -62,7 +62,7 @@ void Render::DrawBox(Matrix4x4 worldMatrix, Camera* camera, MaterialData materia
 	myDirectX_->DrawBox(worldMatrix, camera->VPMatrix(), material, dLightData, textureHandle);
 }
 
-void Render::DrawLine(Vector3 start, Vector3 end, Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
+void Render::DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
 	if (!*isCanDraw_) return;
-	myDirectX_->DrawLine({ start.x, start.y, start.z, 1.0f }, { end.x, end.y, end.z, 1.0f }, worldMatrix, camera->VPMatrix(), material, dLightData, textureHandle);
+	myDirectX_->DrawLine(start, end, worldMatrix, camera->VPMatrix(), material, dLightData, textureHandle);
 }

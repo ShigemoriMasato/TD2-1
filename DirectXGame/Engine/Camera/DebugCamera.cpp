@@ -36,7 +36,7 @@ void DebugCamera::Update() {
 	float mouseWheel = -Input::GetMouseWheel();
 
 	if (Input::GetKeyState(DIK_LSHIFT)) {
-		center_ += Vector3(mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f);
+		center_ += Vector3(mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f) * MakeRotationMatrix(transform_.rotation);
 	} else {
 		spherical_ += Vector3(mouseWheel * 0.05f, mouseMove.y * speed_, -mouseMove.x * speed_);
 	}
@@ -60,7 +60,7 @@ void DebugCamera::Update() {
 	//===================
 	//座標の適用
 	//===================
-	camera_.SetTransform(MakeScaleMatrix(transform_.scale) * Inverse(MakeTranslationMatrix(transform_.position)) * Inverse(MakeRotationMatrix(transform_.rotation)) * MakeTranslationMatrix(center_));
+	camera_.SetTransform(MakeTranslationMatrix(center_) * Inverse(MakeTranslationMatrix(transform_.position)) * Inverse(MakeRotationMatrix(transform_.rotation)) * MakeScaleMatrix(transform_.scale));
 	camera_.SetProjectionMatrix(PerspectiveFovDesc());
 	camera_.MakeMatrix();
 }
