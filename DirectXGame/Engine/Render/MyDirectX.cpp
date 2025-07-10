@@ -380,7 +380,7 @@ int MyDirectX::LoadObjFile(const std::string& directoryPath, const std::string& 
 MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     kClientWidth(kWindowWidth),
     kClientHeight(kWindowHeight),
-    clearColor(new float[4] {0.1f, 0.25f, 0.5f, 1.0f}),
+    clearColor(new float[4] {0.05f, 0.05f, 0.05f, 1.0f}),
     logger(new Logger("master")),
     fenceValue(0),
     readTextureCount(0),
@@ -1011,6 +1011,8 @@ void MyDirectX::ClearScreen() {
 
     commandList->RSSetViewports(1, &viewport);
     commandList->RSSetScissorRects(1, &scissorRect);
+
+    nowPSO = PSOType::kUnkown;
 }
 
 //todo Drawはここだよ

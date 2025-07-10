@@ -3,24 +3,18 @@
 #include "Camera.h"
 #include "../Render/Render.h"
 
-class DebugCamera {
+class DebugCamera : public Camera {
 public:
 
-	void Initialize(Camera* camera = nullptr);
+	void Initialize();
 
 	void Update();
 
-	/// <summary>
-	/// カメラの視点を描画
-	/// </summary>
-	void Draw(Render* render, Camera* camera);
-
-	Camera GetCamera();
 	Transform GetTransform();
+	Vector3 GetPosition() const override;
+	Vector3 GetCenter() const;
 
 private:
-
-	Camera camera_;
 
 	//カメラの親座標
 	Vector3 center_{};

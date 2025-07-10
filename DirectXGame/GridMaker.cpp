@@ -4,23 +4,73 @@
 GridLine::GridLine(Camera* camera, LineType type, Vector3 center) : Object(camera,
 	ShapeType::Line) {
 
+	color = 0x502000ff;
+
+	center_ = center;
+
 	if (type == LineType::kHorizontal) {
 		
-		Vector3 start = { center.x, center.y, center.z + 25.0f };
-		Vector3 end = { center.x, center.y, center.z - 25.0f };
+		Vector3 start = { center.x, center.y, center.z + GRID_LINE_LENGTH / 2 };
+		Vector3 end = { center.x, center.y, center.z - GRID_LINE_LENGTH / 2 };
+		SetLocalPosition(start, end);
+
+		if (static_cast<int>(center.x) % 10 == 0) {
+
+			SetShapeType(ShapeType::ThickLine);
+			commonBuffer = 0.1f;
+
+			if (static_cast<int>(center.x) == 0) {
+				color = 0x500000ff;
+				commonBuffer = 0.1f;
+			}
+		}
+
+	} else {
+
+		Vector3 start = { center.x + GRID_LINE_LENGTH / 2, center.y, center.z };
+		Vector3 end = { center.x - GRID_LINE_LENGTH / 2, center.y, center.z };
+		SetLocalPosition(start, end);
+
+		if (static_cast<int>(center.z) % 10 == 0) {
+
+			SetShapeType(ShapeType::ThickLine);
+			commonBuffer = 0.1f;
+
+			if (static_cast<int>(center.z) == 0) {
+				color = 0x500000ff;
+				commonBuffer = 0.1f;
+			}
+		}
+	}
+
+	center_ = center;
+
+	type_ = type;
+}
+
+void GridLine::AdjustCenter(float center) {
+	if (type_ == LineType::kHorizontal) {
+
+		Vector3 start = { center_.x, center_.y, center + GRID_LINE_LENGTH / 2 };
+		Vector3 end = { center_.x, center_.y, center - GRID_LINE_LENGTH / 2 };
 		SetLocalPosition(start, end);
 
 	} else {
 
-		Vector3 start = { center.x + 25.0f, center.y, center.z };
-		Vector3 end = { center.x - 25.0f, center.y, center.z };
+		Vector3 start = { center + GRID_LINE_LENGTH / 2, center_.y, center_.z };
+		Vector3 end = { center - GRID_LINE_LENGTH / 2, center_.y, center_.z };
 		SetLocalPosition(start, end);
 
 	}
 }
 
-GridMaker::GridMaker(Camera* camera) {
-	camera_ = camera;
+GridMaker::GridMaker(Camera* camera, bool isDebugCamera) {
+	if (isDebugCamera) {
+		debugCamera_ = dynamic_cast<DebugCamera*>(camera);
+		camera_ = debugCamera_;
+	} else {
+		camera_ = camera;
+	}
 
 	Initialize();
 }
@@ -48,63 +98,92 @@ void GridMaker::Initialize() {
 }
 
 void GridMaker::Update() {
-	Vector3 mid = camera_->GetPosition();
-	bool fixed = false;
+	Vector3 mid{};
+	if(debugCamera_) {
+		mid = debugCamera_->GetCenter();
+	} else {
+		mid = camera_->GetPosition();
+	}
+	
+	bool isAdjust = false;
 
-	while (!fixed) {
-		if (fabsf(nowMid.x) + 1 < fabsf(mid.x)) {
-			if (nowMid.x > 0) {
-				++nowMid.x;
+	// 縦線の調整
+	while (!isAdjust) {
+		// グリッド一個分ずれているか
+		if(std::fabsf(nowMid.x - mid.x) >= gridSize_.x) {
 
+			// グリッドのずれてる方向を確認
+			if (nowMid.x - mid.x < 0) {
+
+				// 右にずれているので、左にある線を削除して、右に追加する
 				lines_[0].erase(lines_[0].begin());
 
 				Vector3 center = nowMid;
-				center.x = nowMid.x - (kGridCount * gridSize_.x) / 2 - (kGridCount - 1) * gridSize_.x;
+				center.x = center.x + (kGridCount * gridSize_.x) / 2;
+				lines_[0].push_back(std::make_unique<GridLine>(camera_, GridLine::kHorizontal , center));
 
-				lines_[0].push_back(std::make_unique<GridLine>(camera_, GridLine::kVertical, center));
+				// ずらした分だけnowMidを更新
+				nowMid.x += gridSize_.x;
 
 			} else {
-				--nowMid.x;
 
-				lines_[0].erase(lines_[0].begin());
+				// 左にずれているので、右にある線を削除して、左に追加する
+				lines_[0].pop_back();
 
 				Vector3 center = nowMid;
-				center.x = nowMid.x - (kGridCount * gridSize_.x) / 2;
+				center.x = center.x - (kGridCount * gridSize_.x) / 2;
+				lines_[0].insert(lines_[0].begin(), std::make_unique<GridLine>(camera_, GridLine::kHorizontal, center));
 
-				lines_[0].push_back(std::make_unique<GridLine>(camera_, GridLine::kVertical, center));
+				// ずらした分だけnowMidを更新
+				nowMid.x -= gridSize_.x;
 			}
+
 		} else {
-			fixed = true;
+			isAdjust = true;
 		}
 	}
 
-	fixed = false;
+	isAdjust = false;
 
-	while (!fixed) {
-		if (fabsf(nowMid.z) + 1 < fabsf(mid.z)) {
-			if (nowMid.z > 0) {
-				++nowMid.z;
+	// 横線の調整
+	while (!isAdjust) {
+		// グリッド一個分ずれているか
+		if(std::fabsf(nowMid.z - mid.z) >= gridSize_.y) {
 
+			// グリッドのずれてる方向を確認
+			if (nowMid.z - mid.z < 0) {
+
+				// 上にずれているので、下にある線を削除して、上に追加する
 				lines_[1].erase(lines_[1].begin());
 
 				Vector3 center = nowMid;
-				center.z = nowMid.z - (kGridCount * gridSize_.y) / 2 - (kGridCount - 1) * gridSize_.y;
-
+				center.z = center.z + (kGridCount * gridSize_.y) / 2;
 				lines_[1].push_back(std::make_unique<GridLine>(camera_, GridLine::kVertical, center));
 
+				// ずらした分だけnowMidを更新
+				nowMid.z += gridSize_.y;
 			} else {
-				--nowMid.z;
 
-				lines_[1].erase(lines_[1].begin());
+				// 下にずれているので、上にある線を削除して、下に追加する
+				lines_[1].pop_back();
 
 				Vector3 center = nowMid;
-				center.z = nowMid.z - (kGridCount * gridSize_.y) / 2;
+				center.z = center.z - (kGridCount * gridSize_.y) / 2;
+				lines_[1].insert(lines_[1].begin(), std::make_unique<GridLine>(camera_, GridLine::kVertical, center));
 
-				lines_[1].push_back(std::make_unique<GridLine>(camera_, GridLine::kVertical, center));
+				// ずらした分だけnowMidを更新
+				nowMid.z -= gridSize_.y;
 			}
+
 		} else {
-			fixed = true;
+			isAdjust = true;
 		}
+
+	}
+
+	for (int i = 0; i < kGridCount; ++i) {
+		lines_[0][i]->AdjustCenter(mid.z);
+		lines_[1][i]->AdjustCenter(mid.x);
 	}
 }
 

@@ -82,7 +82,7 @@ void Object::Draw(const Matrix4x4* worldMatrix) const {
 		Vector3 mid = (lt + rt) * 0.5f;												// 中心点
 		Vector3 view = (camera_->GetPosition() - mid).Normalize();					// カメラ方向
 		Vector3 normal = cross(dir, view).Normalize();								// 線とカメラに垂直な方向
-		Vector3 offset = normal * (transform_->scale.x / 2.0f);						// 太さ分のオフセット
+		Vector3 offset = normal * (commonBuffer / 2.0f);							// 太さ分のオフセット
 
 		Render::DrawSprite(Convert(lt + offset), Convert(lt - offset), Convert(rt + offset), Convert(rt - offset),
 			worldMat, camera_, materialData, {}, handle_

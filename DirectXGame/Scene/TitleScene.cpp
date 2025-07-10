@@ -9,8 +9,8 @@ using namespace MyMath;
 
 TitleScene::TitleScene(std::shared_ptr<CommonData> commonData) : Scene(commonData),
 camera_(new Camera()) {
-	gridMaker_ = new GridMaker(camera_);
 	debugCamera_ = new DebugCamera();
+	gridMaker_ = new GridMaker(debugCamera_, true);
 }
 
 TitleScene::~TitleScene() {
@@ -26,7 +26,6 @@ void TitleScene::Initialize() {
 
 Scene* TitleScene::Update() {
 	debugCamera_->Update();
-	*camera_ = debugCamera_->GetCamera();
 	gridMaker_->Update();
 
 	return nullptr;

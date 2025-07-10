@@ -50,7 +50,6 @@ Scene* GameScene::Update() {
 
 	if (isDebugCamera_) {
 		debugCamera_->Update();
-		*camera_ = debugCamera_->GetCamera();
 	} else {
 		camera_->SetTransform(transform_);
 		camera_->MakeMatrix();

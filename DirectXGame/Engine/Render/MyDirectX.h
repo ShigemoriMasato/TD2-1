@@ -89,6 +89,7 @@ public:
 private:
 
 	enum class PSOType {
+		kUnkown = -1,
 		kOpaqueTriangle,		//不透明三角形
 		kTransparentTriangle,	//透明三角形
 
@@ -187,6 +188,6 @@ private:
 	uint32_t frame_ = 0; //フレーム数
 
 	//PSO管理用
-	PSOType nowPSO;
+	PSOType nowPSO = PSOType::kUnkown;
 };
 

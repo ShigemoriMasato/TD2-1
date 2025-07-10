@@ -42,10 +42,10 @@ public:
 		this->lb = lb;
 		this->rb = rb;
 	}
+	void SetShapeType(ShapeType type) { type_ = type; }
 
 	virtual Transform GetTransform() const { return *transform_; }
 	bool GetIsActive() const { return isActive_; }
-	ShapeType GetShapeType() const { return type_; }
 
 	std::string tag;
 
@@ -60,6 +60,8 @@ protected:
 	Camera* camera_ = nullptr;
 
 	Vector3 size_ = { 1.0f, 1.0f, 1.0f };
+
+	float commonBuffer = 0.0f; //ThickLine::太さ
 
 private:
 

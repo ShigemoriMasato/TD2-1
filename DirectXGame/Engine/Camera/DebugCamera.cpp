@@ -4,11 +4,7 @@
 
 using namespace Matrix;
 
-void DebugCamera::Initialize(Camera* camera) {
-	if (camera) {
-		this->camera_ = *camera;
-	}
-
+void DebugCamera::Initialize() {
 	center_ = {};
 
 	transform_.scale = Vector3(1.0f, 1.0f, 1.0f);
@@ -51,27 +47,25 @@ void DebugCamera::Update() {
 
 	transform_.rotation = { -spherical_.y + 1.57f, -spherical_.z - 1.57f, 0.0f };
 
-	ImGui::Begin("Debug Camera");
-	ImGui::Text("mouse move : (%.2f, %.2f)", mouseMove.x, mouseMove.y);
-	ImGui::DragFloat3("rotation", &transform_.rotation.x, 0.01f);
-	ImGui::Text("spherical: (%f, %f, %f)", spherical_.x, spherical_.y, spherical_.z);
-	ImGui::End();
-
+	// Actual camera position in world space
+	Vector3 actualCameraPosition = center_ + transform_.position;
+	
 	//===================
 	//座標の適用
 	//===================
-	camera_.SetTransform(MakeTranslationMatrix(center_) * Inverse(MakeTranslationMatrix(transform_.position)) * Inverse(MakeRotationMatrix(transform_.rotation)) * MakeScaleMatrix(transform_.scale));
-	camera_.SetProjectionMatrix(PerspectiveFovDesc());
-	camera_.MakeMatrix();
-}
-
-void DebugCamera::Draw(Render* render, Camera* camera) {
-}
-
-Camera DebugCamera::GetCamera() {
-	return camera_;
+	SetTransform(MakeTranslationMatrix(center_) * Inverse(MakeTranslationMatrix(transform_.position)) * Inverse(MakeRotationMatrix(transform_.rotation)) * MakeScaleMatrix(transform_.scale));
+	SetProjectionMatrix(PerspectiveFovDesc());
+	MakeMatrix();
 }
 
 Transform DebugCamera::GetTransform() {
 	return transform_;
+}
+
+Vector3 DebugCamera::GetPosition() const {
+	return center_ + transform_.position;
+}
+
+Vector3 DebugCamera::GetCenter() const {
+	return -center_;
 }

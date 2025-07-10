@@ -37,9 +37,9 @@ public:
 	void SetTransform(const Matrix4x4& matrix);
 
 	Matrix4x4 VPMatrix() const;
-	Vector3 GetPosition() const;
+	virtual Vector3 GetPosition() const;
 
-private:
+protected:
 
 	Matrix4x4 projectionMatrix = Matrix::MakeIdentity4x4();		//ワールド行列にこれをかけると正射影になる
 	Matrix4x4 vpMatrix = Matrix::MakeIdentity4x4();			//w抜きviewport変換行列

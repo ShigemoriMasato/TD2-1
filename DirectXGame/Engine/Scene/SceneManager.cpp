@@ -36,9 +36,7 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたいモデル↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい量↓↓↓↓↓↓↓↓↓↓↓↓↓
-	myDirectX_->CreateDrawResource(MyDirectX::kBox, 1000);
 	myDirectX_->CreateDrawResource(MyDirectX::kSprite, 100);
-	myDirectX_->CreateDrawResource(MyDirectX::kSphere, 10);
 	myDirectX_->CreateDrawResource(MyDirectX::kLine, 1000);
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい量↑↑↑↑↑↑↑↑↑↑↑↑↑
 
