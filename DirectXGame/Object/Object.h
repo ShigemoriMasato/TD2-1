@@ -42,6 +42,7 @@ public:
 		this->lb = lb;
 		this->rb = rb;
 	}
+	void SetCamera(Camera* camera) { camera_ = camera; }
 
 	virtual Transform GetTransform() const { return *transform_; }
 	bool GetIsActive() const { return isActive_; }
@@ -53,7 +54,7 @@ protected:
 
 	std::shared_ptr<Transform> transform_{};
 	uint32_t color = 0xffffffff;
-	int handle_ = 1;
+	int handle_ = 2;
 
 	bool isActive_ = true;
 

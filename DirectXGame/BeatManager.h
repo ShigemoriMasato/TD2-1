@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include "BPMMeasure.h"
+#include "HPBM.h"
 
 struct BeatData {
 	std::string name{};
@@ -13,7 +14,7 @@ struct BeatData {
 class BeatManager {
 public:
 
-	BeatManager(BPMMeasure* pMasure = nullptr) : bpmMeasure_(pMasure) {};
+	BeatManager();
 	~BeatManager();
 
 	void Update();
@@ -34,11 +35,18 @@ public:
 private:
 
 	BPMMeasure* bpmMeasure_ = nullptr;
+	HPBM::Measure* hpMeasure_ = nullptr;
 
 	std::vector<std::shared_ptr<BeatData>> data_;
 	std::vector<int> timers_;
 	int updateIndex_ = 0;	//現在更新しているデータのインデックス
 	int beatCount_ = 0;		//現在のビート数
+
+	enum MeasureType {
+		None = -1,
+		Wave,
+		HumanPower
+	}measureType_ = HumanPower;
 
 	bool isUpdate_ = false;
 };

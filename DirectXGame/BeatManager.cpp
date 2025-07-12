@@ -3,9 +3,17 @@
 #include "Engine/Sound/Sound.h"
 #include <list>
 
+BeatManager::BeatManager() {
+	hpMeasure_ = new HPBM::Measure();
+	bpmMeasure_ = new BPMMeasure();
+}
+
 BeatManager::~BeatManager() {
 	if (bpmMeasure_) {
 		delete bpmMeasure_;
+	}
+	if (hpMeasure_) {
+		delete hpMeasure_;
 	}
 }
 
@@ -21,6 +29,14 @@ void BeatManager::Update() {
 		bpmMeasure_->Measure();
 
 		float bpm = bpmMeasure_->GetBPM();
+		if (bpm > 0.0f) {
+			data_[updateIndex_]->bpm = static_cast<int>(bpm);
+		}
+	}
+
+	if (hpMeasure_) {
+		hpMeasure_->Update();
+		float bpm = hpMeasure_->GetBPM();
 		if (bpm > 0.0f) {
 			data_[updateIndex_]->bpm = static_cast<int>(bpm);
 		}
@@ -59,24 +75,48 @@ void BeatManager::ImGuiDraw() {
 	};
 	ImGui::SameLine();
 	if (ImGui::Button("Measure")) {
-		if (bpmMeasure_) {
-			bpmMeasure_->MeasureStart(updateIndex_);
+		switch (measureType_) {
+		case BeatManager::Wave:
+			if (bpmMeasure_) {
+				bpmMeasure_->MeasureStart(updateIndex_);
+			}
+			break;
+		case BeatManager::HumanPower:
+			if (hpMeasure_) {
+				hpMeasure_->MeasureStart(updateIndex_);
+			}
+			break;
 		}
 	}
+
+	std::array<const char*, 2> measureType;
+	int mtBuffer = static_cast<int>(measureType_);
+	
+	measureType[0] = "Machine";
+	measureType[1] = "Human";
+	
+	ImGui::Combo("MeasureType", &mtBuffer, measureType.data(), static_cast<int>(measureType.size()));
+
+	measureType_ = static_cast<MeasureType>(mtBuffer);
 
 	// Info
 	ImGui::Text("Beat Count : %d", beatCount_);
 	ImGui::Text("Timer : %d", timers_[updateIndex_]);
 
 	if (ImGui::Button("play")) {
-		Sound::isPlay_[updateIndex_] = true;
+		Sound::bgm[updateIndex_] = true;
 	}
 
 	ImGui::End();
 }
 
 void BeatManager::DrawWave(Camera* camera) const {
-	bpmMeasure_->DrawWave(camera);
+	if (bpmMeasure_) {
+		bpmMeasure_->DrawWave(camera);
+	}
+	if (hpMeasure_) {
+		hpMeasure_->Draw(camera);
+	}
 }
 
 int BeatManager::AddBeatData(std::string name, int soundIndex, int bpm) {

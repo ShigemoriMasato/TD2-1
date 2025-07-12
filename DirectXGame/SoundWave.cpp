@@ -193,14 +193,14 @@ void SoundWave::WaveCapture() {
 
         } else if (!(flags & AUDCLNT_BUFFERFLAGS_DATA_DISCONTINUITY)) {
             // 新しいデータを一時的に追加した後、規定のサイズに収まるように先頭から削除
-            std::lock_guard<std::mutex> lock(audioWaveformMutex_); // ここに移動
+            std::lock_guard<std::mutex> lock(audioWaveformMutex_);
             // 古いデータを削除して、新しいデータが収まるスペースを確保する
             if (audioWaveform_.size() + numFramesAvailable > WAVEFORM_DISPLAY_SAMPLES_) {
                 // 新しいデータ追加後の目標サイズを超過する分を削除
                 size_t excess = (audioWaveform_.size() + numFramesAvailable) - WAVEFORM_DISPLAY_SAMPLES_;
                 audioWaveform_.erase(audioWaveform_.begin(), audioWaveform_.begin() + excess);
             }
-            // ここにデータのpush_backロジックを移動 (現在のコードからそのまま移動)
+            // ここでデータのpush_back
             if (wfx_->wBitsPerSample == 32 && (wfx_->wFormatTag == WAVE_FORMAT_IEEE_FLOAT || (wfx_->wFormatTag == WAVE_FORMAT_EXTENSIBLE && reinterpret_cast<WAVEFORMATEXTENSIBLE*>(wfx_.get())->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT))) {
                 float* pFloatData = reinterpret_cast<float*>(pData);
                 for (UINT32 i = 0; i < numFramesAvailable; ++i) {

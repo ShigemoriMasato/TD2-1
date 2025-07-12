@@ -10,24 +10,24 @@
 
 SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeight) {
 
-	commonData_ = std::make_shared<CommonData>();
-
-	nextScene_ = nullptr;
-
 	myDirectX_ = std::make_shared<MyDirectX>(kWindowWidth, kWindowHeight);
 
-	render_ = std::make_unique<Render>(myDirectX_.get());
+	sound_ = std::make_unique<Sound>();
 
 	input_ = std::make_unique<Input>(myDirectX_->GetMyWndClass().hInstance, myDirectX_->GetMyHwnd());
 	input_->Initialize();
 
-	sound_ = std::make_unique<Sound>();
+	commonData_ = std::make_shared<CommonData>();
+
+	nextScene_ = nullptr;
+
+	render_ = std::make_unique<Render>(myDirectX_.get());
 
 	std::srand(uint32_t(time(nullptr)));
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい音↓↓↓↓↓↓↓↓↓↓↓↓↓
-	sound_->LoadAudio("resources/TitleBGM.wav");
-	sound_->LoadAudio("resources/fanfare.wav");
+	commonData_->beatManager_->AddBeatData("SampleBGM", sound_->LoadAudio("resources/TitleBGM.wav", true), 0);
+	commonData_->beatManager_->AddBeatData("SampleSE", sound_->LoadAudio("resources/fanfare.wav", true), 0);
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい音↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	commonData_->textureHandle_.resize(int(TextureType::TextureCount));
@@ -42,6 +42,7 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓描画したい量↓↓↓↓↓↓↓↓↓↓↓↓↓
 	myDirectX_->CreateDrawResource(MyDirectX::kSprite, 2000);
 	myDirectX_->CreateDrawResource(MyDirectX::kLine, 100);
+	myDirectX_->CreateDrawResource(MyDirectX::kBox, 50);
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑描画したい量↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//最初のシーンを挿入

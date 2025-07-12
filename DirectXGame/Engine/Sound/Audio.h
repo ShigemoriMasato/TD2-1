@@ -36,7 +36,11 @@ public:
 
 	void SoundUnload(int soundHandle);
 
-	void SoundPlayWave(int soundHandle);
+	int PlayWave(int soundHandle);
+
+	void StopWave(int soundHandle);
+
+	bool IsPlayWave(int soundHandle);
 
 	int GetSampleRate(int index);
 
@@ -47,4 +51,5 @@ private:
 	IXAudio2MasteringVoice* masterVoice = nullptr;
 
 	std::vector<SoundData> sdList_;
+	std::vector<IXAudio2SourceVoice*> sourceVoices_;
 };

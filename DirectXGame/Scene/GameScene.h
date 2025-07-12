@@ -2,6 +2,7 @@
 #include "Common/Scene.h"
 #include "Common/CommonData.h"
 #include "../Engine/Camera/DebugCamera.h"
+#include "../BeatManager.h"
 
 class GameScene : public Scene {
 public:
@@ -15,7 +16,5 @@ public:
 private:
 
 	Camera* camera_;
-	DebugCamera* debugCamera_;
-
-	bool isDebugCamera = false;
+	std::shared_ptr<Transform> cameraTrans_;
 };
