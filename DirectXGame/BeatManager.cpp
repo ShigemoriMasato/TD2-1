@@ -44,6 +44,8 @@ void BeatManager::Update() {
 }
 
 void BeatManager::ImGuiDraw() {
+	bpmMeasure_->ImGuiDraw();
+	hpMeasure_->ImGuiDraw();
 	// Update BGM
 	ImGui::Begin("Beat Manager");
 	ImGui::Text("Update : %s", data_[updateIndex_]->name.c_str());
@@ -111,12 +113,8 @@ void BeatManager::ImGuiDraw() {
 }
 
 void BeatManager::DrawWave(Camera* camera) const {
-	if (bpmMeasure_) {
-		bpmMeasure_->DrawWave(camera);
-	}
-	if (hpMeasure_) {
-		hpMeasure_->Draw(camera);
-	}
+	//bpmMeasure_->DrawWave(camera);
+	hpMeasure_->Draw(camera);
 }
 
 int BeatManager::AddBeatData(std::string name, int soundIndex, int bpm) {

@@ -26,8 +26,7 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	std::srand(uint32_t(time(nullptr)));
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい音↓↓↓↓↓↓↓↓↓↓↓↓↓
-	commonData_->beatManager_->AddBeatData("SampleBGM", sound_->LoadAudio("resources/TitleBGM.wav", true), 0);
-	commonData_->beatManager_->AddBeatData("SampleSE", sound_->LoadAudio("resources/fanfare.wav", true), 0);
+	commonData_->beatManager_->AddBeatData("SampleBGM", sound_->LoadAudio("resources/SampleBGM.wav", true), 93);
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい音↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	commonData_->textureHandle_.resize(int(TextureType::TextureCount));

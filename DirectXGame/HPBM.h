@@ -44,6 +44,8 @@ namespace HPBM {
 		~Measure();
 
 		void Update();
+		void ImGuiDraw();
+
 		void Draw(Camera* camera) const;
 
 		void MeasureStart(int index);

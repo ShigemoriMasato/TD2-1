@@ -47,12 +47,12 @@ void Button::Update() {
 }
 
 void HPBM::Button::Draw(const Matrix4x4* worldMatrix) const {
-	Object::Draw(worldMatrix);
-
 	for (auto button : effects_) {
 		button->SetCamera(camera_);
 		button->Draw(worldMatrix);
 	}
+
+	Object::Draw(worldMatrix);
 }
 
 HPBM::Measure::Measure() {
@@ -63,14 +63,6 @@ HPBM::Measure::~Measure() {
 }
 
 void HPBM::Measure::Update() {
-
-	ImGui::SetNextWindowSize({ 150, 720 });
-	ImGui::SetNextWindowPos({ 200, 0 });
-	ImGui::Begin("Gap Buffer");
-	for (auto& g : gaps_) {
-		ImGui::Text("Gap: %f", g);
-	}
-	ImGui::End();
 
 	if (isMeasuring_) {
 
@@ -109,6 +101,16 @@ void HPBM::Measure::Update() {
 	}
 
 	button_->Update();
+}
+
+void HPBM::Measure::ImGuiDraw() {
+	ImGui::SetNextWindowSize({ 150, 720 });
+	ImGui::SetNextWindowPos({ 200, 0 });
+	ImGui::Begin("Gap Buffer");
+	for (auto& g : gaps_) {
+		ImGui::Text("Gap: %f", g);
+	}
+	ImGui::End();
 }
 
 void HPBM::Measure::Draw(Camera* camera) const {

@@ -31,6 +31,7 @@ public:
 	void ToggleUpdate() { isUpdate_ = !isUpdate_; }
 
 	int GetBeatCount() const;
+	int* GetBeatCountPtr() { return &beatCount_; }
 
 private:
 

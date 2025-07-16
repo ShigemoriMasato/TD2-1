@@ -1846,6 +1846,9 @@ void MyDirectX::PostDraw() {
     //RenderTargetの切り替え
     commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
 
+    //指定した色で画面全体をクリアする
+    commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+
     //offscreenの描画
     DrawSprite({ -1.0f, 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f }, { -1.0f, -1.0f, 0.0f, 1.0f }, { 1.0f, -1.0f, 0.0f, 1.0f },
         Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 0, true);

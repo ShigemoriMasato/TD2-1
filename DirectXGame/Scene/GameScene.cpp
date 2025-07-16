@@ -2,6 +2,7 @@
 #include "../Engine/Input/Input.h"
 #include "../externals/imgui/imgui.h"
 #include "../Engine/Math/MyMath.h"
+#include "../Engine/Sound/Sound.h"
 #include "TitleScene.h"
 
 using namespace Matrix;
@@ -29,6 +30,9 @@ std::unique_ptr<Scene> GameScene::Update() {
 	commonData_->beatManager_->ImGuiDraw();
 
 	if (Input::GetKeyState(DIK_B)) {
+		for (int i = 0; i < Sound::bgm.size(); ++i) {
+			Sound::bgm[i] = false;
+		}
 		return std::make_unique<TitleScene>(commonData_);
 	}
 

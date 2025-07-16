@@ -16,6 +16,7 @@ public:
 
 	float GetBPM();
 
+	void ImGuiDraw();
 	void DrawWave(Camera* camera);
 
 private:

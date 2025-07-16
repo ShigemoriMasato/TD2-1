@@ -44,7 +44,7 @@ int Audio::SoundLoadWave(const char* filename) {
 	}
 
 	if (strncmp(data.id, "data", 4) != 0) {
-		assert(0);
+		assert(false && "data chunk not found");
 	}
 
 	char* pBuffer = new char[data.size];
@@ -106,6 +106,7 @@ int Audio::PlayWave(int soundHandle) {
 
 void Audio::StopWave(int soundHandle) {
 	sourceVoices_[soundHandle]->Stop();
+	sourceVoices_[soundHandle]->FlushSourceBuffers();
 }
 
 bool Audio::IsPlayWave(int soundHandle) {

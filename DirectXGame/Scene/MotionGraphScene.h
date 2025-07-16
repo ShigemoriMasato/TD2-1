@@ -1,5 +1,7 @@
 #pragma once
 #include "Common/Scene.h"
+#include "../Object/Actor.h"
+#include "../SampleGraph.h"
 
 class MotionGraphScene : public Scene {
 public:
@@ -15,5 +17,7 @@ private:
 
 	std::shared_ptr<Camera> camera_ = nullptr;
 	Transform cameraTrans_;
+	std::unique_ptr<SampleGraph> sampleGraph_ = nullptr;
+
 };
 

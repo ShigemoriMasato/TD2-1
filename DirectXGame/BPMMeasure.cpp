@@ -22,15 +22,6 @@ void BPMMeasure::Measure() {
 
     AudioCapture(Waveform::Time);
 
-    ImGui::SetNextWindowPos({ 0,0 });
-    ImGui::SetNextWindowSize({ 200, 720 });
-    //ImGuiでbpmBufferを表示
-	ImGui::Begin("BPM Buffer");
-	for (int i = 0; i < bpmBuffer_.size(); ++i) {
-		ImGui::Text("BPM[%d]: %f", i, bpmBuffer_[i]);
-	}
-	ImGui::End();
-
 	if (!isMeasuring_) {
 		return;
 	}
@@ -182,6 +173,17 @@ float BPMMeasure::GetBPM() {
     canOutputBPM_ = false;
 
     return bpm_;
+}
+
+void BPMMeasure::ImGuiDraw() {
+    ImGui::SetNextWindowPos({ 0,0 });
+    ImGui::SetNextWindowSize({ 200, 720 });
+    //ImGuiでbpmBufferを表示
+    ImGui::Begin("BPM Buffer");
+    for (int i = 0; i < bpmBuffer_.size(); ++i) {
+        ImGui::Text("BPM[%d]: %f", i, bpmBuffer_[i]);
+    }
+    ImGui::End();
 }
 
 void BPMMeasure::DrawWave(Camera* camera) {
