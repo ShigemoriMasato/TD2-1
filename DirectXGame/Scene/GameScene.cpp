@@ -23,7 +23,7 @@ void GameScene::Initialize() {
 	isDebugCamera_ = true;
 }
 
-Scene* GameScene::Update() {
+std::unique_ptr<Scene> GameScene::Update() {
 
 	ImGui::Begin("Debug Tutorial");
 	ImGui::Text("This is a test of a Spherical Camera");
@@ -50,18 +50,13 @@ Scene* GameScene::Update() {
 
 	if (isDebugCamera_) {
 		debugCamera_->Update();
-		*camera_ = debugCamera_->GetCamera();
 	} else {
-		camera_->SetTransform(transform_);
+		camera_->SetTransform(&transform_);
 		camera_->MakeMatrix();
 	}
 
 	if(Input::GetKeyState(DIK_F1) && !Input::GetPreKeyState(DIK_F1)) {
 		isDebugCamera_ = !isDebugCamera_;
-	}
-
-	if (Input::GetKeyState(DIK_SPACE) && !Input::GetPreKeyState(DIK_SPACE)) {
-		return new TitleScene(commonData_);
 	}
 
 	return nullptr;

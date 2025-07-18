@@ -10,7 +10,7 @@ public:
 
 	virtual void Initialize() = 0;
 	[[nodiscard]]
-	virtual Scene* Update() = 0;
+	virtual std::unique_ptr<Scene> Update() = 0;
 	virtual void Draw() const = 0;
 
 protected:

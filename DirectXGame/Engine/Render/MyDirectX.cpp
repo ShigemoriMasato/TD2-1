@@ -380,12 +380,16 @@ int MyDirectX::LoadObjFile(const std::string& directoryPath, const std::string& 
 MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     kClientWidth(kWindowWidth),
     kClientHeight(kWindowHeight),
-    clearColor(new float[4] {0.1f, 0.25f, 0.5f, 1.0f}),
+    clearColor(new float[4] {0.03f, 0.028f, 0.025f, 1.0f}),
     logger(new Logger("master")),
     fenceValue(0),
     readTextureCount(0),
     modelCount_(-1),
     isCanDraw_(new bool(false)) {
+    HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+    assert(SUCCEEDED(hr));
+    frame_ = 0;
+
     resourceStates[swapChainResources[0].Get()] = D3D12_RESOURCE_STATE_PRESENT;
     resourceStates[swapChainResources[1].Get()] = D3D12_RESOURCE_STATE_PRESENT;
 	myWindow_ = new MyWindow(kWindowWidth, kWindowHeight);
@@ -403,10 +407,6 @@ MyDirectX::~MyDirectX() {
 }
 
 void MyDirectX::Initialize() {
-    HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
-    assert(SUCCEEDED(hr));
-    frame_ = 0;
-
     wndHandle_ = myWindow_->CreateWindowForApp();
     InitDirectX();
     InitImGui();
@@ -690,7 +690,7 @@ void MyDirectX::InitDirectX() {
 #pragma region DescriptorHeap
 
     //ディスクリプタヒープの生成
-    rtvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+    rtvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 3, false);
     //ディスクリプタヒープの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
     logger->Log("Complete create DescriptorHeap\n");
@@ -708,7 +708,7 @@ void MyDirectX::InitDirectX() {
     //まず一つ目をつくる。一つ目は最初のところに作る。作る場所をこちらで指定してあげる必要がある。
     rtvHandles[0] = rtvStartHandle;
     device->CreateRenderTargetView(swapChainResources[0].Get(), &rtvDesc, rtvHandles[0]);
-    //二つ目のディスクリプタハンドルを得る(自力で)
+    //二つ目のディスクリプタハンドルを得る
     rtvHandles[1].ptr = rtvHandles[0].ptr + device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     //二つ目を作る
     device->CreateRenderTargetView(swapChainResources[1].Get(), &rtvDesc, rtvHandles[1]);
@@ -913,13 +913,17 @@ void MyDirectX::InitDirectX() {
         blendDesc,
         rasterizerDesc,
         1,
-        DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+        DXGI_FORMAT_R8G8B8A8_UNORM,
         D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
         D3D12_DEFAULT_SAMPLE_MASK
         );
 	pso->SetDevice(device.Get());
     pso->CreatePSO(int(PSOType::kOpaqueTriangle));
 
+	pso->SetRtvFormat(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+	pso->CreatePSO(int(PSOType::kOffScreen));
+
+    pso->SetRtvFormat(DXGI_FORMAT_R8G8B8A8_UNORM);
 	pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
 	pso->CreatePSO(int(PSOType::kOpaqueLine));
 
@@ -948,6 +952,71 @@ void MyDirectX::InitDirectX() {
     //SRV用のヒープを作成する
     srvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
 
+
+    //PostEffect用のリソースの作成
+    D3D12_RESOURCE_DESC desc = {};
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    desc.Width = kClientWidth;
+    desc.Height = kClientHeight;
+    desc.DepthOrArraySize = 1;
+    desc.MipLevels = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+    D3D12_CLEAR_VALUE clearValue = {};
+    clearValue.Format = desc.Format;
+	for (int i = 0; i < 4; ++i) {
+        clearValue.Color[i] = clearColor[i];
+	}
+
+    D3D12_HEAP_PROPERTIES heapProps = {};
+    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;              // defaultのヒープを使用
+
+    ID3D12Resource* offScreenResource = nullptr;
+
+    hr = device->CreateCommittedResource(
+        &heapProps, D3D12_HEAP_FLAG_NONE,
+        &desc,
+        D3D12_RESOURCE_STATE_RENDER_TARGET,
+        &clearValue,
+        IID_PPV_ARGS(&offScreenResource)
+    );
+	assert(SUCCEEDED(hr) && "Failed to create off-screen resource");
+
+    rtvHandles[2].ptr = rtvHandles[1].ptr + descriptorSizeRTV;
+
+    //RTVの設定
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDescOffScreen{};
+    rtvDescOffScreen.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	//出力結果をSRGBに変換して書き込む
+    rtvDescOffScreen.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;	//2Dテクスチャとしてよみこむ
+    device->CreateRenderTargetView(offScreenResource, &rtvDescOffScreen, rtvHandles[2]);
+
+    // metadata がないのでフォーマットとミップ数は手動設定
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1; // オフスクリーン用なのでミップマップ不要なら 1
+
+    // SRV用ディスクリプタ位置を確保
+    ++readTextureCount;
+    D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDesscriptorHandle(
+        srvDescriptorHeap, descriptorSizeSRV, readTextureCount);
+    D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_ = GetGPUDesscriptorHandle(
+        srvDescriptorHeap, descriptorSizeSRV, readTextureCount);
+
+    // SRVを作成
+    device->CreateShaderResourceView(offScreenResource, &srvDesc, textureSrvHandleCPU);
+
+    // 登録（同じようにpush）
+    textureResource.push_back(offScreenResource);
+	intermediateResource.push_back(nullptr); // オフスクリーン用は中間リソースなし
+    textureSrvHandleGPU.push_back(textureSrvHandleGPU_);
+    //バリアの初期状態を設定
+    resourceStates[textureResource[0]] = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
 }
 
 void MyDirectX::InitImGui() {
@@ -972,24 +1041,44 @@ void MyDirectX::BeginImGui() {
 }
 
 void MyDirectX::ClearScreen() {
-    //これから書き込むバックバッファのインデックスを取得
-    UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    //RootSignatureを設定、PSOに設定しているけど別途設定が必要
-    commandList->SetPipelineState(pso->Get(int(PSOType::kOpaqueTriangle)));
+    //RootSignature,PSO,RTVを設定
+	SetPSO(PSOType::kOpaqueTriangle);
     commandList->SetGraphicsRootSignature(rootSignature.Get());
-    commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+    commandList->OMSetRenderTargets(1, &rtvHandles[2], false, &dsvHandle);
 
     //barrierをRenderTargetにする
-    InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, swapChainResources[backBufferIndex].Get());
+    InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, textureResource[0]);
 
     ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap };
     commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
     //指定した色で画面全体をクリアする
-    commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+    commandList->ClearRenderTargetView(rtvHandles[2], clearColor, 0, nullptr);
 
+	//深度バッファをクリアする
     commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+    //ビューポート
+    D3D12_VIEWPORT viewport{};
+    //クライアント領域のサイズと一緒にして画面全体に表示
+    viewport.Width = static_cast<float>(kClientWidth);
+    viewport.Height = static_cast<float>(kClientHeight);
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    //シザー矩形
+    D3D12_RECT scissorRect{};
+    //基本的にビューポートと同じく刑が構成されるようにする
+    scissorRect.left = 0;
+    scissorRect.right = kClientWidth;
+    scissorRect.top = 0;
+    scissorRect.bottom = kClientHeight;
+
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
 
 }
 
@@ -1041,16 +1130,6 @@ void MyDirectX::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4
 	directionalLightResource[kTriangle][drawCount[kTriangle]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
     *directionalLightData = DirectionalLightData();
 
-    //ビューポート
-    D3D12_VIEWPORT viewport{};
-    //クライアント領域のサイズと一緒にして画面全体に表示
-    viewport.Width = static_cast<float>(kClientWidth);
-    viewport.Height = static_cast<float>(kClientHeight);
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-
     //頂点のバッファビューを作成する
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
     //リソースの先頭のアドレスから使う
@@ -1060,16 +1139,6 @@ void MyDirectX::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4
     //1頂点当たりのサイズ
     vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-    //シザー矩形
-    D3D12_RECT scissorRect{};
-    //基本的にビューポートと同じく刑が構成されるようにする
-    scissorRect.left = 0;
-    scissorRect.right = kClientWidth;
-    scissorRect.top = 0;
-    scissorRect.bottom = kClientHeight;
-
-    commandList->RSSetViewports(1, &viewport);
-    commandList->RSSetScissorRects(1, &scissorRect);
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
     if(material.color.w < 1.0f) {
@@ -1293,26 +1362,6 @@ void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMat
     //1頂点当たりのサイズ
     vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-    //ビューポート
-    D3D12_VIEWPORT viewport{};
-    //クライアント領域のサイズと一緒にして画面全体に表示
-    viewport.Width = static_cast<float>(kClientWidth);
-    viewport.Height = static_cast<float>(kClientHeight);
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-
-    //シザー矩形
-    D3D12_RECT scissorRect{};
-    //基本的にビューポートと同じ矩形が構成されるようにする
-    scissorRect.left = 0;
-    scissorRect.right = kClientWidth;
-    scissorRect.top = 0;
-    scissorRect.bottom = kClientHeight;
-
-    commandList->RSSetViewports(1, &viewport);
-    commandList->RSSetScissorRects(1, &scissorRect);
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
     if (material.color.w < 1.0f) {
@@ -1376,26 +1425,6 @@ void MyDirectX::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpM
     vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelList_[modelHandle].vertices.size());
     vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-    //ビューポート
-    D3D12_VIEWPORT viewport{};
-    //クライアント領域のサイズと一緒にして画面全体に表示
-    viewport.Width = static_cast<float>(kClientWidth);
-    viewport.Height = static_cast<float>(kClientHeight);
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-
-    //シザー矩形
-    D3D12_RECT scissorRect{};
-    //基本的にビューポートと同じ矩形が構成されるようにする
-    scissorRect.left = 0;
-    scissorRect.right = kClientWidth;
-    scissorRect.top = 0;
-    scissorRect.bottom = kClientHeight;
-
-    commandList->RSSetViewports(1, &viewport);
-    commandList->RSSetScissorRects(1, &scissorRect);
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
     if (material.color.w < 1.0f) {
@@ -1423,7 +1452,7 @@ void MyDirectX::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpM
     logger->Log(std::format("{} model drawed", drawCount[index]));
 }
 
-void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldmat, Matrix4x4 wvpmat, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
+void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldmat, Matrix4x4 wvpmat, MaterialData material, DirectionalLightData dLightData, int textureHandle, bool isOffScreen) {
     if (drawCount[kSprite] >= vertexResource[kSprite].size()) {
         assert(false && "over drawcount");
     }
@@ -1484,35 +1513,20 @@ void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matri
 	indexBufferView.SizeInBytes = sizeof(uint32_t) * 6;
 	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 
-    //ビューポート
-    D3D12_VIEWPORT viewport{};
-    //クライアント領域のサイズと一緒にして画面全体に表示
-    viewport.Width = static_cast<float>(kClientWidth);
-    viewport.Height = static_cast<float>(kClientHeight);
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-
-    //シザー矩形
-    D3D12_RECT scissorRect{};
-    //基本的にビューポートと同じ矩形が構成されるようにする
-    scissorRect.left = 0;
-    scissorRect.right = kClientWidth;
-    scissorRect.top = 0;
-    scissorRect.bottom = kClientHeight;
-
-    commandList->RSSetViewports(1, &viewport);
-    commandList->RSSetScissorRects(1, &scissorRect);
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	commandList->IASetIndexBuffer(&indexBufferView);
 
-    if (material.color.w < 1.0f) {
-        //透明な三角形を描画する場合は、PSOを透明用に変更する
-        SetPSO(PSOType::kTransparentTriangle);
+	if (isOffScreen) {
+		//オフスクリーン用のPSOを設定
+		SetPSO(PSOType::kOffScreen);
     } else {
-        //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-        SetPSO(PSOType::kOpaqueTriangle);
+        if (material.color.w < 1.0f) {
+            //透明な三角形を描画する場合は、PSOを透明用に変更する
+            SetPSO(PSOType::kTransparentTriangle);
+        } else {
+            //不透明な三角形を描画する場合は、PSOを不透明用に変更する
+            SetPSO(PSOType::kOpaqueTriangle);
+        }
     }
 
     //マテリアルCBufferの場所を設定
@@ -1601,26 +1615,6 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     indexBufferView.SizeInBytes = sizeof(uint32_t) * 24;
     indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 
-    //ビューポート
-    D3D12_VIEWPORT viewport{};
-    //クライアント領域のサイズと一緒にして画面全体に表示
-    viewport.Width = static_cast<float>(kClientWidth);
-    viewport.Height = static_cast<float>(kClientHeight);
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-
-    //シザー矩形
-    D3D12_RECT scissorRect{};
-    //基本的にビューポートと同じ矩形が構成されるようにする
-    scissorRect.left = 0;
-    scissorRect.right = kClientWidth;
-    scissorRect.top = 0;
-    scissorRect.bottom = kClientHeight;
-
-    commandList->RSSetViewports(1, &viewport);
-    commandList->RSSetScissorRects(1, &scissorRect);
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
     commandList->IASetIndexBuffer(&indexBufferView);
 
@@ -1750,26 +1744,6 @@ void MyDirectX::DrawBox(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData
     indexBufferView.SizeInBytes = sizeof(uint32_t) * 36;
     indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 
-    //ビューポート
-    D3D12_VIEWPORT viewport{};
-    //クライアント領域のサイズと一緒にして画面全体に表示
-    viewport.Width = static_cast<float>(kClientWidth);
-    viewport.Height = static_cast<float>(kClientHeight);
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-
-    //シザー矩形
-    D3D12_RECT scissorRect{};
-    //基本的にビューポートと同じ矩形が構成されるようにする
-    scissorRect.left = 0;
-    scissorRect.right = kClientWidth;
-    scissorRect.top = 0;
-    scissorRect.bottom = kClientHeight;
-
-    commandList->RSSetViewports(1, &viewport);
-    commandList->RSSetScissorRects(1, &scissorRect);
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
     commandList->IASetIndexBuffer(&indexBufferView);
 
@@ -1831,26 +1805,6 @@ void MyDirectX::DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMatrix, Matr
     //1頂点当たりのサイズ
     vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-    //ビューポート
-    D3D12_VIEWPORT viewport{};
-    //クライアント領域のサイズと一緒にして画面全体に表示
-    viewport.Width = static_cast<float>(kClientWidth);
-    viewport.Height = static_cast<float>(kClientHeight);
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-
-    //シザー矩形
-    D3D12_RECT scissorRect{};
-    //基本的にビューポートと同じ矩形が構成されるようにする
-    scissorRect.left = 0;
-    scissorRect.right = kClientWidth;
-    scissorRect.top = 0;
-    scissorRect.bottom = kClientHeight;
-
-    commandList->RSSetViewports(1, &viewport);
-    commandList->RSSetScissorRects(1, &scissorRect);
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
 	SetPSO(PSOType::kOpaqueLine);
@@ -1879,7 +1833,25 @@ void MyDirectX::PostDraw() {
 
     *isCanDraw_ = false;
 
+    //画像を描画するためのバリアにする
+    InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, textureResource[0]);
+
+    //描画する画面を取得
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
     UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+    //バリアを変更
+    InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, swapChainResources[backBufferIndex].Get());
+
+    //RenderTargetの切り替え
+    commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+
+    //指定した色で画面全体をクリアする
+    commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+
+    //offscreenの描画
+    DrawSprite({ -1.0f, 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f }, { -1.0f, -1.0f, 0.0f, 1.0f }, { 1.0f, -1.0f, 0.0f, 1.0f },
+        Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 0, true);
 
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
@@ -1929,7 +1901,9 @@ void MyDirectX::Finalize() {
 
     //UnLoad実装時見直し
     for (uint32_t i = 0; i < readTextureCount; ++i) {
-        intermediateResource[i]->Release();
+        if (intermediateResource[i] != nullptr) {
+            intermediateResource[i]->Release();
+        }
         textureResource[i]->Release();
     }
 
@@ -1958,6 +1932,11 @@ void MyDirectX::Finalize() {
 
 void MyDirectX::InsertBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESOURCE_STATES stateAfter, ID3D12Resource* pResource,
     D3D12_RESOURCE_BARRIER_TYPE type, D3D12_RESOURCE_BARRIER_FLAGS flags) {
+
+	if (stateAfter == resourceStates[pResource]) {
+		// 既に同じ状態ならバリアは不要
+		return;
+	}
 
     D3D12_RESOURCE_STATES stateBefore = resourceStates[pResource];
 
