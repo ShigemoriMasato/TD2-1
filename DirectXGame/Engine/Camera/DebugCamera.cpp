@@ -25,14 +25,15 @@ void DebugCamera::Update() {
 	//球面座標系
 	//===================
 	Vector2 mouseMove{};
-	if (Input::GetMouseButtonState()[2]) {
+	if (Input::GetMouseButtonState()[1]) {
 		mouseMove = Input::GetMouseMove();
 		mouseMove.y *= -1.0f; // Y軸を反転
 	}
 	float mouseWheel = -Input::GetMouseWheel();
 
 	if (Input::GetKeyState(DIK_LSHIFT)) {
-		center_ += Vector3(mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f) * MakeRotationMatrix(transform_.rotation);
+		float speed = spherical_.x * 0.05f;
+		center_ += Vector3(mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f) * speed * MakeRotationMatrix(transform_.rotation);
 	} else {
 		spherical_ += Vector3(mouseWheel * 0.05f, mouseMove.y * speed_, -mouseMove.x * speed_);
 	}

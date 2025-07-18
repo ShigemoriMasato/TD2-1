@@ -23,7 +23,7 @@ void GameScene::Initialize() {
 	isDebugCamera_ = true;
 }
 
-Scene* GameScene::Update() {
+std::unique_ptr<Scene> GameScene::Update() {
 
 	ImGui::Begin("Debug Tutorial");
 	ImGui::Text("This is a test of a Spherical Camera");
@@ -51,7 +51,7 @@ Scene* GameScene::Update() {
 	if (isDebugCamera_) {
 		debugCamera_->Update();
 	} else {
-		camera_->SetTransform(transform_);
+		camera_->SetTransform(&transform_);
 		camera_->MakeMatrix();
 	}
 

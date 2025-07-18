@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "Actor.h"
+#include "../Engine/Data/Transform.h"
 
 class Action {
 public:
@@ -9,15 +10,14 @@ public:
 	virtual ~Action() = default;
 
 	/// <summary>
-	/// キューに入れられるかどうか(初期値true)
-	/// </summary>
-	/// <returns>true:入れる</returns>
-	virtual bool CanExecute() { return true; };
-
-	/// <summary>
 	/// 実行する関数
 	/// </summary>
 	virtual void Execute() = 0;
+
+	/// <summary>
+	/// Drawを実行したかったらここに記述する
+	/// </summary>
+	virtual void ExecuteDraw() {};
 
 	/// <summary>
 	/// キューに残り続けるか

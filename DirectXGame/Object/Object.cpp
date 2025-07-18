@@ -23,14 +23,14 @@ void Object::Draw(const Matrix4x4* worldMatrix) const {
 	}
 
 	Matrix4x4 worldMat;
-	if(worldMatrix) {
+	if (worldMatrix) {
 		worldMat = *worldMatrix;
 	} else {
 		worldMat = MakeAffineMatrix(*transform_);
 	}
 
 	MaterialData materialData;
-	materialData.color = { 
+	materialData.color = {
 		float((color & 0xff000000) >> 24) / 255.0f,
 		float((color & 0x00ff0000) >> 16) / 255.0f,
 		float((color & 0x0000ff00) >> 8) / 255.0f,
@@ -70,7 +70,7 @@ void Object::Draw(const Matrix4x4* worldMatrix) const {
 	case ShapeType::Line:
 
 		Render::DrawLine(
-			Convert(lt), Convert(rt), 
+			Convert(lt), Convert(rt),
 			worldMat, camera_, materialData, {}, handle_
 		);
 
@@ -82,11 +82,11 @@ void Object::Draw(const Matrix4x4* worldMatrix) const {
 		Vector3 mid = (lt + rt) * 0.5f;												// 中心点
 		Vector3 view = (camera_->GetPosition() - mid).Normalize();					// カメラ方向
 		Vector3 normal = cross(dir, view).Normalize();								// 線とカメラに垂直な方向
-		Vector3 offset = normal * (commonBuffer / 2.0f);							// 太さ分のオフセット
+		Vector3 offset = normal * (lb.Length() / 2.0f);								// 太さ分のオフセット
 
 		Render::DrawSprite(Convert(lt + offset), Convert(lt - offset), Convert(rt + offset), Convert(rt - offset),
 			worldMat, camera_, materialData, {}, handle_
-			);
+		);
 
 		break;
 
@@ -95,5 +95,20 @@ void Object::Draw(const Matrix4x4* worldMatrix) const {
 		Render::DrawModel(handle_, worldMat, camera_, materialData, {});
 
 		break;
+	}
+}
+
+void Object::SetLocalPosition(const Vector3& lt, const Vector3& rt, const Vector3& lb, const Vector3& rb) {
+	if (lt != UniqueNumber::Vec3::min) {
+		this->lt = lt;
+	}
+	if (rt != UniqueNumber::Vec3::min) {
+		this->rt = rt;
+	}
+	if (lb != UniqueNumber::Vec3::min) {
+		this->lb = lb;
+	}
+	if (rb != UniqueNumber::Vec3::min) {
+		this->rb = rb;
 	}
 }

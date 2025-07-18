@@ -15,6 +15,7 @@
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
     <ClCompile Include="Engine\Core\MyPSO.cpp" />
     <ClCompile Include="Engine\Core\MyWindow.cpp" />
+    <ClCompile Include="Engine\Data\Data.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Math\MyMath.cpp" />
@@ -44,6 +45,7 @@
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\Core\MyPSO.h" />
     <ClInclude Include="Engine\Core\MyWindow.h" />
+    <ClInclude Include="Engine\Data\Data.h" />
     <ClInclude Include="Engine\Data\Matrix.h" />
     <ClInclude Include="Engine\Data\Transform.h" />
     <ClInclude Include="Engine\Data\Vector.h" />

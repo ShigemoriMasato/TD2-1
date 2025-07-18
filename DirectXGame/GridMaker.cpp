@@ -7,23 +7,25 @@ GridLine::GridLine(Camera* camera, LineType type, Vector3 center) : Object(camer
 	color = 0x502000ff;
 
 	center_ = center;
+	float thickness = 0.0f;
 
 	if (type == LineType::kHorizontal) {
 		
 		Vector3 start = { center.x, center.y, center.z + GRID_LINE_LENGTH / 2 };
 		Vector3 end = { center.x, center.y, center.z - GRID_LINE_LENGTH / 2 };
-		SetLocalPosition(start, end);
 
 		if (static_cast<int>(center.x) % 10 == 0) {
 
 			SetShapeType(ShapeType::ThickLine);
-			commonBuffer = 0.1f;
+			thickness = 0.3f;
 
 			if (static_cast<int>(center.x) == 0) {
 				color = 0x500000ff;
-				commonBuffer = 0.1f;
+				thickness = 0.3f;
 			}
 		}
+
+		SetLocalPosition(start, end, { thickness });
 
 	} else {
 
@@ -34,13 +36,15 @@ GridLine::GridLine(Camera* camera, LineType type, Vector3 center) : Object(camer
 		if (static_cast<int>(center.z) % 10 == 0) {
 
 			SetShapeType(ShapeType::ThickLine);
-			commonBuffer = 0.1f;
+			thickness = 0.3f;
 
 			if (static_cast<int>(center.z) == 0) {
 				color = 0x500000ff;
-				commonBuffer = 0.1f;
+				thickness = 0.3f;
 			}
 		}
+
+		SetLocalPosition(start, end, { thickness });
 	}
 
 	center_ = center;

@@ -9,7 +9,7 @@ public:
 	~GameScene();
 
 	void Initialize() override;
-	Scene* Update() override;
+	std::unique_ptr<Scene> Update() override;
 	void Draw() const override;
 
 private:

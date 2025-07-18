@@ -1,6 +1,7 @@
 #pragma once
 #include "Vector.h"
 #include "Matrix.h"
+#include "Data.h"
 #include <cstdint>
 #include <vector>
 #include <string>
@@ -48,7 +49,7 @@ struct DirectionalLightData final {
 
 struct ModelData final {
 	std::vector<VertexData> vertices;
-	ModelMaterial material;
+	ModelMaterial material{};
 };
 
 struct AABB final {

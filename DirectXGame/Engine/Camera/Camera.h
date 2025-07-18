@@ -1,5 +1,6 @@
 #pragma once
 #include "../Math/MyMath.h"
+#include <memory>
 
 using namespace Matrix;
 struct Transform;
@@ -25,7 +26,7 @@ struct OrthographicDesc {
 class Camera {
 public:
 
-	Camera() = default;
+	Camera() : transform_(std::make_shared<Transform>()) {};
 	~Camera() = default;
 	
 	void SetProjectionMatrix(PerspectiveFovDesc desc);
@@ -33,16 +34,22 @@ public:
 
 	void MakeMatrix();
 
-	void SetTransform(const Transform& transform);
-	void SetTransform(const Matrix4x4& matrix);
+	void SetTransform(Transform* transform);
+	void SetTransform(Matrix4x4 mat);
 
 	Matrix4x4 VPMatrix() const;
-	virtual Vector3 GetPosition() const;
 
-protected:
+	virtual Vector3 GetPosition() const {
+		return transform_->position;
+	}
+
+private:
 
 	Matrix4x4 projectionMatrix = Matrix::MakeIdentity4x4();		//ワールド行列にこれをかけると正射影になる
 	Matrix4x4 vpMatrix = Matrix::MakeIdentity4x4();			//w抜きviewport変換行列
 
-	Matrix4x4 transform_ = {};							//カメラ座標
+	std::shared_ptr<Transform> transform_ = {};							//カメラ座標
+	Matrix4x4 transformMatrix_ = Matrix::MakeIdentity4x4();	//カメラ座標変換行列
+
+	bool isSetMatrix = false;
 };

@@ -13,19 +13,25 @@ public:
 
 	SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeight);
 	~SceneManager();
+	bool IsRoop();
+
 	void Update();
 	void Draw() const;
-	
+
 private:
 
-	Scene* scene_ = nullptr;
-	Scene* nextScene_ = nullptr;
+	Logger* logger = nullptr;
+
+	std::unique_ptr<Scene> scene_ = nullptr;
+	std::unique_ptr<Scene> nextScene_ = nullptr;
 
 	std::shared_ptr<CommonData> commonData_ = nullptr;
 
-	MyDirectX* myDirectX_ = nullptr;
-	Render* render_ = nullptr;
+	std::shared_ptr<MyDirectX> myDirectX_ = nullptr;
+	std::unique_ptr<Render> render_ = nullptr;
 
-	Input* input_ = nullptr;
-	Sound* sound_ = nullptr;
+	std::unique_ptr<Input> input_ = nullptr;
+	std::unique_ptr<Sound> sound_ = nullptr;
+
+	MSG msg{};
 };

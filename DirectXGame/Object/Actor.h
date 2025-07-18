@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include "Object.h"
 
 class Action;
 
@@ -9,12 +10,17 @@ enum class ActionType {
 	share
 };
 
-class Actor {
+class Actor : public Object {
 public:
+	Actor(Camera* camera, ShapeType type) : Object(camera, type) {}
 	virtual ~Actor() = default;
 
-	void EnqueueAction(std::shared_ptr<Action> act, ActionType actiontype = ActionType::unique);
+	void EnqueueAction(std::shared_ptr<Action> act, ActionType actiontype = ActionType::share);
 	void ExecuteQueue();
+
+	void ExecuteDrawQueue() const;
+
+	void ClearQueue();
 
 private:
 

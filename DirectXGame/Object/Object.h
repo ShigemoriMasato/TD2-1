@@ -36,16 +36,13 @@ public:
 	/// <param name="rt">三角形上、スプライト右上</param>
 	/// <param name="lb">三角形右下、スプライト左下</param>
 	/// <param name="rb">スプライト右下</param>
-	void SetLocalPosition(const Vector3& lt = {-0.5f, 0.5f, 0.0f}, const Vector3& rt = {0.5f, 0.5f, 0.0f}, const Vector3& lb = {-0.5f, -0.5f, 0.0f}, const Vector3& rb = {0.5f, -0.5f, 0.0f}) {
-		this->lt = lt;
-		this->rt = rt;
-		this->lb = lb;
-		this->rb = rb;
-	}
+	void SetLocalPosition(const Vector3& lt = UniqueNumber::Vec3::min, const Vector3& rt = UniqueNumber::Vec3::min, const Vector3& lb = UniqueNumber::Vec3::min, const Vector3& rb = UniqueNumber::Vec3::min);
+	void SetCamera(Camera* camera) { camera_ = camera; }
 	void SetShapeType(ShapeType type) { type_ = type; }
 
 	virtual Transform GetTransform() const { return *transform_; }
 	bool GetIsActive() const { return isActive_; }
+	ShapeType GetShapeType() const { return type_; }
 
 	std::string tag;
 
@@ -53,15 +50,13 @@ protected:
 
 	std::shared_ptr<Transform> transform_{};
 	uint32_t color = 0xffffffff;
-	int handle_ = 1;
+	int handle_ = 2;
 
 	bool isActive_ = true;
 
 	Camera* camera_ = nullptr;
 
 	Vector3 size_ = { 1.0f, 1.0f, 1.0f };
-
-	float commonBuffer = 0.0f; //ThickLine::太さ
 
 private:
 

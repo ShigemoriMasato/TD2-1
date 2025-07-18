@@ -44,7 +44,7 @@ int Audio::SoundLoadWave(const char* filename) {
 	}
 
 	if (strncmp(data.id, "data", 4) != 0) {
-		assert(0);
+		assert(false && "data chunk not found");
 	}
 
 	char* pBuffer = new char[data.size];
@@ -58,11 +58,9 @@ int Audio::SoundLoadWave(const char* filename) {
 	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
 	soundData.buffferSize = data.size;
 
-	int index = 0;
-
 	sdList_.push_back(soundData);
 
-	return index; //インデックスを返す
+	return static_cast<int>(sdList_.size() - 1);
 }
 
 void Audio::SoundUnload(int soundHandle) {
@@ -71,7 +69,7 @@ void Audio::SoundUnload(int soundHandle) {
 	sdList_.erase(sdList_.begin() + soundHandle); //SoundDataを削除
 }
 
-void Audio::SoundPlayWave(int soundHandle) {
+int Audio::PlayWave(int soundHandle) {
 	HRESULT hr;
 
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
@@ -86,4 +84,37 @@ void Audio::SoundPlayWave(int soundHandle) {
 	hr = pSourceVoice->SubmitSourceBuffer(&buffer);
 	assert(SUCCEEDED(hr) && "Audio::SoundPlayWave SubmitSourceBuffer failed");
 	hr = pSourceVoice->Start();
+
+	int index = 0;
+	for (auto& sv : sourceVoices_) {
+		XAUDIO2_VOICE_STATE state = {};
+		sv->GetState(&state);
+		if (state.BuffersQueued == 0) {
+			sv->DestroyVoice();
+			sv = pSourceVoice; // 既存のソースボイスが空いている場合は再利用
+			return index;
+		}
+
+		++index;
+	}
+
+	//再利用できなかったら新しく挿入する。
+	sourceVoices_.push_back(pSourceVoice);
+
+	return index;
+}
+
+void Audio::StopWave(int soundHandle) {
+	sourceVoices_[soundHandle]->Stop();
+	sourceVoices_[soundHandle]->FlushSourceBuffers();
+}
+
+bool Audio::IsPlayWave(int soundHandle) {
+	XAUDIO2_VOICE_STATE state = {};
+	sourceVoices_[soundHandle]->GetState(&state);
+	return state.BuffersQueued != 0;
+}
+
+int Audio::GetSampleRate(int index) {
+	return sdList_[index].wfex.nSamplesPerSec;
 }

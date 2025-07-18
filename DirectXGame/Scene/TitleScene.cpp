@@ -24,7 +24,7 @@ void TitleScene::Initialize() {
 	debugCamera_->Initialize();
 }
 
-Scene* TitleScene::Update() {
+std::unique_ptr<Scene> TitleScene::Update() {
 	debugCamera_->Update();
 	gridMaker_->Update();
 

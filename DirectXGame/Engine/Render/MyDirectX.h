@@ -68,7 +68,7 @@ public:
 
 	void DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData);
 
-	void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldmat, Matrix4x4 wvpmat, MaterialData material, DirectionalLightData dLightData, int textureHandle);
+	void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldmat, Matrix4x4 wvpmat, MaterialData material, DirectionalLightData dLightData, int textureHandle, bool isOffScreen = false);
 
 	void DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle);
 
@@ -89,11 +89,12 @@ public:
 private:
 
 	enum class PSOType {
-		kUnkown = -1,
 		kOpaqueTriangle,		//不透明三角形
 		kTransparentTriangle,	//透明三角形
 
 		kOpaqueLine,			//不透明線
+
+		kOffScreen,
 
 		PSOTypeCount
 	};
@@ -179,7 +180,7 @@ private:
 	//imgui用
 	ID3D12DescriptorHeap* srvDescriptorHeap = nullptr;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[3];
 
 	std::unordered_map<ID3D12Resource*, D3D12_RESOURCE_STATES> resourceStates;
 
@@ -188,6 +189,6 @@ private:
 	uint32_t frame_ = 0; //フレーム数
 
 	//PSO管理用
-	PSOType nowPSO = PSOType::kUnkown;
+	PSOType nowPSO;
 };
 
