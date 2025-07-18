@@ -42,6 +42,7 @@ public:
 	virtual Vector3 GetPosition() const {
 		return transform_->position;
 	}
+	Transform GetTransform() const { return *transform_; }
 
 private:
 

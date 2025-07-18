@@ -2,11 +2,10 @@
 #include <vector>
 
 enum class ModelType {
-	Block,
-	skydome,
-	player,
-	skull,
-	Title,
+	SkySphere,
+	Player,
+	Enemy,
+	Bullet,
 
 	ModelCount
 };

@@ -2,6 +2,10 @@
 #include "Common/Scene.h"
 #include "Common/CommonData.h"
 #include "../Engine/Camera/DebugCamera.h"
+#include "../Player.h"
+#include "../Enemy.h"
+#include "../CollisionManager.h"
+#include "../RailCameraController.h"
 
 class GameScene : public Scene {
 public:
@@ -13,10 +17,20 @@ public:
 	void Draw() const override;
 
 private:
-	Camera* camera_ = nullptr;
-	DebugCamera* debugCamera_ = nullptr;
 
-	bool isDebugCamera_ = false;
+	void CreateEnemy();
 
-	Transform transform_;
+	void AllCollisionCheck();
+
+	std::unique_ptr<CollisionManager> collisionManager_;
+
+	std::unique_ptr<RailCameraController> railCameraController_ = nullptr;
+	Camera* camera_;
+	DebugCamera* debugCamera_;
+
+	bool isDebugCamera = false;
+
+	std::shared_ptr<Player> player_ = nullptr;
+
+	std::vector<std::shared_ptr<Enemy>> enemies_;
 };
