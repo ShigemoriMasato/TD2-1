@@ -1,5 +1,5 @@
 #include "EnemyBullet.h"
-#include "Engine/Math/MyMath.h"
+#include <Math/MyMath.h>
 #include <numbers>
 
 using namespace MyMath;
@@ -43,7 +43,7 @@ void EnemyBullet::Update() {
 
 	//消滅処理
 	++frame_;
-	if (frame_ > 300) {
+	if (frame_ > 600) {
 		isActive_ = false;
 	}
 }

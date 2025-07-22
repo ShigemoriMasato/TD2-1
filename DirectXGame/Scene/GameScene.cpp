@@ -12,6 +12,7 @@ collisionManager_(std::make_unique<CollisionManager>()) {
 	railCameraController_ = std::make_unique<RailCameraController>();
 	player_ = std::make_shared<Player>(camera_, railCameraController_->GetCameraPtr(),
 		commonData->modelHandle_[int(ModelType::Player)], commonData_->modelHandle_[int(ModelType::Bullet)]);
+	enemies_ = std::make_unique<EnemyManager>(camera_, player_.get(), *commonData_);
 }
 
 GameScene::~GameScene() {
@@ -25,11 +26,14 @@ void GameScene::Initialize() {
 	railCameraController_->Initialize();
 	camera_->SetProjectionMatrix(PerspectiveFovDesc());
 
-	enemies_.clear();
-	CreateEnemy();
+	enemies_->Initialize();
 }
 
 std::unique_ptr<Scene> GameScene::Update() {
+
+	if (Input::GetKeyState(DIK_R)) {
+		Initialize();
+	}
 
 	ImGui::Begin("Camera");
 	ImGui::Checkbox("Debug Camera", &isDebugCamera);
@@ -45,14 +49,7 @@ std::unique_ptr<Scene> GameScene::Update() {
 
 	player_->Update();
 
-	for (int i = 0; i < enemies_.size(); ++i) {
-		enemies_[i]->Update();
-		if (!enemies_[i]->GetIsAlive()) {
-			enemies_.erase(enemies_.begin() + i);
-			//新しい敵を生成
-			CreateEnemy();
-		}
-	}
+	enemies_->Update();
 
 	AllCollisionCheck();
 
@@ -62,19 +59,11 @@ std::unique_ptr<Scene> GameScene::Update() {
 void GameScene::Draw() const {
 	player_->Draw();
 	
-	for (const auto& enemy : enemies_) {
-		enemy->Draw();
-	}
+	enemies_->Draw();
 
 	railCameraController_->Draw(camera_);
 
 	Render::DrawModel(commonData_->modelHandle_[int(ModelType::SkySphere)], MakeIdentity4x4(), camera_);
-}
-
-void GameScene::CreateEnemy() {
-	std::shared_ptr<Enemy> enemy = std::make_shared<Enemy>(camera_, commonData_->modelHandle_[int(ModelType::Enemy)], commonData_->modelHandle_[int(ModelType::Bullet)],  player_.get());
-	enemy->Initialize();
-	enemies_.push_back(enemy);
 }
 
 void GameScene::AllCollisionCheck() {
@@ -84,13 +73,10 @@ void GameScene::AllCollisionCheck() {
 		collisionManager_->AddObject(b.get());
 	}
 
-	for(const auto& enemy : enemies_) {
-		collisionManager_->AddObject(enemy.get());
-	}
-	for (const auto& e : enemies_) {
-		for (const auto& b : e->GetBullets()) {
-			collisionManager_->AddObject(b.get());
-		}
+	std::list<Object*> enemies = enemies_->GetEnemiesCollition();
+
+	for (const auto& e : enemies) {
+		collisionManager_->AddObject(e);
 	}
 
 	collisionManager_->CheckCollisions();

@@ -3,8 +3,10 @@
 
 struct EnemyBulletDesc {
 	Vector3 position = {};
-	int modelHandle = -1;
-	Object* target = nullptr;
+	Vector3 direction = { 0.0f, 0.0f, 1.0f };
+	float speed = 0.1f;
+	uint32_t color = 0xff0000ff;
+	bool isTracking = false;
 };
 
 class EnemyBullet : public Object {
@@ -21,7 +23,7 @@ private:
 
 	Vector3 velocity_;
 	Vector3 direction_;
-	static inline const float speed = 0.1f;
+	static inline const float speed = 0.2f;
 
 	int frame_ = 0;
 

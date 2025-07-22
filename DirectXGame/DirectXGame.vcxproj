@@ -47,6 +47,7 @@
     <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
     <ClCompile Include="TimeCall.cpp" />
+    <ClCompile Include="Engine\Data\Value.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionManager.h" />
@@ -90,6 +91,7 @@
     <ClInclude Include="Scene\TitleScene.h" />
     <ClInclude Include="TimeCall.h" />
     <ClInclude Include="TimeCallData.h" />
+    <ClInclude Include="Engine\Data\Value.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -158,6 +160,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -184,6 +187,7 @@ xcopy /E /I /Y "$(ProjectDir)Engine\Shader\*" "$(TargetDir)Engine\Shader\"</Comm
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

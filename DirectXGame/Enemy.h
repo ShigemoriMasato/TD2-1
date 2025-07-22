@@ -2,93 +2,93 @@
 #include "Object/Object.h"
 #include "EnemyBullet.h"
 #include "TimeCall.h"
+#include "Object/Actor.h"
+#include "Object/Action.h"
 #include <memory>
+#include <functional>
+#include <Data/Value.h>
+#include <unordered_map>
 
-class Enemy;
-
-class EnemyState {
-public:
-	EnemyState(Enemy* enemy) : enemy_(enemy) {}
-	virtual std::shared_ptr<EnemyState> Down() = 0;
-	virtual std::shared_ptr<EnemyState> Up() = 0;
-	virtual void Execute() = 0;
-protected:
-
-	Enemy* enemy_;
-
+struct EnemyCommand {
+	//関数名
+	std::string funcName;
+	//関数の引数
+	std::vector<std::shared_ptr<Value>> args;
 };
 
-class EnemyStateApploach : public EnemyState {
-public:
-	EnemyStateApploach(Enemy* enemy) : EnemyState(enemy) {}
-	std::shared_ptr<EnemyState> Down() override;
-	std::shared_ptr<EnemyState> Up() override;
-	void Execute() override;
+struct EnemyInfo {
+	//敵の名前
+	std::string name;
+	int handle = -1; //敵のモデルハンドル
 
-private:
+	//敵の行動キュー(初期化時に解読する)
+	std::vector<EnemyCommand> queue;
 
-
-
+	//敵の行動キューがどの行に記述されていたか(行動の削除など、他の行動に干渉する際に使用)
+	std::vector<int> queueLines;
 };
 
-class EnemyStateLeave : public EnemyState {
+class Enemy : public Actor {
 public:
-	EnemyStateLeave(Enemy* enemy) : EnemyState(enemy) {}
-	std::shared_ptr<EnemyState> Down() override;
-	std::shared_ptr<EnemyState> Up() override;
-	void Execute() override;
+	Enemy(Camera* camera, EnemyInfo queue, std::function<void(EnemyBulletDesc)> Fire);
+	virtual ~Enemy() = default;
 
-private:
-
-};
-
-class Enemy : public Object {
-public:
-	Enemy(Camera* camera, int modelHandle, int bulletHandle, Object* target);
-	~Enemy() = default;
-
+	static void RegistCommands();
 	void Initialize() override;
 
 	void Update() override;
 
-	std::shared_ptr<EnemyState> Down();
-	std::shared_ptr<EnemyState> Up();
-
-	/// <summary>
-	/// EnemyBulletとEnemyのDraw
-	/// </summary>
-	void Draw(const Matrix4x4* worldMatrix = nullptr) const override;
-
-	void MovePosition(Vector3 velocity);
+	void OnCollision(Object* object) override;
 
 	bool GetIsAlive() const { return isActive_; }
 
-	void OnCollision(Object* object) override;
+	void SetVeloity(const Vector3& v) { velocity_ = v; }
 
-	std::vector<std::shared_ptr<EnemyBullet>> GetBullets() const { return bullets_; }
+	void AddVelocity(const Vector3& v) { velocity_ += v; }
 
 private:
 
-	void Fire();
-
+	void AddFireDesc(std::vector<std::shared_ptr<Value>> args);
 	void Death() { isActive_ = false; }
+	void Wait(std::vector<std::shared_ptr<Value>> args);
+	void Accel(std::vector<std::shared_ptr<Value>> args);
 
-	using StateFunction = void (Enemy::*)(); // メンバ関数ポインタ型を定義
-	static StateFunction stateFunc[];       // メンバ関数ポインタの配列を宣言
+	std::function<void(EnemyBulletDesc)> Fire_;
 
-	std::shared_ptr<EnemyState> state_;
-	
-	int frame_ = 0;
+	//敵について
+	Vector3 velocity_ = {};
 
-	//弾
-	int bulletModelHandle_ = 0;
-	std::vector<std::shared_ptr<EnemyBullet>> bullets_;
-	int fireCooltime_ = 0;
-	static inline const int fireCooltimeMax = 60;
+	//timecall
+	std::unique_ptr<TimeCall> timecall_ = nullptr;
 
-	//TimeCall
-	TimeCall* timecall_ = nullptr;
+	//行動キュー関係
+	EnemyInfo info_;
+	int executeIndex_ = 0; //現在実行中のコマンドのインデックス
+	int waitTime_ = 0;
+	bool wating_ = false;
 
-	Object* target_ = nullptr; // プレイヤーへの参照
+	//Command系
+	static std::unordered_map<std::string, std::function<void(Enemy* e, std::vector<std::shared_ptr<Value>> args)>> commandMap_;
+	static bool isCommandMapInitialized_;
 };
 
+class AccelAct : public Action {
+public:
+
+	AccelAct(Enemy* enemy, std::vector<std::shared_ptr<Value>> args);
+
+	void Execute() override;
+	
+	bool ShouldKeep() override;
+
+private:
+
+	Vector3 acceleration_ = {};
+	Vector3 targetVelocity_ = {};
+	Vector3 addedVelocity_ = {};
+
+	bool isAccelerating_ = false;
+
+	Enemy* enemy_ = nullptr;
+
+};

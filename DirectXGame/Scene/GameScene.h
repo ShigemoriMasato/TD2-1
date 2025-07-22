@@ -3,7 +3,7 @@
 #include "Common/CommonData.h"
 #include "../Engine/Camera/DebugCamera.h"
 #include "../Player.h"
-#include "../Enemy.h"
+#include "../EnemyManager.h"
 #include "../CollisionManager.h"
 #include "../RailCameraController.h"
 
@@ -18,8 +18,6 @@ public:
 
 private:
 
-	void CreateEnemy();
-
 	void AllCollisionCheck();
 
 	std::unique_ptr<CollisionManager> collisionManager_;
@@ -32,5 +30,5 @@ private:
 
 	std::shared_ptr<Player> player_ = nullptr;
 
-	std::vector<std::shared_ptr<Enemy>> enemies_;
+	std::unique_ptr<EnemyManager> enemies_ = nullptr;
 };

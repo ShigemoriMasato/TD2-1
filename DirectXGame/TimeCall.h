@@ -16,7 +16,7 @@ public:
 	/// </summary>
 	/// <param name="">実行する関数</param>
 	/// <param name="afterFrame">今から何フレーム後に実行するか</param>
-	void Register(std::function<void()>, int afterFrame = 0, bool repete = false);
+	void Register(std::function<void()> func, int afterFrame = 0, bool repete = false);
 
 	void Clear();
 
