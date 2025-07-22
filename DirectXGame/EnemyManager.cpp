@@ -11,7 +11,7 @@ namespace {
 		intptr_t handle;
 		struct _finddata_t finddata;
 
-		std::string path = "Resources/EnemyProperty/" + filename + ".*csv";
+		std::string path = "Resources/EnemyProperty/" + filename + "/*.csv";
 
 		handle = _findfirst(path.c_str(), &finddata);
 
@@ -45,7 +45,7 @@ void EnemyManager::Initialize() {
 
 	CreateEnemyQueue();
 
-	enemies_.push_back(std::make_unique<Enemy>(camera_, taskQueues_["EnemyType"][0], [this](EnemyBulletDesc desc) { Fire(desc); }));
+	enemies_.push_back(std::make_unique<Enemy>(camera_, taskQueues_["Normal"], [this](EnemyBulletDesc desc) { Fire(desc); }));
 }
 
 void EnemyManager::Update() {
@@ -101,7 +101,7 @@ void EnemyManager::CreateEnemyQueue() {
 	for (const auto& csv : csvs) {
 
 		//CSVファイルを開く
-		std::ifstream file("Resources/EnemyProperty/" + csv);
+		std::ifstream file("Resources/EnemyProperty/EnemyType/" + csv);
 
 		if (!file.is_open()) {
 			std::cerr << "Failed to open file: " << csv << std::endl;
@@ -161,9 +161,13 @@ void EnemyManager::CreateEnemyQueue() {
 				std::stringstream argStream(arg);
 
 				//フォーマットに従っていないものをはじく
-				std::regex format(R"([a-z]+(?:_[a-z()]+)*=\d+(?:\.\d+)?(?: \d+(?:\.\d+)?){0,2})");
+				std::regex format(R"([a-z]+(?:_[a-z()]+)*=-?\d+(?:\.\d+)?(?: -?\d+(?:\.\d+)?){0,4})");
 				if (!std::regex_match(arg, format)) {
 					continue;
+				}
+
+				if(arg.empty()) {
+					continue; //空の引数は無視
 				}
 
 				// 引数名前の取得
@@ -215,7 +219,7 @@ void EnemyManager::CreateEnemyQueue() {
 		}//行単位while文
 
 		//読み込んだ敵の行動キューを登録
-		taskQueues_[queue.name].push_back(queue);
+		taskQueues_[queue.name] = queue;
 
 	}//csv単位for文
 }

@@ -31,7 +31,7 @@ private:
 	Object* player_;
 	Camera* camera_;
 
-	std::unordered_map<std::string, std::vector<EnemyInfo>> taskQueues_;
+	std::unordered_map<std::string, EnemyInfo> taskQueues_;
 
 	int enemyModelHandle_ = -1; // 敵のモデルハンドル
 	int bulletModelHandle_ = -1; // 弾のモデルハンドル

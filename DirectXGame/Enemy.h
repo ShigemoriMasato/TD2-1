@@ -8,12 +8,19 @@
 #include <functional>
 #include <Data/Value.h>
 #include <unordered_map>
+#include <map>
 
 struct EnemyCommand {
 	//関数名
 	std::string funcName;
 	//関数の引数
 	std::vector<std::shared_ptr<Value>> args;
+	//timecallに設定したときのid(使わない時もある)
+	int funcId = -1;
+
+	EnemyCommand() = default;
+	EnemyCommand(const EnemyCommand&) = default;
+	EnemyCommand& operator=(const EnemyCommand&) = default;
 };
 
 struct EnemyInfo {
@@ -48,11 +55,14 @@ public:
 
 private:
 
-	void AddFireDesc(std::vector<std::shared_ptr<Value>> args);
+	void AddFireDesc(EnemyCommand& command);
 	void Death() { isActive_ = false; }
-	void Wait(std::vector<std::shared_ptr<Value>> args);
-	void Accel(std::vector<std::shared_ptr<Value>> args);
+	void Wait(EnemyCommand& command);
+	void Accel(EnemyCommand& command);
+	void Delete(EnemyCommand& command);
+	void Goto(EnemyCommand& command);
 
+	std::function<void()> BulletDescSelector_ = nullptr;
 	std::function<void(EnemyBulletDesc)> Fire_;
 
 	//敵について
@@ -68,7 +78,7 @@ private:
 	bool wating_ = false;
 
 	//Command系
-	static std::unordered_map<std::string, std::function<void(Enemy* e, std::vector<std::shared_ptr<Value>> args)>> commandMap_;
+	static std::unordered_map<std::string, std::function<void(Enemy* e, EnemyCommand& command)>> commandMap_;
 	static bool isCommandMapInitialized_;
 };
 
@@ -90,5 +100,4 @@ private:
 	bool isAccelerating_ = false;
 
 	Enemy* enemy_ = nullptr;
-
 };

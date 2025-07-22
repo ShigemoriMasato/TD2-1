@@ -1,15 +1,21 @@
 #include "Enemy.h"
 #include <numbers>
+#include <cassert>
 
-std::unordered_map<std::string, std::function<void(Enemy* e, std::vector<std::shared_ptr<Value>> args)>> Enemy::commandMap_;
+std::unordered_map<std::string, std::function<void(Enemy* e, EnemyCommand& command)>> Enemy::commandMap_;
 bool Enemy::isCommandMapInitialized_ = false;
 
 Enemy::Enemy(Camera* camera, EnemyInfo info, std::function<void(EnemyBulletDesc)> Fire) :
 Actor(camera, ShapeType::Model),
-Fire_(Fire) {
+Fire_(Fire),
+timecall_(std::make_unique<TimeCall>()) {
 	handle_ = info.handle;
 	tag = "Enemy";
 	info_ = info;
+
+	if(info_.queue.size() <= 0) {
+		assert(false && "EnemyQueue is Empty");
+	}
 }
 
 void Enemy::RegistCommands() {
@@ -17,45 +23,60 @@ void Enemy::RegistCommands() {
 
 	isCommandMapInitialized_ = true;
 
-	commandMap_["Fire"] = [](Enemy* e, std::vector<std::shared_ptr<Value>> args) {
-		e->AddFireDesc(args);
+	commandMap_["Fire"] = [](Enemy* e, EnemyCommand& command) {
+		e->AddFireDesc(command);
 	};
-	commandMap_["Death"] = [](Enemy* e, std::vector<std::shared_ptr<Value>> args) {
+	commandMap_["Death"] = [](Enemy* e, EnemyCommand& command) {
 		e->Death();
 	};
-	commandMap_["Wait"] = [](Enemy* e, std::vector<std::shared_ptr<Value>> args) {
-		e->Wait(args);
+	commandMap_["Wait"] = [](Enemy* e, EnemyCommand& command) {
+		e->Wait(command);
 	};
-	commandMap_["Accel"] = [](Enemy* e, std::vector<std::shared_ptr<Value>> args) {
-		e->Accel(args);
+	commandMap_["Accel"] = [](Enemy* e, EnemyCommand& command) {
+		e->Accel(command);
 	};
+	commandMap_["Delete"] = [](Enemy* e, EnemyCommand& command) {
+		e->Delete(command);
+	};
+	commandMap_["Goto"] = [](Enemy* e, EnemyCommand& command) {
+		e->Goto(command);
+	};
+
 }
 
 void Enemy::Initialize() {
 }
 
 void Enemy::Update() {
-	while(!wating_) {
-		commandMap_[info_.queue[executeIndex_].funcName](this, info_.queue[executeIndex_].args);
+	while (!wating_) {
+
+		if (executeIndex_ >= info_.queue.size()) {
+			break; //キューが空なら何もしない
+		}
+
+		EnemyCommand& cmd = info_.queue[executeIndex_];
+		commandMap_[cmd.funcName](this, cmd);
 		++executeIndex_;
 	}
 
 	if (wating_) {
-		Wait(info_.queue[executeIndex_].args);
+		Wait(info_.queue[executeIndex_]);
 	}
 
 	ExecuteQueue();
+	timecall_->Update();
+	transform_->position += velocity_;
 }
 
 void Enemy::OnCollision(Object* other) {
 }
 
-void Enemy::AddFireDesc(std::vector<std::shared_ptr<Value>> args) {
-	int cooltime = 30;
+void Enemy::AddFireDesc(EnemyCommand& command) {
+	int cooltime = -1;
 
 	EnemyBulletDesc desc{};
 	desc.position = transform_->position;
-	for (auto& arg : args) {
+	for (auto& arg : command.args) {
 		if (arg->name == "position") {
 			desc.position += dynamic_cast<Vec3Value*>(arg.get())->value;
 		} else if (arg->name == "direction") {
@@ -72,25 +93,37 @@ void Enemy::AddFireDesc(std::vector<std::shared_ptr<Value>> args) {
 				(static_cast<uint32_t>(color.w * 255))
 				);
 
-		} else if (arg->name == "isTracking") {
+		} else if (arg->name == "is_tracking") {
 			desc.isTracking = dynamic_cast<IntValue*>(arg.get())->value != 0;
 		} else if (arg->name == "cooltime") {
 			cooltime = dynamic_cast<IntValue*>(arg.get())->value;
 		}
 	}
 
+	//cooltimeが-1でない場合は、時間経過で発射する
+	if (cooltime != -1) {
+
+		BulletDescSelector_ = [this, desc]() {
+			Fire_(desc);
+			};
+
+		info_.queue[0].funcId = timecall_->Register(BulletDescSelector_, cooltime, true);
+
+	} else {
+		Fire_(desc);
+	}
 }
 
-void Enemy::Wait(std::vector<std::shared_ptr<Value>> args) {
+void Enemy::Wait(EnemyCommand& command) {
 	//waitの初期化処理
 	if (!wating_) {
 
 		wating_ = true;
 
-		if (args.size() <= 0) {
+		if (command.args.size() <= 0) {
 			waitTime_ = 60;
 		} else {
-			waitTime_ = dynamic_cast<IntValue*>(args[0].get())->value;
+			waitTime_ = dynamic_cast<IntValue*>(command.args[0].get())->value;
 		}
 	} 
 	//waitの更新処理
@@ -105,9 +138,50 @@ void Enemy::Wait(std::vector<std::shared_ptr<Value>> args) {
 	}
 }
 
-void Enemy::Accel(std::vector<std::shared_ptr<Value>> args) {
-	EnqueueAction(std::make_shared<AccelAct>(this, args));
+void Enemy::Accel(EnemyCommand& command) {
+	EnqueueAction(std::make_shared<AccelAct>(this, command.args));
 }
+
+void Enemy::Delete(EnemyCommand& command) {
+	if (command.args.size() <= 0) {
+		return;
+	}
+
+	for(auto& arg : command.args) {
+		if (arg->name == "index") {
+			int line = dynamic_cast<IntValue*>(arg.get())->value;
+			if (line < 0 || line >= info_.queue.size()) {
+				return;
+			}
+
+			int index = -1;
+			for (int i = 0; i < info_.queueLines.size(); ++i) {
+				if (line == info_.queueLines[i]) {
+					index = i;
+				}
+			}
+
+			//見つからなかった
+			if (index == -1) {
+				return;
+			}
+
+			if (info_.queue[index].funcName == "Fire") {
+				//indexをもとにFireを削除する
+			}
+		}
+	}
+}
+
+void Enemy::Goto(EnemyCommand& command) {
+	for (auto& arg : command.args) {
+		if (arg->name == "index") {
+			executeIndex_ = dynamic_cast<IntValue*>(arg.get())->value;
+			break;
+		}
+	}
+}
+
 
 AccelAct::AccelAct(Enemy* enemy, std::vector<std::shared_ptr<Value>> args) : Action("Accel", enemy) {
 

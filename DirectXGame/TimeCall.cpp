@@ -29,15 +29,27 @@ void TimeCall::Update() {
 	}
 }
 
-void TimeCall::Register(std::function<void()> func, int afterFrame, bool repete) {
+int TimeCall::Register(std::function<void()> func, int afterFrame, bool repete) {
 	TimeCallData data;
 	data.executeFrame = frame_ + afterFrame;
 	data.registerFrame = frame_;
 	data.func = func;
 	data.repeat = repete;
+	data.id = ++id;
 	timeCallData_.push_back(data);
+
+	return data.id;
 }
 
 void TimeCall::Clear() {
 	timeCallData_.clear();
+}
+
+void TimeCall::Delete(int id) {
+	for(int i = 0; i < timeCallData_.size(); ++i) {
+		if (timeCallData_[i].id == id) {
+			timeCallData_.erase(timeCallData_.begin() + i);
+			return;
+		}
+	}
 }
