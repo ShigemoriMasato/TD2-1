@@ -2,6 +2,7 @@
 #include "Object/Object.h"
 
 struct EnemyBulletDesc {
+	Vector3* localPosition = nullptr;
 	Vector3 position = {};
 	Vector3 direction = { 0.0f, 0.0f, 1.0f };
 	float speed = 0.1f;

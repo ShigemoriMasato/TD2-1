@@ -1,0 +1,4 @@
+Func,
+Pop,kind=Normal,position=0.0 0.0 20.0
+Wait,time=120
+Return

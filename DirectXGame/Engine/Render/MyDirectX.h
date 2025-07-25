@@ -102,15 +102,15 @@ private:
 	void ClearScreen();
 
 	void BeginImGui();
-
 	void InitDirectX();
-
 	void InitImGui();
 
 	void InsertBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESOURCE_STATES stateAfter, ID3D12Resource* pResource,
 		D3D12_RESOURCE_BARRIER_TYPE type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION, D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE);
 
 	void SetPSO(PSOType requirePSO);
+
+	void Draw(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle, MyDirectX::DrawKind kind, MyDirectX::PSOType pso, VertexData* vertexData, int vertexNum, uint32_t* index = nullptr, int indexNum = -1);
 
 	Logger* logger;
 

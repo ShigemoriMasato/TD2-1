@@ -7,7 +7,11 @@ class Action {
 public:
 	//名前と動かす対象を指定する
 	Action(std::string name, Actor* actor)	: name_(name), actor_(actor) {}
-	virtual ~Action() = default;
+	//virtual ~Action() = default;
+	virtual ~Action() {
+		static int a = 0;
+		a++;
+	}
 
 	/// <summary>
 	/// 実行する関数
@@ -26,5 +30,5 @@ public:
 	virtual bool ShouldKeep() { return false; };
 
 	const std::string name_;
-	std::shared_ptr<Actor> actor_;
+	Actor* actor_;
 };

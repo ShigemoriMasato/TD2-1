@@ -37,7 +37,7 @@ struct EnemyInfo {
 
 class Enemy : public Actor {
 public:
-	Enemy(Camera* camera, EnemyInfo queue, std::function<void(EnemyBulletDesc)> Fire);
+	Enemy(Camera* camera, EnemyInfo queue, Transform transform, std::function<void(EnemyBulletDesc)> Fire);
 	virtual ~Enemy() = default;
 
 	static void RegistCommands();
@@ -59,6 +59,9 @@ private:
 	void Death() { isActive_ = false; }
 	void Wait(EnemyCommand& command);
 	void Accel(EnemyCommand& command);
+	void Move(EnemyCommand& command);
+
+	//以下未実装
 	void Delete(EnemyCommand& command);
 	void Goto(EnemyCommand& command);
 
@@ -86,6 +89,7 @@ class AccelAct : public Action {
 public:
 
 	AccelAct(Enemy* enemy, std::vector<std::shared_ptr<Value>> args);
+	~AccelAct();
 
 	void Execute() override;
 	
@@ -99,5 +103,5 @@ private:
 
 	bool isAccelerating_ = false;
 
-	Enemy* enemy_ = nullptr;
+	Enemy* enemy_;
 };

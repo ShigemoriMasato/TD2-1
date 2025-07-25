@@ -13,7 +13,6 @@ enum class ActionType {
 class Actor : public Object {
 public:
 	Actor(Camera* camera, ShapeType type) : Object(camera, type) {}
-	virtual ~Actor() = default;
 
 	void EnqueueAction(std::shared_ptr<Action> act, ActionType actiontype = ActionType::share);
 	void ExecuteQueue();

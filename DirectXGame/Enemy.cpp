@@ -5,13 +5,15 @@
 std::unordered_map<std::string, std::function<void(Enemy* e, EnemyCommand& command)>> Enemy::commandMap_;
 bool Enemy::isCommandMapInitialized_ = false;
 
-Enemy::Enemy(Camera* camera, EnemyInfo info, std::function<void(EnemyBulletDesc)> Fire) :
+Enemy::Enemy(Camera* camera, EnemyInfo info, Transform transform, std::function<void(EnemyBulletDesc)> Fire) :
 Actor(camera, ShapeType::Model),
 Fire_(Fire),
 timecall_(std::make_unique<TimeCall>()) {
 	handle_ = info.handle;
 	tag = "Enemy";
 	info_ = info;
+
+	*transform_ = transform;
 
 	if(info_.queue.size() <= 0) {
 		assert(false && "EnemyQueue is Empty");
@@ -25,22 +27,25 @@ void Enemy::RegistCommands() {
 
 	commandMap_["Fire"] = [](Enemy* e, EnemyCommand& command) {
 		e->AddFireDesc(command);
-	};
+		};
 	commandMap_["Death"] = [](Enemy* e, EnemyCommand& command) {
 		e->Death();
-	};
+		};
 	commandMap_["Wait"] = [](Enemy* e, EnemyCommand& command) {
 		e->Wait(command);
-	};
+		};
 	commandMap_["Accel"] = [](Enemy* e, EnemyCommand& command) {
 		e->Accel(command);
-	};
+		};
 	commandMap_["Delete"] = [](Enemy* e, EnemyCommand& command) {
 		e->Delete(command);
-	};
+		};
 	commandMap_["Goto"] = [](Enemy* e, EnemyCommand& command) {
 		e->Goto(command);
-	};
+		};
+	commandMap_["Move"] = [](Enemy* e, EnemyCommand& command) {
+		e->Move(command);
+		};
 
 }
 
@@ -75,7 +80,7 @@ void Enemy::AddFireDesc(EnemyCommand& command) {
 	int cooltime = -1;
 
 	EnemyBulletDesc desc{};
-	desc.position = transform_->position;
+	desc.localPosition = &transform_->position;
 	for (auto& arg : command.args) {
 		if (arg->name == "position") {
 			desc.position += dynamic_cast<Vec3Value*>(arg.get())->value;
@@ -142,6 +147,16 @@ void Enemy::Accel(EnemyCommand& command) {
 	EnqueueAction(std::make_shared<AccelAct>(this, command.args));
 }
 
+void Enemy::Move(EnemyCommand& command) {
+
+	for (auto& arg : command.args) {
+		if (arg->name == "velocity") {
+			velocity_ = dynamic_cast<Vec3Value*>(arg.get())->value;
+		}
+	}
+
+}
+
 void Enemy::Delete(EnemyCommand& command) {
 	if (command.args.size() <= 0) {
 		return;
@@ -183,7 +198,7 @@ void Enemy::Goto(EnemyCommand& command) {
 }
 
 
-AccelAct::AccelAct(Enemy* enemy, std::vector<std::shared_ptr<Value>> args) : Action("Accel", enemy) {
+AccelAct::AccelAct(Enemy* enemy, std::vector<std::shared_ptr<Value>> args) : Action("Accel", nullptr) {
 
 	for (auto& arg : args) {
 		if (arg->name == "acceleration") {
@@ -197,8 +212,17 @@ AccelAct::AccelAct(Enemy* enemy, std::vector<std::shared_ptr<Value>> args) : Act
 		}
 	}
 
+	for (int i = 0; i < 3; ++i) {
+		if (acceleration_[i] == 0.0f) {
+			acceleration_[i] = 0.001f; //加速が0の場合は、微小な値を設定
+		}
+	}
+
 	enemy_ = enemy;
 	isAccelerating_ = true;
+}
+
+AccelAct::~AccelAct() {
 }
 
 void AccelAct::Execute() {
@@ -208,8 +232,9 @@ void AccelAct::Execute() {
 	int limited = 0;			//加速制限をかけられた回数
 
 	for (int i = 0; i < 3; ++i) {
-		if (targetVelocity_[i] < addedVelocity_[i]) {
-			acceleration[i] -= addedVelocity_[i] - targetVelocity_[i];
+		if ((targetVelocity_[i] - addedVelocity_[i]) * acceleration[i] < 0) {
+			acceleration[i] += targetVelocity_[i] - addedVelocity_[i];
+			addedVelocity_[i] = targetVelocity_[i];
 			++limited;
 		}
 	}
