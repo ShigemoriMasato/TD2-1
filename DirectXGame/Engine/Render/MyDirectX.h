@@ -16,6 +16,8 @@
 #include "../Sound/Audio.h"
 #include "../Core/MyWindow.h"
 #include "../Core/MyPSO.h"
+#define WHIETE1x1 2
+#define UVCHECKER 1
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -89,6 +91,7 @@ public:
 private:
 
 	enum class PSOType {
+		kUnknown = -1,
 		kOpaqueTriangle,		//不透明三角形
 		kTransparentTriangle,	//透明三角形
 
@@ -189,6 +192,6 @@ private:
 	uint32_t frame_ = 0; //フレーム数
 
 	//PSO管理用
-	PSOType nowPSO;
+	PSOType nowPSO = PSOType::kUnknown;
 };
 

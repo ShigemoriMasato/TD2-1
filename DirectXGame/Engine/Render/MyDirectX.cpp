@@ -1024,6 +1024,8 @@ void MyDirectX::InitImGui() {
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
     ImGui_ImplWin32_Init(myWindow_->GetHwnd(wndHandle_));
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // ドッキングを有効化
     ImGui_ImplDX12_Init(device.Get(),
         2,                                              //swapchainのバッファ数
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,                //色の形式
@@ -1038,6 +1040,18 @@ void MyDirectX::BeginImGui() {
     ImGui_ImplDX12_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(float(kClientWidth), float(kClientHeight)), ImGuiCond_Always);
+    ImGui::Begin("DockSpaceWindow");
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+
+    ImGui::End();
 }
 
 void MyDirectX::ClearScreen() {
@@ -1527,6 +1541,17 @@ void MyDirectX::PostDraw() {
     //画像を描画するためのバリアにする
     InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, textureResource[0]);
 
+    //todo ポストエフェクト用の描画を行う
+
+    //ImGuiへ描画
+    ImGui::Begin("GameWindow");
+
+    //16:9の48倍
+    ImVec2 imageSize = { 768, 432 };
+    ImGui::Image(reinterpret_cast<ImTextureID>(reinterpret_cast<void*>(textureSrvHandleGPU[0].ptr)), imageSize);
+
+    ImGui::End();
+
     //描画する画面を取得
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
     UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
@@ -1542,7 +1567,7 @@ void MyDirectX::PostDraw() {
 
     //offscreenの描画
     DrawSprite({ -1.0f, 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f }, { -1.0f, -1.0f, 0.0f, 1.0f }, { 1.0f, -1.0f, 0.0f, 1.0f },
-        Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 0, true);
+        Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 2, true);
 
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());

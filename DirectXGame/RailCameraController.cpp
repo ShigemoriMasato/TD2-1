@@ -13,7 +13,7 @@ camera_(std::make_shared<Camera>()) {
 
 void RailCameraController::Initialize() {
 	transform_->position = { 0.0f, 0.0f, 0.0f };
-	transform_->rotation = { -0.3f, 0.0f, 0.0f };
+	transform_->rotation = { 0.0f, 0.0f, 0.0f };
 	camera_->SetProjectionMatrix(PerspectiveFovDesc());
 
 	 controllPoints_ = { {0.0f, 0.0f, -0.5f},

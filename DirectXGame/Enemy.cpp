@@ -218,7 +218,6 @@ AccelAct::AccelAct(Enemy* enemy, std::vector<std::shared_ptr<Value>> args) : Act
 		}
 	}
 
-	enemy_ = enemy;
 	isAccelerating_ = true;
 }
 
@@ -243,7 +242,7 @@ void AccelAct::Execute() {
 		isAccelerating_ = false;
 	}
 
-	enemy_->AddVelocity(acceleration);
+	actor_->AddVelocity(acceleration);
 }
 
 bool AccelAct::ShouldKeep() {

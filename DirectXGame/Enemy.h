@@ -51,8 +51,6 @@ public:
 
 	void SetVeloity(const Vector3& v) { velocity_ = v; }
 
-	void AddVelocity(const Vector3& v) { velocity_ += v; }
-
 private:
 
 	void AddFireDesc(EnemyCommand& command);
@@ -67,9 +65,6 @@ private:
 
 	std::function<void()> BulletDescSelector_ = nullptr;
 	std::function<void(EnemyBulletDesc)> Fire_;
-
-	//敵について
-	Vector3 velocity_ = {};
 
 	//timecall
 	std::unique_ptr<TimeCall> timecall_ = nullptr;

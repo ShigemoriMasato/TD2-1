@@ -1,6 +1,7 @@
 #pragma once
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
+#include <Xinput.h>
 #include <wrl.h>
 
 #include "../Math/MyMath.h"
@@ -39,6 +40,8 @@ private:
 	Microsoft::WRL::ComPtr<IDirectInput8> directInput_ = nullptr;
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard_ = nullptr;
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse_ = nullptr;
+	
+	XINPUT_STATE state_{};
 
 	//どこからでもGetできるようにstaticにする
 	static BYTE keyState[256];
