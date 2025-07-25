@@ -2,10 +2,7 @@
 #include "Common/Scene.h"
 #include "Common/CommonData.h"
 #include "../Engine/Camera/DebugCamera.h"
-#include "../Player.h"
-#include "../EnemyManager.h"
-#include "../CollisionManager.h"
-#include "../RailCameraController.h"
+#include "../GridMaker.h"
 
 class GameScene : public Scene {
 public:
@@ -18,17 +15,18 @@ public:
 
 private:
 
-	void AllCollisionCheck();
-
-	std::unique_ptr<CollisionManager> collisionManager_;
-
-	std::unique_ptr<RailCameraController> railCameraController_ = nullptr;
 	Camera* camera_;
 	DebugCamera* debugCamera_;
 
 	bool isDebugCamera = false;
 
-	std::shared_ptr<Player> player_ = nullptr;
+	std::array<Vector3, size_t(ModelType::ModelCount)> modelPositions_ = {};
 
-	std::unique_ptr<EnemyManager> enemies_ = nullptr;
+	std::unique_ptr<GridMaker> gridMaker_;
+
+	std::unordered_map<ModelType, int> modelHandle;
+
+	MaterialData material_{};
+	DirectionalLightData dLight_{};
+
 };

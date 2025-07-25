@@ -26,18 +26,42 @@ struct PixelShaderOutput
 Texture2D<float32_t4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 
+
+float32_t4 HalfLambert(float32_t3 normal, float32_t4 color, float32_t4 textureColor, DirectionalLight directionalLight)
+{
+    float NdotL = dot(normalize(normal), -gDirectionalLight.direction);
+    float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+    float32_t4 outputColor = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+    outputColor.w = color.w * textureColor.w;
+    return outputColor;
+}
+
+float32_t4 LambertReflectance(float32_t3 normal, float32_t4 color, float32_t4 textureColor, DirectionalLight directionalLight)
+{
+    float NdotL = dot(normalize(normal), -directionalLight.direction);
+    float cos = saturate(dot(normalize(normal), -directionalLight.direction));
+    float32_t4 outputColor = color * textureColor * directionalLight.color * cos * directionalLight.intensity;
+    outputColor.w = color.w * textureColor.w;
+    return outputColor;
+}
+
+
 PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
     float4 transformedUV = mul(float32_t4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float32_t4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
     
-    if (gMaterial.enableLighting == 0)
+    if (gMaterial.enableLighting)
     {
-        float NdotL = dot(normalize(input.normal), -gDirectionalLight.direction);
-        float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-        //float cos = saturate(dot(normalize(input.normal), -gDirectionalLight.direction));
-        output.color = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+        if (gMaterial.enableLighting == 1)
+        {
+            output.color = LambertReflectance(input.normal, gMaterial.color, textureColor, gDirectionalLight);
+        }
+        else if (gMaterial.enableLighting == 2)
+        {
+            output.color = HalfLambert(input.normal, gMaterial.color, textureColor, gDirectionalLight);
+        }
     }
     else
     {

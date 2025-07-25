@@ -1,6 +1,5 @@
 #pragma once
 #include <functional>
-#include <Data/Value.h>
 
 struct TimeCallData {
 	std::function<void()> func;

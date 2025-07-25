@@ -7,13 +7,10 @@ using namespace Matrix;
 
 GameScene::GameScene(std::shared_ptr<CommonData> commonData) : Scene(commonData),
 camera_(new Camera()),
-debugCamera_(new DebugCamera()),
-collisionManager_(std::make_unique<CollisionManager>()) {
-	railCameraController_ = std::make_unique<RailCameraController>();
-	player_ = std::make_shared<Player>(camera_, railCameraController_->GetCameraPtr(),
-		commonData->modelHandle_[int(ModelType::Player)], commonData_->modelHandle_[int(ModelType::Bullet)]);
-	enemies_ = std::make_unique<EnemyManager>(camera_, player_.get(), *commonData_);
+debugCamera_(new DebugCamera()) {
 	isDebugCamera = true;
+
+	gridMaker_ = std::make_unique<GridMaker>(debugCamera_, true);
 }
 
 GameScene::~GameScene() {
@@ -22,12 +19,19 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Initialize() {
+	gridMaker_->Initialize();
 	debugCamera_->Initialize();
-	player_->Initialize();
-	railCameraController_->Initialize();
 	camera_->SetProjectionMatrix(PerspectiveFovDesc());
 
-	enemies_->Initialize();
+	for (int i = 0; i < int(ModelType::ModelCount); ++i) {
+		Vector3 offset = { -2.5f, 1.5f, 0.0f };
+		modelPositions_[i] = Vector3(
+			i % 2 * 5.0f,
+			float(int(i / 2) * 3.0f),
+			0.0f
+		) + offset;
+	}
+
 }
 
 std::unique_ptr<Scene> GameScene::Update() {
@@ -40,45 +44,39 @@ std::unique_ptr<Scene> GameScene::Update() {
 	ImGui::Checkbox("Debug Camera", &isDebugCamera);
 	ImGui::End();
 
-	railCameraController_->Update();
-	*camera_ = railCameraController_->GetCamera();
-
 	if (isDebugCamera) {
 		debugCamera_->Update();
 		*camera_ = *debugCamera_;
 	}
 
-	player_->Update();
+	ImGui::Begin("DLightData");
+	ImGui::ColorEdit4("Color", &dLight_.color.x);
+	ImGui::DragFloat("Intensity", &dLight_.intensity, 0.01f, 0.0f, 10.0f);
+	ImGui::SliderFloat3("Direction", &dLight_.direction.x, -1.0f, 1.0f);
+	ImGui::Text("LightKind");
+	if (ImGui::Button("NotUseLight")) {
+		material_.enableLighting = 0;
+	}
+	if (ImGui::Button("LambertReflectance")) {
+		material_.enableLighting = 1;
+	}
+	if (ImGui::Button("HalfLambert")) {
+		material_.enableLighting = 2;
+	}
 
-	enemies_->Update();
+	ImGui::End();
 
-	AllCollisionCheck();
+	dLight_.direction = dLight_.direction.Normalize();
+
+	gridMaker_->Update();
 
 	return nullptr;
 }
 
 void GameScene::Draw() const {
-	player_->Draw();
-	
-	enemies_->Draw();
+	gridMaker_->Draw();
 
-	railCameraController_->Draw(camera_);
-
-	Render::DrawModel(commonData_->modelHandle_[int(ModelType::SkySphere)], MakeIdentity4x4(), camera_);
-}
-
-void GameScene::AllCollisionCheck() {
-
-	collisionManager_->AddObject(player_.get());
-	for (auto& b : player_->GetBullets()) {
-		collisionManager_->AddObject(b.get());
+	for (int i = 0; i < int(ModelType::ModelCount); ++i) {
+		Render::DrawModel(commonData_->modelHandle_[i], MakeTranslationMatrix(modelPositions_[i]), camera_, material_, dLight_);
 	}
-
-	std::list<Object*> enemies = enemies_->GetEnemiesCollition();
-
-	for (const auto& e : enemies) {
-		collisionManager_->AddObject(e);
-	}
-
-	collisionManager_->CheckCollisions();
 }

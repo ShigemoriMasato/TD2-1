@@ -5,7 +5,7 @@
 using namespace Matrix;
 
 void DebugCamera::Initialize() {
-	center_ = {};
+	center_ = {0.0f, -5.0f, 0.0f};
 
 	transform_.scale = Vector3(1.0f, 1.0f, 1.0f);
 	transform_.position = Vector3(0.0f, 0.0f, -20.0f);

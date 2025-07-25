@@ -54,7 +54,6 @@ public:
 
 	int CreateDrawResource(DrawKind drawKind, uint32_t createNum);
 	int CreateModelDrawResource(uint32_t modelHandle, uint32_t createNum);
-	ModelMaterial LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 	void BeginFrame();
 
@@ -89,6 +88,8 @@ public:
 	bool* GetIsCanDraw() const { return isCanDraw_; }
 
 private:
+
+	std::vector<ModelMaterial> LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 	enum class PSOType {
 		kUnknown = -1,

@@ -316,45 +316,72 @@ int MyDirectX::LoadObjFile(const std::string& directoryPath, const std::string& 
 	std::ifstream file(directoryPath + "/" + filename); //ファイルを開く
     assert(file.is_open() && "MyDirectX::LoadObjFile / cannot open obj file");
 
+	std::string materialName; //マテリアル名を格納する変数
+
     while (std::getline(file, line)) {
         std::string identifier;
         std::istringstream s(line);
         s >> identifier; //行の先頭の文字列を取得
 
-        if (identifier == "v") {
+        if (identifier == "usemtl") {
+			s >> materialName; //マテリアル名を取得
+
+        } else if (identifier == "v") {
             Vector4 position;
             s >> position.x >> position.y >> position.z;
+            position.x *= -1.0f;
+            position.z *= -1.0f;
             position.w = 1.0f;
             positions.push_back(position); //位置を格納
+
         } else if (identifier == "vt") {
             Vector2 texcoord;
             s >> texcoord.x >> texcoord.y; //テクスチャ座標を格納
 			texcoord.y = 1.0f - texcoord.y;
             texcoords.push_back(texcoord);
+
         } else if (identifier == "vn") {
             Vector3 normal;
 			s >> normal.x >> normal.y >> normal.z; //法線を格納
             normal.x *= -1.0f; //y軸も反転
 			normals.push_back(normal);
+
         } else if (identifier == "f") {
+
             //面は三角形限定なので、読み込む前にEditor等で三角化させること。そのほかは未対応
             for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
                 std::string vertexDefinition;
 				s >> vertexDefinition; //頂点の定義を取得
+
                 //頂点の要素へのIndexは。「位置/UV/法線」で格納されているので、分解してIndexを取得する
                 std::istringstream v(vertexDefinition);
                 uint32_t elementIndices[3];
                 for (int32_t element = 0; element < 3; ++element) {
                     std::string index;
                     std::getline(v, index, '/');// /区切りでインデックスを読む
-                    elementIndices[element] = std::stoi(index);
+                    if (index != "") {
+                        elementIndices[element] = std::stoi(index);
+                    } else {
+                        elementIndices[element] = -1;
+                    }
                 }
+
+
                 //要素へのIndexから、実際の要素の値を取得して頂点を構築する
                 Vector4 position = positions[elementIndices[0] - 1];
-				Vector2 texcoord = texcoords[elementIndices[1] - 1];
+
+                Vector2 texcoord;
+                if (elementIndices[1] != -1) {
+                    texcoord = texcoords[elementIndices[1] - 1];
+                } else {
+					texcoord = { 0.0f, 0.0f }; //テクスチャ座標がない場合はデフォルト値を設定
+                }
+
 				Vector3 normal = normals[elementIndices[2] - 1];
+                
                 VertexData vertex = { position, texcoord, normal };
-				modelData.vertices.push_back(vertex); //頂点を格納
+				modelData.vertices[materialName].push_back(vertex); //頂点を格納
+
             }
         } else if (identifier == "mtllib") {
             std::string materialFilename;
@@ -373,6 +400,8 @@ int MyDirectX::LoadObjFile(const std::string& directoryPath, const std::string& 
 	directionalLightResource.push_back(std::vector<ID3D12Resource*>()); //DirectionalLightリソースの初期化
 
     modelCount_++;
+
+	CreateModelDrawResource(int(modelList_.size() - 1), 1); //モデル描画リソースを一つ作成
 
     return int(modelList_.size() - 1);
 }
@@ -466,8 +495,9 @@ int MyDirectX::CreateModelDrawResource(uint32_t modelHandle, uint32_t createNum)
 	return int(vertexResource[index].size()); //描画できる最大数を返す
 }
 
-ModelMaterial MyDirectX::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
-    ModelMaterial material = {};
+std::vector<ModelMaterial> MyDirectX::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
+    std::vector<ModelMaterial> material = {};
+    int index = -1;
     std::string textureFilePath;
     std::string line;
 	std::ifstream file(directoryPath + "/" + filename); //ファイルを開く
@@ -478,22 +508,24 @@ ModelMaterial MyDirectX::LoadMaterialTemplateFile(const std::string& directoryPa
         std::stringstream s(line);
 		s >> identifier;
 
+        if (identifier == "newmtl") {
+            material.push_back(ModelMaterial());
+
+        }
         //identifierに応じて処理
-        if (identifier == "map_Kd") {
+        else if (identifier == "map_Kd") {
             std::string textureFilename;
 			s >> textureFilename;
             //連結してファイルパスにする
 			textureFilePath = directoryPath + "/" + textureFilename;
-            material.textureHandle = LoadTexture(textureFilePath);
+            material[index].textureHandle = LoadTexture(textureFilePath);
         }
     }
 
-    if (material.textureHandle == 0) {
+    if (material[index].textureHandle == 0) {
 		//テクスチャが読み込めなかった場合は白い1x1のテクスチャを使う
-		material.textureHandle = 1;
+		material[index].textureHandle = 1;
     }
-
-    return material;
 }
 
 void MyDirectX::BeginFrame() {
@@ -1544,6 +1576,7 @@ void MyDirectX::PostDraw() {
     //todo ポストエフェクト用の描画を行う
 
     //ImGuiへ描画
+    ImGui::SetNextWindowSize(ImVec2(768.0f, 432.0f));
     ImGui::Begin("GameWindow");
 
     //16:9の48倍

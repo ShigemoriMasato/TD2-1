@@ -2,10 +2,11 @@
 #include <vector>
 
 enum class ModelType {
-	SkySphere,
-	Player,
-	Enemy,
-	Bullet,
+	MultiMesh,
+	MultiMaterial,
+	TeaPot,
+	Suzanne,
+	Bunny,
 
 	ModelCount
 };
