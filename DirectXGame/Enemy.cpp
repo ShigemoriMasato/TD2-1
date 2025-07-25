@@ -198,7 +198,7 @@ void Enemy::Goto(EnemyCommand& command) {
 }
 
 
-AccelAct::AccelAct(Enemy* enemy, std::vector<std::shared_ptr<Value>> args) : Action("Accel", nullptr) {
+AccelAct::AccelAct(Enemy* enemy, std::vector<std::shared_ptr<Value>> args) : Action("Accel", enemy) {
 
 	for (auto& arg : args) {
 		if (arg->name == "acceleration") {
