@@ -25,25 +25,34 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	std::srand(uint32_t(time(nullptr)));
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい音↓↓↓↓↓↓↓↓↓↓↓↓↓
+
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい音↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	commonData_->textureHandle_.resize(int(TextureType::TextureCount));
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい画像↓↓↓↓↓↓↓↓↓↓↓↓↓
-	
+
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい画像↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	commonData_->modelHandle_.resize(int(ModelType::ModelCount));
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたいモデル↓↓↓↓↓↓↓↓↓↓↓↓↓
+	commonData_->modelHandle_[int(ModelType::Player)] = myDirectX_->LoadObjFile("Resources/Player", "Plane.obj");
+	commonData_->modelHandle_[int(ModelType::Enemy)] = myDirectX_->LoadObjFile("Resources/Enemy", "Plane.obj");
+	commonData_->modelHandle_[int(ModelType::SkySphere)] = myDirectX_->LoadObjFile("Resources/SkySphere", "sky_sphere.obj");
+	commonData_->modelHandle_[int(ModelType::Bullet)] = myDirectX_->LoadObjFile("Resources/Bullet", "Bullet.obj");
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたいモデル↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓描画したい量↓↓↓↓↓↓↓↓↓↓↓↓↓
-	myDirectX_->CreateDrawResource(MyDirectX::kSprite, 2000);
-	myDirectX_->CreateDrawResource(MyDirectX::kLine, 2000);
-	myDirectX_->CreateDrawResource(MyDirectX::kBox, 50);
+	myDirectX_->CreateDrawResource(MyDirectX::kBox, 1000);
+	myDirectX_->CreateDrawResource(MyDirectX::kSprite, 100);
+	myDirectX_->CreateDrawResource(MyDirectX::kLine, 500);
+	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Player)], 10);
+	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Enemy)], 50);
+	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::SkySphere)], 1);
+	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Bullet)], 500);
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑描画したい量↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//最初のシーンを挿入
-	scene_ = std::make_unique<TitleScene>(commonData_);
+	scene_ = std::make_unique<GameScene>(commonData_);
 	scene_->Initialize();
 
 }

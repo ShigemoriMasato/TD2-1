@@ -16,6 +16,8 @@
 #include "../Sound/Audio.h"
 #include "../Core/MyWindow.h"
 #include "../Core/MyPSO.h"
+#define WHIETE1x1 2
+#define UVCHECKER 1
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -89,6 +91,7 @@ public:
 private:
 
 	enum class PSOType {
+		kUnknown = -1,
 		kOpaqueTriangle,		//不透明三角形
 		kTransparentTriangle,	//透明三角形
 
@@ -102,15 +105,15 @@ private:
 	void ClearScreen();
 
 	void BeginImGui();
-
 	void InitDirectX();
-
 	void InitImGui();
 
 	void InsertBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESOURCE_STATES stateAfter, ID3D12Resource* pResource,
 		D3D12_RESOURCE_BARRIER_TYPE type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION, D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE);
 
 	void SetPSO(PSOType requirePSO);
+
+	void Draw(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle, MyDirectX::DrawKind kind, MyDirectX::PSOType pso, VertexData* vertexData, int vertexNum, uint32_t* index = nullptr, int indexNum = -1);
 
 	Logger* logger;
 
@@ -189,6 +192,6 @@ private:
 	uint32_t frame_ = 0; //フレーム数
 
 	//PSO管理用
-	PSOType nowPSO;
+	PSOType nowPSO = PSOType::kUnknown;
 };
 

@@ -1,8 +1,5 @@
 #pragma once
 #include "Common/Scene.h"
-#include "../Engine/Camera/DebugCamera.h"
-#include <array>
-#include "../GridMaker.h"
 
 class TitleScene : public Scene {
 public:
@@ -15,8 +12,4 @@ public:
 
 private:
 	Camera* camera_ = nullptr;
-	DebugCamera* debugCamera_;
-	Transform cameraTransform_;
-
-	GridMaker* gridMaker_;
 };

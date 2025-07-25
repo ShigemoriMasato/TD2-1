@@ -1024,6 +1024,8 @@ void MyDirectX::InitImGui() {
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
     ImGui_ImplWin32_Init(myWindow_->GetHwnd(wndHandle_));
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // ドッキングを有効化
     ImGui_ImplDX12_Init(device.Get(),
         2,                                              //swapchainのバッファ数
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,                //色の形式
@@ -1038,6 +1040,18 @@ void MyDirectX::BeginImGui() {
     ImGui_ImplDX12_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(float(kClientWidth), float(kClientHeight)), ImGuiCond_Always);
+    ImGui::Begin("DockSpaceWindow");
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+
+    ImGui::End();
 }
 
 void MyDirectX::ClearScreen() {
@@ -1109,60 +1123,9 @@ void MyDirectX::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4
     vertexData[2].texcoord = { 1.0f, 1.0f };
     vertexData[2].normal = { 0.0f, 0.0f, -1.0f };
 
-    //データを書き込む
-    TramsformMatrixData* wvpData = nullptr;
-    //書き込むためのアドレスを取得
-    wvpResource[kTriangle][drawCount[kTriangle]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-    //単位行列を書き込む
-    wvpData->wvp = wvpMatrix;
-	wvpData->world = worldMatirx;
-
-    //データを書き込む
-    MaterialData* materialData = nullptr;
-    //書き込むためのアドレスを取得
-    materialResource[kTriangle][drawCount[kTriangle]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-    
-    //光を考慮しない
-    *materialData = material;
-
-	//データを書き込む
-	DirectionalLightData* directionalLightData = nullptr;
-	directionalLightResource[kTriangle][drawCount[kTriangle]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-    *directionalLightData = DirectionalLightData();
-
-    //頂点のバッファビューを作成する
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-    //リソースの先頭のアドレスから使う
-    vertexBufferView.BufferLocation = vertexResource[kTriangle][drawCount[kTriangle]]->GetGPUVirtualAddress();
-    //使用するリソースのサイズは頂点3つ分のサイズ
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
-    //1頂点当たりのサイズ
-    vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-
-    if(material.color.w < 1.0f) {
-        //透明な三角形を描画する場合は、PSOを透明用に変更する
-        SetPSO(PSOType::kTransparentTriangle);
-    } else {
-        //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-        SetPSO(PSOType::kOpaqueTriangle);
-	}
-
-    //マテリアルCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kTriangle][drawCount[kTriangle]]->GetGPUVirtualAddress());
-    //wvp用のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kTriangle][drawCount[kTriangle]]->GetGPUVirtualAddress());
-	//テクスチャの場所を設定
-    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
-	//光のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kTriangle][drawCount[kTriangle]]->GetGPUVirtualAddress());
-    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-    commandList->DrawInstanced(3, 1, 0, 0);
-
-    ++drawCount[kTriangle];
+	Draw(worldMatirx, wvpMatrix, material, dLightData, textureHandle, kTriangle,
+        material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle,
+        vertexData, 3);
 }
 
 void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
@@ -1334,58 +1297,10 @@ void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMat
 		vertexData[i].position *= radius;
     }
 
-    TramsformMatrixData* wvpData = nullptr;
-    //書き込むためのアドレスを取得
-    wvpResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-    //wvp行列を書き込む
-    wvpData->wvp = wvpMatrix;
-    wvpData->world = worldMatrix;
+    Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kSphere,
+        material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle,
+        vertexData, 4);
 
-    MaterialData* materialData = nullptr;
-    //書き込むためのアドレスを取得
-    materialResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-    //色指定
-    *materialData = material;
-
-    DirectionalLightData* directionalLightData = nullptr;
-    //書き込むためのアドレスを取得
-    directionalLightResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-    //光の入力
-    *directionalLightData = dLightData;
-
-    //頂点のバッファビューを作成する
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-    //リソースの先頭のアドレスから使う
-    vertexBufferView.BufferLocation = vertexResource[kSphere][drawCount[kSphere]]->GetGPUVirtualAddress();
-    //使用するリソースのサイズは頂点3つ分のサイズ
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 3 * drawTriangleCountInstance;
-    //1頂点当たりのサイズ
-    vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-
-    if (material.color.w < 1.0f) {
-        //透明な三角形を描画する場合は、PSOを透明用に変更する
-        SetPSO(PSOType::kTransparentTriangle);
-    } else {
-        //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-        SetPSO(PSOType::kOpaqueTriangle);
-    }
-
-    //マテリアルCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kSphere][drawCount[kSphere]]->GetGPUVirtualAddress());
-    //wvp用のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kSphere][drawCount[kSphere]]->GetGPUVirtualAddress());
-    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
-    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
-    //光のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kSphere][drawCount[kSphere]]->GetGPUVirtualAddress());
-    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-    commandList->DrawInstanced(drawTriangleCountInstance * 3, 1, 0, 0);
-
-    ++drawCount[kSphere];
 }
 
 void MyDirectX::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData) {
@@ -1400,56 +1315,18 @@ void MyDirectX::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpM
 	vertexResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	std::memcpy(vertexData, modelList_[modelHandle].vertices.data(), sizeof(VertexData) * modelList_[modelHandle].vertices.size());
 
-    TramsformMatrixData* wvpData = nullptr;
-    //書き込むためのアドレスを取得
-    wvpResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-    //wvp行列を書き込む
-    wvpData->wvp = wvpMatrix;
-    wvpData->world = worldMatrix;
-
-    MaterialData* materialData = nullptr;
-    //書き込むためのアドレスを取得
-    materialResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-    //色指定
-    *materialData = material;
-
-    DirectionalLightData* directionalLightData = nullptr;
-    //書き込むためのアドレスを取得
-    directionalLightResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-    //光の入力
-    *directionalLightData = dLightData;
-
-    //頂点のバッファビューを作成する
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-    vertexBufferView.BufferLocation = vertexResource[index][drawCount[index]]->GetGPUVirtualAddress();
-    vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelList_[modelHandle].vertices.size());
-    vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+	PSOType psoType = PSOType::kOpaqueTriangle;
 
     if (material.color.w < 1.0f) {
         //透明な三角形を描画する場合は、PSOを透明用に変更する
-        SetPSO(PSOType::kTransparentTriangle);
+        psoType = PSOType::kTransparentTriangle;
     } else {
         //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-        SetPSO(PSOType::kOpaqueTriangle);
+        psoType = PSOType::kOpaqueTriangle;
     }
 
-    //マテリアルCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(0, materialResource[index][drawCount[index]]->GetGPUVirtualAddress());
-    //wvp用のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[index][drawCount[index]]->GetGPUVirtualAddress());
-    //光のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[index][drawCount[index]]->GetGPUVirtualAddress());
-    //テクスチャの設定
-    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[modelList_[modelHandle].material.textureHandle]);
-    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList->DrawInstanced(UINT(modelList_[modelHandle].vertices.size()), 1, 0, 0);
-
-	drawCount[index]++;
-
-    logger->Log(std::format("{} model drawed", drawCount[index]));
+    Draw(worldMatrix, wvpMatrix, material, dLightData, modelList_[modelHandle].material.textureHandle,
+        DrawKind(index), psoType, vertexData, int(modelList_[modelHandle].vertices.size()));
 }
 
 void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldmat, Matrix4x4 wvpmat, MaterialData material, DirectionalLightData dLightData, int textureHandle, bool isOffScreen) {
@@ -1485,64 +1362,24 @@ void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matri
     indexData[4] = 3;
     indexData[5] = 2;
 
-	TramsformMatrixData* matData = nullptr;
-	wvpResource[kSprite][drawCount[kSprite]]->Map(0, nullptr, reinterpret_cast<void**>(&matData));
-	matData->world = worldmat;
-	matData->wvp = wvpmat;
-
-	MaterialData* materialData = nullptr;
-	materialResource[kSprite][drawCount[kSprite]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-    *materialData = material;
-
-	DirectionalLightData* directionalLightData = nullptr;
-	directionalLightResource[kSprite][drawCount[kSprite]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-	*directionalLightData = dLightData;
-
-    //頂点のバッファビューを作成する
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-    //リソースの先頭のアドレスから使う
-    vertexBufferView.BufferLocation = vertexResource[kSprite][drawCount[kSprite]]->GetGPUVirtualAddress();
-    //使用するリソースのサイズは頂点3つ分のサイズ
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 4;
-    //1頂点当たりのサイズ
-    vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-    //インデックスのバッファビューを作成する
-	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
-	indexBufferView.BufferLocation = indexResource[kSprite][drawCount[kSprite]]->GetGPUVirtualAddress();
-	indexBufferView.SizeInBytes = sizeof(uint32_t) * 6;
-	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
-
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-	commandList->IASetIndexBuffer(&indexBufferView);
+	PSOType pso = PSOType::kOpaqueTriangle;
 
 	if (isOffScreen) {
 		//オフスクリーン用のPSOを設定
-		SetPSO(PSOType::kOffScreen);
+		pso = PSOType::kOffScreen;
     } else {
         if (material.color.w < 1.0f) {
             //透明な三角形を描画する場合は、PSOを透明用に変更する
-            SetPSO(PSOType::kTransparentTriangle);
+            pso = PSOType::kTransparentTriangle;
         } else {
             //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-            SetPSO(PSOType::kOpaqueTriangle);
+            pso = PSOType::kOpaqueTriangle;
         }
     }
 
-    //マテリアルCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kSprite][drawCount[kSprite]]->GetGPUVirtualAddress());
-    //wvp用のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kSprite][drawCount[kSprite]]->GetGPUVirtualAddress());
-    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
-    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
-    //光のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kSprite][drawCount[kSprite]]->GetGPUVirtualAddress());
-    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-    commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	Draw(worldmat, wvpmat, material, dLightData, textureHandle, DrawKind::kSprite,
+		pso, vertexData, 4, indexData, 6);
 
-    ++drawCount[kSprite];
 }
 
 void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
@@ -1587,59 +1424,9 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
         indexData[i * 3 + 2] = i + 2 - 4;
     }
 
-    TramsformMatrixData* wvpData = nullptr;
-    wvpResource[kPrism][drawCount[kPrism]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-    wvpData->world = worldMatrix;
-    wvpData->wvp = wvpMatrix;
-
-    MaterialData* materialData = nullptr;
-    materialResource[kPrism][drawCount[kPrism]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-    *materialData = material;
-
-    DirectionalLightData* directionalLightData = nullptr;
-    directionalLightResource[kPrism][drawCount[kPrism]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-    *directionalLightData = dLightData;
-
-    //頂点のバッファビューを作成する
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-    //リソースの先頭のアドレスから使う
-    vertexBufferView.BufferLocation = vertexResource[kPrism][drawCount[kPrism]]->GetGPUVirtualAddress();
-    //使用するリソースのサイズは頂点3つ分のサイズ
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 7;
-    //1頂点当たりのサイズ
-    vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-    //インデックスのバッファビューを作成する
-    D3D12_INDEX_BUFFER_VIEW indexBufferView{};
-    indexBufferView.BufferLocation = indexResource[kPrism][drawCount[kPrism]]->GetGPUVirtualAddress();
-    indexBufferView.SizeInBytes = sizeof(uint32_t) * 24;
-    indexBufferView.Format = DXGI_FORMAT_R32_UINT;
-
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-    commandList->IASetIndexBuffer(&indexBufferView);
-
-    if (material.color.w < 1.0f) {
-        //透明な三角形を描画する場合は、PSOを透明用に変更する
-        SetPSO(PSOType::kTransparentTriangle);
-    } else {
-        //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-        SetPSO(PSOType::kOpaqueTriangle);
-    }
-
-    //マテリアルCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kPrism][drawCount[kPrism]]->GetGPUVirtualAddress());
-    //wvp用のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kPrism][drawCount[kPrism]]->GetGPUVirtualAddress());
-    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
-    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
-    //光のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kPrism][drawCount[kPrism]]->GetGPUVirtualAddress());
-    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-    commandList->DrawIndexedInstanced(24, 1, 0, 0, 0);
-
-    ++drawCount[kPrism];
+	Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kPrism,
+		material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle, 
+		vertexData, 7, indexData, 24);
 }
 
 void MyDirectX::DrawBox(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
@@ -1716,37 +1503,6 @@ void MyDirectX::DrawBox(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData
         indexData[idx++] = base + 1;
     }
 
-    TramsformMatrixData* wvpData = nullptr;
-    wvpResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-    wvpData->world = worldMatrix;
-    wvpData->wvp = wvpMatrix;
-
-    MaterialData* materialData = nullptr;
-    materialResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-    *materialData = material;
-
-    DirectionalLightData* directionalLightData = nullptr;
-    directionalLightResource[kBox][drawCount[kBox]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-    *directionalLightData = dLightData;
-
-    //頂点のバッファビューを作成する
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-    //リソースの先頭のアドレスから使う
-    vertexBufferView.BufferLocation = vertexResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress();
-    //使用するリソースのサイズは頂点3つ分のサイズ
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 24;
-    //1頂点当たりのサイズ
-    vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-    //インデックスのバッファビューを作成する
-    D3D12_INDEX_BUFFER_VIEW indexBufferView{};
-    indexBufferView.BufferLocation = indexResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress();
-    indexBufferView.SizeInBytes = sizeof(uint32_t) * 36;
-    indexBufferView.Format = DXGI_FORMAT_R32_UINT;
-
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-    commandList->IASetIndexBuffer(&indexBufferView);
-
     if (material.color.w < 1.0f) {
         //透明な三角形を描画する場合は、PSOを透明用に変更する
         SetPSO(PSOType::kTransparentTriangle);
@@ -1755,20 +1511,9 @@ void MyDirectX::DrawBox(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData
         SetPSO(PSOType::kOpaqueTriangle);
     }
 
-    //マテリアルCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress());
-    //wvp用のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress());
-    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
-    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
-    //光のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kBox][drawCount[kBox]]->GetGPUVirtualAddress());
-    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-    commandList->DrawIndexedInstanced(36, 1, 0, 0, 0);
-
-    ++drawCount[kBox];
+	Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kBox, 
+        material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle,
+		vertexData, 24, indexData, 36);
 }
 
 void MyDirectX::DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
@@ -1783,49 +1528,9 @@ void MyDirectX::DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMatrix, Matr
 	vertexData[1].texcoord = { 0.0f, 1.0f };
 	vertexData[1].normal = { 0.0f, 0.0f, 0.0f };
 
-	TramsformMatrixData* wvpData = nullptr;
-	wvpResource[kLine][drawCount[kLine]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-	wvpData->world = worldMatrix;
-	wvpData->wvp = wvpMatrix;
-
-	MaterialData* materialData = nullptr;
-	materialResource[kLine][drawCount[kLine]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	*materialData = material;
-
-	DirectionalLightData* directionalLightData = nullptr;
-	directionalLightResource[kLine][drawCount[kLine]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-    *directionalLightData = dLightData;
-
-    //頂点のバッファビューを作成する
-    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-    //リソースの先頭のアドレスから使う
-    vertexBufferView.BufferLocation = vertexResource[kLine][drawCount[kLine]]->GetGPUVirtualAddress();
-    //使用するリソースのサイズは頂点3つ分のサイズ
-    vertexBufferView.SizeInBytes = sizeof(VertexData) * 2;
-    //1頂点当たりのサイズ
-    vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-
-	SetPSO(PSOType::kOpaqueLine);
-
-    //マテリアルCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kLine][drawCount[kLine]]->GetGPUVirtualAddress());
-    //wvp用のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kLine][drawCount[kLine]]->GetGPUVirtualAddress());
-    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]である。
-    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
-    //光のCBufferの場所を設定
-    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kLine][drawCount[kLine]]->GetGPUVirtualAddress());
-    //形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけばよい
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-    //描画！(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	commandList->DrawInstanced(2, 1, 0, 0);
-
-    ++drawCount[kLine];
+	Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kLine, PSOType::kOpaqueLine,
+		vertexData, 2);
 }
-
-
 
 #pragma endregion
 
@@ -1835,6 +1540,17 @@ void MyDirectX::PostDraw() {
 
     //画像を描画するためのバリアにする
     InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, textureResource[0]);
+
+    //todo ポストエフェクト用の描画を行う
+
+    //ImGuiへ描画
+    ImGui::Begin("GameWindow");
+
+    //16:9の48倍
+    ImVec2 imageSize = { 768, 432 };
+    ImGui::Image(reinterpret_cast<ImTextureID>(reinterpret_cast<void*>(textureSrvHandleGPU[0].ptr)), imageSize);
+
+    ImGui::End();
 
     //描画する画面を取得
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -1851,7 +1567,7 @@ void MyDirectX::PostDraw() {
 
     //offscreenの描画
     DrawSprite({ -1.0f, 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f }, { -1.0f, -1.0f, 0.0f, 1.0f }, { 1.0f, -1.0f, 0.0f, 1.0f },
-        Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 0, true);
+        Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 2, true);
 
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
@@ -1960,4 +1676,65 @@ void MyDirectX::SetPSO(PSOType requirePSO) {
 
 	nowPSO = requirePSO;
     commandList->SetPipelineState(pso->Get(int(requirePSO)));
+}
+
+void MyDirectX::Draw(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle, DrawKind kind, PSOType pso, VertexData* vertexData, int vertexNum, uint32_t* indexData, int indexNum) {
+    
+    //シェーダーに送る各種データの作成
+    TramsformMatrixData* wvpData = nullptr;
+    wvpResource[kind][drawCount[kind]]->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+    wvpData->world = worldMatrix;
+    wvpData->wvp = wvpMatrix;
+
+    MaterialData* materialData = nullptr;
+    materialResource[kind][drawCount[kind]]->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+    *materialData = material;
+
+    DirectionalLightData* directionalLightData = nullptr;
+    directionalLightResource[kind][drawCount[kind]]->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+    *directionalLightData = dLightData;
+
+    //頂点のバッファビューを作成する
+    D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+    //リソースの先頭のアドレスから使う
+    vertexBufferView.BufferLocation = vertexResource[kind][drawCount[kind]]->GetGPUVirtualAddress();
+    //使用するリソースのサイズは頂点3つ分のサイズ
+    vertexBufferView.SizeInBytes = sizeof(VertexData) * vertexNum;
+    //1頂点当たりのサイズ
+    vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+    //インデックスのバッファビューを作成する
+    if (indexData) {
+        D3D12_INDEX_BUFFER_VIEW indexBufferView{};
+        indexBufferView.BufferLocation = indexResource[kind][drawCount[kind]]->GetGPUVirtualAddress();
+        indexBufferView.SizeInBytes = sizeof(uint32_t) * indexNum;
+        indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+
+        commandList->IASetIndexBuffer(&indexBufferView);
+    }
+
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+    SetPSO(pso);
+
+    //マテリアルCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(0, materialResource[kind][drawCount[kind]]->GetGPUVirtualAddress());
+    //wvp用のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(1, wvpResource[kind][drawCount[kind]]->GetGPUVirtualAddress());
+    //SRVのDescriptorTableの先頭を設定。2はrootParameter[2]。
+    commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU[textureHandle]);
+    //光のCBufferの場所を設定
+    commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource[kind][drawCount[kind]]->GetGPUVirtualAddress());
+    //形状を設定
+    commandList->IASetPrimitiveTopology(kind == kLine ? D3D_PRIMITIVE_TOPOLOGY_LINELIST : D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    if (indexData) {
+		//インデックスがある場合は、インデックスを設定して描画
+		commandList->DrawIndexedInstanced(indexNum, 1, 0, 0, 0);
+    } else {
+        //インデックスがない場合は、インデックスなしで描画
+        commandList->DrawInstanced(vertexNum, 1, 0, 0);
+    }
+
+    ++drawCount[kind];
 }

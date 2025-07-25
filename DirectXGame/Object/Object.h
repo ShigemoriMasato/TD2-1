@@ -44,10 +44,13 @@ public:
 	bool GetIsActive() const { return isActive_; }
 	ShapeType GetShapeType() const { return type_; }
 
+	void AddVelocity(const Vector3& velocity) { velocity_ += velocity; }
+
 	std::string tag;
 
 protected:
 
+	Vector3 velocity_ = {};								//Actor用
 	std::shared_ptr<Transform> transform_{};
 	uint32_t color = 0xffffffff;
 	int handle_ = 2;
@@ -56,6 +59,7 @@ protected:
 
 	Camera* camera_ = nullptr;
 
+	//当たり判定用
 	Vector3 size_ = { 1.0f, 1.0f, 1.0f };
 
 private:

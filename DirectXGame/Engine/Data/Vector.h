@@ -16,6 +16,10 @@ struct Vector2 final {
 		}
 		return { x / len, y / len };
 	}
+
+	float& operator[](int i) {
+		return *(&x + i);
+	}
 };
 
 struct Vector3 final {
@@ -33,6 +37,10 @@ struct Vector3 final {
 			return { 0.0f, 0.0f, 0.0f };
 		}
 		return { x / len, y / len, z / len };
+	}
+
+	float& operator[](int i) {
+		return *(&x + i);
 	}
 };
 
@@ -52,5 +60,9 @@ struct Vector4 final {
 			return { 0.0f, 0.0f, 0.0f, 0.0f };
 		}
 		return { x / len, y / len, z / len, w / len };
+	}
+
+	float& operator[](int i) {
+		return *(&x + i);
 	}
 };

@@ -4,6 +4,7 @@
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "xinput.lib")
 
 DIMOUSESTATE Input::mouseState = {};
 DIMOUSESTATE Input::preMouseState = {};
@@ -45,6 +46,8 @@ void Input::Initialize() {
 	assert(SUCCEEDED(hr));
 
 	isInitialized_ = true;
+
+	ZeroMemory(&state_, sizeof(XINPUT_STATE));
 }
 
 void Input::Update() {
@@ -59,6 +62,25 @@ void Input::Update() {
 	std::memcpy(&preMouseState, &mouseState, sizeof(DIMOUSESTATE));
 
 	mouse_->GetDeviceState(sizeof(DIMOUSESTATE), &mouseState);
+
+	DWORD dwResult = XInputGetState(0, &state_); // 0はコントローラー番号（最大4台）
+
+	if (dwResult == ERROR_SUCCESS) {
+		// コントローラーが接続されている
+		SHORT lx = state_.Gamepad.sThumbLX; // 左スティックX軸
+		SHORT ly = state_.Gamepad.sThumbLY; // 左スティックY軸
+		BYTE lt = state_.Gamepad.bLeftTrigger; // 左トリガー
+		BYTE rt = state_.Gamepad.bRightTrigger; // 右トリガー
+
+		bool isAPressed = (state_.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0;
+	}
+
+	XINPUT_VIBRATION vibration;
+	ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
+	vibration.wLeftMotorSpeed = 0;  // 左モーター
+	vibration.wRightMotorSpeed = 0; // 右モーター
+
+	XInputSetState(0, &vibration);
 }
 
 BYTE* Input::GetKeyState() {
