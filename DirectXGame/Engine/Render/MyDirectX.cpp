@@ -390,20 +390,28 @@ int MyDirectX::LoadObjFile(const std::string& directoryPath, const std::string& 
         }
     }
     
+    //複数materialの場合、空データを入れておく
+    for (int i = 1; i < modelData.material.size(); ++i) {
+        modelList_.push_back(ModelData());
+		drawCount.push_back(0);
+    }
+
 	modelList_.push_back(modelData); //モデルデータをリストに追加
 	drawCount.push_back(0); //描画数を初期化
 	
-    vertexResource.push_back(std::vector<ID3D12Resource*>()); //頂点リソースの初期化
-	indexResource.push_back(std::vector<ID3D12Resource*>()); //インデックスリソースの初期化
-	materialResource.push_back(std::vector<ID3D12Resource*>()); //マテリアルリソースの初期化
-	wvpResource.push_back(std::vector<ID3D12Resource*>()); //ワールドビュー投影行列リソースの初期化
-	directionalLightResource.push_back(std::vector<ID3D12Resource*>()); //DirectionalLightリソースの初期化
+    for (int i = 0; i < modelData.material.size(); ++i) {
+        vertexResource.push_back(std::vector<ID3D12Resource*>()); //頂点リソースの初期化
+        indexResource.push_back(std::vector<ID3D12Resource*>()); //インデックスリソースの初期化
+        materialResource.push_back(std::vector<ID3D12Resource*>()); //マテリアルリソースの初期化
+        wvpResource.push_back(std::vector<ID3D12Resource*>()); //ワールドビュー投影行列リソースの初期化
+        directionalLightResource.push_back(std::vector<ID3D12Resource*>()); //DirectionalLightリソースの初期化
 
-    modelCount_++;
+        modelIndex_++;
+    }
 
-	CreateModelDrawResource(int(modelList_.size() - 1), 1); //モデル描画リソースを一つ作成
+	CreateModelDrawResource(int(modelIndex_), 1); //モデル描画リソースを一つ作成
 
-    return int(modelList_.size() - 1);
+    return int(modelIndex_);
 }
 
 MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
@@ -413,7 +421,7 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     logger(new Logger("master")),
     fenceValue(0),
     readTextureCount(0),
-    modelCount_(-1),
+    modelIndex_(-1),
     isCanDraw_(new bool(false)) {
     HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
     assert(SUCCEEDED(hr));
@@ -486,10 +494,18 @@ int MyDirectX::CreateModelDrawResource(uint32_t modelHandle, uint32_t createNum)
     uint32_t index = DrawKindCount + modelHandle;
 
     for (uint32_t i = 0; i < createNum; ++i) {
-		vertexResource[index].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * modelList_[modelHandle].vertices.size()));
-		materialResource[index].push_back(CreateBufferResource(device.Get(), sizeof(MaterialData)));
-		directionalLightResource[index].push_back(CreateBufferResource(device.Get(), sizeof(DirectionalLightData)));
-		wvpResource[index].push_back(CreateBufferResource(device.Get(), sizeof(TramsformMatrixData)));
+
+        //materialの数だけリソースを作成する
+        for (int i = 0; i < modelList_[modelHandle].material.size(); ++i) {
+
+			std::string materialName = modelList_[modelHandle].material[i].name; //マテリアル名を取得
+
+            vertexResource[index].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * modelList_[modelHandle].vertices[materialName].size()));
+            materialResource[index].push_back(CreateBufferResource(device.Get(), sizeof(MaterialData)));
+            directionalLightResource[index].push_back(CreateBufferResource(device.Get(), sizeof(DirectionalLightData)));
+            wvpResource[index].push_back(CreateBufferResource(device.Get(), sizeof(TramsformMatrixData)));
+        }
+
     }
 
 	return int(vertexResource[index].size()); //描画できる最大数を返す
@@ -510,7 +526,8 @@ std::vector<ModelMaterial> MyDirectX::LoadMaterialTemplateFile(const std::string
 
         if (identifier == "newmtl") {
             material.push_back(ModelMaterial());
-
+            ++index;
+			s >> material[index].name; //新しいマテリアル名を取得
         }
         //identifierに応じて処理
         else if (identifier == "map_Kd") {
@@ -524,8 +541,10 @@ std::vector<ModelMaterial> MyDirectX::LoadMaterialTemplateFile(const std::string
 
     if (material[index].textureHandle == 0) {
 		//テクスチャが読み込めなかった場合は白い1x1のテクスチャを使う
-		material[index].textureHandle = 1;
+		material[index].textureHandle = WHIETE1x1;
     }
+
+    return material;
 }
 
 void MyDirectX::BeginFrame() {
@@ -1326,12 +1345,15 @@ void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMat
     }
 
     for (uint32_t i = 0; i < drawTriangleCountInstance * 3; ++i) {
-		vertexData[i].position *= radius;
+		vertexData[i].position.x *= radius;
+		vertexData[i].position.y *= radius;
+		vertexData[i].position.z *= radius;
+		vertexData[i].normal.z *= -1.0f; //法線のZ軸を反転させる
     }
 
     Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kSphere,
         material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle,
-        vertexData, 4);
+        vertexData, drawTriangleCountInstance * 3);
 
 }
 
@@ -1342,23 +1364,29 @@ void MyDirectX::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpM
         assert(false && "over drawcount");
     }
 
-    //頂点リソースにデータを書き込む
-	VertexData* vertexData = nullptr;
-	vertexResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	std::memcpy(vertexData, modelList_[modelHandle].vertices.data(), sizeof(VertexData) * modelList_[modelHandle].vertices.size());
+    for (int i = 0; i < modelList_[modelHandle].material.size(); ++i) {
 
-	PSOType psoType = PSOType::kOpaqueTriangle;
+		std::string materialName = modelList_[modelHandle].material[i].name;
 
-    if (material.color.w < 1.0f) {
-        //透明な三角形を描画する場合は、PSOを透明用に変更する
-        psoType = PSOType::kTransparentTriangle;
-    } else {
-        //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-        psoType = PSOType::kOpaqueTriangle;
+        //頂点リソースにデータを書き込む
+        VertexData* vertexData = nullptr;
+        vertexResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+        std::memcpy(vertexData, modelList_[modelHandle].vertices[materialName].data(), sizeof(VertexData) * modelList_[modelHandle].vertices[materialName].size());
+
+        PSOType psoType = PSOType::kOpaqueTriangle;
+
+        if (material.color.w < 1.0f) {
+            //透明な三角形を描画する場合は、PSOを透明用に変更する
+            psoType = PSOType::kTransparentTriangle;
+        } else {
+            //不透明な三角形を描画する場合は、PSOを不透明用に変更する
+            psoType = PSOType::kOpaqueTriangle;
+        }
+
+        Draw(worldMatrix, wvpMatrix, material, dLightData, modelList_[modelHandle].material[i].textureHandle,
+            DrawKind(index), psoType, vertexData, int(modelList_[modelHandle].vertices[materialName].size()));
+
     }
-
-    Draw(worldMatrix, wvpMatrix, material, dLightData, modelList_[modelHandle].material.textureHandle,
-        DrawKind(index), psoType, vertexData, int(modelList_[modelHandle].vertices.size()));
 }
 
 void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldmat, Matrix4x4 wvpmat, MaterialData material, DirectionalLightData dLightData, int textureHandle, bool isOffScreen) {
@@ -1656,7 +1684,7 @@ void MyDirectX::Finalize() {
         textureResource[i]->Release();
     }
 
-    for (uint32_t i = 0; i < DrawKindCount + modelCount_ + 1; ++i){
+    for (uint32_t i = 0; i < DrawKindCount + modelIndex_ + 1; ++i){
         for (uint32_t j = 0; j < vertexResource[i].size(); ++j) {
             vertexResource[i][j]->Release();
             wvpResource[i][j]->Release();

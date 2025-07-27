@@ -11,14 +11,14 @@ struct PerspectiveFovDesc {
 	float fovY = 0.45f;
 	float aspectRatio = 1280.0f / 720.0f;
 	float nearClip = 0.1f;
-	float farClip = 100.0f;
+	float farClip = 1000.0f;
 };
 
 struct OrthographicDesc {
-	float left = -640;
-	float top = 640;
-	float right = -360;
-	float bottom = 360;
+	float left = -0.0f;
+	float top = 0.0f;
+	float right = 1280;
+	float bottom = 720;
 	float nearClip = 0.0f;
 	float farClip = 1000.0f;
 };

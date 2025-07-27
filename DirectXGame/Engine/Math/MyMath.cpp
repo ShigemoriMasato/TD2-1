@@ -687,7 +687,7 @@ Matrix3x3 Matrix::Inverse(const Matrix3x3& mat) {
 }
 
 Matrix3x3 Matrix::MakeIdentity3x3() {
-	return Matrix3x3{ 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+	return { 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 }
 
 Matrix3x3 Matrix::MakeTranslationMatrix(const Vector2& translation) {
@@ -714,10 +714,8 @@ Matrix3x3 Matrix::MakeScaleMatrix(const Vector2& scale) {
 	};
 }
 
-Matrix3x3 Matrix::MakeAffineMatrix(const Vector2& translation, float angle, const Vector2& scale) {
-	return MakeTranslationMatrix(translation) *
-		MakeRotationMatrix(angle) *
-		MakeScaleMatrix(scale);
+Matrix3x3 Matrix::MakeAffineMatrix(const Vector2& scale, const float angle, const Vector2 translation) {
+	return MakeScaleMatrix(scale) * MakeRotationMatrix(angle) * MakeTranslationMatrix(translation);
 }
 
 Matrix4x4 Matrix::Inverse(const Matrix4x4& mat) {

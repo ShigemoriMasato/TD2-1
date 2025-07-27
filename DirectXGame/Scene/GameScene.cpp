@@ -6,22 +6,28 @@
 using namespace Matrix;
 
 GameScene::GameScene(std::shared_ptr<CommonData> commonData) : Scene(commonData),
-camera_(new Camera()),
-debugCamera_(new DebugCamera()) {
+persCamera_(new Camera()),
+debugCamera_(new DebugCamera()),
+orthoCamera_(new Camera()) {
 	isDebugCamera = true;
 
 	gridMaker_ = std::make_unique<GridMaker>(debugCamera_, true);
 }
 
 GameScene::~GameScene() {
-	delete camera_;
+	delete persCamera_;
 	delete debugCamera_;
+	delete orthoCamera_;
 }
 
 void GameScene::Initialize() {
 	gridMaker_->Initialize();
 	debugCamera_->Initialize();
-	camera_->SetProjectionMatrix(PerspectiveFovDesc());
+
+	persCamera_->SetProjectionMatrix(PerspectiveFovDesc());
+
+	orthoCamera_->SetProjectionMatrix(OrthographicDesc());
+	orthoCamera_->MakeMatrix();
 
 	for (int i = 0; i < int(ModelType::ModelCount); ++i) {
 		Vector3 offset = { -2.5f, 1.5f, 0.0f };
@@ -40,14 +46,12 @@ std::unique_ptr<Scene> GameScene::Update() {
 		Initialize();
 	}
 
-	ImGui::Begin("Camera");
-	ImGui::Checkbox("Debug Camera", &isDebugCamera);
-	ImGui::End();
-
 	if (isDebugCamera) {
 		debugCamera_->Update();
-		*camera_ = *debugCamera_;
+		*persCamera_ = *debugCamera_;
 	}
+
+#pragma region Directional Light
 
 	ImGui::Begin("DLightData");
 	ImGui::ColorEdit4("Color", &dLight_.color.x);
@@ -63,10 +67,44 @@ std::unique_ptr<Scene> GameScene::Update() {
 	if (ImGui::Button("HalfLambert")) {
 		material_.enableLighting = 2;
 	}
-
 	ImGui::End();
 
 	dLight_.direction = dLight_.direction.Normalize();
+
+#pragma endregion
+
+#pragma region UVTransform
+
+	ImGui::Begin("UVTransform");
+	ImGui::DragFloat2("UVPos", &uvPos_.x, 1.0f);
+	ImGui::DragFloat2("UVScale", &uvScale_.x, 0.01f, 0.01f, 10.0f);
+	ImGui::DragFloat("UVRotate", &uvRotate_, 0.01f, -3.14f, 3.14f);
+	ImGui::End();
+
+	//spriteMaterial_.uvTransform = MakeAffineMatrix(uvScale_, uvRotate_, uvPos_);
+
+#pragma endregion
+
+#pragma region XBoxController
+
+	ImGui::Begin("XBoxController");
+
+	Vector2 rightStick = Input::GetXBoxStickState(0);
+	Vector2 leftStick = Input::GetXBoxStickState(1);
+	ImGui::Text("LeftStick: (%.2f, %.2f)", leftStick.x, leftStick.y);
+	ImGui::Text("RightStick: (%.2f, %.2f)", rightStick.x, rightStick.y);
+
+	ImGui::Text("A:%d, B:%d, X:%d, Y:%d", 
+		Input::GetXBoxButtonState(XBoxController::kA), Input::GetXBoxButtonState(XBoxController::kB),
+		Input::GetXBoxButtonState(XBoxController::kX), Input::GetXBoxButtonState(XBoxController::kY));
+
+	ImGui::Text("Up:%d, Down:%d, Left:%d, Right:%d",
+		Input::GetXBoxButtonState(XBoxController::kUp), Input::GetXBoxButtonState(XBoxController::kDown),
+		Input::GetXBoxButtonState(XBoxController::kLeft), Input::GetXBoxButtonState(XBoxController::kRight));
+
+	ImGui::End();
+
+#pragma endregion
 
 	gridMaker_->Update();
 
@@ -77,6 +115,15 @@ void GameScene::Draw() const {
 	gridMaker_->Draw();
 
 	for (int i = 0; i < int(ModelType::ModelCount); ++i) {
-		Render::DrawModel(commonData_->modelHandle_[i], MakeTranslationMatrix(modelPositions_[i]), camera_, material_, dLight_);
+		Render::DrawModel(commonData_->modelHandle_[i], MakeTranslationMatrix(modelPositions_[i]), persCamera_, material_, dLight_);
 	}
+
+	Render::DrawSprite(
+		{ 0.0f, 0.0f, 0.0f, 1.0f },
+		{ 128.0f, 0.0f, 0.0f, 1.0f },
+		{ 0.0f, 128.0f, 0.0f, 1.0f },
+		{ 128.0f, 128.0f, 0.0f, 1.0f },
+		MakeIdentity4x4(), orthoCamera_, spriteMaterial_, {}, UVCHECKER);
+
+	Render::DrawSphere(2.0f, MakeTranslationMatrix({ 2.5f, 7.5f, 0.0f }), persCamera_, material_, dLight_, UVCHECKER);
 }

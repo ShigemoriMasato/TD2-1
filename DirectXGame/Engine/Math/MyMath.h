@@ -97,7 +97,9 @@ namespace Matrix {
 	Matrix3x3 MakeTranslationMatrix(const Vector2& pos);
 	Matrix3x3 MakeRotationMatrix(float angle);
 	Matrix3x3 MakeScaleMatrix(const Vector2& scale);
-	Matrix3x3 MakeAffineMatrix(const Vector2& pos, float angle, const Vector2& scale);
+	Matrix3x3 MakeAffineMatrix(const Vector2& scale, const float angle, const Vector2 translation);
+
+	Matrix4x4 
 
 	Matrix3x3 MakeIdentity3x3();
 	Matrix4x4 MakeIdentity4x4();

@@ -6,6 +6,26 @@
 
 #include "../Math/MyMath.h"
 
+enum class XBoxController {
+	kUnknown = -1,
+	kA,
+	kB,
+	kX,
+	kY,
+	kUp,
+	kDown,
+	kLeft,
+	kRight,
+	kSelect,
+	kStart,
+	kRightShoulder,
+	kRightTrigger,
+	kLeftShoulder,
+	kLeftTrigger,
+
+	kButtomCount
+};
+
 class Input {
 public:
 	Input(HINSTANCE hInstance, HWND hwnd) : hInstance_(hInstance), hwnd_(hwnd) {}
@@ -35,13 +55,22 @@ public:
 
 	static BYTE* GetPreMouseButtonState();
 
+	static bool* GetXBoxButtonState();
+
+	static bool GetXBoxButtonState(XBoxController button);
+
+	/// <param name="type">0:右スティック	1:左スティック</param>
+	static Vector2 GetXBoxStickState(int type);
+
 private:
 
 	Microsoft::WRL::ComPtr<IDirectInput8> directInput_ = nullptr;
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard_ = nullptr;
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse_ = nullptr;
 	
-	XINPUT_STATE state_{};
+	XINPUT_STATE xBoxState_{};
+	static bool xBoxButtonFlug_[int(XBoxController::kButtomCount)];
+	static Vector2 xBoxStickState_[2]; //0:右スティック 1:左スティック
 
 	//どこからでもGetできるようにstaticにする
 	static BYTE keyState[256];

@@ -15,16 +15,22 @@ public:
 
 private:
 
-	Camera* camera_;
+	Camera* persCamera_;
 	DebugCamera* debugCamera_;
+	Camera* orthoCamera_;
 
 	bool isDebugCamera = false;
 
 	std::array<Vector3, size_t(ModelType::ModelCount)> modelPositions_ = {};
+	std::unordered_map<ModelType, int> modelHandle;
+
+	Vector2 uvPos_{};
+	Vector2 uvScale_{1.0f, 1.0f};
+	float uvRotate_ = 0.0f;
+
+	MaterialData spriteMaterial_{};
 
 	std::unique_ptr<GridMaker> gridMaker_;
-
-	std::unordered_map<ModelType, int> modelHandle;
 
 	MaterialData material_{};
 	DirectionalLightData dLight_{};

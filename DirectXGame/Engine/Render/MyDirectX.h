@@ -169,7 +169,7 @@ private:
 
 	//Model管理用
 	std::vector<ModelData> modelList_;
-	uint32_t modelCount_ = -1; //モデルの数
+	uint32_t modelIndex_ = -1; //モデルの数
 
 	//画像の関数
 	std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> textureSrvHandleGPU;

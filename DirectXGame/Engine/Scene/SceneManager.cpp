@@ -45,6 +45,7 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓描画したい量(Modelはロードした時点で一つ自動で作られてるヨ!!)↓↓↓↓↓↓↓↓↓↓↓↓↓
 	myDirectX_->CreateDrawResource(MyDirectX::kSprite, 100);
 	myDirectX_->CreateDrawResource(MyDirectX::kLine, 1000);
+	myDirectX_->CreateDrawResource(MyDirectX::kSphere, 1);
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑描画したい量↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//最初のシーンを挿入
