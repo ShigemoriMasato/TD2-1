@@ -4,42 +4,62 @@
 #include <vector>
 #include "Vector.h"
 
+template<typename T>
 class Value {
 public:
-	Value(std::string naming) : name(naming) {};
+	Value(T value, std::string name = "default") : name(name), value(value) {};
 	virtual ~Value() = default;
-	std::string name;
-private:
+
+	operator T() const {
+		return value;
+	}
+	void operator=(const T& newValue) {
+		value = newValue;
+	}
+
+	std::string name;		//変数名
+	T value;				//値
 };
 
-class IntValue final : public Value {
-public:
-	IntValue(std::string name, int value) : Value(name), value(value) {}
-	int value = 0;
-};
-
-class FloatValue final : public Value {
-public:
-	FloatValue(std::string name, float value) : Value(name), value(value) {}
-	float value = 0.0f;
-};
-
-class Vec2Value final : public Value {
-public:
-	Vec2Value(std::string name, Vector2 value) : Value(name), value(value) {}
-	Vector2 value{};
-};
-
-class Vec3Value final : public Value {
-public:
-	Vec3Value(std::string name, Vector3 value) : Value(name), value(value) {}
-	Vector3 value{};
-};
-
-class Vec4Value final : public Value {
-public:
-	Vec4Value(std::string name, Vector4 value) : Value(name), value(value) {}
-	Vector4 value{};
-};
-
-std::shared_ptr<Value> MakeValue(std::string argName, std::vector<float> values);
+template<typename T>
+T operator+(const Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator-(const Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator*(const Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator/(const Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator+=(Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator-=(Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator*=(Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator/=(Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator==(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator!=(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator<(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator>(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator<=(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator>=(const Value<T>& a, const Value<T>& b);
+template<typename T>
+Value<T> operator++(Value<T>& a);
+template<typename T>
+Value<T> operator--(Value<T>& a);
+template<typename T>
+bool operator!(Value<T>& a);
+template<typename T>
+bool operator&&(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator||(const Value<T>& a, const Value<T>& b);
+template<typename T>
+Value<T> operator<<(const Value<T>& a, int shift);
+template<typename T>
+Value<T> operator>>(const Value<T>& a, int shift);
