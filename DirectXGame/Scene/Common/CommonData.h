@@ -12,9 +12,7 @@ enum class ModelType {
 };
 
 enum class TextureType {
-	block,
-	AttackEffect,
-	HitEffect,
+	SRT,
 
 	TextureCount
 };

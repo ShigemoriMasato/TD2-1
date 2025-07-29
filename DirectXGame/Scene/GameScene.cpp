@@ -126,6 +126,16 @@ std::unique_ptr<Scene> GameScene::Update() {
 
 #pragma endregion
 
+#pragma region SRT
+
+	ImGui::Begin("SRT");
+	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f, 0.01f, 10.0f);
+	ImGui::DragFloat3("Rotation", &transform_.rotation.x, 0.01f, -3.14f, 3.14f);
+	ImGui::DragFloat3("Position", &transform_.position.x, 0.01f);
+	ImGui::End();
+
+#pragma endregion
+
 	gridMaker_->Update();
 
 	return nullptr;
@@ -144,6 +154,8 @@ void GameScene::Draw() const {
 		{ 0.0f, 128.0f, 0.0f, 1.0f },
 		{ 128.0f, 128.0f, 0.0f, 1.0f },
 		MakeIdentity4x4(), orthoCamera_, spriteMaterial_, {}, UVCHECKER);
+
+	Render::DrawSprite(MakeAffineMatrix(transform_), persCamera_, material_, dLight_, commonData_->textureHandle_[int(TextureType::SRT)]);
 
 	Render::DrawSphere(2.0f, MakeTranslationMatrix({ 2.5f, 7.5f, 0.0f }), persCamera_, material_, dLight_, UVCHECKER);
 }

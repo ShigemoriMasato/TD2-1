@@ -32,6 +32,8 @@ private:
 
 	std::unique_ptr<GridMaker> gridMaker_;
 
+	Transform transform_{};
+
 	MaterialData material_{};
 	DirectionalLightData dLight_{};
 
