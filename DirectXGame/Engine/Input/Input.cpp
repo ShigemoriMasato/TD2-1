@@ -6,11 +6,15 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "xinput.lib")
 
+using XC = XBoxController;
+
 DIMOUSESTATE Input::mouseState = {};
 DIMOUSESTATE Input::preMouseState = {};
 BYTE Input::keyState[256] = {};
 BYTE Input::preKeyState[256] = {};
 bool Input::isInitialized_ = false;
+bool Input::xBoxButtonFlug_[int(XBoxController::kButtomCount)];
+Vector2 Input::xBoxStickState_[2];
 
 void Input::Initialize() {
 	if (isInitialized_) {
@@ -46,8 +50,6 @@ void Input::Initialize() {
 	assert(SUCCEEDED(hr));
 
 	isInitialized_ = true;
-
-	ZeroMemory(&state_, sizeof(XINPUT_STATE));
 }
 
 void Input::Update() {
@@ -63,24 +65,38 @@ void Input::Update() {
 
 	mouse_->GetDeviceState(sizeof(DIMOUSESTATE), &mouseState);
 
-	DWORD dwResult = XInputGetState(0, &state_); // 0はコントローラー番号（最大4台）
+	DWORD dwResult = XInputGetState(0, &xBoxState_); // 0はコントローラー番号（最大4台）
 
 	if (dwResult == ERROR_SUCCESS) {
 		// コントローラーが接続されている
-		SHORT lx = state_.Gamepad.sThumbLX; // 左スティックX軸
-		SHORT ly = state_.Gamepad.sThumbLY; // 左スティックY軸
-		BYTE lt = state_.Gamepad.bLeftTrigger; // 左トリガー
-		BYTE rt = state_.Gamepad.bRightTrigger; // 右トリガー
+		SHORT lx = xBoxState_.Gamepad.sThumbLX; // 左スティックX軸
+		SHORT ly = xBoxState_.Gamepad.sThumbLY; // 左スティックY軸
+		xBoxButtonFlug_[int(XC::kLeftTrigger)] = xBoxState_.Gamepad.bLeftTrigger; // 左トリガー
+		xBoxButtonFlug_[int(XC::kRightTrigger)] = xBoxState_.Gamepad.bRightTrigger; // 右トリガー
 
-		bool isAPressed = (state_.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0;
+		for (int i = 0; i < 4; ++i) {
+			//ABYXのボタン状態の取得
+			xBoxButtonFlug_[i] = (xBoxState_.Gamepad.wButtons & (0x1000 << i)) != 0;
+
+			//↑↓←→の方向キー状態の取得
+			xBoxButtonFlug_[int(XC::kUp) + i] = (xBoxState_.Gamepad.wButtons & (0x0001 << i)) != 0;
+		}
+
+		xBoxButtonFlug_[int(XC::kStart)] = (xBoxState_.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0;
+		xBoxButtonFlug_[int(XC::kSelect)] = (xBoxState_.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) != 0;
 	}
 
-	XINPUT_VIBRATION vibration;
-	ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
-	vibration.wLeftMotorSpeed = 0;  // 左モーター
-	vibration.wRightMotorSpeed = 0; // 右モーター
+	xBoxStickState_[0].x = float(xBoxState_.Gamepad.sThumbRX) / 32767.0f; // 右スティックX軸の正規化
+	xBoxStickState_[0].y = float(xBoxState_.Gamepad.sThumbRY) / 32767.0f; // 右スティックX軸の正規化
+	xBoxStickState_[1].x = float(xBoxState_.Gamepad.sThumbLX) / 32767.0f; // 左スティックX軸の正規化
+	xBoxStickState_[1].y = float(xBoxState_.Gamepad.sThumbLY) / 32767.0f; // 左スティックX軸の正規化
 
-	XInputSetState(0, &vibration);
+	//XINPUT_VIBRATION vibration;
+	//ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
+	//vibration.wLeftMotorSpeed = 0;  // 左モーター
+	//vibration.wRightMotorSpeed = 0; // 右モーター
+
+	//XInputSetState(0, &vibration);
 }
 
 BYTE* Input::GetKeyState() {
@@ -143,4 +159,16 @@ BYTE* Input::GetPreMouseButtonState() {
 		return nullptr;
 	}
 	return reinterpret_cast<BYTE*>(&preMouseState);
+}
+
+bool* Input::GetXBoxButtonState() {
+	return xBoxButtonFlug_;
+}
+
+bool Input::GetXBoxButtonState(XBoxController button) {
+	return xBoxButtonFlug_[int(button)];
+}
+
+Vector2 Input::GetXBoxStickState(int type) {
+	return xBoxStickState_[type];
 }

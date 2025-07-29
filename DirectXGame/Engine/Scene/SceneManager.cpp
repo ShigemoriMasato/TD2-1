@@ -30,7 +30,7 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 
 	commonData_->textureHandle_.resize(int(TextureType::TextureCount));
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい画像↓↓↓↓↓↓↓↓↓↓↓↓↓
-
+	commonData_->textureHandle_[int(TextureType::Reticle)] = myDirectX_->LoadTexture("Resources/reticle.png");
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい画像↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	commonData_->modelHandle_.resize(int(ModelType::ModelCount));
