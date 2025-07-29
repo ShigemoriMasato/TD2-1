@@ -2,6 +2,7 @@
 #include "../Engine/Input/Input.h"
 #include "../externals/imgui/imgui.h"
 #include "../Engine/Math/MyMath.h"
+#include "../Engine/Sound/Sound.h"
 
 using namespace Matrix;
 
@@ -76,12 +77,31 @@ std::unique_ptr<Scene> GameScene::Update() {
 #pragma region UVTransform
 
 	ImGui::Begin("UVTransform");
-	ImGui::DragFloat2("UVPos", &uvPos_.x, 1.0f);
+	ImGui::DragFloat2("UVPos", &uvPos_.x, 0.01f);
 	ImGui::DragFloat2("UVScale", &uvScale_.x, 0.01f, 0.01f, 10.0f);
 	ImGui::DragFloat("UVRotate", &uvRotate_, 0.01f, -3.14f, 3.14f);
 	ImGui::End();
 
-	//spriteMaterial_.uvTransform = MakeAffineMatrix(uvScale_, uvRotate_, uvPos_);
+	Transform uvTransform{};
+	uvTransform.position = { uvPos_.x, uvPos_.y, 0.0f };
+	uvTransform.scale = { uvScale_.x, uvScale_.y, 1.0f };
+	uvTransform.rotation.z = uvRotate_;
+
+	spriteMaterial_.uvTransform = MakeAffineMatrix(uvTransform);
+
+#pragma endregion
+
+#pragma region Sound
+
+	ImGui::Begin("Sound");
+	if (ImGui::Button("Play")) {
+		Sound::bgm[0] = true;
+	}
+	if (ImGui::Button("Stop")) {
+		Sound::bgm[0] = false;
+	}
+	ImGui::Text("Press Play to Repeat Playback");
+	ImGui::End();
 
 #pragma endregion
 

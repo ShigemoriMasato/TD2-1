@@ -718,6 +718,37 @@ Matrix3x3 Matrix::MakeAffineMatrix(const Vector2& scale, const float angle, cons
 	return MakeScaleMatrix(scale) * MakeRotationMatrix(angle) * MakeTranslationMatrix(translation);
 }
 
+Matrix3x3 Matrix::TransMatrix(const Matrix3x3& m) {
+	Matrix3x3 ans{};
+	for(int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			ans.m[j][i] = m.m[i][j];
+		}
+	}
+	return ans;
+}
+
+Matrix4x4 Matrix::TransMatrix(const Matrix4x4& m) {
+	Matrix4x4 ans{};
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			ans.m[j][i] = m.m[i][j];
+		}
+	}
+	return ans;
+}
+
+Matrix4x4 Matrix::AdjustUVMatrix(Matrix3x3 m) {
+	Matrix4x4 ans = {
+		m.m[0][0], m.m[0][1], 0.0f, 0.0f,
+		m.m[1][0], m.m[1][1], 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		m.m[2][0], m.m[2][1], 0.0f, 1.0f
+	};
+
+	return TransMatrix(ans);
+}
+
 Matrix4x4 Matrix::Inverse(const Matrix4x4& mat) {
 	float d = mat.m[0][0] * mat.m[1][1] * mat.m[2][2] * mat.m[3][3]
 		+ mat.m[0][0] * mat.m[1][2] * mat.m[2][3] * mat.m[3][1]

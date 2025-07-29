@@ -99,7 +99,10 @@ namespace Matrix {
 	Matrix3x3 MakeScaleMatrix(const Vector2& scale);
 	Matrix3x3 MakeAffineMatrix(const Vector2& scale, const float angle, const Vector2 translation);
 
-	Matrix4x4 
+	Matrix3x3 TransMatrix(const Matrix3x3& m);
+	Matrix4x4 TransMatrix(const Matrix4x4& m);
+
+	Matrix4x4 AdjustUVMatrix(Matrix3x3 m);
 
 	Matrix3x3 MakeIdentity3x3();
 	Matrix4x4 MakeIdentity4x4();

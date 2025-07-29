@@ -25,13 +25,13 @@ void DebugCamera::Update() {
 	//球面座標系
 	//===================
 	Vector2 mouseMove{};
-	if (Input::GetMouseButtonState()[1]) {
+	if (Input::GetMouseButtonState()[1] || Input::GetMouseButtonState()[2]) {
 		mouseMove = Input::GetMouseMove();
 		mouseMove.y *= -1.0f; // Y軸を反転
 	}
 	float mouseWheel = -Input::GetMouseWheel();
 
-	if (Input::GetKeyState(DIK_LSHIFT)) {
+	if (Input::GetMouseButtonState()[2] || Input::GetKeyState(DIK_LSHIFT)) {
 		float speed = spherical_.x * 0.05f;
 		center_ += Vector3(mouseMove.x * speed_, mouseMove.y * speed_, mouseWheel * 0.05f) * speed * MakeRotationMatrix(transform_.rotation);
 	} else {
@@ -50,7 +50,7 @@ void DebugCamera::Update() {
 
 	// Actual camera position in world space
 	Vector3 actualCameraPosition = center_ + transform_.position;
-	
+
 	//===================
 	//座標の適用
 	//===================
