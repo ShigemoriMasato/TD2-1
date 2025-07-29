@@ -1,14 +1,16 @@
 #include "Player.h"
 #include "Engine/Input/Input.h"
 #include "externals/imgui/imgui.h"
+#include "Engine/Render/Render.h"
 #include <algorithm>
 #include <numbers>
 
-Player::Player(Camera* camera, Camera* parent, int modelHandle, int bullethandle) : Object(camera, ShapeType::Model),
+Player::Player(Camera* camera, Camera* parent, CommonData* cd) : Object(camera, ShapeType::Model),
 playerTransform_(std::make_shared<Transform>()),
 parentCamera_(parent) {
-	handle_ = modelHandle;
-	bulletModelHandle_ = bullethandle;
+	handle_ = cd->modelHandle_[int(ModelType::Player)];
+	bulletModelHandle_ = cd->modelHandle_[int(ModelType::Bullet)];
+	reticleHandle_ = cd->textureHandle_[int(TextureType::Reticle)];
 	playerTransform_->rotation.y = std::numbers::pi_v<float>;
 	tag = "Player";
 }
@@ -88,6 +90,15 @@ void Player::Update() {
 	ImGui::End();
 
 	transform_->position = pos;
+
+	ImGuiIO& io = ImGui::GetIO();
+	Vector2 mousePos = { io.MousePos.x, io.MousePos.y };
+	reticleTransform_.position = { mousePos.x / 1280.0f + 0.5f, mousePos.y / 720.0f + 0.5f, 5.0f };
+
+
+	ImGui::Begin("WorldPlayer");
+	ImGui::Text("Reticle Position: (%.2f, %.2f, %.2f)", reticleTransform_.position.x, reticleTransform_.position.y, reticleTransform_.position.z);
+	ImGui::End();
 }
 
 void Player::Draw(const Matrix4x4* worldMatrix) const {
@@ -96,4 +107,6 @@ void Player::Draw(const Matrix4x4* worldMatrix) const {
 	for (const auto& bullet : bullets_) {
 		bullet->Draw();
 	}
+
+	Render::DrawSprite(MakeAffineMatrix(reticleTransform_) * screenTransform_, camera_, {}, {}, reticleHandle_);
 }

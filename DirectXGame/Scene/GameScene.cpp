@@ -10,8 +10,7 @@ camera_(new Camera()),
 debugCamera_(new DebugCamera()),
 collisionManager_(std::make_unique<CollisionManager>()) {
 	railCameraController_ = std::make_unique<RailCameraController>();
-	player_ = std::make_shared<Player>(camera_, railCameraController_->GetCameraPtr(),
-		commonData->modelHandle_[int(ModelType::Player)], commonData_->modelHandle_[int(ModelType::Bullet)]);
+	player_ = std::make_shared<Player>(camera_, railCameraController_->GetCameraPtr(), commonData.get());
 	enemies_ = std::make_unique<EnemyManager>(camera_, player_.get(), *commonData_);
 	isDebugCamera = true;
 }

@@ -1,13 +1,14 @@
 #pragma once
 #include "Object/Object.h"
 #include "PlayerBullet.h"
+#include "Scene/Common/CommonData.h"
 #include <vector>
 #include <memory>
 
 class Player : public Object {
 public:
 
-	Player(Camera* camera, Camera* parent, int modelhandle, int bullethandle);
+	Player(Camera* camera, Camera* parent, CommonData* cd);
 	~Player() = default;
 
 	void Initialize() override;
@@ -32,6 +33,9 @@ private:
 	const int maxCooltime_ = 5;
 	int bulletModelHandle_ = 0;
 	std::vector<std::shared_ptr<PlayerBullet>> bullets_;
+
+	int reticleHandle_ = 0;
+	Transform reticleTransform_{};
 
 	std::shared_ptr<Transform> playerTransform_ = nullptr;
 
