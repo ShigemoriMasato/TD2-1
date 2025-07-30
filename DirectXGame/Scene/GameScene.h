@@ -2,6 +2,7 @@
 #include "Common/Scene.h"
 #include "Common/CommonData.h"
 #include "../Engine/Camera/DebugCamera.h"
+#include "../BluePrint/Struct.h"
 
 class GameScene : public Scene {
 public:
@@ -19,4 +20,16 @@ private:
 
 	bool isDebugCamera = false;
 
+	std::vector<ValueBase*> values_{};
+
+	int typeIndex{};
+
+	int intbuffer{};
+	float floatbuffer{};
+	Vector2 vector2buffer{};
+	Vector3 vector3buffer{};
+	char valueNamebuffer[256]{};
+	char structNamebuffer[256]{};
+
+	std::vector<Struct> structs_;
 };

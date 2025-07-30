@@ -1,13 +1,11 @@
 #pragma once
 #include <Data/Value.h>
 
-template <typename T>
 class Struct {
 public:
-	Struct(std::string name, std::vector<Value<T>> members)
-		: name(std::move(name)), members(std::move(members)) {}
+	Struct(std::string name, std::vector<ValueBase*> members)
+		: name(std::move(name)), members(members) {}
 
-private:
-	std::string name;										// 構造体の名前
-
+	std::string name;
+	std::vector<ValueBase*> members;
 };

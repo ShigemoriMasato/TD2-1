@@ -58,6 +58,9 @@
     <Filter Include="MyEngine\Logger">
       <UniqueIdentifier>{87707572-8692-443e-a2ec-223c7eb23df9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BluePrint">
+      <UniqueIdentifier>{543457e8-9d14-457c-8a45-d9c5b103e9c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -242,11 +245,11 @@
     <ClInclude Include="Engine\Data\Value.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="BluePrint\Function.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="BluePrint\Struct.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>BluePrint</Filter>
+    </ClInclude>
+    <ClInclude Include="BluePrint\Function.h">
+      <Filter>BluePrint</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
