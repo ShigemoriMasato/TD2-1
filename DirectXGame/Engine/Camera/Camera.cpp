@@ -45,7 +45,7 @@ void Camera::MakeMatrix() {
 	if (!isSetMatrix) {
 		transformMatrix_ = MakeTranslationMatrix(-transform_->position) * MakeRotationMatrix(transform_->rotation) * MakeScaleMatrix(transform_->scale);
 	}
-	vpMatrix = transformMatrix_ * projectionMatrix;
+	vpMatrix = transformMatrix_ * MakeAffineMatrix(*localTransform_) * projectionMatrix;
 }
 
 void Camera::SetTransform(Transform* transform) {
@@ -56,6 +56,10 @@ void Camera::SetTransform(Transform* transform) {
 void Camera::SetTransform(Matrix4x4 mat) {
 	transformMatrix_ = mat;
 	isSetMatrix = true;
+}
+
+void Camera::SetLocalTransform(Transform* transform) {
+	localTransform_ = transform;
 }
 
 Matrix4x4 Camera::VPMatrix() const {

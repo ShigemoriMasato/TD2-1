@@ -1567,10 +1567,11 @@ void MyDirectX::PostDraw() {
 
     //offscreenの描画
     DrawSprite({ -1.0f, 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f }, { -1.0f, -1.0f, 0.0f, 1.0f }, { 1.0f, -1.0f, 0.0f, 1.0f },
-        Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 2, true);
+        Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 0, true);
+    ImGui::EndFrame();
 
-    ImGui::Render();
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+    //ImGui::Render();
+    //ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
 
     InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_PRESENT, swapChainResources[backBufferIndex].Get());
 

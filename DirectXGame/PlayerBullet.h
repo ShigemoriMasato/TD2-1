@@ -4,7 +4,7 @@
 class PlayerBullet : public Object {
 public:
 
-	PlayerBullet(Camera* camera, Vector3 pos, Vector3 rotate, int handle);
+	PlayerBullet(Camera* camera, Vector3 pos, Vector3 target, int handle);
 	~PlayerBullet() = default;
 	void Initialize() override;
 	void Update() override;

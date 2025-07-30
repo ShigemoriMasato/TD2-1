@@ -3,12 +3,12 @@
 
 using namespace Matrix;
 
-PlayerBullet::PlayerBullet(Camera* camera, Vector3 pos, Vector3 rotate, int handle) : Object(camera, ShapeType::Model) {
+PlayerBullet::PlayerBullet(Camera* camera, Vector3 pos, Vector3 target, int handle) : Object(camera, ShapeType::Model) {
 	handle_ = handle;
 	transform_->position = pos;
 	
 	velocity_ = {};
-	direction_ = Vector3(0.0f, 0.0f, 1.0f) * MakeRotationMatrix(rotate);
+	direction_ = (target - pos).Normalize();
 	tag = "Player";
 	color = 0x888800ff;
 }

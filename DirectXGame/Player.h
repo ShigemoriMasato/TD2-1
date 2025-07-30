@@ -36,6 +36,12 @@ private:
 
 	int reticleHandle_ = 0;
 	Transform reticleTransform_{};
+	Matrix4x4 reticleWorldMatrix_{};
+	float reticleMoveAdjustment_ = 1.25f;
+	float reticleSpeed_ = 0.2f;
+	bool isXBoxController_ = false;
+
+	Transform fpsCameraTransform_;
 
 	std::shared_ptr<Transform> playerTransform_ = nullptr;
 

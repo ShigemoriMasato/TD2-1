@@ -71,9 +71,12 @@ void Enemy::Update() {
 	ExecuteQueue();
 	timecall_->Update();
 	transform_->position += velocity_;
+
+	color = 0xffffffff;
 }
 
 void Enemy::OnCollision(Object* other) {
+	color = 0xff0000ff;
 }
 
 void Enemy::AddFireDesc(EnemyCommand& command) {

@@ -37,6 +37,8 @@ public:
 	void SetTransform(Transform* transform);
 	void SetTransform(Matrix4x4 mat);
 
+	void SetLocalTransform(Transform* transform);
+
 	Matrix4x4 VPMatrix() const;
 
 	virtual Vector3 GetPosition() const {
@@ -50,6 +52,7 @@ private:
 	Matrix4x4 vpMatrix = Matrix::MakeIdentity4x4();			//w抜きviewport変換行列
 
 	std::shared_ptr<Transform> transform_ = {};							//カメラ座標
+	Transform* localTransform_ = nullptr;	//ローカル座標変換用のTransform
 	Matrix4x4 transformMatrix_ = Matrix::MakeIdentity4x4();	//カメラ座標変換行列
 
 	bool isSetMatrix = false;
