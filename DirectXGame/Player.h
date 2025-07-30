@@ -4,6 +4,7 @@
 #include "Scene/Common/CommonData.h"
 #include <vector>
 #include <memory>
+#include <list>
 
 class Player : public Object {
 public:
@@ -21,10 +22,14 @@ public:
 	void Draw(const Matrix4x4* worldMatrix = nullptr) const override;
 
 	std::vector<std::shared_ptr<PlayerBullet>> GetBullets() { return bullets_; }
+	Vector3 GetDirection() const { return direction_; }
+
+	void SetBulletTargetPosition(const Vector3* position);
 
 private:
 
 	Vector3 velocity_{};
+	Vector3 direction_{};
 	const float speed_ = 0.01f;
 
 	Camera* parentCamera_ = nullptr;
@@ -39,11 +44,16 @@ private:
 	Matrix4x4 reticleWorldMatrix_{};
 	float reticleMoveAdjustment_ = 1.25f;
 	float reticleSpeed_ = 0.2f;
+	int reticleIndex_ = 0;
 	bool isXBoxController_ = false;
+
+	bool isStalking_ = true;
 
 	Transform fpsCameraTransform_;
 
 	std::shared_ptr<Transform> playerTransform_ = nullptr;
 
 	Matrix4x4 screenTransform_{};
+
+	std::list<Vector3*> bulletTargetPositions_;
 };

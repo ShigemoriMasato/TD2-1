@@ -45,7 +45,11 @@ void Camera::MakeMatrix() {
 	if (!isSetMatrix) {
 		transformMatrix_ = MakeTranslationMatrix(-transform_->position) * MakeRotationMatrix(transform_->rotation) * MakeScaleMatrix(transform_->scale);
 	}
-	vpMatrix = transformMatrix_ * MakeAffineMatrix(*localTransform_) * projectionMatrix;
+	if (localTransform_) {
+		vpMatrix = transformMatrix_ * MakeAffineMatrix(*localTransform_) * projectionMatrix;
+	} else {
+		vpMatrix = transformMatrix_ * projectionMatrix;
+	}
 }
 
 void Camera::SetTransform(Transform* transform) {

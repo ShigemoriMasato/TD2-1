@@ -28,7 +28,8 @@ public:
 	void Update();
 	void Draw();
 
-	std::list<Object*> GetEnemiesCollition();
+	std::list<Object*> GetEnemiesAndBulletCollition();
+	std::list<Enemy*> GetEnemiesCollition();
 
 private:
 

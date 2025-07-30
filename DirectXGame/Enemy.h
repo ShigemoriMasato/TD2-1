@@ -48,6 +48,7 @@ public:
 	void OnCollision(Object* object) override;
 
 	bool GetIsAlive() const { return isActive_; }
+	Vector3* GetPositionPtr() { return &transform_->position; }
 
 	void SetVeloity(const Vector3& v) { velocity_ = v; }
 

@@ -42,6 +42,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerBullet.cpp" />
     <ClCompile Include="RailCameraController.cpp" />
+    <ClCompile Include="Reticle.cpp" />
     <ClCompile Include="Scene\Common\CommonData.cpp" />
     <ClCompile Include="Scene\Common\Scene.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
@@ -85,6 +86,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerBullet.h" />
     <ClInclude Include="RailCameraController.h" />
+    <ClInclude Include="Reticle.h" />
     <ClInclude Include="Scene\Common\CommonData.h" />
     <ClInclude Include="Scene\Common\Scene.h" />
     <ClInclude Include="Scene\GameScene.h" />

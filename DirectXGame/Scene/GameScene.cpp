@@ -11,6 +11,7 @@ debugCamera_(new DebugCamera()),
 collisionManager_(std::make_unique<CollisionManager>()) {
 	railCameraController_ = std::make_unique<RailCameraController>();
 	player_ = std::make_shared<Player>(camera_, railCameraController_->GetCameraPtr(), commonData.get());
+	reticle_ = std::make_unique<Reticle>(player_.get());
 	enemies_ = std::make_unique<EnemyManager>(camera_, player_.get(), *commonData_);
 	isDebugCamera = false;
 }
@@ -47,6 +48,8 @@ std::unique_ptr<Scene> GameScene::Update() {
 		*camera_ = *debugCamera_;
 	}
 
+	reticle_->GetTarget(enemies_->GetEnemiesCollition());
+
 	player_->Update();
 
 	enemies_->Update();
@@ -73,7 +76,7 @@ void GameScene::AllCollisionCheck() {
 		collisionManager_->AddObject(b.get());
 	}
 
-	std::list<Object*> enemies = enemies_->GetEnemiesCollition();
+	std::list<Object*> enemies = enemies_->GetEnemiesAndBulletCollition();
 
 	for (const auto& e : enemies) {
 		collisionManager_->AddObject(e);

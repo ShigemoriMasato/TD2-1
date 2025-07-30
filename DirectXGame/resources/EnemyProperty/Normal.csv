@@ -1,4 +1,8 @@
 Func,
-Pop,kind=Normal,position=0.0 0.0 20.0
-Wait,time=120
+Pop,kind=Normal,position=0.0 0.0 50.0
+Wait,time=30
+Pop,kind=Normal,position=5.0 0.0 50.0
+Wait,time=30
+Pop,kind=Normal,position=10.0 0.0 50.0
+Wait,time=180
 Return

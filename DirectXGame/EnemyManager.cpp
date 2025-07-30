@@ -75,7 +75,7 @@ void EnemyManager::Draw() {
 	}
 }
 
-std::list<Object*> EnemyManager::GetEnemiesCollition() {
+std::list<Object*> EnemyManager::GetEnemiesAndBulletCollition() {
 	std::list<Object*> data;
 
 	for (const auto& e : enemies_) {
@@ -88,6 +88,16 @@ std::list<Object*> EnemyManager::GetEnemiesCollition() {
 		data.push_back(b.get());
 	}
 
+	return data;
+}
+
+std::list<Enemy*> EnemyManager::GetEnemiesCollition() {
+	std::list<Enemy*> data;
+	for (const auto& e : enemies_) {
+		if (e->GetIsAlive()) {
+			data.push_back(e.get());
+		}
+	}
 	return data;
 }
 
