@@ -12,9 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CollisionManager.cpp" />
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="EnemyBullet.cpp" />
-    <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
     <ClCompile Include="Engine\Core\MyPSO.cpp" />
@@ -42,7 +39,6 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerBullet.cpp" />
     <ClCompile Include="RailCameraController.cpp" />
-    <ClCompile Include="Reticle.cpp" />
     <ClCompile Include="Scene\Common\CommonData.cpp" />
     <ClCompile Include="Scene\Common\Scene.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
@@ -52,9 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionManager.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="EnemyBullet.h" />
-    <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\Core\MyPSO.h" />
@@ -86,7 +79,6 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerBullet.h" />
     <ClInclude Include="RailCameraController.h" />
-    <ClInclude Include="Reticle.h" />
     <ClInclude Include="Scene\Common\CommonData.h" />
     <ClInclude Include="Scene\Common\Scene.h" />
     <ClInclude Include="Scene\GameScene.h" />

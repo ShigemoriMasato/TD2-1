@@ -3,10 +3,8 @@
 #include "Common/CommonData.h"
 #include "../Engine/Camera/DebugCamera.h"
 #include "../Player.h"
-#include "../EnemyManager.h"
 #include "../CollisionManager.h"
 #include "../RailCameraController.h"
-#include "../Reticle.h"
 
 class GameScene : public Scene {
 public:
@@ -30,7 +28,4 @@ private:
 	bool isDebugCamera = false;
 
 	std::shared_ptr<Player> player_ = nullptr;
-	std::unique_ptr<Reticle> reticle_ = nullptr;
-
-	std::unique_ptr<EnemyManager> enemies_ = nullptr;
 };

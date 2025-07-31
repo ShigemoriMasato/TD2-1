@@ -11,8 +11,6 @@ debugCamera_(new DebugCamera()),
 collisionManager_(std::make_unique<CollisionManager>()) {
 	railCameraController_ = std::make_unique<RailCameraController>();
 	player_ = std::make_shared<Player>(camera_, railCameraController_->GetCameraPtr(), commonData.get());
-	reticle_ = std::make_unique<Reticle>(player_.get());
-	enemies_ = std::make_unique<EnemyManager>(camera_, player_.get(), *commonData_);
 	isDebugCamera = false;
 }
 
@@ -52,8 +50,6 @@ std::unique_ptr<Scene> GameScene::Update() {
 
 	player_->Update();
 
-	enemies_->Update();
-
 	AllCollisionCheck();
 
 	return nullptr;
@@ -62,8 +58,6 @@ std::unique_ptr<Scene> GameScene::Update() {
 void GameScene::Draw() const {
 	player_->Draw();
 	
-	enemies_->Draw();
-
 	railCameraController_->Draw(camera_);
 
 	Render::DrawModel(commonData_->modelHandle_[int(ModelType::SkySphere)], MakeIdentity4x4(), camera_);
