@@ -160,7 +160,7 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Data\Value.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>MyEngine\Data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -279,7 +279,7 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Data\Value.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>MyEngine\Data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

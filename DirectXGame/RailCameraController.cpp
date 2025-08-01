@@ -12,21 +12,11 @@ camera_(std::make_shared<Camera>()) {
 }
 
 void RailCameraController::Initialize() {
+
+	//todo targetとlaptimeを外部から決められるようにする
 	transform_->position = { 0.0f, 0.0f, 0.0f };
 	transform_->rotation = { 0.0f, 0.0f, 0.0f };
 	camera_->SetProjectionMatrix(PerspectiveFovDesc());
-
-	 controllPoints_ = { {0.0f, 0.0f, -0.5f},
-		{ 0.0f, 0.0f, 0.0f },
-		{0.0f, 0.0f, 5.0f},
-		{5.0f, 0.0f, 5.0f},
-		{5.0f, 0.0f, 0.0f},
-		{ 5.0f, 0.0f, -5.0f },
-		{0.0f, 0.0f, -5.0f},
-		{0.0f, 0.0f, 0.0f},
-		{0.0f, 0.0f, 5.0f}
-	};
-	catmullPoints_ = GetCatmullPoints(controllPoints_, 50);
 }
 
 void RailCameraController::Update() {
@@ -36,10 +26,15 @@ void RailCameraController::Update() {
 	ImGui::End();
 
 	++lapTimer_;
-	lapTimer_ = int(MyMath::Repeat(float(lapTimer_), float(lapTime_)));
-	t = float(lapTimer_) / float(lapTime_);
-	transform_->position = GetCatmullPoint(controllPoints_, t);
-	transform_->position -= Vector3(0.0f, -2.0f, 0.0f);
+	
+	if (lapTimer_ > lapTime_) {
+		lapTimer_ = 0;
+		t = 0.0f;
+	}
+
+	t = static_cast<float>(lapTimer_) / lapTime_;
+
+	transform_->position = targetPos_ * t;
 
 	camera_->MakeMatrix();
 }

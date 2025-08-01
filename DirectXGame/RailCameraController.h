@@ -8,9 +8,11 @@ public:
 
 	RailCameraController(Camera* camera = nullptr);
 	~RailCameraController() = default;
+
 	void Initialize();
 	void Update();
 	void Draw(Camera* camera);
+
 	Camera GetCamera() { return *camera_; }
 	Camera* GetCameraPtr() { return camera_.get(); }
 
@@ -25,4 +27,5 @@ private:
 	float t = 0.0f;		//catmullの補完用t
 	int lapTimer_ = 0;
 	const int lapTime_ = 500;	//1周の時間
+	Vector3 targetPos_;
 };
