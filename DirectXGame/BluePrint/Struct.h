@@ -3,9 +3,9 @@
 
 class Struct {
 public:
-	Struct(std::string name, std::vector<ValueBase*> members)
-		: name(std::move(name)), members(members) {}
+	Struct(std::vector<ValueBase*> members)
+		: members(members) {
+	}
 
-	std::string name;
-	std::vector<ValueBase*> members;
+	std::vector<ValueBase*> members; // 構造体のメンバー変数
 };

@@ -7,7 +7,7 @@
 
 class ValueBase {
 public:
-	ValueBase(std::string name) : name(name) {};
+	ValueBase(std::string name) : name(name) {}
 	virtual ~ValueBase() = default;
 
 	template<typename T>

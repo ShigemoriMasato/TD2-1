@@ -3,6 +3,7 @@
 #include "Common/CommonData.h"
 #include "../Engine/Camera/DebugCamera.h"
 #include "../BluePrint/Struct.h"
+#include "../BluePrint/Function.h"
 
 class GameScene : public Scene {
 public:
@@ -31,5 +32,9 @@ private:
 	char valueNamebuffer[256]{};
 	char structNamebuffer[256]{};
 
-	std::vector<Struct> structs_;
+	std::vector<ValueBase*> args_;
+	char functionNamebuffer_[256]{};
+	std::vector<Function> funcs_;
+
+	std::vector<Value<Struct>> structs_;
 };

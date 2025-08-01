@@ -5,6 +5,8 @@
 
 using namespace Matrix;
 
+ValueBase* selectedValue = nullptr;
+
 namespace {
 	int useImGui = 0;
 
@@ -22,6 +24,8 @@ namespace {
 				ImGui::InputFloat2("##Vector2", &dynamic_cast<Value<Vector2>*>(values[i])->value.x);
 			} else if (dynamic_cast<Value<Vector3>*>(values[i])) {
 				ImGui::InputFloat3("##Vector3", &dynamic_cast<Value<Vector3>*>(values[i])->value.x);
+			} else if(dynamic_cast<Value<Struct>*>(values[i])) {
+				ImGui::Text("This is Struct Type");
 			}
 			ImGui::PopID();
 			ImGui::SameLine();
@@ -31,6 +35,13 @@ namespace {
 				delete values[i];
 				values.erase(values.begin() + i);
 				--i; // 削除したのでインデックスを調整
+			}
+			ImGui::PopID();
+
+			ImGui::SameLine();
+			ImGui::PushID(useImGui++);
+			if (ImGui::Button("Select")) {
+				selectedValue = values[i];
 			}
 			ImGui::PopID();
 		}
@@ -49,7 +60,27 @@ namespace {
 				ans.push_back(new Value<Vector2>(dynamic_cast<Value<Vector2>*>(v)->value, v->name));
 			} else if (dynamic_cast<Value<Vector3>*>(v)) {
 				ans.push_back(new Value<Vector3>(dynamic_cast<Value<Vector3>*>(v)->value, v->name));
+			} else if (dynamic_cast<Value<Struct>*>(v)) {
+				ans.push_back(new Value<Struct>(dynamic_cast<Value<Struct>*>(v)->value, v->name));
 			}
+		}
+
+		return ans;
+	}
+
+	ValueBase* MakeSameValue(ValueBase* value) {
+		ValueBase* ans{};
+
+		if (dynamic_cast<Value<int>*>(value)) {
+			ans = new Value<int>(dynamic_cast<Value<int>*>(value)->value, value->name);
+		} else if (dynamic_cast<Value<float>*>(value)) {
+			ans = new Value<float>(dynamic_cast<Value<float>*>(value)->value, value->name);
+		} else if (dynamic_cast<Value<Vector2>*>(value)) {
+			ans = new Value<Vector2>(dynamic_cast<Value<Vector2>*>(value)->value, value->name);
+		} else if (dynamic_cast<Value<Vector3>*>(value)) {
+			ans = new Value<Vector3>(dynamic_cast<Value<Vector3>*>(value)->value, value->name);
+		} else if (dynamic_cast<Value<Struct>*>(value)) {
+			ans = new Value<Struct>(dynamic_cast<Value<Struct>*>(value)->value, value->name);
 		}
 
 		return ans;
@@ -93,7 +124,7 @@ std::unique_ptr<Scene> GameScene::Update() {
 	ImGui::End();
 
 
-	//以下Valueに関するImGUi
+#pragma region 変数追加
 
 	const char* types[] = {
 		"int",
@@ -153,10 +184,14 @@ std::unique_ptr<Scene> GameScene::Update() {
 
 	ImGui::End();
 
+#pragma endregion
+
+#pragma region 構造体追加
+
 	ImGui::Begin("StructAdd");
 	ImGui::InputText("Struct Name", structNamebuffer, 256);
 	if (ImGui::Button("Add")) {
-		structs_.push_back(Struct(structNamebuffer, values_));
+		structs_.push_back(Value<Struct>(Struct(values_), structNamebuffer));
 		values_ = MakeSameValues(values_);
 	}
 	ImGui::End();
@@ -167,14 +202,47 @@ std::unique_ptr<Scene> GameScene::Update() {
 
 	for (int i = 0; i < structs_.size(); ++i) {
 		ImGui::Begin(structs_[i].name.c_str());
-		DrawValues(structs_[i].members);
+		DrawValues(structs_[i].value.members);
+
+		//構造体を変数として登録
+		if (ImGui::Button("SelectThisStruct")) {
+		}
+		ImGui::SameLine();
+
+		//構造体の削除
 		if(ImGui::Button("DeleteThisStruct")) {
 			structs_.erase(structs_.begin() + i);
 		}
 		ImGui::End();
 	}
 
-	//以上Valueに関するImGUi
+#pragma endregion
+
+#pragma region 関数追加
+
+	ImGui::Begin("Function");
+
+	//引数の追加
+	if (ImGui::Button("SetArgs") && selectedValue) {
+		args_.push_back(MakeSameValue(selectedValue));
+		selectedValue = nullptr; // 選択解除
+	}
+
+	//引数の表示
+	DrawValues(args_);
+
+	//関数名入力
+	ImGui::InputText("Function Name", functionNamebuffer_, 256);
+
+	//関数登録
+	if (ImGui::Button("Add")) {
+		funcs_.push_back(Function(functionNamebuffer_, args_, typeid(int)));
+		args_.clear();
+	}
+
+	ImGui::End();
+
+#pragma endregion
 
 	if (isDebugCamera) {
 		debugCamera_->Update();

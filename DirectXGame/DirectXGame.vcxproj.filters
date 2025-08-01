@@ -141,11 +141,14 @@
     <ClCompile Include="Engine\Data\Data.cpp">
       <Filter>MyEngine\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Data\Value.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="BluePrint\Function.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Data\Value.cpp">
+      <Filter>MyEngine\Data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -242,14 +245,14 @@
     <ClInclude Include="Engine\Data\Data.h">
       <Filter>MyEngine\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Data\Value.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="BluePrint\Struct.h">
       <Filter>BluePrint</Filter>
     </ClInclude>
     <ClInclude Include="BluePrint\Function.h">
       <Filter>BluePrint</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Data\Value.h">
+      <Filter>MyEngine\Data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
