@@ -6,10 +6,14 @@
 using namespace Matrix;
 
 namespace {
+	int useImGui = 0;
+
 	void DrawValues(std::vector<ValueBase*>& values) {
 		for (int i = 0; i < values.size(); ++i) {
 			ImGui::Text("%s", values[i]->name.c_str());
+
 			ImGui::SameLine();
+			ImGui::PushID(useImGui++);
 			if (dynamic_cast<Value<int>*>(values[i])) {
 				ImGui::InputInt("##int", &dynamic_cast<Value<int>*>(values[i])->value);
 			} else if (dynamic_cast<Value<float>*>(values[i])) {
@@ -19,14 +23,36 @@ namespace {
 			} else if (dynamic_cast<Value<Vector3>*>(values[i])) {
 				ImGui::InputFloat3("##Vector3", &dynamic_cast<Value<Vector3>*>(values[i])->value.x);
 			}
+			ImGui::PopID();
 			ImGui::SameLine();
-			if (ImGui::Button("Delete##")) {
+			
+			ImGui::PushID(useImGui++);
+			if (ImGui::Button("Delete")) {
 				delete values[i];
-				values[i] = nullptr;
 				values.erase(values.begin() + i);
 				--i; // 削除したのでインデックスを調整
 			}
+			ImGui::PopID();
 		}
+	}
+
+	std::vector<ValueBase*> MakeSameValues(std::vector<ValueBase*> values) {
+
+		std::vector<ValueBase*> ans;
+
+		for (auto& v : values) {
+			if (dynamic_cast<Value<int>*>(v)) {
+				ans.push_back(new Value<int>(dynamic_cast<Value<int>*>(v)->value, v->name));
+			} else if (dynamic_cast<Value<float>*>(v)) {
+				ans.push_back(new Value<float>(dynamic_cast<Value<float>*>(v)->value, v->name));
+			} else if (dynamic_cast<Value<Vector2>*>(v)) {
+				ans.push_back(new Value<Vector2>(dynamic_cast<Value<Vector2>*>(v)->value, v->name));
+			} else if (dynamic_cast<Value<Vector3>*>(v)) {
+				ans.push_back(new Value<Vector3>(dynamic_cast<Value<Vector3>*>(v)->value, v->name));
+			}
+		}
+
+		return ans;
 	}
 }
 
@@ -42,6 +68,12 @@ GameScene::~GameScene() {
 
 	for (ValueBase* value : values_) {
 		delete value;
+	}
+
+	for (Struct& s : structs_) {
+		for (ValueBase* value : s.members) {
+			delete value;
+		}
 	}
 }
 
@@ -125,6 +157,7 @@ std::unique_ptr<Scene> GameScene::Update() {
 	ImGui::InputText("Struct Name", structNamebuffer, 256);
 	if (ImGui::Button("Add")) {
 		structs_.push_back(Struct(structNamebuffer, values_));
+		values_ = MakeSameValues(values_);
 	}
 	ImGui::End();
 
@@ -152,4 +185,5 @@ std::unique_ptr<Scene> GameScene::Update() {
 }
 
 void GameScene::Draw() const {
+	useImGui = 0;
 }
