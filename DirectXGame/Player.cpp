@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <numbers>
 
-Player::Player(Camera* camera, Camera* parent, CommonData* cd) : Object(camera, ShapeType::Model),
+Player::Player(Camera* camera, Camera* parent, CommonData* cd, float* speed) : Object(camera, ShapeType::Model),
 playerTransform_(std::make_shared<Transform>()),
 parentCamera_(parent) {
 	handle_ = cd->modelHandle_[int(ModelType::Player)];
@@ -13,13 +13,20 @@ parentCamera_(parent) {
 	reticleHandle_ = cd->textureHandle_[int(TextureType::Reticle)];
 	playerTransform_->rotation.y = std::numbers::pi_v<float>;
 	tag = "Player";
+	speed_ = speed;
+	collisionType_ = CollisionType::Cupsule;
 }
 
 void Player::Initialize() {
 	playerTransform_->position = { 0.0f, 0.0f, 20.0f };
+	prePos_ = transform_->position;
 }
 
 void Player::Update() {
+
+	prePos_ = transform_->position;
+	hited_ = hit_;
+	hit_ = false;
 
 	velocity_ = {};
 
@@ -69,7 +76,7 @@ void Player::Update() {
 		cooltime_ = maxCooltime_;
 
 		// プレイヤーの弾を発射
-		std::shared_ptr<PlayerBullet> bullet = std::make_shared<PlayerBullet>(camera_, pos, Vector3(), bulletModelHandle_);
+		std::shared_ptr<PlayerBullet> bullet = std::make_shared<PlayerBullet>(camera_, pos, Vector3(0.0f, 0.0f, 1.0f), bulletModelHandle_);
 
 		bullet->Initialize();
 		bullets_.push_back(bullet);
@@ -98,4 +105,12 @@ void Player::Draw(const Matrix4x4* worldMatrix) const {
 
 void Player::SetBulletTargetPosition(const Vector3* position) {
 	bulletTargetPositions_.push_back(const_cast<Vector3*>(position));
+}
+
+void Player::OnCollision(Object* other) {
+	if (other->tag == "Accelerate" && !hited_) {
+		*speed_ += 9.0f;
+		hit_ = true;
+		hited_ = true;
+	}
 }

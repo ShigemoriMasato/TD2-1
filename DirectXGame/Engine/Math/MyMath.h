@@ -143,3 +143,5 @@ bool CollisionChecker(Object* a, Object* b);
 std::vector<Vector3> GetSplinePoints(const std::vector<Vector3>& controlPoints, int segment);
 std::vector<Vector3> GetCatmullPoints(const std::vector<Vector3>& points, int segmentsPerCurve);
 Vector3 GetCatmullPoint(const std::vector<Vector3>& points, float t);
+std::vector<DistanceSample> BuildDistanceTable(const std::vector<Vector3>& points, int segmentsPerCurve);
+float GetTFromDistance(const std::vector<DistanceSample>& table, float targetDistance);

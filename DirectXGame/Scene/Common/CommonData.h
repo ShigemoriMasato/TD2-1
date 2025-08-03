@@ -6,6 +6,7 @@ enum class ModelType {
 	Player,
 	Enemy,
 	Bullet,
+	AccelerateGate,
 
 	ModelCount
 };

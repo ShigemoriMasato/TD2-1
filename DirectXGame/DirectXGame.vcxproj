@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AccelerateGate.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
@@ -47,6 +48,7 @@
     <ClCompile Include="Engine\Data\Value.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AccelerateGate.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />

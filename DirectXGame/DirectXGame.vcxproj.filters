@@ -162,6 +162,9 @@
     <ClCompile Include="Engine\Data\Value.cpp">
       <Filter>MyEngine\Data</Filter>
     </ClCompile>
+    <ClCompile Include="AccelerateGate.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -280,6 +283,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Data\Value.h">
       <Filter>MyEngine\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="AccelerateGate.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

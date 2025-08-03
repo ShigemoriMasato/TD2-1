@@ -10,8 +10,9 @@ camera_(new Camera()),
 debugCamera_(new DebugCamera()),
 collisionManager_(std::make_unique<CollisionManager>()) {
 	railCameraController_ = std::make_unique<RailCameraController>();
-	player_ = std::make_shared<Player>(camera_, railCameraController_->GetCameraPtr(), commonData.get());
+	player_ = std::make_shared<Player>(camera_, railCameraController_->GetCameraPtr(), commonData.get(), railCameraController_->GetSpeedPtr());
 	isDebugCamera = false;
+	gridMaker_ = std::make_unique<GridMaker>(camera_, false);
 }
 
 GameScene::~GameScene() {
@@ -24,11 +25,18 @@ void GameScene::Initialize() {
 	player_->Initialize();
 	railCameraController_->Initialize();
 	camera_->SetProjectionMatrix(PerspectiveFovDesc());
+	gridMaker_->Initialize();
 
-	enemies_->Initialize();
+	AccelerateGate::SetHandle(commonData_->modelHandle_[int(ModelType::AccelerateGate)]);
+
+	accelerateGates_.clear();
+	std::shared_ptr<AccelerateGate> gate = std::make_shared<AccelerateGate>(camera_, Vector3());
+	accelerateGates_.push_back(gate);
 }
 
 std::unique_ptr<Scene> GameScene::Update() {
+
+	gridMaker_->Update();
 
 	if (Input::GetKeyState(DIK_R)) {
 		Initialize();
@@ -46,8 +54,6 @@ std::unique_ptr<Scene> GameScene::Update() {
 		*camera_ = *debugCamera_;
 	}
 
-	reticle_->GetTarget(enemies_->GetEnemiesCollition());
-
 	player_->Update();
 
 	AllCollisionCheck();
@@ -60,7 +66,11 @@ void GameScene::Draw() const {
 	
 	railCameraController_->Draw(camera_);
 
-	Render::DrawModel(commonData_->modelHandle_[int(ModelType::SkySphere)], MakeIdentity4x4(), camera_);
+	gridMaker_->Draw();
+
+	for(auto& a : accelerateGates_) {
+		a->Draw();
+	}
 }
 
 void GameScene::AllCollisionCheck() {
@@ -70,10 +80,8 @@ void GameScene::AllCollisionCheck() {
 		collisionManager_->AddObject(b.get());
 	}
 
-	std::list<Object*> enemies = enemies_->GetEnemiesAndBulletCollition();
-
-	for (const auto& e : enemies) {
-		collisionManager_->AddObject(e);
+	for (auto& a : accelerateGates_) {
+		collisionManager_->AddObject(a.get());
 	}
 
 	collisionManager_->CheckCollisions();

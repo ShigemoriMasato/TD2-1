@@ -8,7 +8,7 @@ PlayerBullet::PlayerBullet(Camera* camera, Vector3 pos, Vector3 target, int hand
 	transform_->position = pos;
 	
 	velocity_ = {};
-	direction_ = (target - pos).Normalize();
+	direction_ = target.Normalize();
 	tag = "Player";
 	color = 0x888800ff;
 }
@@ -27,5 +27,7 @@ void PlayerBullet::Update() {
 }
 
 void PlayerBullet::OnCollision(Object* other) {
-	isActive_ = false;
+	if (other->tag == "Enemy") {
+		isActive_ = false;
+	}
 }

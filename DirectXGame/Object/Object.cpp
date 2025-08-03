@@ -10,6 +10,7 @@ namespace {
 using namespace MyMath;
 
 void Object::Draw(const Matrix4x4* worldMatrix) const {
+
 	if (!camera_) {
 		return;
 	}

@@ -39,16 +39,18 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	commonData_->modelHandle_[int(ModelType::Enemy)] = myDirectX_->LoadObjFile("Resources/Enemy", "Plane.obj");
 	commonData_->modelHandle_[int(ModelType::SkySphere)] = myDirectX_->LoadObjFile("Resources/SkySphere", "sky_sphere.obj");
 	commonData_->modelHandle_[int(ModelType::Bullet)] = myDirectX_->LoadObjFile("Resources/Bullet", "Bullet.obj");
+	commonData_->modelHandle_[int(ModelType::AccelerateGate)] = myDirectX_->LoadObjFile("Resources/AccelerateGate", "AccelerateGate.obj");
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたいモデル↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓描画したい量↓↓↓↓↓↓↓↓↓↓↓↓↓
-	myDirectX_->CreateDrawResource(MyDirectX::kBox, 1000);
+	myDirectX_->CreateDrawResource(MyDirectX::kBox, 100);
 	myDirectX_->CreateDrawResource(MyDirectX::kSprite, 100);
-	myDirectX_->CreateDrawResource(MyDirectX::kLine, 500);
+	myDirectX_->CreateDrawResource(MyDirectX::kLine, 1500);
+	myDirectX_->CreateDrawResource(MyDirectX::kSphere, 10);
 	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Player)], 10);
 	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Enemy)], 50);
-	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::SkySphere)], 1);
 	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Bullet)], 500);
+	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::AccelerateGate)], 10);
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑描画したい量↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//最初のシーンを挿入

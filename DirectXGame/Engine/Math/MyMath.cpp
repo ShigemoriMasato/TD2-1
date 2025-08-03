@@ -476,12 +476,76 @@ bool operator!=(const Matrix4x4& a, const Matrix4x4& b) {
 }
 
 bool CollisionChecker(Object* a, Object* b) {
-	//今は球同士のみ
-	Sphere as = { a->GetTransform().position, 0.5f * a->GetTransform().scale.x };
-	Sphere bs = { b->GetTransform().position, 0.5f * b->GetTransform().scale.x };
 
-	float distance = Vector3(as.center - bs.center).Length();
-	return (distance <= (as.radius + bs.radius));
+	if (a->collisionType_ == CollisionType::Sphere) {
+		if(b->collisionType_ == CollisionType::Sphere) {
+
+			Sphere as = { a->GetTransform().position, 0.5f * a->GetTransform().scale.x };
+			Sphere bs = { b->GetTransform().position, 0.5f * b->GetTransform().scale.x };
+
+			float distance = Vector3(as.center - bs.center).Length();
+			return (distance <= (as.radius + bs.radius));
+
+		}
+
+		if (b->collisionType_ == CollisionType::Cupsule) {
+
+			//半径は0.5fとして計算
+
+			Vector3 segStart = b->GetPrePosition();
+			Vector3 segEnd = b->GetTransform().position;
+			Vector3 sphereCenter = a->GetTransform().position;
+
+			Vector3 seg = segEnd - segStart;
+			Vector3 toCenter = sphereCenter - segStart;
+
+			float segLengthSq = seg.Length();
+			float t = 0.0f;
+
+			if (segLengthSq > 0.0f) {
+				t = std::clamp(dot(toCenter, seg) / segLengthSq, 0.0f, 1.0f);
+			}
+
+			Vector3 closestPoint = segStart + seg * t;
+			float distance = (sphereCenter - closestPoint).Length();
+
+			return distance <= 1.0f;
+
+		}
+	}
+
+	if (a->collisionType_ == CollisionType::Cupsule) {
+		if (b->collisionType_ == CollisionType::Sphere) {
+
+			//半径は0.5fとして計算
+
+			Vector3 segStart = a->GetPrePosition();
+			Vector3 segEnd = a->GetTransform().position;
+			Vector3 sphereCenter = b->GetTransform().position;
+
+			Vector3 seg = segEnd - segStart;
+			Vector3 toCenter = sphereCenter - segStart;
+
+			float segLengthSq = seg.Length();
+			float t = 0.0f;
+
+			if (segLengthSq > 0.0f) {
+				t = std::clamp(dot(toCenter, seg) / segLengthSq, 0.0f, 1.0f);
+			}
+
+			Vector3 closestPoint = segStart + seg * t;
+			float distance = (sphereCenter - closestPoint).Length();
+
+			return distance <= 1.0f;
+
+		}
+		if (b->collisionType_ == CollisionType::Cupsule) {
+
+		}
+	}
+
+	return false;
+
 }
 
 Vector3 deCasteljau(const std::vector<Vector3>& controlPoints, float t) {
@@ -543,6 +607,45 @@ Vector3 GetCatmullPoint(const std::vector<Vector3>& points, float t) {
 	segmentIndex = std::clamp(segmentIndex, 0, static_cast<int>(points.size()) - 4);
 	float localT = (t - segmentIndex * segmentLength) / segmentLength;
 	return catmullRom(points[segmentIndex], points[segmentIndex + 1], points[segmentIndex + 2], points[segmentIndex + 3], localT);
+}
+
+std::vector<DistanceSample> BuildDistanceTable(const std::vector<Vector3>& points, int segmentsPerCurve) {
+	std::vector<DistanceSample> table;
+	if (points.size() < 4) return table;
+
+	float totalDistance = 0.0f;
+	Vector3 prev = catmullRom(points[0], points[1], points[2], points[3], 0.0f);
+	table.push_back({ 0.0f, 0.0f });
+
+	int totalSegments = int(points.size() - 3) * segmentsPerCurve;
+	for (int i = 1; i <= totalSegments; ++i) {
+		float t = static_cast<float>(i) / totalSegments;
+		Vector3 curr = GetCatmullPoint(points, t);
+		totalDistance += (curr - prev).Length();
+		table.push_back({ t, totalDistance });
+		prev = curr;
+	}
+
+	return table;
+}
+
+float GetTFromDistance(const std::vector<DistanceSample>& table, float targetDistance) {
+	if (table.empty()) return 0.0f;
+	if (targetDistance <= 0.0f) return table.front().t;
+	if (targetDistance >= table.back().distance) return table.back().t;
+
+	for (size_t i = 1; i < table.size(); ++i) {
+		if (targetDistance < table[i].distance) {
+			float d0 = table[i - 1].distance;
+			float d1 = table[i].distance;
+			float t0 = table[i - 1].t;
+			float t1 = table[i].t;
+			float ratio = (targetDistance - d0) / (d1 - d0);
+			return t0 + ratio * (t1 - t0);
+		}
+	}
+
+	return table.back().t;
 }
 
 float MyMath::lerp(float a, float b, float t) {

@@ -15,6 +15,7 @@ public:
 
 	Camera GetCamera() { return *camera_; }
 	Camera* GetCameraPtr() { return camera_.get(); }
+	float* GetSpeedPtr() { return &effectSpeed_; }
 
 private:
 
@@ -23,9 +24,13 @@ private:
 	std::shared_ptr<Transform> transform_;
 
 	std::vector<Vector3> catmullPoints_;
+	std::vector<DistanceSample> distanceSamples_;
 	std::vector<Vector3> controllPoints_;
-	float t = 0.0f;		//catmullの補完用t
-	int lapTimer_ = 0;
-	const int lapTime_ = 500;	//1周の時間
+
+	float speed_ = 0.5f;
+	float effectSpeed_ = 0.0f;
+	float moveDistance_ = 0.0f;
+	const float attenuation_ = 0.99f;
+
 	Vector3 targetPos_;
 };

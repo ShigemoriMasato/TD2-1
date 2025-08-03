@@ -18,6 +18,6 @@ private:
 
 	int frame_ = 0;
 
-	static inline const float speed = 0.5f;
+	static inline const float speed = 1.0f;
 };
 

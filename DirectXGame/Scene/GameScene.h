@@ -5,6 +5,8 @@
 #include "../Player.h"
 #include "../CollisionManager.h"
 #include "../RailCameraController.h"
+#include "../GridMaker.h"
+#include "../AccelerateGate.h"
 
 class GameScene : public Scene {
 public:
@@ -24,8 +26,11 @@ private:
 	std::unique_ptr<RailCameraController> railCameraController_ = nullptr;
 	Camera* camera_;
 	DebugCamera* debugCamera_;
+	std::shared_ptr<GridMaker> gridMaker_ = nullptr;
 
 	bool isDebugCamera = false;
 
 	std::shared_ptr<Player> player_ = nullptr;
+
+	std::vector<std::shared_ptr<AccelerateGate>> accelerateGates_;
 };

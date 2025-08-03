@@ -1,6 +1,7 @@
 #pragma once
 #include "../Engine/Data/Transform.h"
 #include "../Engine/Camera/Camera.h"
+#include "../Engine/Render/MyDirectX.h"
 #include <string>
 #include <memory>
 
@@ -13,6 +14,13 @@ enum class ShapeType {
 	ThickLine,
 	Model,
 	Count
+};
+
+enum class CollisionType {
+	Sphere,
+	Cupsule,
+
+	CollisionTypeCount
 };
 
 class Object {
@@ -43,17 +51,20 @@ public:
 	virtual Transform GetTransform() const { return *transform_; }
 	bool GetIsActive() const { return isActive_; }
 	ShapeType GetShapeType() const { return type_; }
+	Vector3 GetPrePosition() const { return prePos_; }
 
 	void AddVelocity(const Vector3& velocity) { velocity_ += velocity; }
 
 	std::string tag;
+	CollisionType collisionType_ = CollisionType::Sphere; //当たり判定の種類
 
 protected:
 
 	Vector3 velocity_ = {};								//Actor用
 	std::shared_ptr<Transform> transform_{};
+	Vector3 prePos_ = {};								//使う場合、各自Updateなどで自分で更新すること
 	uint32_t color = 0xffffffff;
-	int handle_ = 2;
+	int handle_ = WHIETE1x1;
 
 	bool isActive_ = true;
 

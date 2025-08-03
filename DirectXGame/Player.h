@@ -9,7 +9,7 @@
 class Player : public Object {
 public:
 
-	Player(Camera* camera, Camera* parent, CommonData* cd);
+	Player(Camera* camera, Camera* parent, CommonData* cd, float* speed);
 	~Player() = default;
 
 	void Initialize() override;
@@ -26,11 +26,13 @@ public:
 
 	void SetBulletTargetPosition(const Vector3* position);
 
+	void OnCollision(Object* other) override;
+
 private:
 
 	Vector3 velocity_{};
 	Vector3 direction_{};
-	const float speed_ = 0.01f;
+	float* speed_ = nullptr;
 
 	Camera* parentCamera_ = nullptr;
 
@@ -48,6 +50,9 @@ private:
 	bool isXBoxController_ = false;
 
 	bool isStalking_ = true;
+
+	bool hited_ = false;
+	bool hit_ = false;
 
 	Transform fpsCameraTransform_;
 
