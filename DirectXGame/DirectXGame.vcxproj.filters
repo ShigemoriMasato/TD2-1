@@ -144,6 +144,12 @@
     <ClCompile Include="GridMaker.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Data\Value.cpp">
+      <Filter>MyEngine\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Shader\ShaderShelf.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -240,6 +246,12 @@
       <Filter>MyEngine\Data</Filter>
     </ClInclude>
     <ClInclude Include="GridMaker.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Data\Value.h">
+      <Filter>MyEngine\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Shader\ShaderShelf.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,6 +5,7 @@
 #include "../Math/MyMath.h"
 #include <memory>
 #include <sstream>
+#include <numbers>
 #include "../../externals/imgui/imgui.h"
 #include "../../externals/imgui/imgui_impl_dx12.h"
 #include "../../externals/imgui/imgui_impl_win32.h"
@@ -418,7 +419,7 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     kClientWidth(kWindowWidth),
     kClientHeight(kWindowHeight),
     clearColor(new float[4] {0.03f, 0.028f, 0.025f, 1.0f}),
-    logger(new Logger("master")),
+    logger(new Logger()),
     fenceValue(0),
     readTextureCount(0),
     modelIndex_(-1),
@@ -457,7 +458,8 @@ int MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
 		//頂点リソース用のリソース作成
         switch (drawKind) {
         case kSphere:
-			vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 992 * 3));
+			vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 561));
+            indexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(uint32_t) * 3072));
             break;
 
 		case kSprite:
@@ -1185,175 +1187,63 @@ void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMat
         assert(false && "球の描画上限の超過");
     }
 
-    const float pie = 3.14159265358f;
-    const int vertical = 32;
-    const int horizontal = 16;
+    int vertical = 16;
+    int horizontal = 32;
 
-    uint32_t drawTriangleCountInstance = 0;
+    int vertexCount = 0;
+	VertexData* vertexData = nullptr;
+	vertexResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
-    VertexData* vertexData = nullptr;
-    vertexResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+    for (int i = 0; i < vertical + 1; ++i) {
+		float theta = i * std::numbers::pi_v<float> / vertical; // 緯度
 
-    //頂点データを作成する
+		float sinTheta = std::sin(theta);
+		float cosTheta = std::cos(theta);
+
+        for (int j = 0; j < horizontal + 1; ++j) {
+            float phi = j * std::numbers::pi_v<float> * 2.0f / horizontal;
+
+			float sinPhi = std::sin(phi);
+			float cosPhi = std::cos(phi);
+
+			// 球の頂点座標を計算
+			vertexData[vertexCount].position.x = radius * cosPhi * sinTheta;
+			vertexData[vertexCount].position.y = radius * cosTheta;
+			vertexData[vertexCount].position.z = radius * sinPhi * sinTheta;
+			vertexData[vertexCount].position.w = 1.0f;
+
+			vertexData[vertexCount].texcoord.x = static_cast<float>(j) / horizontal;
+			vertexData[vertexCount].texcoord.y = static_cast<float>(i) / vertical;
+
+			vertexData[vertexCount].normal.x = cosPhi * sinTheta;
+			vertexData[vertexCount].normal.y = cosTheta;
+			vertexData[vertexCount].normal.z = sinPhi * sinTheta;
+
+            ++vertexCount;
+        }
+    }
+
+    uint32_t* indexData = nullptr;
+	indexResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	int indexCount = 0;
+
     for (int i = 0; i < vertical; ++i) {
+        for (int j = 0; j < horizontal; ++j) {
 
-        int buffer;
+            indexData[indexCount++] = i * (horizontal + 1) + j;
+			indexData[indexCount++] = i * (horizontal + 1) + j + 1;
+            indexData[indexCount++] = (i + 1) * (horizontal + 1) + j;
 
-        if (i == 0 || i == vertical - 1) {
-
-            float point;
-
-            if (i == 0) {
-                point = 0.5f;
-                buffer = 1;
-            } else {
-                point = -0.49f;
-                buffer = -1;
-            }
-
-            for (int j = 0; j < horizontal; ++j) {
-                //球のさきっちょ
-                vertexData[drawTriangleCountInstance * 3 + 1].position = { 0.0f, point, 0.0f, 1.0f };
-                vertexData[drawTriangleCountInstance * 3 + 1].texcoord = { (float(horizontal - 1 - j)) / float(horizontal - 1), buffer == 1 ? 0.0f : 0.9999f };
-
-                //先っちょから一個離れた点たち
-                vertexData[drawTriangleCountInstance * 3 + 1 - buffer].position = {
-                    sinf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    cosf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    1.0f
-                };
-                vertexData[drawTriangleCountInstance * 3 + 1 - buffer].texcoord = {
-                    float(horizontal - 1 - j - 1 + (8 * buffer) - 8) / float(horizontal - 1),
-                    float(i + 1) / float(vertical)
-                };
-
-                vertexData[drawTriangleCountInstance * 3 + 1 - buffer * -1].position = {
-                    sinf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    cosf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    1.0f
-                };
-                vertexData[drawTriangleCountInstance * 3 + 1 - buffer * -1].texcoord = {
-                    float(horizontal - 1 - j + (8 * buffer) - 8) / float(horizontal - 1),
-                    float(i + 1) / float(vertical)
-                };
-
-                vertexData[drawTriangleCountInstance * 3].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3].position);
-                vertexData[drawTriangleCountInstance * 3 + 1].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 1].position);
-                vertexData[drawTriangleCountInstance * 3 + 2].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 2].position);
-
-                ++drawTriangleCountInstance;
-            }
-        } else {
-
-            if (i > vertical / 2) {
-                buffer = 1;
-            } else {
-                buffer = -1;
-            }
-
-            for (int j = 0; j < horizontal; ++j) {
-                //1つ目の三角形
-                //RightBottom
-                vertexData[drawTriangleCountInstance * 3 + 2].position = {
-                    sinf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    cosf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    1.0f
-                };
-                vertexData[drawTriangleCountInstance * 3 + 2].texcoord = {
-                    float(horizontal - 1 - j) / float(horizontal - 1),
-                    float(i + 1) / float(vertical)
-                };
-
-                //RightTop
-                vertexData[drawTriangleCountInstance * 3 + 1].position = {
-                    sinf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
-                    cosf(pie * float(i) / float(vertical - 1)) / 2,
-                    cosf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
-                    1.0f
-                };
-                vertexData[drawTriangleCountInstance * 3 + 1].texcoord = {
-                    float(horizontal - 1 - j) / float(horizontal - 1),
-                    float(i) / float(vertical)
-                };
-
-                //LeftTop
-                vertexData[drawTriangleCountInstance * 3].position = {
-                    sinf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
-                    cosf(pie * float(i) / float(vertical - 1)) / 2,
-                    cosf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
-                    1.0f
-                };
-                vertexData[drawTriangleCountInstance * 3].texcoord = {
-                    float(horizontal - 1 - j - 1) / float(horizontal - 1),
-                    float(i) / float(vertical)
-                };
-
-                vertexData[drawTriangleCountInstance * 3].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3].position);
-                vertexData[drawTriangleCountInstance * 3 + 1].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 1].position);
-                vertexData[drawTriangleCountInstance * 3 + 2].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 2].position);
-
-                ++drawTriangleCountInstance;
-
-                //2つ目の三角形
-                //RightBottom
-                vertexData[drawTriangleCountInstance * 3 + 2].position = {
-                    sinf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    cosf(pie * (j) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    1.0f
-                };
-                vertexData[drawTriangleCountInstance * 3 + 2].texcoord = {
-                    float(horizontal - 1 - j) / float(horizontal - 1),
-                    float(i + 1) / float(vertical)
-                };
-
-                //LeftTop
-                vertexData[drawTriangleCountInstance * 3 + 1].position = {
-                    sinf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
-                    cosf(pie * float(i) / float(vertical - 1)) / 2,
-                    cosf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i) / float(vertical - 1)) / 2,
-                    1.0f
-                };
-                vertexData[drawTriangleCountInstance * 3 + 1].texcoord = {
-                    float(horizontal - 1 - j - 1) / float(horizontal - 1),
-                    float(i) / float(vertical)
-                };
-
-                //LeftBottom
-                vertexData[drawTriangleCountInstance * 3].position = {
-                    sinf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    cosf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    cosf(pie * (j + 1) / float(horizontal - 1) * 2) * sinf(pie * float(i + 1) / float(vertical - 1)) / 2,
-                    1.0f
-                };
-                vertexData[drawTriangleCountInstance * 3].texcoord = {
-                    float(horizontal - 1 - j - 1) / float(horizontal - 1),
-                    float(i + 1) / float(vertical)
-                };
-
-                vertexData[drawTriangleCountInstance * 3].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3].position);
-                vertexData[drawTriangleCountInstance * 3 + 1].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 1].position);
-                vertexData[drawTriangleCountInstance * 3 + 2].normal = ConvertVector(vertexData[drawTriangleCountInstance * 3 + 2].position);
-
-                ++drawTriangleCountInstance;
-            }
+            indexData[indexCount++] = i * (horizontal + 1) + j + 1;
+			indexData[indexCount++] = (i + 1) * (horizontal + 1) + j + 1;
+            indexData[indexCount++] = (i + 1) * (horizontal + 1) + j;
 
         }
     }
 
-    for (uint32_t i = 0; i < drawTriangleCountInstance * 3; ++i) {
-		vertexData[i].position.x *= radius;
-		vertexData[i].position.y *= radius;
-		vertexData[i].position.z *= radius;
-		vertexData[i].normal.z *= -1.0f; //法線のZ軸を反転させる
-    }
-
     Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kSphere,
         material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle,
-        vertexData, drawTriangleCountInstance * 3);
+        vertexData, vertexCount, indexData, indexCount);
 
 }
 
@@ -1628,10 +1518,18 @@ void MyDirectX::PostDraw() {
 
     //offscreenの描画
     DrawSprite({ -1.0f, 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f }, { -1.0f, -1.0f, 0.0f, 1.0f }, { 1.0f, -1.0f, 0.0f, 1.0f },
-        Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 2, true);
+        Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 0, true);
+
+#ifdef _DEBUG
 
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+
+#else
+
+    ImGui::EndFrame();
+
+#endif
 
     InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_PRESENT, swapChainResources[backBufferIndex].Get());
 

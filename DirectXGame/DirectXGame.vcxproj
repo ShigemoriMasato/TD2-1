@@ -16,6 +16,7 @@
     <ClCompile Include="Engine\Core\MyPSO.cpp" />
     <ClCompile Include="Engine\Core\MyWindow.cpp" />
     <ClCompile Include="Engine\Data\Data.cpp" />
+    <ClCompile Include="Engine\Data\Value.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Math\MyMath.cpp" />
@@ -39,6 +40,7 @@
     <ClCompile Include="Scene\Common\Scene.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
+    <ClCompile Include="Engine\Shader\ShaderShelf.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Camera\Camera.h" />
@@ -48,6 +50,7 @@
     <ClInclude Include="Engine\Data\Data.h" />
     <ClInclude Include="Engine\Data\Matrix.h" />
     <ClInclude Include="Engine\Data\Transform.h" />
+    <ClInclude Include="Engine\Data\Value.h" />
     <ClInclude Include="Engine\Data\Vector.h" />
     <ClInclude Include="Engine\Input\Input.h" />
     <ClInclude Include="Engine\Logger\Logger.h" />
@@ -73,6 +76,7 @@
     <ClInclude Include="Scene\Common\Scene.h" />
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Scene\TitleScene.h" />
+    <ClInclude Include="Engine\Shader\ShaderShelf.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

@@ -2,17 +2,25 @@
 #include <iostream>
 #include <fstream>
 #include <format>
+#include <vector>
 
 class Logger {
 public:
 	//ログファイルを作成する
-	Logger(std::string logName);
+	Logger();
+	//ログファイルを登録する
+	void RegistLogFile(std::string& logName);
 	//ログを出力する
 	void Log(const std::string &message);
 
+	void operator<<(const std::string& message);
+	void operator<<(const std::wstring& message);
+
 private:
 
-	std::ofstream logStream;		//ログファイルストリーム
+	int logStreamHandle = 0;
+
+	static std::vector<std::ofstream> logStreams; //ログファイル一覧
 
 };
 
