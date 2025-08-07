@@ -1,6 +1,14 @@
 #include "Value.h"
 #include <cassert>
 
+uint8_t Value<int>::GetTypeID() const {
+    return uint8_t(TypeID::Int);
+}
+
+uint8_t Value <float> ::GetTypeID() const {
+    return uint8_t(TypeID::Float);
+}
+
 #pragma region Operator
 
 #pragma region 四則演算

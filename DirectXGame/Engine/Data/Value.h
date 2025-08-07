@@ -5,6 +5,20 @@
 #include <any>
 #include <cassert>
 
+enum class TypeID : uint8_t {
+	Int = 0x01,
+	Float = 0x02,
+	Bool = 0x03,
+	String = 0x04,
+
+	Vector2 = 0x10,
+	Vector3 = 0x11,
+	Vector4 = 0x12,
+
+	Custom = 0x80
+
+};
+
 class ValueBase {
 public:
 	ValueBase(std::string name) : name(name) {}
@@ -23,6 +37,11 @@ public:
 		}
 
 	};
+
+	virtual uint8_t GetTypeID() const = 0;
+
+	virtual void Serialize(std::ostream& out) const = 0;
+	virtual void Deserialize(std::istream& in) const = 0;
 
 	std::string name;		//変数名
 	
@@ -46,6 +65,16 @@ public:
 	void set(const T& newValue) {
 		value = newValue;
 	};
+
+	uint8_t GetTypeID() const override;
+
+	void Serialize(std::ostream& out) const override {
+		out.write(reinterpret_cast<const char*>(&value), sizeof(T));
+	}
+
+	void Deserialize(std::istream& in) override {
+		in.read(reinterpret_cast<char*>(&value), sizeof(T));
+	}
 
 	T value;				//値
 
