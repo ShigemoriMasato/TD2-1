@@ -6,7 +6,7 @@
 class Scene {
 public:
 	Scene(std::shared_ptr<CommonData> commonData);
-	~Scene() = default;
+	virtual ~Scene() = default;
 
 	virtual void Initialize() = 0;
 	[[nodiscard]]

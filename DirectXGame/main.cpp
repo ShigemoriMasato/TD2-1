@@ -9,7 +9,7 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	MSG msg{};
 
 	//ウィンドウのxボタンが押されるまでループ
-	while (sceneManager->IsRoop()) {
+	while (sceneManager->IsLoop()) {
 		//更新処理
 		sceneManager->Update();
 

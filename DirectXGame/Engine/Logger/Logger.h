@@ -6,12 +6,16 @@
 
 class Logger {
 public:
-	//ログファイルを作成する
+	//初期設定はmaster.log
 	Logger();
 	//ログファイルを登録する
-	void RegistLogFile(std::string& logName);
+	int RegistLogFile(std::string logName);
 	//ログを出力する
 	void Log(const std::string &message);
+
+	void SetLogStreamHandle(int handle);
+
+	void SetLogStreamName(std::string& logName);
 
 	void operator<<(const std::string& message);
 	void operator<<(const std::wstring& message);
@@ -21,6 +25,7 @@ private:
 	int logStreamHandle = 0;
 
 	static std::vector<std::ofstream> logStreams; //ログファイル一覧
+	static std::vector<std::string> logStreamNames; //ログファイル名一覧
 
 };
 

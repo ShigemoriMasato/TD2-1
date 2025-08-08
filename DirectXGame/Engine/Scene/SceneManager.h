@@ -13,7 +13,7 @@ public:
 
 	SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeight);
 	~SceneManager();
-	bool IsRoop();
+	bool IsLoop();
 
 	void Update();
 	void Draw() const;

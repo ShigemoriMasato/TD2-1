@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
-#include "BinaryOutput.h"
-#include "BinaryInput.h"
+#include "Data/BinaryOutput.h"
+#include "Data/BinaryInput.h"
 #include <string>
 #include <vector>
 

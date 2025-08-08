@@ -58,6 +58,18 @@
     <Filter Include="MyEngine\Logger">
       <UniqueIdentifier>{87707572-8692-443e-a2ec-223c7eb23df9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{c58f7455-7de8-48e7-8ec7-7f303896172f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\Binary">
+      <UniqueIdentifier>{a8c23ca2-435e-4feb-bb6a-9ee4e48f7abe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\Grid">
+      <UniqueIdentifier>{e935f8fb-00fb-4f5c-8105-c8027d69562b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\Binary\Data">
+      <UniqueIdentifier>{37a3dc17-d7de-4f6c-8ad5-de8de9fe95cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -141,20 +153,23 @@
     <ClCompile Include="Engine\Data\Data.cpp">
       <Filter>MyEngine\Data</Filter>
     </ClCompile>
-    <ClCompile Include="GridMaker.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Data\Value.cpp">
       <Filter>MyEngine\Data</Filter>
     </ClCompile>
+    <ClCompile Include="GridMaker.cpp">
+      <Filter>Tools\Grid</Filter>
+    </ClCompile>
     <ClCompile Include="Tools\Binary\BinaryManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>Tools\Binary</Filter>
     </ClCompile>
-    <ClCompile Include="Tools\Binary\BinaryInput.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Tools\Binary\Data\BinaryInput.cpp">
+      <Filter>Tools\Binary\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Tools\Binary\BinaryOutput.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Tools\Binary\Data\BinaryOutput.cpp">
+      <Filter>Tools\Binary\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Shader\ShaderShelf.cpp">
+      <Filter>MyEngine\Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -251,20 +266,23 @@
     <ClInclude Include="Engine\Data\Data.h">
       <Filter>MyEngine\Data</Filter>
     </ClInclude>
-    <ClInclude Include="GridMaker.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Data\Value.h">
       <Filter>MyEngine\Data</Filter>
     </ClInclude>
+    <ClInclude Include="GridMaker.h">
+      <Filter>Tools\Grid</Filter>
+    </ClInclude>
     <ClInclude Include="Tools\Binary\BinaryManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>Tools\Binary</Filter>
     </ClInclude>
-    <ClInclude Include="Tools\Binary\BinaryInput.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Tools\Binary\Data\BinaryInput.h">
+      <Filter>Tools\Binary\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Tools\Binary\BinaryOutput.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Tools\Binary\Data\BinaryOutput.h">
+      <Filter>Tools\Binary\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Shader\ShaderShelf.h">
+      <Filter>MyEngine\Shader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

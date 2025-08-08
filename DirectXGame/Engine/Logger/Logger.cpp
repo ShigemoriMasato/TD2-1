@@ -6,6 +6,7 @@
 namespace fs = std::filesystem;
 
 std::vector<std::ofstream> Logger::logStreams;
+std::vector<std::string> Logger::logStreamNames;
 
 Logger::Logger() {
     std::string a = "master";
@@ -16,7 +17,13 @@ Logger::Logger() {
     logStreamHandle = 0;
 }
 
-void Logger::RegistLogFile(std::string& logName) {
+int Logger::RegistLogFile(std::string logName) {
+    for(int i = 0; i < logStreamNames.size(); ++i) {
+        if (logStreamNames[i] == logName) {
+            return i; // 既に存在する場合はそのハンドルを返す
+        }
+	}
+
 #pragma region ファイル名を作成
     //現在時刻を取得
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
@@ -53,12 +60,30 @@ void Logger::RegistLogFile(std::string& logName) {
     //ファイルを作成して書き込み準備
     logStreams.push_back(std::ofstream(logFileName));
 
-    Log("Process started.\n");
+	logStreamNames.push_back(logName);
+
+	return int(logStreams.size() - 1);
 }
 
 void Logger::Log(const std::string &message) {
 	//ログファイルに出力
 	this->logStreams[logStreamHandle] << message << std::endl;
+}
+
+void Logger::SetLogStreamHandle(int handle) {
+    if (handle < 0 || handle >= logStreams.size()) {
+        throw std::out_of_range("Invalid log stream handle.");
+    }
+	logStreamHandle = handle;
+}
+
+void Logger::SetLogStreamName(std::string& logName) {
+    for (int i = 0; i < logStreamNames.size(); ++i) {
+        if(logStreamNames[i] == logName) {
+            logStreamHandle = i;
+            return;
+		}
+    }
 }
 
 

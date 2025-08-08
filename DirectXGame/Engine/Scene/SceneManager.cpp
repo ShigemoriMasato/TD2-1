@@ -57,7 +57,7 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 SceneManager::~SceneManager() {
 }
 
-bool SceneManager::IsRoop() {
+bool SceneManager::IsLoop() {
 
 	while (msg.message != WM_QUIT) {
 

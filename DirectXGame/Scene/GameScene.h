@@ -8,7 +8,7 @@
 class GameScene : public Scene {
 public:
 	GameScene(std::shared_ptr<CommonData> commonData);
-	~GameScene();
+	~GameScene() override;
 
 	void Initialize() override;
 	std::unique_ptr<Scene> Update() override;

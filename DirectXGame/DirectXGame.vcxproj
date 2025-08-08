@@ -40,9 +40,10 @@
     <ClCompile Include="Scene\Common\Scene.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
+    <ClCompile Include="Engine\Shader\ShaderShelf.cpp" />
     <ClCompile Include="Tools\Binary\BinaryManager.cpp" />
-    <ClCompile Include="Tools\Binary\BinaryInput.cpp" />
-    <ClCompile Include="Tools\Binary\BinaryOutput.cpp" />
+    <ClCompile Include="Tools\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Tools\Binary\Data\BinaryOutput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Camera\Camera.h" />
@@ -78,9 +79,10 @@
     <ClInclude Include="Scene\Common\Scene.h" />
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Scene\TitleScene.h" />
+    <ClInclude Include="Engine\Shader\ShaderShelf.h" />
     <ClInclude Include="Tools\Binary\BinaryManager.h" />
-    <ClInclude Include="Tools\Binary\BinaryInput.h" />
-    <ClInclude Include="Tools\Binary\BinaryOutput.h" />
+    <ClInclude Include="Tools\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Tools\Binary\Data\BinaryOutput.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -149,7 +151,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)Tools;$(ProjectDir)Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Tools;$(ProjectDir)Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -176,7 +178,7 @@ xcopy /E /I /Y "$(ProjectDir)Engine\Shader\*" "$(TargetDir)Engine\Shader\"</Comm
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)Tools;$(ProjectDir)Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Tools;$(ProjectDir)Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -186,9 +188,7 @@ xcopy /E /I /Y "$(ProjectDir)Engine\Shader\*" "$(TargetDir)Engine\Shader\"</Comm
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
-copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-xcopy /E /I /Y "$(ProjectDir)resources\*" "$(TargetDir)resources\"
-xcopy /E /I /Y "$(ProjectDir)Engine\Shader\*" "$(TargetDir)Engine\Shader\"</Command>
+copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

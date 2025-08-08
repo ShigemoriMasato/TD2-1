@@ -9,17 +9,20 @@
 #include <Data/Transform.h>
 
 enum class TypeID : uint8_t {
+	//もともとある型
 	Int = 0x01,
 	Float = 0x02,
 	Bool = 0x03,
 	String = 0x04,
 	Double = 0x05,
 
+	//VectorとかMatrixとか
 	Vector2 = 0x10,
 	Vector3 = 0x11,
 	Vector4 = 0x12,
 
-	Custom = 0x80
+	//構造体とか
+	PSODesc = 0x80,
 
 };
 
@@ -64,7 +67,7 @@ template<typename T>
 class Value : public ValueBase {
 public:
 	Value(T value, std::string name = "default") : ValueBase(name), value(value) {};
-	virtual ~Value() = default;
+	~Value() override = default;
 
 	//値を変更する
 	void set(const T& newValue) {

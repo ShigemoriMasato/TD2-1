@@ -22,6 +22,8 @@ void BinaryManager::Write(std::string fileName) {
 	for (auto v : buffer) {
 		output->WriteVBin(file, v.get());
 	}
+
+	file.close();
 }
 
 std::vector<std::shared_ptr<ValueBase>> BinaryManager::Read(std::string fileName) {
@@ -40,6 +42,8 @@ std::vector<std::shared_ptr<ValueBase>> BinaryManager::Read(std::string fileName
 		}
 		ans.push_back(val);
 	}
+
+	file.close();
 
 	return ans;
 }

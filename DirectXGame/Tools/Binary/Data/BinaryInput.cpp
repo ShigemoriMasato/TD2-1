@@ -1,5 +1,7 @@
 #include "BinaryInput.h"
 #include <Data/Transform.h>
+#include <d3d12.h>
+#include <Core/MyPSO.h>
 
 std::shared_ptr<ValueBase> BinaryInput::ReadVBin(std::istream& in) {
 	// 1. TypeID
@@ -54,6 +56,12 @@ std::shared_ptr<ValueBase> BinaryInput::ReadVBin(std::istream& in) {
 	case TypeID::Vector4:
 	{
 		auto val = std::make_shared<Value<Vector4>>(Vector4(0.0f, 0.0f, 0.0f, 0.0f), name);
+		val->Deserialize(in);
+		return val;
+	}
+	case TypeID::PSODesc:
+	{
+		auto val = std::make_shared<Value<PSODescData>>(PSODescData(), name);
 		val->Deserialize(in);
 		return val;
 	}

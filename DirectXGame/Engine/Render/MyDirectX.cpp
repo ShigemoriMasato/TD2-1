@@ -783,24 +783,6 @@ void MyDirectX::InitDirectX() {
 
     //=======================================================
 
-#pragma region dxcUtils & dxcCompiler
-
-    //dxcCompilerを初期化
-    hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
-    assert(SUCCEEDED(hr));
-    hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
-    assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-#pragma region includeHandler
-
-    //現時点でincludeはしないが、includeに対応するための設定を行っておく
-    hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
-    assert(SUCCEEDED(hr));
-
-#pragma endregion
-
 #pragma region RootSignature
 
     //RootSignature作成
@@ -885,27 +867,6 @@ void MyDirectX::InitDirectX() {
         signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
     assert(SUCCEEDED(hr));
 
-    //InputLayout
-    D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-    inputElementDescs[0].SemanticName = "POSITION";
-    inputElementDescs[0].SemanticIndex = 0;
-    inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-    inputElementDescs[1].SemanticName = "TEXCOORD";
-    inputElementDescs[1].SemanticIndex = 0;
-    inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-    inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-	inputElementDescs[2].SemanticName = "NORMAL";
-	inputElementDescs[2].SemanticIndex = 0;
-	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-    D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-    inputLayoutDesc.pInputElementDescs = inputElementDescs;
-    inputLayoutDesc.NumElements = _countof(inputElementDescs);
-
     //BlendStateの設定
     D3D12_BLEND_DESC blendDesc{};
     blendDesc.AlphaToCoverageEnable = false;
@@ -926,6 +887,45 @@ void MyDirectX::InitDirectX() {
     rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
     //三角形の中を塗りつぶす
     rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+
+#pragma region dxcUtils & dxcCompiler
+
+    //dxcCompilerを初期化
+    hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
+    assert(SUCCEEDED(hr));
+    hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
+    assert(SUCCEEDED(hr));
+
+#pragma endregion
+
+#pragma region includeHandler
+
+    //includeに対応するための設定を行っておく
+    hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
+    assert(SUCCEEDED(hr));
+
+#pragma endregion
+
+    //InputLayout
+    D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
+    inputElementDescs[0].SemanticName = "POSITION";
+    inputElementDescs[0].SemanticIndex = 0;
+    inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+    inputElementDescs[1].SemanticName = "TEXCOORD";
+    inputElementDescs[1].SemanticIndex = 0;
+    inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+    inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+    inputElementDescs[2].SemanticName = "NORMAL";
+    inputElementDescs[2].SemanticIndex = 0;
+    inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+    inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+    D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+    inputLayoutDesc.pInputElementDescs = inputElementDescs;
+    inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
     //Shaderをコンパイルする
     vertexShaderBlob = CompileShader(L"./Engine/Shader/Object3D.VS.hlsl",
@@ -956,13 +956,15 @@ void MyDirectX::InitDirectX() {
     depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK; // デフォルト値
     depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK; // デフォルト値
 
+    pso->Initialize(device.Get(), rootSignature.Get());
+
     //実際に生成
     pso->SetPSODesc(depthStencilDesc,
         DXGI_FORMAT_D24_UNORM_S8_UINT,
         rootSignature.Get(),
         inputLayoutDesc,
-        { vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() },
-        { pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() },
+        "Object3D.VS",
+        "Object3D.PS",
         blendDesc,
         rasterizerDesc,
         1,
@@ -970,15 +972,14 @@ void MyDirectX::InitDirectX() {
         D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
         D3D12_DEFAULT_SAMPLE_MASK
         );
-	pso->SetDevice(device.Get());
-    pso->CreatePSO(int(PSOType::kOpaqueTriangle));
+    pso->CreatePSO(int(PSOType::kOpaqueTriangle), true);
 
 	pso->SetRtvFormat(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-	pso->CreatePSO(int(PSOType::kOffScreen));
+	pso->CreatePSO(int(PSOType::kOffScreen), true);
 
     pso->SetRtvFormat(DXGI_FORMAT_R8G8B8A8_UNORM);
 	pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
-	pso->CreatePSO(int(PSOType::kOpaqueLine));
+	pso->CreatePSO(int(PSOType::kOpaqueLine), true);
 
     D3D12_DEPTH_STENCIL_DESC depthStencilDesc2{};
     depthStencilDesc2.DepthEnable = true;	//深度バッファを使う
@@ -991,7 +992,7 @@ void MyDirectX::InitDirectX() {
 
     pso->SetDsvDesc(depthStencilDesc2);
 	pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-	pso->CreatePSO(int(PSOType::kTransparentTriangle));
+	pso->CreatePSO(int(PSOType::kTransparentTriangle), true);
 
     for (int i = 0; i < DrawKindCount; ++i) {
 		vertexResource.push_back({});
@@ -1561,9 +1562,8 @@ void MyDirectX::PostDraw() {
 		count = 0;
 	}
 
-    //フレームの終了をログに通知
-	logger->Log(std::format("{} frame ended", ++frame_));
-    
+    ++frame_;
+
     //次のフレームのためのcommandReset
     commandAllocator->Reset();
     commandList->Reset(commandAllocator.Get(), nullptr);
