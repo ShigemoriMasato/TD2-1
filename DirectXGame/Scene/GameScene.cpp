@@ -38,7 +38,6 @@ void GameScene::Initialize() {
 			0.0f
 		) + offset;
 	}
-
 }
 
 std::unique_ptr<Scene> GameScene::Update() {
@@ -68,6 +67,7 @@ std::unique_ptr<Scene> GameScene::Update() {
 	if (ImGui::Button("HalfLambert")) {
 		material_.enableLighting = 2;
 	}
+	
 	ImGui::End();
 
 	dLight_.direction = dLight_.direction.Normalize();

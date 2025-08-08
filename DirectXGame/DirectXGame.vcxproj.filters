@@ -144,6 +144,18 @@
     <ClCompile Include="GridMaker.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Data\Value.cpp">
+      <Filter>MyEngine\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Binary\BinaryManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Binary\BinaryInput.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Binary\BinaryOutput.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -240,6 +252,18 @@
       <Filter>MyEngine\Data</Filter>
     </ClInclude>
     <ClInclude Include="GridMaker.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Data\Value.h">
+      <Filter>MyEngine\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Binary\BinaryManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Binary\BinaryInput.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Binary\BinaryOutput.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

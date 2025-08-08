@@ -3,6 +3,7 @@
 #include "Common/CommonData.h"
 #include "../Engine/Camera/DebugCamera.h"
 #include "../GridMaker.h"
+#include "../Tools/Binary/BinaryManager.h"
 
 class GameScene : public Scene {
 public:
@@ -36,5 +37,7 @@ private:
 
 	MaterialData material_{};
 	DirectionalLightData dLight_{};
+
+	BinaryManager binaryManager_;
 
 };
