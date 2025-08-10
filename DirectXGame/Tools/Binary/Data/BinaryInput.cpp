@@ -3,6 +3,15 @@
 #include <d3d12.h>
 #include <Core/MyPSO.h>
 
+namespace {
+	template<typename T>
+	std::shared_ptr<Value<T>> ValueDeserialize(std::string name, std::istream& in) {
+		auto val = std::make_shared<Value<T>>(T(), name);
+		val->Deserialize(in);
+		return val;
+	}
+}
+
 std::shared_ptr<ValueBase> BinaryInput::ReadVBin(std::istream& in) {
 	// 1. TypeID
 	uint8_t typeID;
@@ -19,51 +28,35 @@ std::shared_ptr<ValueBase> BinaryInput::ReadVBin(std::istream& in) {
 	switch (static_cast<TypeID>(typeID)) {
 	case TypeID::Int:
 	{
-		auto val = std::make_shared<Value<int>>(0, name);
-		val->Deserialize(in);
-		return val;
+		return ValueDeserialize<int>(name, in);
 	}
 	case TypeID::Float:
 	{
-		auto val = std::make_shared<Value<float>>(0.0f, name);
-		val->Deserialize(in);
-		return val;
+		return ValueDeserialize<float>(name, in);
 	}
 	case TypeID::String:
 	{
-		auto val = std::make_shared<Value<std::string>>("", name);
-		val->Deserialize(in);
-		return val;
+		return ValueDeserialize<std::string>(name, in);
 	}
 	case TypeID::Bool:
 	{
-		auto val = std::make_shared<Value<bool>>(false, name);
-		val->Deserialize(in);
-		return val;
+		return ValueDeserialize<bool>(name, in);
 	}
 	case TypeID::Vector2:
 	{
-		auto val = std::make_shared<Value<Vector2>>(Vector2(0.0f, 0.0f), name);
-		val->Deserialize(in);
-		return val;
+		return ValueDeserialize<Vector2>(name, in);
 	}
 	case TypeID::Vector3:
 	{
-		auto val = std::make_shared<Value<Vector3>>(Vector3(0.0f, 0.0f, 0.0f), name);
-		val->Deserialize(in);
-		return val;
+		return ValueDeserialize<Vector3>(name, in);
 	}
 	case TypeID::Vector4:
 	{
-		auto val = std::make_shared<Value<Vector4>>(Vector4(0.0f, 0.0f, 0.0f, 0.0f), name);
-		val->Deserialize(in);
-		return val;
+		return ValueDeserialize<Vector4>(name, in);
 	}
 	case TypeID::PSODesc:
 	{
-		auto val = std::make_shared<Value<PSODescData>>(PSODescData(), name);
-		val->Deserialize(in);
-		return val;
+		return ValueDeserialize<PSODescData>(name, in);
 	}
 	// 他の型も同様に追加
 	default:

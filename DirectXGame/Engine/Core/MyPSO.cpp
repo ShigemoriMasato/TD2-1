@@ -26,8 +26,6 @@ void MyPSO::Initialize(ID3D12Device* device, ID3D12RootSignature* rs) {
 	}
 
 	pRootSignature = rs;
-
-	binaryPSO->CreatePSOsFromBinary("DefaultPSO.dat", device);
 }
 
 void MyPSO::SetPSODesc(D3D12_DEPTH_STENCIL_DESC dsvDesc, DXGI_FORMAT dsvFormat, ID3D12RootSignature* pRootSignature, D3D12_INPUT_LAYOUT_DESC inputLayoutDesc, std::string vs, std::string ps, D3D12_BLEND_DESC blendDesc, D3D12_RASTERIZER_DESC rasterizerDesc, UINT numRtv, DXGI_FORMAT rtvFormat, D3D12_PRIMITIVE_TOPOLOGY_TYPE primitiveTopologyType, UINT sampleMask) {
@@ -149,10 +147,6 @@ void MyPSO::CreatePSO(int index, bool isSave) {
 
 	this->psoList[index] = (pso);
 
-	//PSOをバイナリに保存するため、バイナリリストに追加する
-	if (isSave) {
-		binaryPSO->RegistBinaryData(psoDesc);
-	}
 }
 
 ID3D12PipelineState* MyPSO::Get(int index) {

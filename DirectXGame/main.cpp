@@ -8,13 +8,20 @@ int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 	MSG msg{};
 
+	try {
+
 	//ウィンドウのxボタンが押されるまでループ
 	while (sceneManager->IsLoop()) {
 		//更新処理
 		sceneManager->Update();
-
+	
 		//描画処理
 		sceneManager->Draw();
+	}
+
+	} catch (const std::exception& err) {
+		err;
+		return 0;
 	}
 
 	return 0;
