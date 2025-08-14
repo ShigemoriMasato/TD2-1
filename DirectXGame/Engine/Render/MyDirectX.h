@@ -15,7 +15,8 @@
 #include "../Math/MyMath.h"
 #include "../Sound/Audio.h"
 #include "../Core/MyWindow.h"
-#include "../Core/MyPSO.h"
+#include "../Core/PSO/PSOEditor.h"
+
 #define WHIETE1x1 2
 #define UVCHECKER 1
 
@@ -112,9 +113,7 @@ private:
 	void InsertBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESOURCE_STATES stateAfter, ID3D12Resource* pResource,
 		D3D12_RESOURCE_BARRIER_TYPE type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION, D3D12_RESOURCE_BARRIER_FLAGS flags = D3D12_RESOURCE_BARRIER_FLAG_NONE);
 
-	void SetPSO(PSOType requirePSO);
-
-	void Draw(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle, MyDirectX::DrawKind kind, MyDirectX::PSOType pso, VertexData* vertexData, int vertexNum, uint32_t* index = nullptr, int indexNum = -1);
+	void Draw(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle, MyDirectX::DrawKind kind, VertexData* vertexData, int vertexNum, uint32_t* index = nullptr, int indexNum = -1);
 
 	Logger* logger;
 
@@ -151,13 +150,15 @@ private:
 	//三角形描画用
 	ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
 	ID3D12Resource* depthStencilResource = nullptr;
-	MyPSO* pso = nullptr;
 	Microsoft::WRL::ComPtr<ID3D10Blob> signatureBlob = nullptr;
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = nullptr;
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = nullptr;
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+
+	//PSO管理
+	std::unique_ptr<PSOEditor> psoEditor_ = nullptr;
 
 	//1フレームに描画した数をカウントする
 	std::vector<uint32_t> drawCount;

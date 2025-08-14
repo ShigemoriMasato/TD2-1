@@ -70,6 +70,9 @@
     <Filter Include="Tools\Binary\Data">
       <UniqueIdentifier>{37a3dc17-d7de-4f6c-8ad5-de8de9fe95cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MyEngine\Core\Shlef">
+      <UniqueIdentifier>{5701567d-c667-482c-b1c1-80892a14dd78}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -135,7 +138,7 @@
     <ClCompile Include="Scene\TitleScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\MyPSO.cpp">
+    <ClCompile Include="Engine\Core\PSOManager.cpp">
       <Filter>MyEngine\Core</Filter>
     </ClCompile>
     <ClCompile Include="Object\Actor.cpp">
@@ -168,10 +171,25 @@
     <ClCompile Include="Tools\Binary\Data\BinaryOutput.cpp">
       <Filter>Tools\Binary\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Shader\ShaderShelf.cpp">
+    <ClCompile Include="Engine\Core\Shelf\ShaderShelf.cpp">
       <Filter>MyEngine\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\BlendStateShelf.cpp">
+    <ClCompile Include="Engine\Core\Shelf\BlendStateShelf.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Shelf\DepthStencilShelf.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Shelf\RasterizerShelf.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Shelf\RootSignatureShelf.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Shelf\InputLayoutShelf.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\PSOEditor.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -248,7 +266,7 @@
     <ClInclude Include="Scene\TitleScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\MyPSO.h">
+    <ClInclude Include="Engine\Core\PSOManager.h">
       <Filter>MyEngine\Core</Filter>
     </ClInclude>
     <ClInclude Include="Object\Action.h">
@@ -284,10 +302,25 @@
     <ClInclude Include="Tools\Binary\Data\BinaryOutput.h">
       <Filter>Tools\Binary\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Shader\ShaderShelf.h">
+    <ClInclude Include="Engine\Core\Shelf\ShaderShelf.h">
       <Filter>MyEngine\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\BlendStateShelf.h">
+    <ClInclude Include="Engine\Core\Shelf\BlendStateShelf.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Shelf\DepthStencilShelf.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Shelf\RasterizerShelf.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Shelf\RootSignatureShelf.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Shelf\InputLayoutShelf.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSOEditor.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

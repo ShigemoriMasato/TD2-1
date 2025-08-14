@@ -431,7 +431,6 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     resourceStates[swapChainResources[0].Get()] = D3D12_RESOURCE_STATE_PRESENT;
     resourceStates[swapChainResources[1].Get()] = D3D12_RESOURCE_STATE_PRESENT;
 	myWindow_ = new MyWindow(kWindowWidth, kWindowHeight);
-	pso = new MyPSO();
     Initialize();
 }
 
@@ -441,7 +440,6 @@ MyDirectX::~MyDirectX() {
 	delete isCanDraw_;
     delete logger;
     delete[] clearColor;
-	delete pso;
 }
 
 void MyDirectX::Initialize() {
@@ -555,6 +553,7 @@ void MyDirectX::BeginFrame() {
 
 void MyDirectX::PreDraw() {
     ClearScreen();
+    psoEditor_->BeginFrame(commandList.Get());
     *isCanDraw_ = true;
 }
 
@@ -638,7 +637,7 @@ void MyDirectX::InitDirectX() {
 
 #ifdef _DEBUG
 
-    ID3D12InfoQueue* infoQueue = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
     if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
         //やばいエラーの時に止まる
         infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
@@ -662,9 +661,6 @@ void MyDirectX::InitDirectX() {
         filter.DenyList.pSeverityList = severities;
         //指定したメッセージの行事を抑制する
         infoQueue->PushStorageFilter(&filter);
-
-        //解放
-        infoQueue->Release();
     }
 
 #endif
@@ -783,161 +779,6 @@ void MyDirectX::InitDirectX() {
 
     //=======================================================
 
-#pragma region RootSignature
-
-    //RootSignature作成
-    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-    descriptionRootSignature.Flags =
-        D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-#pragma region RootParameter
-
-#pragma region DescriptorTable
-
-    D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-    descriptorRange[0].BaseShaderRegister = 0;
-    descriptorRange[0].NumDescriptors = 1;
-    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-    descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-#pragma endregion
-
-    //RootParameter作成。複数設定できるので配列
-    D3D12_ROOT_PARAMETER rootParameters[4] = {};
-
-#pragma region Material
-    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
-    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     //PixelShaderで使う
-    rootParameters[0].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
-#pragma endregion
-
-#pragma region Matrix
-    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
-    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;     //VertexShaderで使う
-    rootParameters[1].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
-#pragma endregion
-
-#pragma region Texture
-
-    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
-    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
-    rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;	//テーブルの中身
-    rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);	//テーブルの数
-
-#pragma endregion
-
-#pragma region DirectionalLight
-    
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;	//CBVを使う
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
-	rootParameters[3].Descriptor.ShaderRegister = 1;	//レジスタ番号1とバインド
-
-#pragma endregion
-
-#pragma endregion
-
-    descriptionRootSignature.pParameters = rootParameters;                  //ルートパラメータ配列へのポインタ
-    descriptionRootSignature.NumParameters = _countof(rootParameters);      //配列の長さ
-
-#pragma endregion
-
-
-
-    D3D12_STATIC_SAMPLER_DESC staticSampler[1] = {};
-    staticSampler[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;	//フィルタリングの方法
-    staticSampler[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-    staticSampler[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-    staticSampler[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-    staticSampler[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;	//比較しない
-    staticSampler[0].MaxLOD = D3D12_FLOAT32_MAX;    //ありったけのMipmapを使う
-    staticSampler[0].ShaderRegister = 0;    //レジスタ番号0
-    staticSampler[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;    //PixelShaderで使う
-    descriptionRootSignature.pStaticSamplers = staticSampler;              //StaticSamplerの配列へのポインタ
-    descriptionRootSignature.NumStaticSamplers = _countof(staticSampler);   //配列の長さ
-
-    //シリアライズしてバイナリにする
-    hr = D3D12SerializeRootSignature(&descriptionRootSignature,
-        D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-    if (FAILED(hr)) {
-        logger->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-        assert(false);
-    }
-    //バイナリをもとに生成
-    hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-        signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
-    assert(SUCCEEDED(hr));
-
-    //BlendStateの設定
-    D3D12_BLEND_DESC blendDesc{};
-    blendDesc.AlphaToCoverageEnable = false;
-    blendDesc.IndependentBlendEnable = false;
-    blendDesc.RenderTarget[0].BlendEnable = true;
-	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-    //すべての色を取り込む
-    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-    //RasisterzerStateの設定
-    D3D12_RASTERIZER_DESC rasterizerDesc{};
-    //裏面(時計回り)を表示しない
-    rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-    //三角形の中を塗りつぶす
-    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-
-#pragma region dxcUtils & dxcCompiler
-
-    //dxcCompilerを初期化
-    hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
-    assert(SUCCEEDED(hr));
-    hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
-    assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-#pragma region includeHandler
-
-    //includeに対応するための設定を行っておく
-    hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
-    assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-    //InputLayout
-    D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-    inputElementDescs[0].SemanticName = "POSITION";
-    inputElementDescs[0].SemanticIndex = 0;
-    inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-    inputElementDescs[1].SemanticName = "TEXCOORD";
-    inputElementDescs[1].SemanticIndex = 0;
-    inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-    inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-    inputElementDescs[2].SemanticName = "NORMAL";
-    inputElementDescs[2].SemanticIndex = 0;
-    inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-    inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-    D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-    inputLayoutDesc.pInputElementDescs = inputElementDescs;
-    inputLayoutDesc.NumElements = _countof(inputElementDescs);
-
-    //Shaderをコンパイルする
-    vertexShaderBlob = CompileShader(L"./Engine/Shader/Object3D.VS.hlsl",
-        L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get(), logger);
-    assert(vertexShaderBlob != nullptr);
-
-    pixelShaderBlob = CompileShader(L"./Engine/Shader/Object3D.PS.hlsl",
-        L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get(), logger);
-    assert(pixelShaderBlob != nullptr);
-
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-
     dsvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
     dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -947,52 +788,9 @@ void MyDirectX::InitDirectX() {
 
     device->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-    depthStencilDesc.DepthEnable = true;	//深度バッファを使う
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;	//全ての深度値を使う
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;	//深度値の比較方法
-
-    depthStencilDesc.StencilEnable = FALSE; // ステンシルテストを使わないなら FALSE
-    depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK; // デフォルト値
-    depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK; // デフォルト値
-
-    pso->Initialize(device.Get(), rootSignature.Get());
-
-    //実際に生成
-    pso->SetPSODesc(depthStencilDesc,
-        DXGI_FORMAT_D24_UNORM_S8_UINT,
-        rootSignature.Get(),
-        inputLayoutDesc,
-        "Object3D.VS",
-        "Object3D.PS",
-        blendDesc,
-        rasterizerDesc,
-        1,
-        DXGI_FORMAT_R8G8B8A8_UNORM,
-        D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-        D3D12_DEFAULT_SAMPLE_MASK
-        );
-    pso->CreatePSO(int(PSOType::kOpaqueTriangle), true);
-
-	pso->SetRtvFormat(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-	pso->CreatePSO(int(PSOType::kOffScreen), true);
-
-    pso->SetRtvFormat(DXGI_FORMAT_R8G8B8A8_UNORM);
-	pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
-	pso->CreatePSO(int(PSOType::kOpaqueLine), true);
-
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc2{};
-    depthStencilDesc2.DepthEnable = true;	//深度バッファを使う
-    depthStencilDesc2.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;	//深度地を書き込まない
-    depthStencilDesc2.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;	//深度値の比較方法
-
-    depthStencilDesc2.StencilEnable = FALSE; // ステンシルテストを使わないなら FALSE
-    depthStencilDesc2.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK; // デフォルト値
-    depthStencilDesc2.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK; // デフォルト値
-
-    pso->SetDsvDesc(depthStencilDesc2);
-	pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-	pso->CreatePSO(int(PSOType::kTransparentTriangle), true);
+	//PSOの初期化
+    psoEditor_ = std::make_unique<PSOEditor>(device.Get());
+    psoEditor_->Initialize(device.Get());
 
     for (int i = 0; i < DrawKindCount; ++i) {
 		vertexResource.push_back({});
@@ -1111,7 +909,6 @@ void MyDirectX::BeginImGui() {
 void MyDirectX::ClearScreen() {
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
     //RootSignature,PSO,RTVを設定
-	SetPSO(PSOType::kOpaqueTriangle);
     commandList->SetGraphicsRootSignature(rootSignature.Get());
     commandList->OMSetRenderTargets(1, &rtvHandles[2], false, &dsvHandle);
 
@@ -1178,7 +975,6 @@ void MyDirectX::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4
     vertexData[2].normal = { 0.0f, 0.0f, -1.0f };
 
 	Draw(worldMatirx, wvpMatrix, material, dLightData, textureHandle, kTriangle,
-        material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle,
         vertexData, 3);
 }
 
@@ -1243,7 +1039,6 @@ void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMat
     }
 
     Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kSphere,
-        material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle,
         vertexData, vertexCount, indexData, indexCount);
 
 }
@@ -1264,18 +1059,8 @@ void MyDirectX::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpM
         vertexResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
         std::memcpy(vertexData, modelList_[modelHandle].vertices[materialName].data(), sizeof(VertexData) * modelList_[modelHandle].vertices[materialName].size());
 
-        PSOType psoType = PSOType::kOpaqueTriangle;
-
-        if (material.color.w < 1.0f) {
-            //透明な三角形を描画する場合は、PSOを透明用に変更する
-            psoType = PSOType::kTransparentTriangle;
-        } else {
-            //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-            psoType = PSOType::kOpaqueTriangle;
-        }
-
         Draw(worldMatrix, wvpMatrix, material, dLightData, modelList_[modelHandle].material[i].textureHandle,
-            DrawKind(index), psoType, vertexData, int(modelList_[modelHandle].vertices[materialName].size()));
+            DrawKind(index), vertexData, int(modelList_[modelHandle].vertices[materialName].size()));
 
     }
 }
@@ -1313,23 +1098,12 @@ void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matri
     indexData[4] = 3;
     indexData[5] = 2;
 
-	PSOType pso = PSOType::kOpaqueTriangle;
-
-	if (isOffScreen) {
-		//オフスクリーン用のPSOを設定
-		pso = PSOType::kOffScreen;
-    } else {
-        if (material.color.w < 1.0f) {
-            //透明な三角形を描画する場合は、PSOを透明用に変更する
-            pso = PSOType::kTransparentTriangle;
-        } else {
-            //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-            pso = PSOType::kOpaqueTriangle;
-        }
+    if (isOffScreen) {
+        psoEditor_->SetOffScreen(true);
     }
 
 	Draw(worldmat, wvpmat, material, dLightData, textureHandle, DrawKind::kSprite,
-		pso, vertexData, 4, indexData, 6);
+		vertexData, 4, indexData, 6);
 
 }
 
@@ -1376,7 +1150,6 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     }
 
 	Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kPrism,
-		material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle, 
 		vertexData, 7, indexData, 24);
 }
 
@@ -1454,16 +1227,7 @@ void MyDirectX::DrawBox(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData
         indexData[idx++] = base + 1;
     }
 
-    if (material.color.w < 1.0f) {
-        //透明な三角形を描画する場合は、PSOを透明用に変更する
-        SetPSO(PSOType::kTransparentTriangle);
-    } else {
-        //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-        SetPSO(PSOType::kOpaqueTriangle);
-    }
-
 	Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kBox, 
-        material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle,
 		vertexData, 24, indexData, 36);
 }
 
@@ -1479,7 +1243,9 @@ void MyDirectX::DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMatrix, Matr
 	vertexData[1].texcoord = { 0.0f, 1.0f };
 	vertexData[1].normal = { 0.0f, 0.0f, 0.0f };
 
-	Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kLine, PSOType::kOpaqueLine,
+	psoEditor_->SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+
+	Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kLine,
 		vertexData, 2);
 }
 
@@ -1628,16 +1394,7 @@ void MyDirectX::InsertBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESO
     resourceStates[pResource] = stateAfter;
 }
 
-void MyDirectX::SetPSO(PSOType requirePSO) {
-    if (nowPSO == requirePSO) {
-        return;
-    }
-
-	nowPSO = requirePSO;
-    commandList->SetPipelineState(pso->Get(int(requirePSO)));
-}
-
-void MyDirectX::Draw(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle, DrawKind kind, PSOType pso, VertexData* vertexData, int vertexNum, uint32_t* indexData, int indexNum) {
+void MyDirectX::Draw(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle, DrawKind kind, VertexData* vertexData, int vertexNum, uint32_t* indexData, int indexNum) {
     
     //シェーダーに送る各種データの作成
     TramsformMatrixData* wvpData = nullptr;
@@ -1672,9 +1429,13 @@ void MyDirectX::Draw(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData ma
         commandList->IASetIndexBuffer(&indexBufferView);
     }
 
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+    if (material.color.w < 1.0f) {
+        psoEditor_->SetDepthStencilState(DepthStencilID::Transparent);
+    }
 
-    SetPSO(pso);
+    psoEditor_->Setting(commandList.Get());
+
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
     //マテリアルCBufferの場所を設定
     commandList->SetGraphicsRootConstantBufferView(0, materialResource[kind][drawCount[kind]]->GetGPUVirtualAddress());

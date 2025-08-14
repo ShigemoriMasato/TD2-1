@@ -1,8 +1,10 @@
 #pragma once
 #include <cstdint>
 #include <d3d12.h>
+#include <vector>
 
 enum class BlendStateID : uint8_t {
+	Default,
 	Alpha,
 
 	Count
@@ -18,6 +20,6 @@ public:
 
 private:
 
-	
+	std::vector<D3D12_BLEND_DESC> blendStates_;
 
 };

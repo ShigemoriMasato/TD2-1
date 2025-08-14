@@ -1,7 +1,6 @@
 #include "BinaryInput.h"
 #include <Data/Transform.h>
 #include <d3d12.h>
-#include <Core/MyPSO.h>
 
 namespace {
 	template<typename T>
@@ -53,10 +52,6 @@ std::shared_ptr<ValueBase> BinaryInput::ReadVBin(std::istream& in) {
 	case TypeID::Vector4:
 	{
 		return ValueDeserialize<Vector4>(name, in);
-	}
-	case TypeID::PSODesc:
-	{
-		return ValueDeserialize<PSODescData>(name, in);
 	}
 	// 他の型も同様に追加
 	default:

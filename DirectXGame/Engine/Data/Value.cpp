@@ -1,6 +1,5 @@
 #include "Value.h"
 #include <cassert>
-#include <Core/MyPSO.h>
 
 uint8_t Value<int>::GetTypeID() const {
     return uint8_t(TypeID::Int);
@@ -32,10 +31,6 @@ uint8_t Value <Vector3> ::GetTypeID() const {
 
 uint8_t Value <Vector4> ::GetTypeID() const {
     return uint8_t(TypeID::Vector4);
-}
-
-uint8_t Value<PSODescData>::GetTypeID() const {
-    return uint8_t(TypeID::PSODesc);
 }
 
 uint8_t Value<ValueBase*>::GetTypeID() const {

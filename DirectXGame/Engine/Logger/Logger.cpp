@@ -114,11 +114,3 @@ std::string ConvertString(const std::wstring &str) {
     WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
     return result;
 }
-
-void Logger::operator<<(const std::string& message) {
-    this->logStreams[logStreamHandle] << message << std::endl;
-}
-
-void Logger::operator<<(const std::wstring& message) {
-    this->logStreams[logStreamHandle] << ConvertString(message) << std::endl;
-}

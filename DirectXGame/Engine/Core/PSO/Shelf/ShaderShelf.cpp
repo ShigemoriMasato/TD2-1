@@ -1,6 +1,8 @@
 #include "ShaderShelf.h"
 #include <cassert>
 
+namespace fs = std::filesystem;
+
 namespace {
 
     IDxcBlob* CompileShader(
@@ -69,6 +71,23 @@ namespace {
         return shaderBlob;
     }
 
+    //どっかに置きたいけど場所が思いつかないのでとりあえず匿名名前空間に置いとく。多分ConvertStringとかと一緒にどっか新しく作る
+    std::vector<std::string> SearchFilesWithExtension(const fs::path& directory, const std::string& extension) {
+        std::vector<std::string> contents;
+
+        if (!fs::exists(directory) || !fs::is_directory(directory)) {
+            throw std::runtime_error("Invalid directory: " + directory.string());
+        }
+
+        for (const auto& entry : fs::directory_iterator(directory)) {
+            std::string path = entry.path().string();
+            path.erase(0, directory.string().length() + 1);
+			contents.push_back(path);
+        }
+
+        return contents;
+    }
+
 }
 
 ShaderShelf::ShaderShelf() {
@@ -83,69 +102,81 @@ ShaderShelf::ShaderShelf() {
     hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
     assert(SUCCEEDED(hr));
 
-    //InputLayout
-    inputElementDescs[0].SemanticName = "POSITION";
-    inputElementDescs[0].SemanticIndex = 0;
-    inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-    inputElementDescs[1].SemanticName = "TEXCOORD";
-    inputElementDescs[1].SemanticIndex = 0;
-    inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-    inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-    inputElementDescs[2].SemanticName = "NORMAL";
-    inputElementDescs[2].SemanticIndex = 0;
-    inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-    inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-    inputLayoutDesc.pInputElementDescs = inputElementDescs;
-    inputLayoutDesc.NumElements = _countof(inputElementDescs);
-
 	logger_ = std::make_unique<Logger>();
     logger_->SetLogStreamHandle((logger_->RegistLogFile("Shader")));
 
-	shaderVersions_[0] = L"vs_6_0"; // Vertex Shader
-    shaderVersions_[1] = L"ps_6_0"; // Pixel Shader
+	compileVersions_[0] = L"vs_6_0"; // Vertex Shader
+    compileVersions_[1] = L"ps_6_0"; // Pixel Shader
 }
 
 ShaderShelf::~ShaderShelf() {
-    for(int i = 0; i < int(ShaderType::Count); ++i) {
-        for(const auto& shader : shaderNames_[i]) {
-            if (shader.second != nullptr) {
-                shader.second->Release();
-            }
+    
+}
+
+void ShaderShelf::CompileAllShader() {
+
+	std::vector<std::wstring> shaderNames;
+
+    //shaderNameBufferを削除するためのスコープ
+    {
+        std::vector<std::string> shaderNameBuffer = SearchFilesWithExtension(basePath_, ".hlsl");
+        for (const auto& name : shaderNameBuffer) {
+            shaderNames.push_back(ConvertString(name));
         }
-        shaderNames_[i].clear();
-	}
-}
+    }
 
-void ShaderShelf::RegisterShader(const std::string& name, ShaderType shaderType) {
-    int type = int(shaderType);
-    for(const auto& shader : shaderNames_[type]) {
-        if (shader.first == name) {
-            // 既に登録されている場合は何もしない
-            return;
+    for (const auto& sn : shaderNames) {
+        if (sn.find(L".hlsli") != std::string::npos) {
+            continue;
         }
-	}
+        //VertexShaderだったら
+        else if (sn.find(L"VS") != std::string::npos) {
+			RegistShaderByteCode(sn, ShaderType::VERTEX_SHADER);
+        }
+		//PixelShaderだったら
+        else if (sn.find(L"PS") != std::string::npos) {
+			RegistShaderByteCode(sn, ShaderType::PIXEL_SHADER);
+        } 
+        //これ以降も同じように追加する
 
-    IDxcBlob* shaderBlob = CompileShader(ConvertString(basePath_ + name + ".hlsl"),
-        shaderVersions_[int(shaderType)].c_str(), dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get(), logger_.get());
 
-    assert(shaderBlob != nullptr);
-
-	shaderNames_[type][name] = shaderBlob;
+		// 登録してない、または名前が間違っているShaderは見つかり次第エラーを出す
+        else {
+            logger_->Log(ConvertString(std::format(L"Unknown Shader Type: {}", sn)));
+			throw std::runtime_error("Unknown shader type: " + ConvertString(sn));
+        }
+    }
 }
 
-D3D12_INPUT_LAYOUT_DESC ShaderShelf::GetInputLayoutDesc() const {
-    return inputLayoutDesc;
+std::list<D3D12_SHADER_BYTECODE> ShaderShelf::GetShaderBytecodes(ShaderType shaderType) {
+    std::list<D3D12_SHADER_BYTECODE> ans;
+
+    for (const auto& [name, bytecode] : shaderBytecodes_[static_cast<size_t>(shaderType)]) {
+        ans.push_back(bytecode);
+    }
+
+	return ans;
 }
 
-IDxcBlob* ShaderShelf::GetShaderBlob(const std::string& name, ShaderType shaderType) const {
-    if(shaderNames_[int(shaderType)].find(name) != shaderNames_[int(shaderType)].end()) {
-        return shaderNames_[int(shaderType)].at(name);
-	}
+std::list<std::string> ShaderShelf::GetShaderNames(ShaderType shaderType) {
+    std::list<std::string> ans;
 
-    // 見つからなかった場合はnullptrを返す
-	return nullptr;
+    for (const auto& [name, bytecode] : shaderBytecodes_[static_cast<size_t>(shaderType)]) {
+        ans.push_back(name);
+    }
+
+    return ans;
+}
+
+D3D12_SHADER_BYTECODE ShaderShelf::GetShaderBytecode(ShaderType shaderType, std::string shaderName) {
+	return shaderBytecodes_[static_cast<int>(shaderType)][shaderName];
+}
+
+void ShaderShelf::RegistShaderByteCode(std::wstring shaderName, ShaderType shaderType) {
+    IDxcBlob* blobBuffer = CompileShader(ConvertString(basePath_.string()) + L"/" + shaderName, compileVersions_[int(shaderType)].c_str(),
+        dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get(), logger_.get());
+
+    shaderBlobs_.push_back(blobBuffer);
+
+    shaderBytecodes_[int(shaderType)][ConvertString(shaderName)] = { blobBuffer->GetBufferPointer(), blobBuffer->GetBufferSize() };
 }

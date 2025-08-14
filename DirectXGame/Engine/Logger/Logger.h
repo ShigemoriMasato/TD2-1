@@ -17,9 +17,6 @@ public:
 
 	void SetLogStreamName(std::string& logName);
 
-	void operator<<(const std::string& message);
-	void operator<<(const std::wstring& message);
-
 private:
 
 	int logStreamHandle = 0;

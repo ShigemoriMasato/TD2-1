@@ -22,7 +22,7 @@ enum class TypeID : uint8_t {
 	Vector4 = 0x12,
 
 	//構造体とか
-	PSODesc = 0x80,
+	Custom = 0x80,
 
 };
 
