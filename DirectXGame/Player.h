@@ -28,6 +28,8 @@ public:
 
 	void OnCollision(Object* other) override;
 
+	Vector3* GetPositionPtr() { return &transform_->position; }
+
 private:
 
 	Vector3 velocity_{};

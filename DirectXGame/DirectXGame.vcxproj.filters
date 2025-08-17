@@ -49,14 +49,17 @@
     <Filter Include="MyEngine\Scene">
       <UniqueIdentifier>{26e14feb-1a71-4c4e-8636-5b8c07e81a08}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MyEngine\Shader">
-      <UniqueIdentifier>{724ccedd-0eaf-4897-b885-e2c82199681a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Object">
       <UniqueIdentifier>{0c7a170f-de2d-45bf-bfc4-e22ba0affd4b}</UniqueIdentifier>
     </Filter>
     <Filter Include="MyEngine\Logger">
       <UniqueIdentifier>{87707572-8692-443e-a2ec-223c7eb23df9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyEngine\Core\PSO">
+      <UniqueIdentifier>{9c96e0f9-2eb0-4028-99aa-f6ad061e0b32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyEngine\Core\PSO\Shelf">
+      <UniqueIdentifier>{d10575bd-c6e6-4302-ad81-5b624a2c1d1c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -123,9 +126,6 @@
     <ClCompile Include="Scene\TitleScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\MyPSO.cpp">
-      <Filter>MyEngine\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Object\Actor.cpp">
       <Filter>Object</Filter>
     </ClCompile>
@@ -163,6 +163,33 @@
       <Filter>MyEngine\Data</Filter>
     </ClCompile>
     <ClCompile Include="AccelerateGate.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\PSO\PSOEditor.cpp">
+      <Filter>MyEngine\Core\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\PSO\PSOManager.cpp">
+      <Filter>MyEngine\Core\PSO</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\PSO\Shelf\BlendStateShelf.cpp">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\PSO\Shelf\DepthStencilShelf.cpp">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\PSO\Shelf\InputLayoutShelf.cpp">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\PSO\Shelf\ShaderShelf.cpp">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClCompile>
+    <ClCompile Include="Comet.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -239,9 +266,6 @@
     <ClInclude Include="Scene\TitleScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\MyPSO.h">
-      <Filter>MyEngine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Object\Action.h">
       <Filter>Object</Filter>
     </ClInclude>
@@ -287,23 +311,40 @@
     <ClInclude Include="AccelerateGate.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\PSOConfig.h">
+      <Filter>MyEngine\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\PSOEditor.h">
+      <Filter>MyEngine\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\PSOManager.h">
+      <Filter>MyEngine\Core\PSO</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\Shelf\BlendStateShelf.h">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\Shelf\DepthStencilShelf.h">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\Shelf\InputLayoutShelf.h">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\Shelf\RasterizerShelf.h">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\Shelf\RootSignatureShelf.h">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\Shelf\ShaderShelf.h">
+      <Filter>MyEngine\Core\PSO\Shelf</Filter>
+    </ClInclude>
+    <ClInclude Include="Comet.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
       <Filter>imgui</Filter>
     </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Engine\Shader\Object3d.hlsli">
-      <Filter>MyEngine\Shader</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Engine\Shader\Object3d.PS.hlsl">
-      <Filter>MyEngine\Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Engine\Shader\Object3d.VS.hlsl">
-      <Filter>MyEngine\Shader</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>

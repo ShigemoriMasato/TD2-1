@@ -7,6 +7,7 @@
 #include "../RailCameraController.h"
 #include "../GridMaker.h"
 #include "../AccelerateGate.h"
+#include "../Comet.h"
 
 class GameScene : public Scene {
 public:
@@ -33,4 +34,5 @@ private:
 	std::shared_ptr<Player> player_ = nullptr;
 
 	std::vector<std::shared_ptr<AccelerateGate>> accelerateGates_;
+	std::vector<std::shared_ptr<Comet>> comets_;
 };

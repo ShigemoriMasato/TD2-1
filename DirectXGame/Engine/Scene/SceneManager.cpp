@@ -40,6 +40,9 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	commonData_->modelHandle_[int(ModelType::SkySphere)] = myDirectX_->LoadObjFile("Resources/SkySphere", "sky_sphere.obj");
 	commonData_->modelHandle_[int(ModelType::Bullet)] = myDirectX_->LoadObjFile("Resources/Bullet", "Bullet.obj");
 	commonData_->modelHandle_[int(ModelType::AccelerateGate)] = myDirectX_->LoadObjFile("Resources/AccelerateGate", "AccelerateGate.obj");
+	commonData_->modelHandle_[int(ModelType::lowCommet)] = myDirectX_->LoadObjFile("Resources/Commet", "Commet1.obj");
+	commonData_->modelHandle_[int(ModelType::middleCommet)] = myDirectX_->LoadObjFile("Resources/Commet", "Commet2.obj");
+	commonData_->modelHandle_[int(ModelType::highCommet)] = myDirectX_->LoadObjFile("Resources/Commet", "Commet3.obj");
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたいモデル↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓描画したい量↓↓↓↓↓↓↓↓↓↓↓↓↓

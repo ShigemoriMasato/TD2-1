@@ -5,6 +5,7 @@
 #include "../Math/MyMath.h"
 #include <memory>
 #include <sstream>
+#include <numbers>
 #include "../../externals/imgui/imgui.h"
 #include "../../externals/imgui/imgui_impl_dx12.h"
 #include "../../externals/imgui/imgui_impl_win32.h"
@@ -20,25 +21,6 @@
 using namespace MyMath;
 
 namespace {
-    //ウィンドウプロシージャ
-    LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-        //imguiのウィンドウプロシージャを呼ぶ
-        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
-            return true;
-        }
-
-        //メッセージに応じてゲーム固有の処理を行う
-        switch (msg) {
-        case WM_DESTROY:
-            //アプリを落とす
-            PostQuitMessage(0);
-            return 0;
-        }
-
-        //標準のメッセージ
-        return DefWindowProc(hwnd, msg, wparam, lparam);
-    }
-
     static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
         //取得した時間を名前にしたファイルを作成し、そのなかにDumpを出力する
         SYSTEMTIME time;
@@ -316,45 +298,72 @@ int MyDirectX::LoadObjFile(const std::string& directoryPath, const std::string& 
 	std::ifstream file(directoryPath + "/" + filename); //ファイルを開く
     assert(file.is_open() && "MyDirectX::LoadObjFile / cannot open obj file");
 
+	std::string materialName; //マテリアル名を格納する変数
+
     while (std::getline(file, line)) {
         std::string identifier;
         std::istringstream s(line);
         s >> identifier; //行の先頭の文字列を取得
 
-        if (identifier == "v") {
+        if (identifier == "usemtl") {
+			s >> materialName; //マテリアル名を取得
+
+        } else if (identifier == "v") {
             Vector4 position;
             s >> position.x >> position.y >> position.z;
+            position.x *= -1.0f;
+            position.z *= -1.0f;
             position.w = 1.0f;
             positions.push_back(position); //位置を格納
+
         } else if (identifier == "vt") {
             Vector2 texcoord;
             s >> texcoord.x >> texcoord.y; //テクスチャ座標を格納
 			texcoord.y = 1.0f - texcoord.y;
             texcoords.push_back(texcoord);
+
         } else if (identifier == "vn") {
             Vector3 normal;
 			s >> normal.x >> normal.y >> normal.z; //法線を格納
             normal.x *= -1.0f; //y軸も反転
 			normals.push_back(normal);
+
         } else if (identifier == "f") {
+
             //面は三角形限定なので、読み込む前にEditor等で三角化させること。そのほかは未対応
             for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
                 std::string vertexDefinition;
 				s >> vertexDefinition; //頂点の定義を取得
+
                 //頂点の要素へのIndexは。「位置/UV/法線」で格納されているので、分解してIndexを取得する
                 std::istringstream v(vertexDefinition);
                 uint32_t elementIndices[3];
                 for (int32_t element = 0; element < 3; ++element) {
                     std::string index;
                     std::getline(v, index, '/');// /区切りでインデックスを読む
-                    elementIndices[element] = std::stoi(index);
+                    if (index != "") {
+                        elementIndices[element] = std::stoi(index);
+                    } else {
+                        elementIndices[element] = -1;
+                    }
                 }
+
+
                 //要素へのIndexから、実際の要素の値を取得して頂点を構築する
                 Vector4 position = positions[elementIndices[0] - 1];
-				Vector2 texcoord = texcoords[elementIndices[1] - 1];
+
+                Vector2 texcoord;
+                if (elementIndices[1] != -1) {
+                    texcoord = texcoords[elementIndices[1] - 1];
+                } else {
+					texcoord = { 0.0f, 0.0f }; //テクスチャ座標がない場合はデフォルト値を設定
+                }
+
 				Vector3 normal = normals[elementIndices[2] - 1];
+                
                 VertexData vertex = { position, texcoord, normal };
-				modelData.vertices.push_back(vertex); //頂点を格納
+				modelData.vertices[materialName].push_back(vertex); //頂点を格納
+
             }
         } else if (identifier == "mtllib") {
             std::string materialFilename;
@@ -363,28 +372,38 @@ int MyDirectX::LoadObjFile(const std::string& directoryPath, const std::string& 
         }
     }
     
+    //複数materialの場合、空データを入れておく
+    for (int i = 1; i < modelData.material.size(); ++i) {
+        modelList_.push_back(ModelData());
+		drawCount.push_back(0);
+    }
+
 	modelList_.push_back(modelData); //モデルデータをリストに追加
 	drawCount.push_back(0); //描画数を初期化
 	
-    vertexResource.push_back(std::vector<ID3D12Resource*>()); //頂点リソースの初期化
-	indexResource.push_back(std::vector<ID3D12Resource*>()); //インデックスリソースの初期化
-	materialResource.push_back(std::vector<ID3D12Resource*>()); //マテリアルリソースの初期化
-	wvpResource.push_back(std::vector<ID3D12Resource*>()); //ワールドビュー投影行列リソースの初期化
-	directionalLightResource.push_back(std::vector<ID3D12Resource*>()); //DirectionalLightリソースの初期化
+    for (int i = 0; i < modelData.material.size(); ++i) {
+        vertexResource.push_back(std::vector<ID3D12Resource*>()); //頂点リソースの初期化
+        indexResource.push_back(std::vector<ID3D12Resource*>()); //インデックスリソースの初期化
+        materialResource.push_back(std::vector<ID3D12Resource*>()); //マテリアルリソースの初期化
+        wvpResource.push_back(std::vector<ID3D12Resource*>()); //ワールドビュー投影行列リソースの初期化
+        directionalLightResource.push_back(std::vector<ID3D12Resource*>()); //DirectionalLightリソースの初期化
 
-    modelCount_++;
+        modelIndex_++;
+    }
 
-    return int(modelList_.size() - 1);
+	CreateModelDrawResource(int(modelIndex_), 1); //モデル描画リソースを一つ作成
+
+    return int(modelIndex_);
 }
 
 MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     kClientWidth(kWindowWidth),
     kClientHeight(kWindowHeight),
     clearColor(new float[4] {0.03f, 0.028f, 0.025f, 1.0f}),
-    logger(new Logger("master")),
+    logger(new Logger()),
     fenceValue(0),
     readTextureCount(0),
-    modelCount_(-1),
+    modelIndex_(-1),
     isCanDraw_(new bool(false)) {
     HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
     assert(SUCCEEDED(hr));
@@ -393,7 +412,6 @@ MyDirectX::MyDirectX(int32_t kWindowWidth, int32_t kWindowHeight) :
     resourceStates[swapChainResources[0].Get()] = D3D12_RESOURCE_STATE_PRESENT;
     resourceStates[swapChainResources[1].Get()] = D3D12_RESOURCE_STATE_PRESENT;
 	myWindow_ = new MyWindow(kWindowWidth, kWindowHeight);
-	pso = new MyPSO();
     Initialize();
 }
 
@@ -403,7 +421,6 @@ MyDirectX::~MyDirectX() {
 	delete isCanDraw_;
     delete logger;
     delete[] clearColor;
-	delete pso;
 }
 
 void MyDirectX::Initialize() {
@@ -420,8 +437,8 @@ int MyDirectX::CreateDrawResource(DrawKind drawKind, uint32_t createNum) {
 		//頂点リソース用のリソース作成
         switch (drawKind) {
         case kSphere:
-			vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 600));
-			indexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(uint32_t) * 3100));
+			vertexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * 561));
+            indexResource[drawKind].push_back(CreateBufferResource(device.Get(), sizeof(uint32_t) * 3072));
             break;
 
 		case kSprite:
@@ -458,17 +475,26 @@ int MyDirectX::CreateModelDrawResource(uint32_t modelHandle, uint32_t createNum)
     uint32_t index = DrawKindCount + modelHandle;
 
     for (uint32_t i = 0; i < createNum; ++i) {
-		vertexResource[index].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * modelList_[modelHandle].vertices.size()));
-		materialResource[index].push_back(CreateBufferResource(device.Get(), sizeof(MaterialData)));
-		directionalLightResource[index].push_back(CreateBufferResource(device.Get(), sizeof(DirectionalLightData)));
-		wvpResource[index].push_back(CreateBufferResource(device.Get(), sizeof(TramsformMatrixData)));
+
+        //materialの数だけリソースを作成する
+        for (int i = 0; i < modelList_[modelHandle].material.size(); ++i) {
+
+			std::string materialName = modelList_[modelHandle].material[i].name; //マテリアル名を取得
+
+            vertexResource[index].push_back(CreateBufferResource(device.Get(), sizeof(VertexData) * modelList_[modelHandle].vertices[materialName].size()));
+            materialResource[index].push_back(CreateBufferResource(device.Get(), sizeof(MaterialData)));
+            directionalLightResource[index].push_back(CreateBufferResource(device.Get(), sizeof(DirectionalLightData)));
+            wvpResource[index].push_back(CreateBufferResource(device.Get(), sizeof(TramsformMatrixData)));
+        }
+
     }
 
 	return int(vertexResource[index].size()); //描画できる最大数を返す
 }
 
-ModelMaterial MyDirectX::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
-    ModelMaterial material = {};
+std::vector<ModelMaterial> MyDirectX::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
+    std::vector<ModelMaterial> material = {};
+    int index = -1;
     std::string textureFilePath;
     std::string line;
 	std::ifstream file(directoryPath + "/" + filename); //ファイルを開く
@@ -479,19 +505,33 @@ ModelMaterial MyDirectX::LoadMaterialTemplateFile(const std::string& directoryPa
         std::stringstream s(line);
 		s >> identifier;
 
+        if (identifier == "newmtl") {
+            material.push_back(ModelMaterial());
+            ++index;
+			s >> material[index].name; //新しいマテリアル名を取得
+        }
         //identifierに応じて処理
-        if (identifier == "map_Kd") {
+        else if (identifier == "map_Kd") {
             std::string textureFilename;
 			s >> textureFilename;
             //連結してファイルパスにする
 			textureFilePath = directoryPath + "/" + textureFilename;
-            material.textureHandle = LoadTexture(textureFilePath);
+            material[index].textureHandle = LoadTexture(textureFilePath);
         }
     }
 
-    if (material.textureHandle == 0) {
-		//テクスチャが読み込めなかった場合は白い1x1のテクスチャを使う
-		material.textureHandle = 1;
+	file.close();
+    
+    //マテリアルが一つもない場合はデフォルトのマテリアルを作成
+    if(material.empty()) {
+        material.push_back(ModelMaterial());
+        index = 0;
+        material[index].textureHandle = WHIETE1x1; //白い1x1のテクスチャを使う
+	}
+
+    //テクスチャが読み込めなかった場合は白い1x1のテクスチャを使う
+    if (material[index].textureHandle == 0) {
+		material[index].textureHandle = WHIETE1x1;
     }
 
     return material;
@@ -503,6 +543,7 @@ void MyDirectX::BeginFrame() {
 
 void MyDirectX::PreDraw() {
     ClearScreen();
+    psoEditor_->BeginFrame(commandList.Get());
     *isCanDraw_ = true;
 }
 
@@ -586,7 +627,7 @@ void MyDirectX::InitDirectX() {
 
 #ifdef _DEBUG
 
-    ID3D12InfoQueue* infoQueue = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
     if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
         //やばいエラーの時に止まる
         infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
@@ -610,9 +651,6 @@ void MyDirectX::InitDirectX() {
         filter.DenyList.pSeverityList = severities;
         //指定したメッセージの行事を抑制する
         infoQueue->PushStorageFilter(&filter);
-
-        //解放
-        infoQueue->Release();
     }
 
 #endif
@@ -731,161 +769,6 @@ void MyDirectX::InitDirectX() {
 
     //=======================================================
 
-#pragma region dxcUtils & dxcCompiler
-
-    //dxcCompilerを初期化
-    hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils));
-    assert(SUCCEEDED(hr));
-    hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler));
-    assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-#pragma region includeHandler
-
-    //現時点でincludeはしないが、includeに対応するための設定を行っておく
-    hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
-    assert(SUCCEEDED(hr));
-
-#pragma endregion
-
-#pragma region RootSignature
-
-    //RootSignature作成
-    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-    descriptionRootSignature.Flags =
-        D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-#pragma region RootParameter
-
-#pragma region DescriptorTable
-
-    D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-    descriptorRange[0].BaseShaderRegister = 0;
-    descriptorRange[0].NumDescriptors = 1;
-    descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-    descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-#pragma endregion
-
-    //RootParameter作成。複数設定できるので配列
-    D3D12_ROOT_PARAMETER rootParameters[4] = {};
-
-#pragma region Material
-    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
-    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     //PixelShaderで使う
-    rootParameters[0].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
-#pragma endregion
-
-#pragma region Matrix
-    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
-    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;     //VertexShaderで使う
-    rootParameters[1].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
-#pragma endregion
-
-#pragma region Texture
-
-    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
-    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
-    rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;	//テーブルの中身
-    rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);	//テーブルの数
-
-#pragma endregion
-
-#pragma region DirectionalLight
-    
-	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;	//CBVを使う
-	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
-	rootParameters[3].Descriptor.ShaderRegister = 1;	//レジスタ番号1とバインド
-
-#pragma endregion
-
-#pragma endregion
-
-    descriptionRootSignature.pParameters = rootParameters;                  //ルートパラメータ配列へのポインタ
-    descriptionRootSignature.NumParameters = _countof(rootParameters);      //配列の長さ
-
-#pragma endregion
-
-
-
-    D3D12_STATIC_SAMPLER_DESC staticSampler[1] = {};
-    staticSampler[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;	//フィルタリングの方法
-    staticSampler[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-    staticSampler[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-    staticSampler[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//テクスチャのアドレスの方法
-    staticSampler[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;	//比較しない
-    staticSampler[0].MaxLOD = D3D12_FLOAT32_MAX;    //ありったけのMipmapを使う
-    staticSampler[0].ShaderRegister = 0;    //レジスタ番号0
-    staticSampler[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;    //PixelShaderで使う
-    descriptionRootSignature.pStaticSamplers = staticSampler;              //StaticSamplerの配列へのポインタ
-    descriptionRootSignature.NumStaticSamplers = _countof(staticSampler);   //配列の長さ
-
-    //シリアライズしてバイナリにする
-    hr = D3D12SerializeRootSignature(&descriptionRootSignature,
-        D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-    if (FAILED(hr)) {
-        logger->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-        assert(false);
-    }
-    //バイナリをもとに生成
-    hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-        signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
-    assert(SUCCEEDED(hr));
-
-    //InputLayout
-    D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-    inputElementDescs[0].SemanticName = "POSITION";
-    inputElementDescs[0].SemanticIndex = 0;
-    inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-    inputElementDescs[1].SemanticName = "TEXCOORD";
-    inputElementDescs[1].SemanticIndex = 0;
-    inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-    inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-	inputElementDescs[2].SemanticName = "NORMAL";
-	inputElementDescs[2].SemanticIndex = 0;
-	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-    D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-    inputLayoutDesc.pInputElementDescs = inputElementDescs;
-    inputLayoutDesc.NumElements = _countof(inputElementDescs);
-
-    //BlendStateの設定
-    D3D12_BLEND_DESC blendDesc{};
-    blendDesc.AlphaToCoverageEnable = false;
-    blendDesc.IndependentBlendEnable = false;
-    blendDesc.RenderTarget[0].BlendEnable = true;
-	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-    //すべての色を取り込む
-    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-    //RasisterzerStateの設定
-    D3D12_RASTERIZER_DESC rasterizerDesc{};
-    //裏面(時計回り)を表示しない
-    rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-    //三角形の中を塗りつぶす
-    rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-
-    //Shaderをコンパイルする
-    vertexShaderBlob = CompileShader(L"./Engine/Shader/Object3D.VS.hlsl",
-        L"vs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get(), logger);
-    assert(vertexShaderBlob != nullptr);
-
-    pixelShaderBlob = CompileShader(L"./Engine/Shader/Object3D.PS.hlsl",
-        L"ps_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get(), logger);
-    assert(pixelShaderBlob != nullptr);
-
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-
     dsvDescriptorHeap = CreateDescriptorHeap(device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
     dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -895,51 +778,9 @@ void MyDirectX::InitDirectX() {
 
     device->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-    depthStencilDesc.DepthEnable = true;	//深度バッファを使う
-    depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;	//全ての深度値を使う
-    depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;	//深度値の比較方法
-
-    depthStencilDesc.StencilEnable = FALSE; // ステンシルテストを使わないなら FALSE
-    depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK; // デフォルト値
-    depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK; // デフォルト値
-
-    //実際に生成
-    pso->SetPSODesc(depthStencilDesc,
-        DXGI_FORMAT_D24_UNORM_S8_UINT,
-        rootSignature.Get(),
-        inputLayoutDesc,
-        { vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize() },
-        { pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize() },
-        blendDesc,
-        rasterizerDesc,
-        1,
-        DXGI_FORMAT_R8G8B8A8_UNORM,
-        D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-        D3D12_DEFAULT_SAMPLE_MASK
-        );
-	pso->SetDevice(device.Get());
-    pso->CreatePSO(int(PSOType::kOpaqueTriangle));
-
-	pso->SetRtvFormat(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-	pso->CreatePSO(int(PSOType::kOffScreen));
-
-    pso->SetRtvFormat(DXGI_FORMAT_R8G8B8A8_UNORM);
-	pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
-	pso->CreatePSO(int(PSOType::kOpaqueLine));
-
-    D3D12_DEPTH_STENCIL_DESC depthStencilDesc2{};
-    depthStencilDesc2.DepthEnable = true;	//深度バッファを使う
-    depthStencilDesc2.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;	//深度地を書き込まない
-    depthStencilDesc2.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;	//深度値の比較方法
-
-    depthStencilDesc2.StencilEnable = FALSE; // ステンシルテストを使わないなら FALSE
-    depthStencilDesc2.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK; // デフォルト値
-    depthStencilDesc2.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK; // デフォルト値
-
-    pso->SetDsvDesc(depthStencilDesc2);
-	pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-	pso->CreatePSO(int(PSOType::kTransparentTriangle));
+	//PSOの初期化
+    psoEditor_ = std::make_unique<PSOEditor>(device.Get());
+    psoEditor_->Initialize(device.Get());
 
     for (int i = 0; i < DrawKindCount; ++i) {
 		vertexResource.push_back({});
@@ -1058,7 +899,6 @@ void MyDirectX::BeginImGui() {
 void MyDirectX::ClearScreen() {
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
     //RootSignature,PSO,RTVを設定
-	SetPSO(PSOType::kOpaqueTriangle);
     commandList->SetGraphicsRootSignature(rootSignature.Get());
     commandList->OMSetRenderTargets(1, &rtvHandles[2], false, &dsvHandle);
 
@@ -1125,92 +965,72 @@ void MyDirectX::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4
     vertexData[2].normal = { 0.0f, 0.0f, -1.0f };
 
 	Draw(worldMatirx, wvpMatrix, material, dLightData, textureHandle, kTriangle,
-        material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle,
         vertexData, 3);
 }
 
-void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix,
-    MaterialData material, DirectionalLightData dLightData, int textureHandle) {
+void MyDirectX::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
 
     if (drawCount[kSphere] >= vertexResource[kSphere].size()) {
         assert(false && "球の描画上限の超過");
     }
 
-    const float pie = 3.14159265358f;
-    const int vertical = 32;
-    const int horizontal = 16;
+    int vertical = 16;
+    int horizontal = 32;
 
-    const int vertexCount = (vertical + 1) * horizontal;
-    const int southPoleIndex = vertexCount;
-    const int totalVertexCount = vertexCount + 1;
-    const int indexCount = (vertical - 1) * horizontal * 6 + horizontal * 3;
+    int vertexCount = 0;
+	VertexData* vertexData = nullptr;
+	vertexResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
-    // 頂点バッファのマッピング
-    VertexData* vertexData = nullptr;
-    vertexResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+    for (int i = 0; i < vertical + 1; ++i) {
+		float theta = i * std::numbers::pi_v<float> / vertical; // 緯度
 
-    // インデックスバッファのマッピング
-    uint32_t* indexData = nullptr;
-    indexResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+		float sinTheta = std::sin(theta);
+		float cosTheta = std::cos(theta);
 
-    // 頂点生成（リング状）
-    for (int i = 0; i <= vertical; ++i) {
-        float v = float(i) / float(vertical);
-        float theta = pie * v;
+        for (int j = 0; j < horizontal + 1; ++j) {
+            float phi = j * std::numbers::pi_v<float> * 2.0f / horizontal;
 
-        for (int j = 0; j < horizontal; ++j) {
-            float u = float(j) / float(horizontal);
-            float phi = 2.0f * pie * u;
+			float sinPhi = std::sin(phi);
+			float cosPhi = std::cos(phi);
 
-            int index = i * horizontal + j;
+			// 球の頂点座標を計算
+			vertexData[vertexCount].position.x = radius * cosPhi * sinTheta;
+			vertexData[vertexCount].position.y = radius * cosTheta;
+			vertexData[vertexCount].position.z = radius * sinPhi * sinTheta;
+			vertexData[vertexCount].position.w = 1.0f;
 
-            float x = sinf(phi) * sinf(theta);
-            float y = cosf(theta);
-            float z = cosf(phi) * sinf(theta);
+			vertexData[vertexCount].texcoord.x = static_cast<float>(j) / horizontal;
+			vertexData[vertexCount].texcoord.y = static_cast<float>(i) / vertical;
 
-            vertexData[index].position = { x * radius, y * radius, z * radius, 1.0f };
-            vertexData[index].normal = { x, y, z };
-            vertexData[index].texcoord = { 1.0f - u, v };
+			vertexData[vertexCount].normal.x = cosPhi * sinTheta;
+			vertexData[vertexCount].normal.y = cosTheta;
+			vertexData[vertexCount].normal.z = sinPhi * sinTheta;
+
+            ++vertexCount;
         }
     }
 
-    // 南極点の追加
-    vertexData[southPoleIndex].position = { 0.0f, -radius, 0.0f, 1.0f };
-    vertexData[southPoleIndex].normal = { 0.0f, -1.0f, 0.0f };
-    vertexData[southPoleIndex].texcoord = { 0.5f, 1.0f };
+    uint32_t* indexData = nullptr;
+	indexResource[kSphere][drawCount[kSphere]]->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	int indexCount = 0;
 
-    // インデックス生成（リング間の三角形）
-    int idx = 0;
     for (int i = 0; i < vertical; ++i) {
         for (int j = 0; j < horizontal; ++j) {
-            int curr = i * horizontal + j;
-            int next = (i + 1) * horizontal + j;
-            int currNext = i * horizontal + (j + 1) % horizontal;
-            int nextNext = (i + 1) * horizontal + (j + 1) % horizontal;
 
-            if (i < vertical - 1) {
-                // 三角形1
-                indexData[idx++] = curr;
-                indexData[idx++] = next;
-                indexData[idx++] = currNext;
+            indexData[indexCount++] = i * (horizontal + 1) + j;
+			indexData[indexCount++] = i * (horizontal + 1) + j + 1;
+            indexData[indexCount++] = (i + 1) * (horizontal + 1) + j;
 
-                // 三角形2
-                indexData[idx++] = currNext;
-                indexData[idx++] = next;
-                indexData[idx++] = nextNext;
-            } else {
-                // 最下段（南極）への三角形
-                indexData[idx++] = next;
-                indexData[idx++] = nextNext;
-                indexData[idx++] = southPoleIndex;
-            }
+            indexData[indexCount++] = i * (horizontal + 1) + j + 1;
+			indexData[indexCount++] = (i + 1) * (horizontal + 1) + j + 1;
+            indexData[indexCount++] = (i + 1) * (horizontal + 1) + j;
+
         }
     }
 
-    // 描画呼び出し
     Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kSphere,
-        material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle,
-        vertexData, totalVertexCount, indexData, idx);
+        vertexData, vertexCount, indexData, indexCount);
+
 }
 
 void MyDirectX::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData) {
@@ -1220,23 +1040,19 @@ void MyDirectX::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpM
         assert(false && "over drawcount");
     }
 
-    //頂点リソースにデータを書き込む
-	VertexData* vertexData = nullptr;
-	vertexResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	std::memcpy(vertexData, modelList_[modelHandle].vertices.data(), sizeof(VertexData) * modelList_[modelHandle].vertices.size());
+    for (int i = 0; i < modelList_[modelHandle].material.size(); ++i) {
 
-	PSOType psoType = PSOType::kOpaqueTriangle;
+		std::string materialName = modelList_[modelHandle].material[i].name;
 
-    if (material.color.w < 1.0f) {
-        //透明な三角形を描画する場合は、PSOを透明用に変更する
-        psoType = PSOType::kTransparentTriangle;
-    } else {
-        //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-        psoType = PSOType::kOpaqueTriangle;
+        //頂点リソースにデータを書き込む
+        VertexData* vertexData = nullptr;
+        vertexResource[index][drawCount[index]]->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+        std::memcpy(vertexData, modelList_[modelHandle].vertices[materialName].data(), sizeof(VertexData) * modelList_[modelHandle].vertices[materialName].size());
+
+        Draw(worldMatrix, wvpMatrix, material, dLightData, modelList_[modelHandle].material[i].textureHandle,
+            DrawKind(index), vertexData, int(modelList_[modelHandle].vertices[materialName].size()));
+
     }
-
-    Draw(worldMatrix, wvpMatrix, material, dLightData, modelList_[modelHandle].material.textureHandle,
-        DrawKind(index), psoType, vertexData, int(modelList_[modelHandle].vertices.size()));
 }
 
 void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldmat, Matrix4x4 wvpmat, MaterialData material, DirectionalLightData dLightData, int textureHandle, bool isOffScreen) {
@@ -1272,23 +1088,12 @@ void MyDirectX::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matri
     indexData[4] = 3;
     indexData[5] = 2;
 
-	PSOType pso = PSOType::kOpaqueTriangle;
-
-	if (isOffScreen) {
-		//オフスクリーン用のPSOを設定
-		pso = PSOType::kOffScreen;
-    } else {
-        if (material.color.w < 1.0f) {
-            //透明な三角形を描画する場合は、PSOを透明用に変更する
-            pso = PSOType::kTransparentTriangle;
-        } else {
-            //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-            pso = PSOType::kOpaqueTriangle;
-        }
+    if (isOffScreen) {
+        psoEditor_->SetOffScreen(true);
     }
 
 	Draw(worldmat, wvpmat, material, dLightData, textureHandle, DrawKind::kSprite,
-		pso, vertexData, 4, indexData, 6);
+		vertexData, 4, indexData, 6);
 
 }
 
@@ -1335,7 +1140,6 @@ void MyDirectX::DrawPrism(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialDa
     }
 
 	Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kPrism,
-		material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle, 
 		vertexData, 7, indexData, 24);
 }
 
@@ -1413,16 +1217,7 @@ void MyDirectX::DrawBox(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData
         indexData[idx++] = base + 1;
     }
 
-    if (material.color.w < 1.0f) {
-        //透明な三角形を描画する場合は、PSOを透明用に変更する
-        SetPSO(PSOType::kTransparentTriangle);
-    } else {
-        //不透明な三角形を描画する場合は、PSOを不透明用に変更する
-        SetPSO(PSOType::kOpaqueTriangle);
-    }
-
 	Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kBox, 
-        material.color.w < 1.0f ? PSOType::kTransparentTriangle : PSOType::kOpaqueTriangle,
 		vertexData, 24, indexData, 36);
 }
 
@@ -1438,7 +1233,9 @@ void MyDirectX::DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMatrix, Matr
 	vertexData[1].texcoord = { 0.0f, 1.0f };
 	vertexData[1].normal = { 0.0f, 0.0f, 0.0f };
 
-	Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kLine, PSOType::kOpaqueLine,
+	psoEditor_->SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE);
+
+	Draw(worldMatrix, wvpMatrix, material, dLightData, textureHandle, DrawKind::kLine,
 		vertexData, 2);
 }
 
@@ -1454,6 +1251,7 @@ void MyDirectX::PostDraw() {
     //todo ポストエフェクト用の描画を行う
 
     //ImGuiへ描画
+    ImGui::SetNextWindowSize(ImVec2(768.0f, 432.0f));
     ImGui::Begin("GameWindow");
 
     //16:9の48倍
@@ -1477,11 +1275,18 @@ void MyDirectX::PostDraw() {
 
     //offscreenの描画
     DrawSprite({ -1.0f, 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f }, { -1.0f, -1.0f, 0.0f, 1.0f }, { 1.0f, -1.0f, 0.0f, 1.0f },
-        Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 2, true);
-    //ImGui::EndFrame();
+        Matrix::MakeIdentity4x4(), Matrix::MakeIdentity4x4(), {}, {}, 0, true);
+
+#ifdef _DEBUG
 
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+
+#else
+
+    ImGui::EndFrame();
+
+#endif
 
     InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_PRESENT, swapChainResources[backBufferIndex].Get());
 
@@ -1513,9 +1318,8 @@ void MyDirectX::PostDraw() {
 		count = 0;
 	}
 
-    //フレームの終了をログに通知
-	logger->Log(std::format("{} frame ended", ++frame_));
-    
+    ++frame_;
+
     //次のフレームのためのcommandReset
     commandAllocator->Reset();
     commandList->Reset(commandAllocator.Get(), nullptr);
@@ -1534,7 +1338,7 @@ void MyDirectX::Finalize() {
         textureResource[i]->Release();
     }
 
-    for (uint32_t i = 0; i < DrawKindCount + modelCount_ + 1; ++i){
+    for (uint32_t i = 0; i < DrawKindCount + modelIndex_ + 1; ++i){
         for (uint32_t j = 0; j < vertexResource[i].size(); ++j) {
             vertexResource[i][j]->Release();
             wvpResource[i][j]->Release();
@@ -1580,16 +1384,7 @@ void MyDirectX::InsertBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESO
     resourceStates[pResource] = stateAfter;
 }
 
-void MyDirectX::SetPSO(PSOType requirePSO) {
-    if (nowPSO == requirePSO) {
-        return;
-    }
-
-	nowPSO = requirePSO;
-    commandList->SetPipelineState(pso->Get(int(requirePSO)));
-}
-
-void MyDirectX::Draw(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle, DrawKind kind, PSOType pso, VertexData* vertexData, int vertexNum, uint32_t* indexData, int indexNum) {
+void MyDirectX::Draw(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, DirectionalLightData dLightData, int textureHandle, DrawKind kind, VertexData* vertexData, int vertexNum, uint32_t* indexData, int indexNum) {
     
     //シェーダーに送る各種データの作成
     TramsformMatrixData* wvpData = nullptr;
@@ -1624,9 +1419,13 @@ void MyDirectX::Draw(Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData ma
         commandList->IASetIndexBuffer(&indexBufferView);
     }
 
-    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+    if (material.color.w < 1.0f) {
+        psoEditor_->SetDepthStencilState(DepthStencilID::Transparent);
+    }
 
-    SetPSO(pso);
+    psoEditor_->Setting(commandList.Get());
+
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
     //マテリアルCBufferの場所を設定
     commandList->SetGraphicsRootConstantBufferView(0, materialResource[kind][drawCount[kind]]->GetGPUVirtualAddress());

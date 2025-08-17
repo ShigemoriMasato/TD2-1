@@ -32,6 +32,11 @@ void GameScene::Initialize() {
 	accelerateGates_.clear();
 	std::shared_ptr<AccelerateGate> gate = std::make_shared<AccelerateGate>(camera_, Vector3());
 	accelerateGates_.push_back(gate);
+
+	comets_.clear();
+	auto comet = std::make_shared<Comet>(camera_,commonData_.get(), player_->GetPositionPtr());
+	comet->Initialize();
+	comets_.push_back(comet);
 }
 
 std::unique_ptr<Scene> GameScene::Update() {
@@ -56,6 +61,10 @@ std::unique_ptr<Scene> GameScene::Update() {
 
 	player_->Update();
 
+	for(auto& c : comets_){
+		c->Update();
+	}
+
 	AllCollisionCheck();
 
 	return nullptr;
@@ -71,6 +80,11 @@ void GameScene::Draw() const {
 	for(auto& a : accelerateGates_) {
 		a->Draw();
 	}
+
+	for (auto& c : comets_) {
+		c->Draw();
+	}
+
 }
 
 void GameScene::AllCollisionCheck() {

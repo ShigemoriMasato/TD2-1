@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 class Camera;
 
@@ -33,6 +34,7 @@ struct MaterialData final {
 };
 
 struct ModelMaterial final {
+	std::string name;
 	int textureHandle;
 };
 
@@ -48,8 +50,8 @@ struct DirectionalLightData final {
 };
 
 struct ModelData final {
-	std::vector<VertexData> vertices;
-	ModelMaterial material{};
+	std::unordered_map<std::string, std::vector<VertexData>> vertices;
+	std::vector<ModelMaterial> material{};
 };
 
 struct AABB final {

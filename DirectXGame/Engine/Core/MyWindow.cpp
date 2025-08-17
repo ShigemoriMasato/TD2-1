@@ -3,10 +3,16 @@
 
 std::vector<HWND> MyWindow::hwndList_;
 std::vector<WNDCLASS> MyWindow::wcList_;
+std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> MyWindow::windowProc_ = nullptr;
 
 MyWindow::MyWindow(const int32_t kClientWidth, const int32_t kClientHeight) :
 kClientHeight_(kClientHeight),
 kClientWidth_(kClientWidth) {
+
+    windowProc_ = [this](HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+        return this->WindowProc(hwnd, msg, wparam, lparam);
+	};
+
 }
 
 MyWindow::~MyWindow() {
@@ -35,7 +41,7 @@ WNDCLASS MyWindow::GetWndClass(int handle) {
 int MyWindow::CreateWindowForApp() {
     WNDCLASS wc{};
     //ウィンドウプロシージャ
-    wc.lpfnWndProc = WindowProc;
+    wc.lpfnWndProc = WindowProcCarrier;
     //ウィンドウクラス名
     wc.lpszClassName = L"CG2WindowClass";
     //インスタンスハンドル
@@ -74,7 +80,12 @@ int MyWindow::CreateWindowForApp() {
 	return int(hwndList_.size() - 1); //ウィンドウハンドルのインデックスを返す
 }
 
-LRESULT MyWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+LRESULT MyWindow::WindowProcCarrier(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+    if (windowProc_) {
+		return windowProc_(hwnd, msg, wparam, lparam);
+    }
+
+    //登録されてなかったとき用の必要最低限構成
     //imguiのウィンドウプロシージャを呼ぶ
     if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
         return true;
@@ -86,6 +97,44 @@ LRESULT MyWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
         //アプリを落とす
         PostQuitMessage(0);
         return 0;
+    }
+
+    //標準のメッセージ
+    return DefWindowProc(hwnd, msg, wparam, lparam);
+}
+
+LRESULT MyWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+    //imguiのウィンドウプロシージャを呼ぶ
+    if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
+        return true;
+    }
+
+    int x, y;
+
+    //メッセージに応じてゲーム固有の処理を行う
+    switch (msg) {
+    case WM_DESTROY:
+        //アプリを落とす
+        PostQuitMessage(0);
+        return 0;
+    case WM_MOUSEMOVE:
+		//マウスの座標を取得
+        x = LOWORD(lparam);
+        y = HIWORD(lparam);
+        return 0;
+	case WM_LBUTTONDOWN:
+        //左クリック時の処理
+		return 0;
+    case WM_RBUTTONDOWN:
+		//右クリック時の処理
+		return 0;
+    case WM_KEYDOWN:
+        //キーボードのキーが押されたときの処理
+        if (wparam == VK_ESCAPE) { //ESCキーが押された場合
+            PostQuitMessage(0); //アプリを終了する
+            return 0;
+        }
+		return 0;
     }
 
     //標準のメッセージ

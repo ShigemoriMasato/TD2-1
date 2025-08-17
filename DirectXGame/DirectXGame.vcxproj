@@ -13,10 +13,18 @@
   <ItemGroup>
     <ClCompile Include="AccelerateGate.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
+    <ClCompile Include="Comet.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
-    <ClCompile Include="Engine\Core\MyPSO.cpp" />
     <ClCompile Include="Engine\Core\MyWindow.cpp" />
+    <ClCompile Include="Engine\Core\PSO\PSOEditor.cpp" />
+    <ClCompile Include="Engine\Core\PSO\PSOManager.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\BlendStateShelf.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\DepthStencilShelf.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\InputLayoutShelf.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\ShaderShelf.cpp" />
     <ClCompile Include="Engine\Data\Data.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
@@ -50,10 +58,19 @@
   <ItemGroup>
     <ClInclude Include="AccelerateGate.h" />
     <ClInclude Include="CollisionManager.h" />
+    <ClInclude Include="Comet.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
-    <ClInclude Include="Engine\Core\MyPSO.h" />
     <ClInclude Include="Engine\Core\MyWindow.h" />
+    <ClInclude Include="Engine\Core\PSO\PSOConfig.h" />
+    <ClInclude Include="Engine\Core\PSO\PSOEditor.h" />
+    <ClInclude Include="Engine\Core\PSO\PSOManager.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\BlendStateShelf.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\DepthStencilShelf.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\InputLayoutShelf.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\RasterizerShelf.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\RootSignatureShelf.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\ShaderShelf.h" />
     <ClInclude Include="Engine\Data\Data.h" />
     <ClInclude Include="Engine\Data\Matrix.h" />
     <ClInclude Include="Engine\Data\Transform.h" />
@@ -91,22 +108,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Engine\Shader\Object3d.hlsli">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Engine\Shader\Object3d.PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Engine\Shader\Object3d.VS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -156,7 +157,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Engine/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -167,8 +168,7 @@
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-xcopy /E /I /Y "$(ProjectDir)resources\*" "$(TargetDir)resources\"
-xcopy /E /I /Y "$(ProjectDir)Engine\Shader\*" "$(TargetDir)Engine\Shader\"</Command>
+xcopy /E /I /Y "$(ProjectDir)resources\*" "$(TargetDir)resources\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -183,7 +183,7 @@ xcopy /E /I /Y "$(ProjectDir)Engine\Shader\*" "$(TargetDir)Engine\Shader\"</Comm
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Engine/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

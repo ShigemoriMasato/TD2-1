@@ -7,6 +7,9 @@ enum class ModelType {
 	Enemy,
 	Bullet,
 	AccelerateGate,
+	lowCommet,
+	middleCommet,
+	highCommet,
 
 	ModelCount
 };
