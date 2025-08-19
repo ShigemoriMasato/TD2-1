@@ -61,6 +61,15 @@
     <Filter Include="MyEngine\Core\PSO\Shelf">
       <UniqueIdentifier>{d10575bd-c6e6-4302-ad81-5b624a2c1d1c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{3bd95070-ac0c-42b5-bb26-5fe94091ade8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\Binary">
+      <UniqueIdentifier>{ca23fdd8-a318-402d-9624-8cc86121c2b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\Binary\Data">
+      <UniqueIdentifier>{a8ae40bb-8946-472f-89bf-025087f278dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -189,7 +198,22 @@
     <ClCompile Include="Engine\Core\PSO\Shelf\ShaderShelf.cpp">
       <Filter>MyEngine\Core\PSO\Shelf</Filter>
     </ClCompile>
-    <ClCompile Include="Comet.cpp">
+    <ClCompile Include="Comet\Comet.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Comet\CometManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Binary\BinaryManager.cpp">
+      <Filter>Tools\Binary</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Binary\Data\BinaryInput.cpp">
+      <Filter>Tools\Binary\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Binary\Data\BinaryOutput.cpp">
+      <Filter>Tools\Binary\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Comet\CometDebugger.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -338,7 +362,25 @@
     <ClInclude Include="Engine\Core\PSO\Shelf\ShaderShelf.h">
       <Filter>MyEngine\Core\PSO\Shelf</Filter>
     </ClInclude>
-    <ClInclude Include="Comet.h">
+    <ClInclude Include="Comet\Comet.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Comet\CometManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Binary\BinaryManager.h">
+      <Filter>Tools\Binary</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Binary\Data\BinaryInput.h">
+      <Filter>Tools\Binary\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Binary\Data\BinaryOutput.h">
+      <Filter>Tools\Binary\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Comet\CometConfig.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Comet\CometDebugger.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

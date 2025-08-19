@@ -13,7 +13,9 @@
   <ItemGroup>
     <ClCompile Include="AccelerateGate.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
-    <ClCompile Include="Comet.cpp" />
+    <ClCompile Include="Comet\Comet.cpp" />
+    <ClCompile Include="Comet\CometDebugger.cpp" />
+    <ClCompile Include="Comet\CometManager.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
     <ClCompile Include="Engine\Core\MyWindow.cpp" />
@@ -54,11 +56,17 @@
     <ClCompile Include="Scene\TitleScene.cpp" />
     <ClCompile Include="TimeCall.cpp" />
     <ClCompile Include="Engine\Data\Value.cpp" />
+    <ClCompile Include="Tools\Binary\BinaryManager.cpp" />
+    <ClCompile Include="Tools\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Tools\Binary\Data\BinaryOutput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerateGate.h" />
     <ClInclude Include="CollisionManager.h" />
-    <ClInclude Include="Comet.h" />
+    <ClInclude Include="Comet\Comet.h" />
+    <ClInclude Include="Comet\CometConfig.h" />
+    <ClInclude Include="Comet\CometDebugger.h" />
+    <ClInclude Include="Comet\CometManager.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\Core\MyWindow.h" />
@@ -105,6 +113,9 @@
     <ClInclude Include="TimeCall.h" />
     <ClInclude Include="TimeCallData.h" />
     <ClInclude Include="Engine\Data\Value.h" />
+    <ClInclude Include="Tools\Binary\BinaryManager.h" />
+    <ClInclude Include="Tools\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Tools\Binary\Data\BinaryOutput.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -157,7 +168,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)Engine/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals/imgui/;$(ProjectDir)Engine/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

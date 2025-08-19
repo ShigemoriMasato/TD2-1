@@ -2,44 +2,140 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include "Vector.h"
+#include <any>
+#include <cassert>
+#include <istream>
+#include <ostream>
+#include <Data/Transform.h>
 
-class Value {
+enum class TypeID : uint8_t {
+	kUnknown = 0x00,	//不明な型
+
+	//もともとある型
+	Int = 0x01,
+	Float,
+	Bool,
+	String,
+	Double,
+
+	//VectorとかMatrixとか
+	Vector2 = 0x10,
+	Vector3,
+	Vector4,
+
+	//構造体とか
+	Custom = 0x80,
+	CometConfig,
+
+
+};
+
+class ValueBase {
 public:
-	Value(std::string naming) : name(naming) {};
-	virtual ~Value() = default;
-	std::string name;
+	ValueBase(std::string name) : name(name) {}
+	virtual ~ValueBase() = default;
+
+	template<typename T>
+	T get() {
+		std::any buffer = GetValueData();
+
+		//tryの中でエラーが発生したらキャッチに飛ぶやつ
+		try {
+			return std::any_cast<T>(buffer);
+		} catch (const std::bad_any_cast& e) {
+			assert(false && "ValueBase::get() failed: Type mismatch");
+			e;
+			return T(); // 型が一致しない場合はデフォルト値を返す
+		}
+
+	};
+
+	virtual uint8_t GetTypeID() const = 0;
+
+	virtual void Serialize(std::ostream& out) const = 0;
+	virtual void Deserialize(std::istream& in) = 0;
+
+	std::string name;		//変数名
+	
+protected:
+	ValueBase() = default;
+
 private:
+	//std::anyはできれば使いたくないので、誰も使えないようにprivateにする
+	
+	//値を取得する
+	virtual std::any GetValueData() = 0;	
 };
 
-class IntValue final : public Value {
+template<typename T>
+class Value : public ValueBase {
 public:
-	IntValue(std::string name, int value) : Value(name), value(value) {}
-	int value = 0;
+	Value(T value, std::string name = "default") : ValueBase(name), value(value) {};
+	~Value() override = default;
+
+	//値を変更する
+	void set(const T& newValue) {
+		value = newValue;
+	};
+
+	uint8_t GetTypeID() const override;
+
+	void Serialize(std::ostream& out) const override {
+		out.write(reinterpret_cast<const char*>(&value), sizeof(T));
+	}
+
+	void Deserialize(std::istream& in) override {
+		in.read(reinterpret_cast<char*>(&value), sizeof(T));
+	}
+
+	T value;				//値
+
+private:
+	//親クラスが値を取得する用関数
+	std::any GetValueData() override {
+		return value;
+	}
 };
 
-class FloatValue final : public Value {
-public:
-	FloatValue(std::string name, float value) : Value(name), value(value) {}
-	float value = 0.0f;
-};
-
-class Vec2Value final : public Value {
-public:
-	Vec2Value(std::string name, Vector2 value) : Value(name), value(value) {}
-	Vector2 value{};
-};
-
-class Vec3Value final : public Value {
-public:
-	Vec3Value(std::string name, Vector3 value) : Value(name), value(value) {}
-	Vector3 value{};
-};
-
-class Vec4Value final : public Value {
-public:
-	Vec4Value(std::string name, Vector4 value) : Value(name), value(value) {}
-	Vector4 value{};
-};
-
-std::shared_ptr<Value> MakeValue(std::string argName, std::vector<float> values);
+template<typename T>
+T operator+(const Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator-(const Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator*(const Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator/(const Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator+=(Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator-=(Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator*=(Value<T>& a, const Value<T>& b);
+template<typename T>
+T operator/=(Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator==(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator!=(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator<(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator>(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator<=(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator>=(const Value<T>& a, const Value<T>& b);
+template<typename T>
+Value<T> operator++(Value<T>& a);
+template<typename T>
+Value<T> operator--(Value<T>& a);
+template<typename T>
+bool operator!(Value<T>& a);
+template<typename T>
+bool operator&&(const Value<T>& a, const Value<T>& b);
+template<typename T>
+bool operator||(const Value<T>& a, const Value<T>& b);
+template<typename T>
+Value<T> operator<<(const Value<T>& a, int shift);
+template<typename T>
+Value<T> operator>>(const Value<T>& a, int shift);

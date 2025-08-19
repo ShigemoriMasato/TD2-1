@@ -1,15 +1,14 @@
 #pragma once
-#include "Object/Object.h"
-#include "Scene/Common/CommonData.h"
+#include "../Object/Object.h"
 
-struct CommetConfig {
+struct CometConfig {
 	Vector3 position;
 };
 
 class Comet : public Object {
 public:
 
-	Comet(Camera* camera, CommonData* commonData, Vector3* playerTransformPtr);
+	Comet(Camera* camera, std::array<int, 3> modelHandle, Vector3* playerTransformPtr);
 	~Comet() = default;
 
 	void Initialize() override;
@@ -20,6 +19,10 @@ public:
 	void AddMovement(const Vector3& movement);
 
 	void OnCollision(Object* other) override;
+
+	CometConfig GetConfig() const;
+
+	void SetConfig(const CometConfig& config);
 
 private:
 

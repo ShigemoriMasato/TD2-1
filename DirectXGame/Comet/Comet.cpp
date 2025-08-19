@@ -1,11 +1,7 @@
 #include "Comet.h"
 
-Comet::Comet(Camera* camera, CommonData* commonData, Vector3* playerPositionPtr) : Object(camera, ShapeType::Model) {
-	modelHandle_ = {
-		commonData->modelHandle_[int(ModelType::lowCommet)],
-		commonData->modelHandle_[int(ModelType::middleCommet)],
-		commonData->modelHandle_[int(ModelType::highCommet)]
-	};
+Comet::Comet(Camera* camera, std::array<int, 3> modelHandle, Vector3* playerPositionPtr) : Object(camera, ShapeType::Model) {
+	modelHandle_ = modelHandle;
 
 	handle_ = modelHandle_[2];
 
@@ -42,4 +38,14 @@ void Comet::AddMovement(const Vector3& movement) {
 
 void Comet::OnCollision(Object* other) {
 	
+}
+
+CometConfig Comet::GetConfig() const {
+	CometConfig config;
+	config.position = transform_->position;
+	return config;
+}
+
+void Comet::SetConfig(const CometConfig& config) {
+	transform_->position = config.position;
 }
