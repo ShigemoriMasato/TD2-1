@@ -13,6 +13,12 @@ Comet::Comet(Camera* camera, std::array<int, 3> modelHandle, Vector3* playerPosi
 
 	mainCollision_ = std::make_shared<RenderCollision>(CollisionType::Sphere, camera, this);
 	nearCollision_ = std::make_shared<RenderCollision>(CollisionType::Sphere, camera, this);
+
+	mainCollision_->SetColor(0xff0000ff);
+	nearCollision_->SetColor(0xaa5000ff);
+
+	mainCollision_->sphereConfig_.radius = 0.8f;
+	nearCollision_->sphereConfig_.radius = 1.0f;
 }
 
 void Comet::Initialize() {
@@ -31,7 +37,8 @@ void Comet::Update() {
 		handle_ = modelHandle_[0]; // high Commet
 	}
 
-
+	mainCollision_->Update();
+	nearCollision_->Update();
 }
 
 void Comet::SetPosition(const Vector3& position) {
@@ -61,5 +68,6 @@ Vector3* Comet::GetPositionPtr() const {
 }
 
 void Comet::Draw(const Matrix4x4* worldMatrix) const {
-
+	mainCollision_->Draw();
+	nearCollision_->Draw();
 }
