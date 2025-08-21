@@ -5,6 +5,8 @@
 #include "CometConfig.h"
 #include <memory>
 
+class CometDebugger;
+
 class CometManager {
 public:
 
@@ -12,24 +14,23 @@ public:
 	~CometManager();
 
 	void Initialize();
-
 	void Update();
-
 	void Draw();
+
+	void MakeComet();
+	void MakeCometfromConfig(const CometConfig& config);
+	void ClearComet();
+
+	std::vector<std::shared_ptr<Comet>>& GetComets() { return comets_; }
 
 private:
 
-	void SaveCometConfig(std::string filePath);
-	void LoadCometConfig(std::string filePath);
-
-	std::unique_ptr<BinaryManager> binaryManager_;
-
 	Camera* camera_;
 	Vector3* playerPos_;
-	std::vector<std::unique_ptr<Comet>> comets_;
-
-	std::vector<std::string> cometConfigFileNames_;
+	std::vector<std::shared_ptr<Comet>> comets_;
 
 	std::array<int, 3> cometHandles_ = { -1, -1, -1 };
+
+	std::unique_ptr<CometDebugger> debugger_;
 };
 

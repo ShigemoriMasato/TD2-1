@@ -198,10 +198,10 @@
     <ClCompile Include="Engine\Core\PSO\Shelf\ShaderShelf.cpp">
       <Filter>MyEngine\Core\PSO\Shelf</Filter>
     </ClCompile>
-    <ClCompile Include="Comet\Comet.cpp">
+    <ClCompile Include="Comet.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Comet\CometManager.cpp">
+    <ClCompile Include="CometManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Tools\Binary\BinaryManager.cpp">
@@ -213,8 +213,11 @@
     <ClCompile Include="Tools\Binary\Data\BinaryOutput.cpp">
       <Filter>Tools\Binary\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Comet\CometDebugger.cpp">
+    <ClCompile Include="CometDebugger.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Collision.cpp">
+      <Filter>Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -268,9 +271,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Input\Input.h">
       <Filter>MyEngine\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\MyMath.h">
-      <Filter>MyEngine\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Render\MyDirectX.h">
       <Filter>MyEngine\Render</Filter>
@@ -362,10 +362,10 @@
     <ClInclude Include="Engine\Core\PSO\Shelf\ShaderShelf.h">
       <Filter>MyEngine\Core\PSO\Shelf</Filter>
     </ClInclude>
-    <ClInclude Include="Comet\Comet.h">
+    <ClInclude Include="Comet.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Comet\CometManager.h">
+    <ClInclude Include="CometManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Tools\Binary\BinaryManager.h">
@@ -377,11 +377,14 @@
     <ClInclude Include="Tools\Binary\Data\BinaryOutput.h">
       <Filter>Tools\Binary\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Comet\CometConfig.h">
+    <ClInclude Include="CometDebugger.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Comet\CometDebugger.h">
+    <ClInclude Include="CometConfig.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\MyMath.h">
+      <Filter>MyEngine\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

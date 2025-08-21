@@ -1,7 +1,7 @@
 #include "GameScene.h"
-#include "../Engine/Input/Input.h"
-#include "../externals/imgui/imgui.h"
-#include "../Engine/Math/MyMath.h"
+#include <Input/Input.h>
+#include <imgui.h>
+#include <Math/MyMath.h>
 
 using namespace Matrix;
 
@@ -13,6 +13,7 @@ collisionManager_(std::make_unique<CollisionManager>()) {
 	player_ = std::make_shared<Player>(camera_, railCameraController_->GetCameraPtr(), commonData.get(), railCameraController_->GetSpeedPtr());
 	isDebugCamera = false;
 	gridMaker_ = std::make_unique<GridMaker>(camera_, false);
+	cometManager_ = std::make_unique<CometManager>(camera_, player_->GetPositionPtr(), commonData.get());
 }
 
 GameScene::~GameScene() {
@@ -33,10 +34,7 @@ void GameScene::Initialize() {
 	std::shared_ptr<AccelerateGate> gate = std::make_shared<AccelerateGate>(camera_, Vector3());
 	accelerateGates_.push_back(gate);
 
-	comets_.clear();
-	auto comet = std::make_shared<Comet>(camera_,commonData_.get(), player_->GetPositionPtr());
-	comet->Initialize();
-	comets_.push_back(comet);
+	cometManager_->Initialize();
 }
 
 std::unique_ptr<Scene> GameScene::Update() {
@@ -61,9 +59,7 @@ std::unique_ptr<Scene> GameScene::Update() {
 
 	player_->Update();
 
-	for(auto& c : comets_){
-		c->Update();
-	}
+	cometManager_->Update();
 
 	AllCollisionCheck();
 
@@ -81,21 +77,18 @@ void GameScene::Draw() const {
 		a->Draw();
 	}
 
-	for (auto& c : comets_) {
-		c->Draw();
-	}
-
+	cometManager_->Draw();
 }
 
 void GameScene::AllCollisionCheck() {
 
-	collisionManager_->AddObject(player_.get());
+	collisionManager_->AddObject(player_->GetCollision());
 	for (auto& b : player_->GetBullets()) {
-		collisionManager_->AddObject(b.get());
+		collisionManager_->AddObject(b->GetCollision());
 	}
 
 	for (auto& a : accelerateGates_) {
-		collisionManager_->AddObject(a.get());
+		collisionManager_->AddObject(a->GetCollision());
 	}
 
 	collisionManager_->CheckCollisions();

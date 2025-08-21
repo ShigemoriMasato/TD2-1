@@ -9,6 +9,12 @@ Render::Render(MyDirectX* myDirectX) {
 	isCanDraw_ = myDirectX_->GetIsCanDraw();
 }
 
+void Render::SetIsWireframe(bool isWireframe) {
+	if (myDirectX_ != nullptr) {
+		myDirectX_->SetIsWireframe(isWireframe);
+	}
+}
+
 void Render::DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 worldMatrix, Camera* camera, MaterialData material, DirectionalLightData dLightData, int textureHandle) {
 	if (!*isCanDraw_) {
 		return;

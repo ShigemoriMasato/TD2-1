@@ -1,7 +1,7 @@
 #include "BinaryInput.h"
 #include <Data/Transform.h>
 #include <d3d12.h>
-#include "../../../Comet/CometConfig.h"
+#include "../../../CometConfig.h"
 
 namespace {
 	template<typename T>
@@ -12,7 +12,7 @@ namespace {
 	}
 }
 
-std::shared_ptr<ValueBase> BinaryInput::ReadVBin(std::istream& in) {
+std::shared_ptr<ValueBase> BinaryInput::ReadBinaryFile(std::istream& in) {
 	// 1. TypeID
 	uint8_t typeID;
 	in.read(reinterpret_cast<char*>(&typeID), sizeof(typeID));
@@ -23,6 +23,9 @@ std::shared_ptr<ValueBase> BinaryInput::ReadVBin(std::istream& in) {
 
 	std::string name(nameLength, '\0');
 	in.read(&name[0], nameLength);
+
+	uint8_t stringLength;
+	std::string stringData;
 
 	// 3. 型ごとのValue生成
 	switch (static_cast<TypeID>(typeID)) {
@@ -36,7 +39,12 @@ std::shared_ptr<ValueBase> BinaryInput::ReadVBin(std::istream& in) {
 	}
 	case TypeID::String:
 	{
-		return ValueDeserialize<std::string>(name, in);
+		in.read(reinterpret_cast<char*>(&stringLength), sizeof(stringLength));
+
+		stringData = std::string(stringLength, '\0');
+		in.read(&stringData[0], stringLength);
+
+		return std::make_unique<Value<std::string>>(stringData, name);
 	}
 	case TypeID::Bool:
 	{

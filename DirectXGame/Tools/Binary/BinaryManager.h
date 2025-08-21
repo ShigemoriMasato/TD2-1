@@ -30,6 +30,8 @@ public:
 	/// <returns>新たに生成したValue配列</returns>
 	std::vector<std::shared_ptr<ValueBase>> Read(std::string fileName);
 
+	void MakeFile(std::string path);
+
 private:
 
 	std::unique_ptr<BinaryInput> input;

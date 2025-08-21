@@ -12,9 +12,9 @@ parentCamera_(parent) {
 	bulletModelHandle_ = cd->modelHandle_[int(ModelType::Bullet)];
 	reticleHandle_ = cd->textureHandle_[int(TextureType::Reticle)];
 	playerTransform_->rotation.y = std::numbers::pi_v<float>;
-	tag = "Player";
+	tag_ = "Player";
 	speed_ = speed;
-	collisionType_ = CollisionType::Cupsule;
+	collision_ = std::make_shared<RenderCollision>(CollisionType::Capsule, camera, this);
 }
 
 void Player::Initialize() {
@@ -91,12 +91,20 @@ void Player::Update() {
 
 	transform_->position = pos;
 
+	collision_->Update();
+	
+	//当たり判定のコンフィグ登録
+	collision_->capsuleConfig_.start = pos;
+	collision_->capsuleConfig_.end = prePos_;
+	collision_->capsuleConfig_.radius = 0.5f;
 }
 
 void Player::Draw(const Matrix4x4* worldMatrix) const {
 	Render::DrawSprite(reticleWorldMatrix_, camera_, { 1.0f, 1.0f, 1.0f, 1.0f }, {}, reticleHandle_);
 
 	Object::Draw(&screenTransform_);
+
+	collision_->Draw();
 
 	for (const auto& bullet : bullets_) {
 		bullet->Draw();
@@ -108,7 +116,7 @@ void Player::SetBulletTargetPosition(const Vector3* position) {
 }
 
 void Player::OnCollision(Object* other) {
-	if (other->tag == "Accelerate" && !hited_) {
+	if (other->tag_ == "Accelerate" && !hited_) {
 		*speed_ += 9.0f;
 		hit_ = true;
 		hited_ = true;

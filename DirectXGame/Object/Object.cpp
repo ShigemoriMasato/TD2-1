@@ -32,11 +32,13 @@ void Object::Draw(const Matrix4x4* worldMatrix) const {
 
 	MaterialData materialData;
 	materialData.color = {
-		float((color & 0xff000000) >> 24) / 255.0f,
-		float((color & 0x00ff0000) >> 16) / 255.0f,
-		float((color & 0x0000ff00) >> 8) / 255.0f,
-		float(color & 0x000000ff) / 255.0f
+		float((color_ & 0xff000000) >> 24) / 255.0f,
+		float((color_ & 0x00ff0000) >> 16) / 255.0f,
+		float((color_ & 0x0000ff00) >> 8) / 255.0f,
+		float(color_ & 0x000000ff) / 255.0f
 	};
+
+	Render::SetIsWireframe(isWireframe_);
 
 	switch (type_) {
 	case ShapeType::Triangle:

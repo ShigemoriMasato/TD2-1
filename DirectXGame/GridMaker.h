@@ -17,8 +17,6 @@ public:
 	GridLine(Camera* camera, LineType type, Vector3 center);
 	~GridLine() = default;
 
-	void Initialize() override {};
-	void Update() override {};
 	void AdjustCenter(float center);
 
 private:

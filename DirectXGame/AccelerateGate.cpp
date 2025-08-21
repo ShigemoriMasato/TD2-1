@@ -10,7 +10,9 @@ AccelerateGate::AccelerateGate(Camera* camera, Vector3 position, Vector3 rotatio
 	handle_ = modelHandle_;
 	transform_->position = position;
 	transform_->rotation = rotation;
-	tag = "Accelerate";
+	tag_ = "Accelerate";
+
+	collision_ = std::make_shared<Collision>(CollisionType::Sphere, this);
 }
 
 void AccelerateGate::OnCollision(Object* other) {
@@ -19,4 +21,6 @@ void AccelerateGate::OnCollision(Object* other) {
 	}
 
 	hited_ = true;
+
+	collision_->Update();
 }

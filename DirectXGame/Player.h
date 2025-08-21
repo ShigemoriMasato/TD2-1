@@ -1,5 +1,6 @@
 #pragma once
 #include "Object/Object.h"
+#include "Object/Collision.h"
 #include "PlayerBullet.h"
 #include "Scene/Common/CommonData.h"
 #include <vector>
@@ -12,9 +13,9 @@ public:
 	Player(Camera* camera, Camera* parent, CommonData* cd, float* speed);
 	~Player() = default;
 
-	void Initialize() override;
+	void Initialize();
 
-	void Update() override;
+	void Update();
 
 	/// <summary>
 	/// BulletとPlayerのDraw
@@ -30,6 +31,8 @@ public:
 
 	Vector3* GetPositionPtr() { return &transform_->position; }
 
+	Collision* GetCollision() { return collision_.get(); }
+
 private:
 
 	Vector3 velocity_{};
@@ -37,6 +40,8 @@ private:
 	float* speed_ = nullptr;
 
 	Camera* parentCamera_ = nullptr;
+
+	std::shared_ptr<RenderCollision> collision_;
 
 	int cooltime_ = 0;
 	const int maxCooltime_ = 5;

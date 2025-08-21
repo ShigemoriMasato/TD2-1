@@ -9,6 +9,8 @@ public:
 	Render(MyDirectX* myDirectX);
 	~Render() = default;
 
+	static void SetIsWireframe(bool isWireframe);
+
 	static void DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);
 
 	static void DrawSphere(float radius, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);

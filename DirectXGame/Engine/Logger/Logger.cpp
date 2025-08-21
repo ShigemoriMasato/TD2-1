@@ -40,6 +40,11 @@ int Logger::RegistLogFile(std::string logName) {
     std::string path = "Logs";  // 検索対象のディレクトリ
     
     bool isFind = false;
+	//Logsディレクトリが存在するか確認
+    if (!fs::exists(path)) {
+        fs::create_directory(path); // 存在しない場合は作成
+	}
+
     for (const auto& entry : fs::directory_iterator(path)) {
         std::cout << entry.path() << std::endl;
         if (entry.path() == logName) {

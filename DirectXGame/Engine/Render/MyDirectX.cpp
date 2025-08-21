@@ -782,6 +782,7 @@ void MyDirectX::InitDirectX() {
     psoEditor_ = std::make_unique<PSOEditor>(device.Get());
     psoEditor_->Initialize(device.Get());
 
+	//描画リソースの初期化
     for (int i = 0; i < DrawKindCount; ++i) {
 		vertexResource.push_back({});
 		wvpResource.push_back({});
@@ -1240,6 +1241,10 @@ void MyDirectX::DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMatrix, Matr
 }
 
 #pragma endregion
+
+void MyDirectX::SetIsWireframe(bool isWireframe) {
+    psoEditor_->SetRasterizerState(isWireframe ? RasterizerID::Wireframe : RasterizerID::Solid);
+}
 
 void MyDirectX::PostDraw() {
 

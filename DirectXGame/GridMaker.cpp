@@ -4,7 +4,7 @@
 GridLine::GridLine(Camera* camera, LineType type, Vector3 center) : Object(camera,
 	ShapeType::Line) {
 
-	color = 0x502000ff;
+	color_ = 0x502000ff;
 
 	center_ = center;
 	float thickness = 0.0f;
@@ -20,7 +20,7 @@ GridLine::GridLine(Camera* camera, LineType type, Vector3 center) : Object(camer
 			thickness = 0.3f;
 
 			if (static_cast<int>(center.x) == 0) {
-				color = 0x500000ff;
+				color_ = 0x500000ff;
 				thickness = 0.3f;
 			}
 		}
@@ -39,7 +39,7 @@ GridLine::GridLine(Camera* camera, LineType type, Vector3 center) : Object(camer
 			thickness = 0.3f;
 
 			if (static_cast<int>(center.z) == 0) {
-				color = 0x500000ff;
+				color_ = 0x500000ff;
 				thickness = 0.3f;
 			}
 		}

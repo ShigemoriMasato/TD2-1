@@ -7,6 +7,7 @@
 #include "../Data/Vector.h"
 #include "../Data/Matrix.h"
 #include "../Data/Transform.h"
+#include "../../Object/Collision.h"
 
 Vector2 operator+(const Vector2& a, const Vector2& b);
 Vector2 operator-(const Vector2& a, const Vector2& b);
@@ -138,7 +139,7 @@ namespace MyMath {
 }
 
 class Object;
-bool CollisionChecker(Object* a, Object* b);
+bool CollisionChecker(Collision* a, Collision* b);
 
 std::vector<Vector3> GetSplinePoints(const std::vector<Vector3>& controlPoints, int segment);
 std::vector<Vector3> GetCatmullPoints(const std::vector<Vector3>& points, int segmentsPerCurve);

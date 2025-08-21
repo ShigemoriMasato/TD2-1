@@ -5,6 +5,6 @@
 class BinaryInput {
 public:
 
-	std::shared_ptr<ValueBase> ReadVBin(std::istream& in);
+	std::shared_ptr<ValueBase> ReadBinaryFile(std::istream& in);
 };
 

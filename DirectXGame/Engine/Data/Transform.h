@@ -68,3 +68,9 @@ struct DistanceSample {
 	float t;       // 曲線上の割合
 	float distance; // 始点からの累積距離
 };
+
+struct Capsule {
+	Vector3 start;
+	Vector3 end;
+	float radius;
+};

@@ -1,5 +1,9 @@
 #include "BinaryManager.h"
 #include <fstream>
+#include <filesystem>
+
+
+namespace fs = std::filesystem;
 
 BinaryManager::BinaryManager() {
 	input = std::make_unique<BinaryInput>();
@@ -20,7 +24,7 @@ void BinaryManager::Write(std::string fileName) {
 	}
 
 	for (auto v : buffer) {
-		output->WriteVBin(file, v.get());
+		output->WriteBinaryFile(file, v.get());
 	}
 
 	file.close();
@@ -36,7 +40,7 @@ std::vector<std::shared_ptr<ValueBase>> BinaryManager::Read(std::string fileName
 	std::vector<std::shared_ptr<ValueBase>> ans;
 
 	while(file.peek() != EOF) {
-		auto val = input->ReadVBin(file);
+		auto val = input->ReadBinaryFile(file);
 		if (!val) {
 			break;
 		}
@@ -46,4 +50,25 @@ std::vector<std::shared_ptr<ValueBase>> BinaryManager::Read(std::string fileName
 	file.close();
 
 	return ans;
+}
+
+void BinaryManager::MakeFile(std::string path) {
+	fs::path filePath = fs::path(basePath) / path;
+	// ディレクトリが存在しなければ作成
+	fs::create_directories(filePath.parent_path());
+
+	// ファイルが既に存在する場合は何もしない
+	if (fs::exists(filePath)) {
+		return;
+	}
+
+	// ファイルを作成
+	std::ofstream ofs(filePath);
+	if (!ofs) {
+		throw std::runtime_error("Could not create file: " + filePath.string());
+	}
+
+	ofs.close();
+
+	return;
 }

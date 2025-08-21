@@ -12,10 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AccelerateGate.cpp" />
+    <ClCompile Include="Object\Collision.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
-    <ClCompile Include="Comet\Comet.cpp" />
-    <ClCompile Include="Comet\CometDebugger.cpp" />
-    <ClCompile Include="Comet\CometManager.cpp" />
+    <ClCompile Include="Comet.cpp" />
+    <ClCompile Include="CometDebugger.cpp" />
+    <ClCompile Include="CometManager.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
     <ClCompile Include="Engine\Core\MyWindow.cpp" />
@@ -62,11 +63,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerateGate.h" />
+    <ClInclude Include="Engine\Math\MyMath.h" />
     <ClInclude Include="CollisionManager.h" />
-    <ClInclude Include="Comet\Comet.h" />
-    <ClInclude Include="Comet\CometConfig.h" />
-    <ClInclude Include="Comet\CometDebugger.h" />
-    <ClInclude Include="Comet\CometManager.h" />
+    <ClInclude Include="Comet.h" />
+    <ClInclude Include="CometConfig.h" />
+    <ClInclude Include="CometDebugger.h" />
+    <ClInclude Include="CometManager.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\Core\MyWindow.h" />
@@ -85,7 +87,6 @@
     <ClInclude Include="Engine\Data\Vector.h" />
     <ClInclude Include="Engine\Input\Input.h" />
     <ClInclude Include="Engine\Logger\Logger.h" />
-    <ClInclude Include="Engine\Math\MyMath.h" />
     <ClInclude Include="Engine\Render\MyDirectX.h" />
     <ClInclude Include="Engine\Render\Render.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />

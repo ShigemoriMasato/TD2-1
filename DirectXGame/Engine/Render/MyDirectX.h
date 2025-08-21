@@ -88,6 +88,8 @@ public:
 
 	bool* GetIsCanDraw() const { return isCanDraw_; }
 
+	void SetIsWireframe(bool isWireframe);
+
 private:
 
 	std::vector<ModelMaterial> LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
