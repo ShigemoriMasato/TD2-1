@@ -1,5 +1,5 @@
 #pragma once
-#include "Object/Collision.h"
+#include "Object/Object.h"
 #include <list>
 
 class CollisionManager {
@@ -7,12 +7,12 @@ public:
 	CollisionManager() = default;
 	~CollisionManager() = default;
 
-	void AddObject(Collision* object);
+	void AddObject(Object* object);
 
 	void CheckCollisions();
 
 private:
 
-	std::list<Collision*> objects;
+	std::list<Object*> objects;
 
 };

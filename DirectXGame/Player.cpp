@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <numbers>
 
+using namespace Matrix;
+
 Player::Player(Camera* camera, Camera* parent, CommonData* cd, float* speed) : Object(camera, ShapeType::Model),
 playerTransform_(std::make_shared<Transform>()),
 parentCamera_(parent) {

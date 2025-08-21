@@ -2,7 +2,6 @@
 #include "../Math/MyMath.h"
 #include <memory>
 
-using namespace Matrix;
 struct Transform;
 
 //初期値を画面サイズ1280*720と仮定して設定

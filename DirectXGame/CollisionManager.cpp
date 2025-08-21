@@ -1,15 +1,14 @@
 #include "CollisionManager.h"
-#include <Math/MyMath.h>
 
-void CollisionManager::AddObject(Collision* object) {
+void CollisionManager::AddObject(Object* object) {
 	objects.push_back(object);
 }
 
 void CollisionManager::CheckCollisions() {
 
-	std::list<Collision*>::iterator itrA = objects.begin();
+	std::list<Object*>::iterator itrA = objects.begin();
 	for (; itrA != objects.end(); ++itrA) {
-		std::list<Collision*>::iterator itrB = itrA;
+		std::list<Object*>::iterator itrB = itrA;
 		++itrB;
 		for (; itrB != objects.end(); ++itrB) {
 
@@ -17,11 +16,9 @@ void CollisionManager::CheckCollisions() {
 				continue;
 			}
 
-			Collision* a = *itrA;
-			Collision* b = *itrB;
-
-			if (CollisionChecker) {
-
+			if (CollisionChecker(*itrA, *itrB)) {
+				(*itrA)->OnCollision(*itrB);
+				(*itrB)->OnCollision(*itrA);
 			}
 		}
 	}

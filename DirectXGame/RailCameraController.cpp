@@ -2,6 +2,8 @@
 #include "externals/imgui/imgui.h"
 #include "Engine/Render/Render.h"
 
+using namespace Matrix;
+
 RailCameraController::RailCameraController(Camera* camera) :
 	transform_(std::make_unique<Transform>()),
 	camera_(std::make_shared<Camera>()) {

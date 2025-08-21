@@ -11,8 +11,6 @@ Comet::Comet(Camera* camera, std::array<int, 3> modelHandle, Vector3* playerPosi
 
 	size_.x = 1.0f;
 
-	collisionRender_ = std::make_shared<CometCollision>(camera, false);
-
 	mainCollision_ = std::make_shared<RenderCollision>(CollisionType::Sphere, camera, this);
 	nearCollision_ = std::make_shared<RenderCollision>(CollisionType::Sphere, camera, this);
 }
@@ -33,7 +31,6 @@ void Comet::Update() {
 		handle_ = modelHandle_[0]; // high Commet
 	}
 
-	collisionRender_->SetPosition(transform_->position);
 
 }
 
@@ -65,30 +62,4 @@ Vector3* Comet::GetPositionPtr() const {
 
 void Comet::Draw(const Matrix4x4* worldMatrix) const {
 
-	collisionRender_->Draw();
-}
-
-CometCollision::CometCollision(Camera* camera, bool isSub) : Object(camera, ShapeType::Sphere) {
-	isWireframe_ = true;
-	size_.x = 1.0f;
-	SetLocalPosition({ 1.0f, 0.0f, 0.0f });
-
-
-	if (!isSub) {
-		nearCollision_ = std::make_shared<CometCollision>(camera, true);
-
-		color_ = 0xff8000ff;
-	} else {
-		size_.x = 0.8f;
-		SetLocalPosition({ 0.8f, 0.0f, 0.0f });
-		color_ = 0xff0000ff;
-	}
-}
-
-void CometCollision::Draw(const Matrix4x4* worldMatrix) const {
-	Object::Draw();
-
-	if (nearCollision_) {
-		nearCollision_->Draw();
-	}
 }

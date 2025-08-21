@@ -1,8 +1,7 @@
 #include "GridMaker.h"
 #include <cmath>
 
-GridLine::GridLine(Camera* camera, LineType type, Vector3 center) : Object(camera,
-	ShapeType::Line) {
+GridLine::GridLine(Camera* camera, LineType type, Vector3 center) : Object(camera, ShapeType::Line) {
 
 	color_ = 0x502000ff;
 

@@ -9,6 +9,12 @@ Collision::Collision(CollisionType collisionType, Object* object) {
 void Collision::Update() {
 	isHit_ = isHitMessage_;
 	isHitMessage_ = false;
+
+	collisionTransform_ = object_->GetTransform();
+}
+
+void Collision::SetCollisionType(CollisionType collisionType) {
+	collisionType_ = collisionType;
 }
 
 Object* Collision::GetObjectPtr() {
@@ -20,13 +26,14 @@ bool Collision::GetIsHit() {
 }
 
 RenderCollision::RenderCollision(CollisionType collisionType, Camera* camera, Object* object) : Collision(collisionType, object), Object(camera, ShapeType::Sphere) {
+	isWireframe_ = true;
 }
 
 void RenderCollision::Update() {
 	Collision::Update();
 
 	//当たり判定のconfigを描画クラスに渡す
-	transform_->position = *position_;
+	transform_->position = collisionTransform_.position;
 	
 	switch (GetCollisionType()) {
 	case CollisionType::Sphere:
@@ -55,4 +62,6 @@ void RenderCollision::SetCollisionType(CollisionType type) {
 	Collision::SetCollisionType(type);
 
 	//形の変更も行う
+	static int a = 0;
+	a = 1;
 }

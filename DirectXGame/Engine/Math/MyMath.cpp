@@ -1,6 +1,5 @@
 #include "MyMath.h"
 #include "../../Object/Object.h"
-#include "../../Object/Collision.h"
 #include <cmath>
 #include <cassert>
 #include <algorithm>
@@ -476,23 +475,26 @@ bool operator!=(const Matrix4x4& a, const Matrix4x4& b) {
 	return !(a == b);
 }
 
-bool CollisionChecker(Collision* a, Collision* b) {
+bool CollisionChecker(Object* a, Object* b) {
 
-	if (a->GetCollisionType() == CollisionType::Sphere) {
-		if (b->GetCollisionType() == CollisionType::Sphere) {
+	if (a->collisionType_ == CollisionType::Sphere) {
+		if(b->collisionType_ == CollisionType::Sphere) {
 
-			float distance = Vector3(*a->position_ - *b->position_).Length();
-			return (distance <= (a->sphereConfig_.radius + b->sphereConfig_.radius));
+			Sphere as = { a->GetTransform().position, 0.5f * a->GetTransform().scale.x };
+			Sphere bs = { b->GetTransform().position, 0.5f * b->GetTransform().scale.x };
+
+			float distance = Vector3(as.center - bs.center).Length();
+			return (distance <= (as.radius + bs.radius));
 
 		}
 
-		if (b->GetCollisionType() == CollisionType::Capsule) {
+		if (b->collisionType_ == CollisionType::Capsule) {
 
 			//半径は0.5fとして計算
 
-			Vector3 segStart = b->capsuleConfig_.start + *b->position_;
-			Vector3 segEnd = b->capsuleConfig_.end + *b->position_;
-			Vector3 sphereCenter = *a->position_;
+			Vector3 segStart = b->GetPrePosition();
+			Vector3 segEnd = b->GetTransform().position;
+			Vector3 sphereCenter = a->GetTransform().position;
 
 			Vector3 seg = segEnd - segStart;
 			Vector3 toCenter = sphereCenter - segStart;
@@ -512,14 +514,14 @@ bool CollisionChecker(Collision* a, Collision* b) {
 		}
 	}
 
-	if (a->GetCollisionType() == CollisionType::Capsule) {
-		if (b->GetCollisionType() == CollisionType::Sphere) {
+	if (a->collisionType_ == CollisionType::Capsule) {
+		if (b->collisionType_ == CollisionType::Sphere) {
 
 			//半径は0.5fとして計算
 
-			Vector3 segStart = a->capsuleConfig_.start + *a->position_;
-			Vector3 segEnd = a->capsuleConfig_.end + *a->position_;
-			Vector3 sphereCenter = *b->position_;
+			Vector3 segStart = a->GetPrePosition();
+			Vector3 segEnd = a->GetTransform().position;
+			Vector3 sphereCenter = b->GetTransform().position;
 
 			Vector3 seg = segEnd - segStart;
 			Vector3 toCenter = sphereCenter - segStart;
@@ -537,8 +539,8 @@ bool CollisionChecker(Collision* a, Collision* b) {
 			return distance <= 1.0f;
 
 		}
-		if (b->GetCollisionType() == CollisionType::Capsule) {
-			//カプセルとカプセルは未実装
+		if (b->collisionType_ == CollisionType::Capsule) {
+
 		}
 	}
 

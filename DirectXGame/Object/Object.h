@@ -16,12 +16,18 @@ enum class ShapeType {
 	Count
 };
 
+enum class CollisionType {
+	Sphere,
+	Capsule,
+
+	CollisionTypeCount
+};
+
 class Object {
 public:
 
 	Object(Camera* camera, ShapeType type) : camera_(camera), type_(type), transform_(std::make_unique<Transform>()) {};
 	virtual ~Object() = default;
-
 	// 描画
 	virtual void Draw(const Matrix4x4* worldMatrix = nullptr) const;
 
@@ -30,8 +36,8 @@ public:
 	/// <summary>
 	/// 三角形、スプライト、球のときのみ適用
 	/// </summary>
-	/// <param name="lt">三角形左下、スプライト左上、球の半径、カプセルの始点</param>
-	/// <param name="rt">三角形上、スプライト右上、カプセルの終点</param>
+	/// <param name="lt">三角形左下、スプライト左上、球の半径</param>
+	/// <param name="rt">三角形上、スプライト右上</param>
 	/// <param name="lb">三角形右下、スプライト左下</param>
 	/// <param name="rb">スプライト右下</param>
 	void SetLocalPosition(const Vector3& lt = UniqueNumber::Vec3::min, const Vector3& rt = UniqueNumber::Vec3::min, const Vector3& lb = UniqueNumber::Vec3::min, const Vector3& rb = UniqueNumber::Vec3::min);
@@ -46,6 +52,7 @@ public:
 	void AddVelocity(const Vector3& velocity) { velocity_ += velocity; }
 
 	std::string tag_;
+	CollisionType collisionType_ = CollisionType::Sphere; //当たり判定の種類
 
 protected:
 
@@ -62,7 +69,7 @@ protected:
 	//当たり判定用
 	Vector3 size_ = { 1.0f, 1.0f, 1.0f };
 
-	bool isWireframe_ = false; //ワイヤーフレームで描画するかどうか
+	bool isWireframe_ = false;
 
 private:
 

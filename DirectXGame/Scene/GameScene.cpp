@@ -82,13 +82,13 @@ void GameScene::Draw() const {
 
 void GameScene::AllCollisionCheck() {
 
-	collisionManager_->AddObject(player_->GetCollision());
+	collisionManager_->AddObject(player_.get());
 	for (auto& b : player_->GetBullets()) {
-		collisionManager_->AddObject(b->GetCollision());
+		collisionManager_->AddObject(b.get());
 	}
 
 	for (auto& a : accelerateGates_) {
-		collisionManager_->AddObject(a->GetCollision());
+		collisionManager_->AddObject(a.get());
 	}
 
 	collisionManager_->CheckCollisions();

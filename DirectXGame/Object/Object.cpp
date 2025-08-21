@@ -8,6 +8,7 @@ namespace {
 }
 
 using namespace MyMath;
+using namespace Matrix;
 
 void Object::Draw(const Matrix4x4* worldMatrix) const {
 

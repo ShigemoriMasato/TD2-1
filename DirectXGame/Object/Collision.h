@@ -4,18 +4,11 @@
 #include <functional>
 #include <memory>
 
-enum class CollisionType {
-	Sphere,
-	Capsule,
-
-	CollisionTypeCount
-};
-
 class Collision {
 public:
 
 	Collision(CollisionType collisionType, Object* object);
-	~Collision() = default;
+	virtual ~Collision() = default;
 
 	virtual void Update();
 
@@ -25,14 +18,18 @@ public:
 
 	virtual void SetCollisionType(CollisionType collisionType);
 
-	std::unique_ptr<Vector3> position_{};
-
+	//ローカルポジション
 	Sphere sphereConfig_{};
+	//ローカルポジション
 	Capsule capsuleConfig_{};
 
 	std::function<void(Object* other)> onCollision_;
 
 	std::string tag_;
+
+protected:
+
+	Transform collisionTransform_{};
 
 private:
 
