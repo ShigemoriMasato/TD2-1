@@ -9,7 +9,6 @@ PlayerBullet::PlayerBullet(Camera* camera, Vector3 pos, Vector3 target, int hand
 	
 	velocity_ = {};
 	direction_ = target.Normalize();
-	tag_ = "Player";
 	color_ = 0x888800ff;
 
 	collision_ = std::make_shared<Collision>(CollisionType::Sphere, this);
@@ -29,7 +28,7 @@ void PlayerBullet::Update() {
 }
 
 void PlayerBullet::OnCollision(Object* other) {
-	if (other->tag_ == "Enemy") {
-		isActive_ = false;
-	}
+	//if (other->tag_ == "Enemy") {
+	//	isActive_ = false;
+	//}
 }

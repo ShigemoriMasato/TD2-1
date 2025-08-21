@@ -1,6 +1,7 @@
 #include "RailCameraController.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/Render/Render.h"
+#include <algorithm>
 
 using namespace Matrix;
 
@@ -40,6 +41,9 @@ void RailCameraController::Update() {
 	ImGui::Text("Speed: %.2f, Effect Speed: %.2f", speed_, effectSpeed_);
 	ImGui::End();
 
+	//全体速度が0.2未満にならないようにする
+	effectSpeed_ = std::max(-speed_ + 0.1f, effectSpeed_);
+
 	moveDistance_ += speed_ + effectSpeed_;
 	float t = GetTFromDistance(distanceSamples_, moveDistance_);
 	if (t >= 1.0f) {
@@ -51,6 +55,7 @@ void RailCameraController::Update() {
 	camera_->MakeMatrix();
 
 	effectSpeed_ *= attenuation_;
+
 }
 
 void RailCameraController::Draw(Camera* camera) {

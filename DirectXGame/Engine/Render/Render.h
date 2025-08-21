@@ -1,8 +1,8 @@
 #pragma once
 #include "../Math/MyMath.h"
-#include "MyDirectX.h"
 
 class Camera;
+class MyDirectX;
 
 class Render {
 public:

@@ -82,13 +82,19 @@ void GameScene::Draw() const {
 
 void GameScene::AllCollisionCheck() {
 
-	collisionManager_->AddObject(player_.get());
+	collisionManager_->AddObject(player_->GetCollision());
 	for (auto& b : player_->GetBullets()) {
-		collisionManager_->AddObject(b.get());
+		collisionManager_->AddObject(b->GetCollision());
 	}
 
 	for (auto& a : accelerateGates_) {
-		collisionManager_->AddObject(a.get());
+		collisionManager_->AddObject(a->GetCollision());
+	}
+
+	auto comets = cometManager_->GetComets();
+	for (auto& c : comets) {
+		collisionManager_->AddObject(c->GetMainCollision());
+		collisionManager_->AddObject(c->GetNearCollision());
 	}
 
 	collisionManager_->CheckCollisions();

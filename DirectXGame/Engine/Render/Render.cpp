@@ -1,5 +1,6 @@
 #include "Render.h"
 #include "../Camera/Camera.h"
+#include "MyDirectX.h"
 
 MyDirectX* Render::myDirectX_ = nullptr;
 bool* Render::isCanDraw_ = nullptr;

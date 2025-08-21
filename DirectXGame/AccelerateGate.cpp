@@ -10,9 +10,11 @@ AccelerateGate::AccelerateGate(Camera* camera, Vector3 position, Vector3 rotatio
 	handle_ = modelHandle_;
 	transform_->position = position;
 	transform_->rotation = rotation;
-	tag_ = "Accelerate";
 
-	collision_ = std::make_shared<Collision>(CollisionType::Sphere, this);
+	collision_ = std::make_shared<RenderCollision>(CollisionType::Sphere, camera, this);
+	collision_->sphereConfig_.radius = 2.0f;
+	collision_->tag_ = "middleBuff";
+	collision_->SetColor(0xff);
 }
 
 void AccelerateGate::OnCollision(Object* other) {

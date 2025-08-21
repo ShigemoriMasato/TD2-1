@@ -137,8 +137,8 @@ namespace MyMath {
 	float dot(const Vector3& a, const Vector3& b);
 }
 
-class Object;
-bool CollisionChecker(Object* a, Object* b);
+class Collision;
+bool CollisionChecker(Collision* a, Collision* b);
 
 std::vector<Vector3> GetSplinePoints(const std::vector<Vector3>& controlPoints, int segment);
 std::vector<Vector3> GetCatmullPoints(const std::vector<Vector3>& points, int segmentsPerCurve);

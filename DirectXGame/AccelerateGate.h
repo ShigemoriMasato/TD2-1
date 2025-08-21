@@ -14,7 +14,7 @@ public:
 
 	void SetPosition(Vector3 pos) { transform_->position = pos; }
 
-	void OnCollision(Object* other) override;
+	void OnCollision(Object* other);
 
 	Collision* GetCollision() { return collision_.get(); }
 
@@ -24,7 +24,6 @@ private:
 
 	bool hited_ = false;//当たり判定をTriggerにする用
 
-	std::shared_ptr<Collision> collision_ = nullptr;
+	std::shared_ptr<RenderCollision> collision_ = nullptr;
 
 };
-

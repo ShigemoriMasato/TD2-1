@@ -7,18 +7,19 @@ Comet::Comet(Camera* camera, std::array<int, 3> modelHandle, Vector3* playerPosi
 
 	playerPosition_ = playerPositionPtr;
 
-	tag_ = "Enemy";
-
 	size_.x = 1.0f;
 
 	mainCollision_ = std::make_shared<RenderCollision>(CollisionType::Sphere, camera, this);
-	nearCollision_ = std::make_shared<RenderCollision>(CollisionType::Sphere, camera, this);
-
 	mainCollision_->SetColor(0xff0000ff);
-	nearCollision_->SetColor(0xaa5000ff);
+	mainCollision_->sphereConfig_.radius = 0.5f;
+	mainCollision_->tag_ = "Enemy";
+	mainCollision_->onCollision_ = [this](Collision* other) {};
 
-	mainCollision_->sphereConfig_.radius = 0.8f;
+	nearCollision_ = std::make_shared<RenderCollision>(CollisionType::Sphere, camera, this);
+	nearCollision_->SetColor(0xaa5000ff);
 	nearCollision_->sphereConfig_.radius = 1.0f;
+	nearCollision_->tag_ = "smallBuff";
+	nearCollision_->onCollision_ = [this](Collision* other) {};
 }
 
 void Comet::Initialize() {
@@ -47,6 +48,14 @@ void Comet::SetPosition(const Vector3& position) {
 
 void Comet::AddMovement(const Vector3& movement) {
 	transform_->position += movement;
+}
+
+Collision* Comet::GetMainCollision() const {
+	return mainCollision_.get();
+}
+
+Collision* Comet::GetNearCollision() const {
+	return nearCollision_.get();
 }
 
 void Comet::OnCollision(Object* other) {

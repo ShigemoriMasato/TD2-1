@@ -16,13 +16,6 @@ enum class ShapeType {
 	Count
 };
 
-enum class CollisionType {
-	Sphere,
-	Capsule,
-
-	CollisionTypeCount
-};
-
 class Object {
 public:
 
@@ -30,8 +23,6 @@ public:
 	virtual ~Object() = default;
 	// 描画
 	virtual void Draw(const Matrix4x4* worldMatrix = nullptr) const;
-
-	virtual void OnCollision(Object* other) {}
 
 	/// <summary>
 	/// 三角形、スプライト、球のときのみ適用
@@ -50,9 +41,6 @@ public:
 	Vector3 GetPrePosition() const { return prePos_; }
 
 	void AddVelocity(const Vector3& velocity) { velocity_ += velocity; }
-
-	std::string tag_;
-	CollisionType collisionType_ = CollisionType::Sphere; //当たり判定の種類
 
 protected:
 

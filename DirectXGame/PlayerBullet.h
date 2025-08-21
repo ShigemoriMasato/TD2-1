@@ -10,7 +10,7 @@ public:
 	void Initialize();
 	void Update();
 
-	void OnCollision(Object* other) override;
+	void OnCollision(Object* other);
 
 	Collision* GetCollision() { return collision_.get(); }
 

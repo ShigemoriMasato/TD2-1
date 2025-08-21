@@ -22,15 +22,11 @@ public:
 	/// </summary>
 	void Draw(const Matrix4x4* worldMatrix = nullptr) const override;
 
-	std::vector<std::shared_ptr<PlayerBullet>> GetBullets() { return bullets_; }
-	Vector3 GetDirection() const { return direction_; }
-
 	void SetBulletTargetPosition(const Vector3* position);
 
-	void OnCollision(Object* other) override;
-
+	std::vector<std::shared_ptr<PlayerBullet>> GetBullets() { return bullets_; }
+	Vector3 GetDirection() const { return direction_; }
 	Vector3* GetPositionPtr() { return &transform_->position; }
-
 	Collision* GetCollision() { return collision_.get(); }
 
 private:
@@ -42,6 +38,7 @@ private:
 	Camera* parentCamera_ = nullptr;
 
 	std::shared_ptr<RenderCollision> collision_;
+	int collisionCooltime_ = 0;
 
 	int cooltime_ = 0;
 	const int maxCooltime_ = 5;

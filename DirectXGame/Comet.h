@@ -16,7 +16,10 @@ public:
 	void SetPosition(const Vector3& position);
 	void AddMovement(const Vector3& movement);
 
-	void OnCollision(Object* other) override;
+	Collision* GetMainCollision() const;
+	Collision* GetNearCollision() const;
+
+	void OnCollision(Object* other);
 
 	void SetConfig(const CometConfig& config);
 	CometConfig GetConfig() const;

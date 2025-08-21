@@ -4,6 +4,13 @@
 #include <functional>
 #include <memory>
 
+enum class CollisionType {
+	Sphere,
+	Capsule,
+
+	Count
+};
+
 class Collision {
 public:
 
@@ -23,7 +30,7 @@ public:
 	//ローカルポジション
 	Capsule capsuleConfig_{};
 
-	std::function<void(Object* other)> onCollision_;
+	std::function<void(Collision* other)> onCollision_;
 
 	std::string tag_;
 

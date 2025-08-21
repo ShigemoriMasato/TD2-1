@@ -14,9 +14,41 @@ parentCamera_(parent) {
 	bulletModelHandle_ = cd->modelHandle_[int(ModelType::Bullet)];
 	reticleHandle_ = cd->textureHandle_[int(TextureType::Reticle)];
 	playerTransform_->rotation.y = std::numbers::pi_v<float>;
-	tag_ = "Player";
 	speed_ = speed;
-	collision_ = std::make_shared<RenderCollision>(CollisionType::Capsule, camera, this);
+	collision_ = std::make_shared<RenderCollision>(CollisionType::Sphere, camera, this);
+
+	collision_->sphereConfig_.radius = 0.5f;
+
+	collision_->onCollision_ = [this](Collision* other) {
+
+		if (other->tag_ == "Enemy") {
+
+			collisionCooltime_ = 10;
+			*speed_ -= 3.0f;
+		
+		} else if (other->tag_ == "smallBuff") {
+
+			// クールタイム中は無効
+			if (collisionCooltime_ > 0) {
+				return;
+			}
+
+			*speed_ += 1.0f;
+
+		} else if (other->tag_ == "middleBuff") {
+
+			//クールタイム中は無効
+			if (collisionCooltime_ > 0) {
+				return;
+			}
+
+			collisionCooltime_ = 10;
+
+			*speed_ += 2.0f;
+
+		}
+
+		};
 }
 
 void Player::Initialize() {
@@ -99,6 +131,10 @@ void Player::Update() {
 	collision_->capsuleConfig_.start = pos;
 	collision_->capsuleConfig_.end = prePos_;
 	collision_->capsuleConfig_.radius = 0.5f;
+
+	if(collisionCooltime_ > 0) {
+		--collisionCooltime_;
+	}
 }
 
 void Player::Draw(const Matrix4x4* worldMatrix) const {
@@ -115,12 +151,4 @@ void Player::Draw(const Matrix4x4* worldMatrix) const {
 
 void Player::SetBulletTargetPosition(const Vector3* position) {
 	bulletTargetPositions_.push_back(const_cast<Vector3*>(position));
-}
-
-void Player::OnCollision(Object* other) {
-	if (other->tag_ == "Accelerate" && !hited_) {
-		*speed_ += 9.0f;
-		hit_ = true;
-		hited_ = true;
-	}
 }
