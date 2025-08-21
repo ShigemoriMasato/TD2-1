@@ -8,6 +8,7 @@
 #include <ostream>
 #include <Data/Transform.h>
 #include "../../CometConfig.h"
+#include "../../AccelerateGateConfig.h"
 
 enum class TypeID : uint8_t {
 	kUnknown = 0x00,	//不明な型
@@ -27,7 +28,7 @@ enum class TypeID : uint8_t {
 	//構造体とか
 	Custom = 0x80,
 	CometConfig,
-
+	AccelerateGateConfig,
 
 };
 
@@ -45,6 +46,7 @@ template<> struct TypeIDResolver<Vector2> { static constexpr TypeID id = TypeID:
 template<> struct TypeIDResolver<Vector3> { static constexpr TypeID id = TypeID::Vector3; };
 template<> struct TypeIDResolver<Vector4> { static constexpr TypeID id = TypeID::Vector4; };
 template<> struct TypeIDResolver<CometConfig> { static constexpr TypeID id = TypeID::CometConfig; };
+template<> struct TypeIDResolver<AccelerateGateConfig> { static constexpr TypeID id = TypeID::AccelerateGateConfig; };
 
 class ValueBase {
 public:

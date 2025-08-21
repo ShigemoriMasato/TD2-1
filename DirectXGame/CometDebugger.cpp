@@ -3,18 +3,18 @@
 #include <algorithm>
 
 CometDebugger::CometDebugger(CometManager* cometManager) {
-	cometManager_ = cometManager;
+	manager_ = cometManager;
 	binaryManager_ = std::make_unique<BinaryManager>();
 
-	auto files = binaryManager_->Read("Comet/CometFile.dat");
+	auto files = binaryManager_->Read("Comet/ConfigFile.dat");
 
 	for (auto& file : files) {
-		cometConfigFileNames_.push_back(dynamic_cast<Value<std::string>&>(*file).value);
+		configFileNames_.push_back(dynamic_cast<Value<std::string>&>(*file).value);
 	}
 }
 
 CometDebugger::~CometDebugger() {
-	for (auto& file : cometConfigFileNames_) {
+	for (auto& file : configFileNames_) {
 		binaryManager_->RegistOutput(file, "s");
 	}
 	binaryManager_->Write("Comet/CometFile.dat");
@@ -26,7 +26,7 @@ void CometDebugger::Update() {
 
 #pragma region Comet操作
 
-	auto comets = cometManager_->GetComets();
+	auto comets = manager_->GetComets();
 	std::vector<std::string> cometIDStrings;
 	std::vector<const char*> cometIDs;
 
@@ -49,8 +49,8 @@ void CometDebugger::Update() {
 		ImGui::Text("Comet ID: %d", selectedCometIndex_);
 
 		//position
-		Vector3* posPtr = cometManager_->GetComets()[selectedCometIndex_]->GetPositionPtr();
-		ImGui::DragFloat3("Position", &posPtr->x);
+		Vector3* posPtr = manager_->GetComets()[selectedCometIndex_]->GetPositionPtr();
+		ImGui::DragFloat3("Position", &posPtr->x, 0.1f);
 
 		ImGui::End();
 	}
@@ -60,10 +60,10 @@ void CometDebugger::Update() {
 #pragma region Comet生成
 
 	if (ImGui::Button("Make Comet")) {
-		cometManager_->MakeComet();
+		manager_->MakeComet();
 	}
 	if (ImGui::Button("Clear Comets")) {
-		cometManager_->ClearComet();
+		manager_->ClearComet();
 		selectedCometIndex_ = 0;
 	}
 
@@ -73,22 +73,22 @@ void CometDebugger::Update() {
 
 	std::vector<const char*> fileNames;
 
-	for(const auto& file : cometConfigFileNames_) {
+	for(const auto& file : configFileNames_) {
 		fileNames.push_back(file.c_str());
 	}
 
 	ImGui::Combo("ConfigFile", &selectedCometConfigIndex_, fileNames.data(), int(fileNames.size()));
 
 	if (ImGui::Button("Load")) {
-		LoadCometConfig(cometConfigFileNames_[selectedCometConfigIndex_]);
+		LoadCometConfig(configFileNames_[selectedCometConfigIndex_]);
 	}
 
 	if(ImGui::Button("Save")) {
-		SaveCometConfig(cometConfigFileNames_[selectedCometConfigIndex_]);
+		SaveCometConfig(configFileNames_[selectedCometConfigIndex_]);
 	}
 
 	if (ImGui::Button("Delete")) {
-		cometConfigFileNames_.erase(cometConfigFileNames_.begin() + selectedCometConfigIndex_);
+		configFileNames_.erase(configFileNames_.begin() + selectedCometConfigIndex_);
 		selectedCometConfigIndex_ = 0;
 	}
 
@@ -99,10 +99,10 @@ void CometDebugger::Update() {
 	ImGui::InputText("NewFile", newFileName_, 128);
 
 	if (ImGui::Button("MakeNewFile")) {
-		cometConfigFileNames_.push_back(newFileName_);
+		configFileNames_.push_back(newFileName_);
 		binaryManager_->MakeFile("Comet/" + std::string(newFileName_));
 
-		for (auto& file : cometConfigFileNames_) {
+		for (auto& file : configFileNames_) {
 			binaryManager_->RegistOutput(file, "s");
 		}
 		binaryManager_->Write("Comet/CometFile.dat");
@@ -115,7 +115,7 @@ void CometDebugger::Update() {
 }
 
 void CometDebugger::SaveCometConfig(std::string filePath) {
-	for (auto& comet : cometManager_->GetComets()) {
+	for (auto& comet : manager_->GetComets()) {
 		CometConfig config = comet->GetConfig();
 		binaryManager_->RegistOutput(config, "c");
 	}
@@ -125,7 +125,7 @@ void CometDebugger::SaveCometConfig(std::string filePath) {
 
 void CometDebugger::LoadCometConfig(std::string filePath) {
 	//Cometを全て削除
-	cometManager_->ClearComet();
+	manager_->ClearComet();
 
 	//バイナリからデータを読む
 	auto cometData = binaryManager_->Read("Comet/" + filePath);
@@ -133,6 +133,6 @@ void CometDebugger::LoadCometConfig(std::string filePath) {
 	//読み込んだデータをCometに変換してCometを生成する
 	for (auto& data : cometData) {
 		CometConfig config = dynamic_cast<Value<CometConfig>&>(*data).value;
-		cometManager_->MakeCometfromConfig(config);
+		manager_->MakeCometfromConfig(config);
 	}
 }

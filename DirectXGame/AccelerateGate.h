@@ -1,22 +1,25 @@
 #pragma once
 #include "Object/Object.h"
 #include "Object/Collision.h"
+#include "AccelerateGateConfig.h"
 
 class AccelerateGate : public Object {
 public:
 
 	static void SetHandle(int handle);
 
-	AccelerateGate(Camera* camera, Vector3 position, Vector3 rotation = {});
+	AccelerateGate(Camera* camera);
 
 	void Initialize() {};
 	void Update() {};
 
 	void SetPosition(Vector3 pos) { transform_->position = pos; }
+	void SetConfig(AccelerateGateConfig config);
 
 	void OnCollision(Object* other);
 
 	Collision* GetCollision() { return collision_.get(); }
+	AccelerateGateConfig GetConfig() const;
 
 private:
 

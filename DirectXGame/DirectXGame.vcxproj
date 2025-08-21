@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AccelerateGate.cpp" />
+    <ClCompile Include="AccelerateGateDebugger.cpp" />
+    <ClCompile Include="AccelerateGateManager.cpp" />
     <ClCompile Include="Object\Collision.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Comet.cpp" />
@@ -63,6 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerateGate.h" />
+    <ClInclude Include="AccelerateGateConfig.h" />
+    <ClInclude Include="AccelerateGateDebugger.h" />
+    <ClInclude Include="AccelerateGateManager.h" />
     <ClInclude Include="Engine\Math\MyMath.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Comet.h" />

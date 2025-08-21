@@ -6,7 +6,7 @@
 #include "../CollisionManager.h"
 #include "../RailCameraController.h"
 #include "../GridMaker.h"
-#include "../AccelerateGate.h"
+#include "../AccelerateGatemanager.h"
 #include "../CometManager.h"
 
 class GameScene : public Scene {
@@ -33,7 +33,7 @@ private:
 
 	std::shared_ptr<Player> player_ = nullptr;
 
-	std::vector<std::shared_ptr<AccelerateGate>> accelerateGates_;
-
 	std::unique_ptr<CometManager> cometManager_ = nullptr;
+
+	std::unique_ptr<AccelerateGateManager> accelerateGateManager_ = nullptr;
 };

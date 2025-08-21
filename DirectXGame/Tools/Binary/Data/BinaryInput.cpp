@@ -66,6 +66,10 @@ std::shared_ptr<ValueBase> BinaryInput::ReadBinaryFile(std::istream& in) {
 	{
 		return ValueDeserialize<CometConfig>(name, in);
 	}
+	case TypeID::AccelerateGateConfig:
+	{
+		return ValueDeserialize<AccelerateGateConfig>(name, in);
+	}
 	// 他の型も同様に追加
 	default:
 		assert(false && "Unknown TypeID in ReadVBin");

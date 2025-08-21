@@ -17,9 +17,9 @@ private:
 	void LoadCometConfig(std::string filePath);
 
 	std::unique_ptr<BinaryManager> binaryManager_;
-	std::vector<std::string> cometConfigFileNames_;
+	std::vector<std::string> configFileNames_;
 
-	CometManager* cometManager_ = nullptr;
+	CometManager* manager_ = nullptr;
 
 	char newFileName_[128];
 

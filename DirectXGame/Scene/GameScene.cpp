@@ -14,6 +14,7 @@ collisionManager_(std::make_unique<CollisionManager>()) {
 	isDebugCamera = false;
 	gridMaker_ = std::make_unique<GridMaker>(camera_, false);
 	cometManager_ = std::make_unique<CometManager>(camera_, player_->GetPositionPtr(), commonData.get());
+	accelerateGateManager_ = std::make_unique<AccelerateGateManager>(camera_, commonData.get());
 }
 
 GameScene::~GameScene() {
@@ -30,9 +31,7 @@ void GameScene::Initialize() {
 
 	AccelerateGate::SetHandle(commonData_->modelHandle_[int(ModelType::AccelerateGate)]);
 
-	accelerateGates_.clear();
-	std::shared_ptr<AccelerateGate> gate = std::make_shared<AccelerateGate>(camera_, Vector3());
-	accelerateGates_.push_back(gate);
+	accelerateGateManager_->Initialize();
 
 	cometManager_->Initialize();
 }
@@ -61,6 +60,8 @@ std::unique_ptr<Scene> GameScene::Update() {
 
 	cometManager_->Update();
 
+	accelerateGateManager_->Update();
+
 	AllCollisionCheck();
 
 	return nullptr;
@@ -73,24 +74,22 @@ void GameScene::Draw() const {
 
 	gridMaker_->Draw();
 
-	for(auto& a : accelerateGates_) {
-		a->Draw();
-	}
-
 	cometManager_->Draw();
+
+	accelerateGateManager_->Draw();
 }
 
 void GameScene::AllCollisionCheck() {
 
+	//Player
 	collisionManager_->AddObject(player_->GetCollision());
-	for (auto& b : player_->GetBullets()) {
+	//Player's Bullets
+	auto bullets = player_->GetBullets();
+	for (auto& b : bullets) {
 		collisionManager_->AddObject(b->GetCollision());
 	}
 
-	for (auto& a : accelerateGates_) {
-		collisionManager_->AddObject(a->GetCollision());
-	}
-
+	//Comets
 	auto comets = cometManager_->GetComets();
 	for (auto& c : comets) {
 		collisionManager_->AddObject(c->GetMainCollision());
