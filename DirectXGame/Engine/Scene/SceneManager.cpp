@@ -47,14 +47,14 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓描画したい量↓↓↓↓↓↓↓↓↓↓↓↓↓
 	myDirectX_->CreateDrawResource(MyDirectX::kBox, 100);
-	myDirectX_->CreateDrawResource(MyDirectX::kSprite, 100);
-	myDirectX_->CreateDrawResource(MyDirectX::kLine, 1500);
-	myDirectX_->CreateDrawResource(MyDirectX::kSphere, 10);
+	myDirectX_->CreateDrawResource(MyDirectX::kSprite, 200);
+	myDirectX_->CreateDrawResource(MyDirectX::kLine, 1000);
+	myDirectX_->CreateDrawResource(MyDirectX::kSphere, 1000);
 	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Player)], 10);
 	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Enemy)], 50);
-	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Bullet)], 500);
+	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Bullet)], 100);
 	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::AccelerateGate)], 10);
-	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::lowCommet)], 1000);
+	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::lowCommet)], 100);
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑描画したい量↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//最初のシーンを挿入
@@ -76,6 +76,15 @@ bool SceneManager::IsRoop() {
 			DispatchMessage(&msg);
 		} else {
 			//メッセージがなければ処理を始める
+
+			//前フレームの実行時間を計測
+			auto end = std::chrono::high_resolution_clock::now();
+			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - executeTime_);
+
+			frameTimes_.push_back(static_cast<int>(1.0f / (duration.count() / 1000.0f)));
+
+			executeTime_ = std::chrono::high_resolution_clock::now();
+
 			return true;
 		}
 

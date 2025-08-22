@@ -23,7 +23,7 @@ parentCamera_(parent) {
 
 		if (other->tag_ == "Enemy") {
 
-			collisionCooltime_ = 10;
+			collisionCooltime_ = 5;
 			*speed_ -= 3.0f;
 		
 		} else if (other->tag_ == "smallBuff") {
@@ -42,7 +42,7 @@ parentCamera_(parent) {
 				return;
 			}
 
-			collisionCooltime_ = 10;
+			collisionCooltime_ = 5;
 
 			*speed_ += 2.0f;
 

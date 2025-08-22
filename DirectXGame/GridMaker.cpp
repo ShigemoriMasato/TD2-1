@@ -74,19 +74,17 @@ GridMaker::GridMaker(Camera* camera, bool isDebugCamera) {
 	} else {
 		camera_ = camera;
 	}
-
-	Initialize();
 }
 
 void GridMaker::Initialize() {
 	Transform transform{};
 
 	for (int i = 0; i < 2; ++i) {
+		// i == 0: 縦線, i == 1: 横線
 
 		lines_[i].clear(); // 既存のラインをクリア
 
 		for (int j = 0; j < kGridCount; ++j) {
-			// i == 0: 縦線, i == 1: 横線
 			Vector3 center = nowMid;
 			if (i == 0) {
 				center.x = center.x - (kGridCount * gridSize_.x) / 2 + float(j * gridSize_.x);
@@ -196,4 +194,9 @@ void GridMaker::Draw() const {
 			line->Draw();
 		}
 	}
+}
+
+void GridMaker::SetPos(Vector3 pos) {
+	pos_ = pos;
+	nowMid.y = pos.y;
 }

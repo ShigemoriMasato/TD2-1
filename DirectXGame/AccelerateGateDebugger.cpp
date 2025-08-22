@@ -89,7 +89,11 @@ void AccelerateGateDebugger::Update() {
 	ImGui::Combo("ConfigFile", &selectedConfigIndex_, fileNames.data(), int(fileNames.size()));
 
 	if (ImGui::Button("Load")) {
-		LoadState(configFileNames_[selectedConfigIndex_]);
+		LoadState(configFileNames_[selectedConfigIndex_], true);
+	}
+
+	if (ImGui::Button("Making")) {
+		LoadState(configFileNames_[selectedConfigIndex_], false);
 	}
 
 	if (ImGui::Button("Save")) {
@@ -133,8 +137,10 @@ void AccelerateGateDebugger::SaveState(std::string filename) {
 	binaryManager_->Write(basePath_ + filename);
 }
 
-void AccelerateGateDebugger::LoadState(std::string filename) {
-	manager_->ClearGates();
+void AccelerateGateDebugger::LoadState(std::string filename, bool isClear) {
+	if (isClear) {
+		manager_->ClearGates();
+	}
 
 	auto configs = binaryManager_->Read(basePath_ + filename);
 

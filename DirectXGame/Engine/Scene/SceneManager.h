@@ -1,6 +1,7 @@
 #pragma once
 #include "../Render/MyDirectX.h"
 #include <memory>
+#include <chrono>
 
 class Scene;
 struct CommonData;
@@ -34,4 +35,8 @@ private:
 
 	std::unique_ptr<Input> input_ = nullptr;
 	std::unique_ptr<Sound> sound_ = nullptr;
+
+	std::chrono::steady_clock::time_point executeTime_{};
+
+	std::list<int> frameTimes_{};
 };

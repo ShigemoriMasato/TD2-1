@@ -15,6 +15,16 @@ AccelerateGate::AccelerateGate(Camera* camera) : Object(camera, ShapeType::Model
 	collision_->SetColor(0xff);
 }
 
+void AccelerateGate::Update() {
+	collision_->Update();
+}
+
+void AccelerateGate::Draw(const Matrix4x4* worldMatrix) const {
+	Object::Draw();
+
+	collision_->Draw();
+}
+
 void AccelerateGate::SetConfig(AccelerateGateConfig config) {
 	*transform_ = config.transform;
 

@@ -70,6 +70,9 @@
     <Filter Include="Tools\Binary\Data">
       <UniqueIdentifier>{a8ae40bb-8946-472f-89bf-025087f278dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tools\ObjectDebugger">
+      <UniqueIdentifier>{8b36245a-6ce0-45c7-8504-c5b26ce3ab4f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -400,6 +403,9 @@
     </ClInclude>
     <ClInclude Include="AccelerateGateConfig.h">
       <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Collision.h">
+      <Filter>Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -12,7 +12,8 @@ collisionManager_(std::make_unique<CollisionManager>()) {
 	railCameraController_ = std::make_unique<RailCameraController>();
 	player_ = std::make_shared<Player>(camera_, railCameraController_->GetCameraPtr(), commonData.get(), railCameraController_->GetSpeedPtr());
 	isDebugCamera = false;
-	gridMaker_ = std::make_unique<GridMaker>(camera_, false);
+	adoveGrid_ = std::make_unique<GridMaker>(camera_, false);
+	belowGrid_ = std::make_unique<GridMaker>(camera_, false);
 	cometManager_ = std::make_unique<CometManager>(camera_, player_->GetPositionPtr(), commonData.get());
 	accelerateGateManager_ = std::make_unique<AccelerateGateManager>(camera_, commonData.get());
 }
@@ -27,7 +28,10 @@ void GameScene::Initialize() {
 	player_->Initialize();
 	railCameraController_->Initialize();
 	camera_->SetProjectionMatrix(PerspectiveFovDesc());
-	gridMaker_->Initialize();
+	adoveGrid_->SetPos({ 0.0f, 10.0f });
+	adoveGrid_->Initialize();
+	belowGrid_->SetPos({ 0.0f, -20.0f });
+	belowGrid_->Initialize();
 
 	AccelerateGate::SetHandle(commonData_->modelHandle_[int(ModelType::AccelerateGate)]);
 
@@ -38,7 +42,8 @@ void GameScene::Initialize() {
 
 std::unique_ptr<Scene> GameScene::Update() {
 
-	gridMaker_->Update();
+	adoveGrid_->Update();
+	belowGrid_->Update();
 
 	if (Input::GetKeyState(DIK_R)) {
 		Initialize();
@@ -68,15 +73,15 @@ std::unique_ptr<Scene> GameScene::Update() {
 }
 
 void GameScene::Draw() const {
-	player_->Draw();
-	
 	railCameraController_->Draw(camera_);
 
-	gridMaker_->Draw();
+	belowGrid_->Draw();
 
 	cometManager_->Draw();
 
 	accelerateGateManager_->Draw();
+
+	player_->Draw();
 }
 
 void GameScene::AllCollisionCheck() {
@@ -94,6 +99,12 @@ void GameScene::AllCollisionCheck() {
 	for (auto& c : comets) {
 		collisionManager_->AddObject(c->GetMainCollision());
 		collisionManager_->AddObject(c->GetNearCollision());
+	}
+
+	//Gate
+	auto gates = accelerateGateManager_->GetGates();
+	for (auto& g : gates) {
+		collisionManager_->AddObject(g->GetCollision());
 	}
 
 	collisionManager_->CheckCollisions();

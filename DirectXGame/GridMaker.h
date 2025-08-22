@@ -38,6 +38,8 @@ public:
 
 	void Draw() const;
 
+	void SetPos(Vector3 pos = {});
+
 private:
 
 	std::array<std::vector<std::unique_ptr<GridLine>>, 2> lines_{};
@@ -45,6 +47,8 @@ private:
 	const Vector2 gridSize_{ 1.0f, 1.0f }; //Gridで囲う空間のサイズ
 	Camera* camera_;
 	DebugCamera* debugCamera_ = nullptr;
+
+	Vector3 pos_ = {};
 
 	Vector3 nowMid = { 0.0f, 0.0f, 0.0f };
 

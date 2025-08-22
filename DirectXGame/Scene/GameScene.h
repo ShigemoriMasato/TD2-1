@@ -27,7 +27,8 @@ private:
 	std::unique_ptr<RailCameraController> railCameraController_ = nullptr;
 	Camera* camera_;
 	DebugCamera* debugCamera_;
-	std::shared_ptr<GridMaker> gridMaker_ = nullptr;
+	std::shared_ptr<GridMaker> adoveGrid_ = nullptr;
+	std::shared_ptr<GridMaker> belowGrid_ = nullptr;
 
 	bool isDebugCamera = false;
 

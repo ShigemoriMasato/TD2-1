@@ -14,7 +14,7 @@ public:
 private:
 
 	void SaveState(std::string filename);
-	void LoadState(std::string filename);
+	void LoadState(std::string filename, bool isClear);
 
 	std::unique_ptr<BinaryManager> binaryManager_;
 	std::vector<std::string> configFileNames_;

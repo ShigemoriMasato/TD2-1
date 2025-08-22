@@ -11,7 +11,8 @@ public:
 	AccelerateGate(Camera* camera);
 
 	void Initialize() {};
-	void Update() {};
+	void Update();
+	void Draw(const Matrix4x4* worldMatrix = nullptr) const override;
 
 	void SetPosition(Vector3 pos) { transform_->position = pos; }
 	void SetConfig(AccelerateGateConfig config);
