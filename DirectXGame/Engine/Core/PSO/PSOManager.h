@@ -20,6 +20,8 @@ public:
 
 private:
 
+	void CreatePSO(const PSOConfig& config);
+
 	ID3D12Device* device_ = nullptr;
 
 	std::unordered_map<PSOConfig, ID3D12PipelineState*> psoMap_;

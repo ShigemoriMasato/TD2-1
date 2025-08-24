@@ -1,7 +1,7 @@
 #pragma once
 #include "Vector.h"
 #include "Matrix.h"
-#include "Data.h"
+#include "UniqueNumber.h"
 #include <cstdint>
 #include <vector>
 #include <string>
@@ -15,44 +15,6 @@ struct Transform {
 	Vector3 position{ 0.0f, 0.0f, 0.0f }; //位置
 };
 
-
-struct VertexData final {
-	Vector4 position;
-	Vector2 texcoord;
-	Vector3 normal;
-};
-
-struct MaterialData final {
-	Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	int32_t enableLighting = true;
-	float padding[3];
-	Matrix4x4 uvTransform = {
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f ,0.0f, 1.0f, 0.0f
-	};
-};
-
-struct ModelMaterial final {
-	std::string name;
-	int textureHandle;
-};
-
-struct TramsformMatrixData final {
-	Matrix4x4 wvp;
-	Matrix4x4 world;
-};
-
-struct DirectionalLightData final {
-	Vector4 color;
-	Vector3 direction;
-	float intensity;
-};
-
-struct ModelData final {
-	std::unordered_map<std::string, std::vector<VertexData>> vertices;
-	std::vector<ModelMaterial> material{};
-};
 
 struct AABB final {
 	Vector3 min{ 0.0f, 0.0f, 0.0f };

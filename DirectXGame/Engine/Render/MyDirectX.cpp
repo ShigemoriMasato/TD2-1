@@ -11,6 +11,7 @@
 #include "../../externals/imgui/imgui_impl_win32.h"
 #include "../../externals/DirectXTex/DirectXTex.h"
 #include "../../externals/DirectXTex/d3dx12.h"
+#include "DrawCommandManager.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")

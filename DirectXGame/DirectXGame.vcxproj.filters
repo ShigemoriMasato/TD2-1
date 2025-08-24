@@ -153,7 +153,7 @@
     <ClCompile Include="GridMaker.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Data\Data.cpp">
+    <ClCompile Include="Engine\Data\UniqueNumber.cpp">
       <Filter>MyEngine\Data</Filter>
     </ClCompile>
     <ClCompile Include="CollisionManager.cpp">
@@ -226,6 +226,24 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="AccelerateGateDebugger.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Render\DrawCommandManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resource\TextureLoader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resource\ModelLoader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resource\Data\TextureManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resource\Data\ModelManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resource\DrawResourceManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -317,7 +335,7 @@
     <ClInclude Include="Engine\Data\Vector.h">
       <Filter>MyEngine\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Data\Data.h">
+    <ClInclude Include="Engine\Data\UniqueNumber.h">
       <Filter>MyEngine\Data</Filter>
     </ClInclude>
     <ClInclude Include="TimeCallData.h">
@@ -406,6 +424,30 @@
     </ClInclude>
     <ClInclude Include="Object\Collision.h">
       <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Render\DrawCommandManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\TextureLoader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\ModelLoader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\Data\TextureManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\Data\ModelManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Render\DrawConfig.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Data\DrawData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\DrawResourceManager.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

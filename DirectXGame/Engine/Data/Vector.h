@@ -66,3 +66,57 @@ struct Vector4 final {
 		return *(&x + i);
 	}
 };
+
+namespace std {
+	template<>
+	struct hash<Vector4> {
+		size_t operator()(const Vector4& v) const {
+			size_t h = 0;
+			hash_combine(h, hash<float>()(v.x));
+			hash_combine(h, hash<float>()(v.y));
+			hash_combine(h, hash<float>()(v.z));
+			hash_combine(h, hash<float>()(v.w));
+			return h;
+		}
+
+	private:
+		static void hash_combine(size_t& seed, size_t value) {
+			seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+		}
+	};
+}
+
+namespace std {
+	template<>
+	struct hash<Vector3> {
+		size_t operator()(const Vector3& v) const {
+			size_t h = 0;
+			hash_combine(h, hash<float>()(v.x));
+			hash_combine(h, hash<float>()(v.y));
+			hash_combine(h, hash<float>()(v.z));
+			return h;
+		}
+
+	private:
+		static void hash_combine(size_t& seed, size_t value) {
+			seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+		}
+	};
+}
+
+namespace std {
+	template<>
+	struct hash<Vector2> {
+		size_t operator()(const Vector2& v) const {
+			size_t h = 0;
+			hash_combine(h, hash<float>()(v.x));
+			hash_combine(h, hash<float>()(v.y));
+			return h;
+		}
+
+	private:
+		static void hash_combine(size_t& seed, size_t value) {
+			seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+		}
+	};
+}

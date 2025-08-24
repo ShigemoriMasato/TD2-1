@@ -65,8 +65,6 @@ void PSOManager::Initialize() {
 								config.inputLayoutID = InputLayoutID::Default;
 								config.rootID = RootSignatureID::Default;
 
-								config.Validate(*shaderShelf_.get(), *inputLayoutShelf_.get(), *rootSignatureShelf_.get(), logger_);
-
 								//defaultとして設定したPSOを持ってくる
 								D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = basicDesc;
 
@@ -103,12 +101,42 @@ ID3D12PipelineState* PSOManager::GetPSO(const PSOConfig& config) {
 	if (it != psoMap_.end()) {
 		return it->second;
 	} else {
-		logger_->Log("PSO not found for given config");
-		assert(false && "PSO not found for given config");
+		
 		return nullptr;
 	}
 }
 
 ID3D12RootSignature* PSOManager::GetRootSignature(const RootSignatureID id) const {
 	return rootSignatureShelf_->GetRootSignature(id);
+}
+
+void PSOManager::CreatePSO(const PSOConfig& config) {
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+
+	//config関係ないやつ
+	psoDesc.NumRenderTargets = 1;
+	psoDesc.SampleDesc.Count = 1;
+	psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	psoDesc.InputLayout = inputLayoutShelf_->GetInputLayoutDesc(InputLayoutID::Default);
+	psoDesc.pRootSignature = rootSignatureShelf_->GetRootSignature(RootSignatureID::Default);
+	psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	//config関係あるやつ
+	psoDesc.VS = shaderShelf_->GetShaderBytecode(ShaderType::VERTEX_SHADER, config.vs);
+	psoDesc.PS = shaderShelf_->GetShaderBytecode(ShaderType::PIXEL_SHADER, config.ps);
+	psoDesc.DepthStencilState = depthStencilShelf_->GetDepthStencilDesc(config.depthStencilID);
+	psoDesc.BlendState = blendStateShelf_->GetBlendState(config.blendID);
+	psoDesc.PrimitiveTopologyType = config.topology;
+	psoDesc.RasterizerState = rasterizerShelf_->GetRasterizerDesc(config.rasterizerID);
+	psoDesc.RTVFormats[0] = config.isOffScreen ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
+
+	ID3D12PipelineState* pso = nullptr;
+	HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso));
+
+	if (FAILED(hr)) {
+		logger_->Log(std::format("Failed to Create PSO"));
+		assert(false && "Failed to create PSO");
+	}
+
+	psoMap_[config] = pso;
 }

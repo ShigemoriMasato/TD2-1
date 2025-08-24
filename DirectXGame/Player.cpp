@@ -17,7 +17,7 @@ parentCamera_(parent) {
 	speed_ = speed;
 	collision_ = std::make_shared<RenderCollision>(CollisionType::Sphere, camera, this);
 
-	collision_->sphereConfig_.radius = 0.5f;
+	collision_->sphereConfig_.radius = 0.3f;
 
 	collision_->onCollision_ = [this](Collision* other) {
 

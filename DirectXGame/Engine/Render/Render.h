@@ -1,5 +1,5 @@
 #pragma once
-#include "../Math/MyMath.h"
+#include <Data/DrawData.h>
 
 class Camera;
 class MyDirectX;

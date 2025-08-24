@@ -7,6 +7,7 @@
 
 enum class RootSignatureID : uint8_t {
 	Default,
+	Sphere,
 
 	Count
 };

@@ -12,6 +12,7 @@
 #include <dxcapi.h>
 #include <wrl.h>
 
+#include <Data/DrawData.h>
 #include "../Logger/Logger.h"
 #include "../Math/MyMath.h"
 #include "../Sound/Audio.h"

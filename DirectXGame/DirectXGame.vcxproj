@@ -14,6 +14,10 @@
     <ClCompile Include="AccelerateGate.cpp" />
     <ClCompile Include="AccelerateGateDebugger.cpp" />
     <ClCompile Include="AccelerateGateManager.cpp" />
+    <ClCompile Include="Engine\Resource\DrawResourceManager.cpp" />
+    <ClCompile Include="Engine\Render\DrawCommandManager.cpp" />
+    <ClCompile Include="Engine\Resource\ModelLoader.cpp" />
+    <ClCompile Include="Engine\Resource\Data\ModelManager.cpp" />
     <ClCompile Include="Object\Collision.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Comet.cpp" />
@@ -30,7 +34,7 @@
     <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\ShaderShelf.cpp" />
-    <ClCompile Include="Engine\Data\Data.cpp" />
+    <ClCompile Include="Engine\Data\UniqueNumber.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Math\MyMath.cpp" />
@@ -57,6 +61,8 @@
     <ClCompile Include="Scene\Common\Scene.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Scene\TitleScene.cpp" />
+    <ClCompile Include="Engine\Resource\TextureLoader.cpp" />
+    <ClCompile Include="Engine\Resource\Data\TextureManager.cpp" />
     <ClCompile Include="TimeCall.cpp" />
     <ClCompile Include="Engine\Data\Value.cpp" />
     <ClCompile Include="Tools\Binary\BinaryManager.cpp" />
@@ -68,6 +74,9 @@
     <ClInclude Include="AccelerateGateConfig.h" />
     <ClInclude Include="AccelerateGateDebugger.h" />
     <ClInclude Include="AccelerateGateManager.h" />
+    <ClInclude Include="Engine\Resource\DrawResourceManager.h" />
+    <ClInclude Include="Engine\Data\DrawData.h" />
+    <ClInclude Include="Engine\Render\DrawCommandManager.h" />
     <ClInclude Include="Engine\Math\MyMath.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Comet.h" />
@@ -86,7 +95,7 @@
     <ClInclude Include="Engine\Core\PSO\Shelf\RasterizerShelf.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\RootSignatureShelf.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\ShaderShelf.h" />
-    <ClInclude Include="Engine\Data\Data.h" />
+    <ClInclude Include="Engine\Data\UniqueNumber.h" />
     <ClInclude Include="Engine\Data\Matrix.h" />
     <ClInclude Include="Engine\Data\Transform.h" />
     <ClInclude Include="Engine\Data\Vector.h" />
@@ -94,6 +103,7 @@
     <ClInclude Include="Engine\Logger\Logger.h" />
     <ClInclude Include="Engine\Render\MyDirectX.h" />
     <ClInclude Include="Engine\Render\Render.h" />
+    <ClInclude Include="Engine\Render\DrawConfig.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\Sound\Audio.h" />
     <ClInclude Include="Engine\Sound\Sound.h" />
@@ -106,6 +116,8 @@
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="GridMaker.h" />
+    <ClInclude Include="Engine\Resource\ModelLoader.h" />
+    <ClInclude Include="Engine\Resource\Data\ModelManager.h" />
     <ClInclude Include="Object\Action.h" />
     <ClInclude Include="Object\Actor.h" />
     <ClInclude Include="Object\Collision.h" />
@@ -117,6 +129,8 @@
     <ClInclude Include="Scene\Common\Scene.h" />
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Scene\TitleScene.h" />
+    <ClInclude Include="Engine\Resource\TextureLoader.h" />
+    <ClInclude Include="Engine\Resource\Data\TextureManager.h" />
     <ClInclude Include="TimeCall.h" />
     <ClInclude Include="TimeCallData.h" />
     <ClInclude Include="Engine\Data\Value.h" />
