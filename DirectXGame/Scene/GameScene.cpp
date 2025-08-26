@@ -30,7 +30,7 @@ void GameScene::Initialize() {
 	camera_->SetProjectionMatrix(PerspectiveFovDesc());
 	adoveGrid_->SetPos({ 0.0f, 10.0f });
 	adoveGrid_->Initialize();
-	belowGrid_->SetPos({ 0.0f, -20.0f });
+	belowGrid_->SetPos({ 0.0f, -15.0f });
 	belowGrid_->Initialize();
 
 	AccelerateGate::SetHandle(commonData_->modelHandle_[int(ModelType::AccelerateGate)]);

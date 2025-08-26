@@ -10,6 +10,7 @@ enum class ModelType {
 	lowCommet,
 	middleCommet,
 	highCommet,
+	Title,
 
 	ModelCount
 };

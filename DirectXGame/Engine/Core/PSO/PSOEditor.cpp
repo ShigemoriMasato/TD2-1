@@ -41,6 +41,10 @@ void PSOEditor::SetOffScreen(const bool offScreen) {
 	nextConfig_.isOffScreen = offScreen;
 }
 
+void PSOEditor::SetConfig(const PSOConfig& config) {
+	nextConfig_ = config;
+}
+
 void PSOEditor::SetRootSignature(const RootSignatureID id) {
 	nextConfig_.rootID = id;
 }

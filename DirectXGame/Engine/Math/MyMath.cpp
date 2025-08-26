@@ -475,6 +475,28 @@ bool operator!=(const Matrix4x4& a, const Matrix4x4& b) {
 	return !(a == b);
 }
 
+Vector4 operator*(const Matrix4x4& a, const Vector4& b) {
+	Vector4 ans;
+	ans.x = b.x * a.m[0][0] + b.y * a.m[1][0] + b.z * a.m[2][0] + a.m[3][0] * b.w;
+	ans.y = b.x * a.m[0][1] + b.y * a.m[1][1] + b.z * a.m[2][1] + a.m[3][1] * b.w;
+	ans.z = b.x * a.m[0][2] + b.y * a.m[1][2] + b.z * a.m[2][2] + a.m[3][2] * b.w;
+	ans.w = b.x * a.m[0][3] + b.y * a.m[1][3] + b.z * a.m[2][3] + a.m[3][3] * b.w;
+	assert(std::abs(ans.w) > 1e-4);
+	ans.x /= ans.w;
+	ans.y /= ans.w;
+	ans.z /= ans.w;
+	return ans;
+}
+
+Vector4 operator*(const Vector4& a, const Matrix4x4& b) {
+	return b * a;
+}
+
+Vector4 operator*=(Vector4& a, const Matrix4x4& b) {
+	a = a * b;
+	return a;
+}
+
 bool CollisionChecker(Collision* a, Collision* b) {
 
 	Object* objA = a->GetObjectPtr();

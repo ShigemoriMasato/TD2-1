@@ -2,7 +2,8 @@
 #include "MyDirectX.h"
 #include <numbers>
 
-DrawCommandManager::DrawCommandManager() {
+DrawCommandManager::DrawCommandManager(ModelManager* manager) {
+	manager_ = manager;
 }
 
 DrawCommandManager::~DrawCommandManager() {
@@ -105,15 +106,37 @@ void DrawCommandManager::DrawSphere(float radius, Matrix4x4 worldMatrix, Matrix4
 
 }
 
-void DrawCommandManager::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material) {
-	int drawType = MyDirectX::DrawKindCount + modelHandle;
-
-
-
+void DrawCommandManager::DrawModel(int modelHandle, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, std::vector<int> textureIDs) {
 	TramsformMatrixData matrixData{};
 	matrixData.world = worldMatrix;
 	matrixData.wvp = wvpMatrix;
 
+	PSOConfig pso{};
+	if (material.color.w < 1.0f) {
+		pso.depthStencilID = DepthStencilID::Transparent;
+	}
+
+	ModelDrawConfig drawConfig{};
+	drawConfig.pso = pso;
+	drawConfig.material = material;
+	drawConfig.matrixData = matrixData;
+	drawConfig.textureIDs = textureIDs;
+
+	//画像について
+	int textureNum = static_cast<int>(manager_->GetModelData(modelHandle).material.size());
+	//modelが要求するテクスチャサイズと違う場合は合わせる
+	if (textureNum != textureIDs.size()) {
+		drawConfig.textureIDs.resize(textureNum);
+
+		//足りてなかった場合はWhite1x1を入れる
+		if (textureNum > textureIDs.size()) {
+			for(int i = static_cast<int>(textureIDs.size()); i < textureNum; ++i) {
+				drawConfig.textureIDs[i] = WHIETE1x1;
+			}
+		}
+	}
+
+	modelDrawQueue_[drawConfig].push_back(modelHandle);
 }
 
 void DrawCommandManager::DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldMatrix, Matrix4x4 wvpMatrix, MaterialData material, int textureHandle, bool isOffScreen) {
@@ -321,13 +344,19 @@ void DrawCommandManager::DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMat
 	MakeDrawData(drawType, { vertexData }, material, pso, matrixData, textureHandle);
 }
 
-std::vector<std::unordered_map<DrawConfig, DrawData>> DrawCommandManager::pushQueue() {
-	std::vector<std::unordered_map<DrawConfig, DrawData>> queue = std::move(drawQueue_);
+std::vector<std::unordered_map<DrawConfig, std::list<DrawData>>> DrawCommandManager::pushQueue() {
+	std::vector<std::unordered_map<DrawConfig, std::list<DrawData>>> queue = std::move(primitiveDrawQueue_);
 	
-	for(auto& drawMap : drawQueue_) {
+	for(auto& drawMap : primitiveDrawQueue_) {
 		drawMap.clear();
 	}
 
+	return queue;
+}
+
+std::unordered_map<ModelDrawConfig, std::list<int>> DrawCommandManager::pushModelQueue() {
+	std::unordered_map<ModelDrawConfig, std::list<int>> queue = std::move(modelDrawQueue_);
+	modelDrawQueue_.clear();
 	return queue;
 }
 
@@ -346,5 +375,9 @@ void DrawCommandManager::MakeDrawData(int drawType, DrawData drawData, MaterialD
 	drawConfig.matrixData = data;
 	drawConfig.textureID = textureID;
 
-	drawQueue_[drawType][drawConfig] = drawData;
+	if(primitiveDrawQueue_.size() <= static_cast<size_t>(drawType)) {
+		primitiveDrawQueue_.resize(drawType + 1);
+	}
+
+	primitiveDrawQueue_[drawType][drawConfig].push_back(drawData);
 }

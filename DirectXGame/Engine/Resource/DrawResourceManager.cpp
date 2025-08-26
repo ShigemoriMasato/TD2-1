@@ -29,76 +29,86 @@ namespace {
     }
 }
 
-DrawResourceManager::DrawResourceManager() {
-    vertexNum_.resize(int(MyDirectX::DrawKindCount));
-    indexNum_.resize(int(MyDirectX::DrawKindCount));
+DrawResourceManager::DrawResourceManager(ID3D12Device* device) {
+    std::vector<int> vertexNum;
+    std::vector<int> indexNum;
 
-    vertexNum_[0] = 3;
-    vertexNum_[1] = 561;
-    vertexNum_[2] = 4;
-    vertexNum_[3] = 7;
-    vertexNum_[4] = 24;
-    vertexNum_[5] = 2;
+    vertexNum.push_back(3);
+    vertexNum.push_back(561);
+    vertexNum.push_back(4);
+    vertexNum.push_back(7);
+    vertexNum.push_back(24);
+    vertexNum.push_back(2);
 
-    indexNum_[0] = 0;
-    indexNum_[1] = 3072;
-    indexNum_[2] = 6;
-    indexNum_[3] = 24;
-    indexNum_[4] = 36;
-    indexNum_[5] = 0;
+    indexNum.push_back(0);
+    indexNum.push_back(3072);
+    indexNum.push_back(6);
+    indexNum.push_back(24);
+    indexNum.push_back(36);
+    indexNum.push_back(0);
+
+    for (int i = 0; i < primitiveResource_.size(); ++i) {
+		primitiveResource_[i] = DrawResource(vertexNum[i], indexNum[i]);
+    }
+
+	device_ = device;
 }
 
 DrawResourceManager::~DrawResourceManager() {
-    
 }
 
 void DrawResourceManager::CreateResource(MyDirectX::DrawKind kind, int num) {
 	int index = static_cast<int>(kind);
 
-    bool useIndex = kind != MyDirectX::kTriangle && kind != MyDirectX::kLine;
-
-    primitiveResource_[index].CreateResource(device_, num, vertexNum_[index], kind == MyDirectX::kSphere, useIndex, indexNum_[index]);
+    primitiveResource_[index].Initialize(device_, num, kind == MyDirectX::kSphere);
 }
 
 void DrawResourceManager::CreateModelResource(int modelHandle, int num) {
+    for (auto& [materialName, resource] : modelResource_[modelHandle]) {
+        resource.Initialize(device_, num, true);
+    }
 }
 
 void DrawResourceManager::AddModelKind(ModelData modelData, int handle) {
-    for (int i = handle; i > handle - modelData.material.size(); --i) {
-
+    for (int i = 0; i < modelData.material.size(); ++i) {
+		std::string name = modelData.material[i].name;
+        modelResource_[handle][name] = DrawResource(static_cast<int>(modelData.vertices[name].size()), 0);
     }
 }
 
-void DrawResource::CreateResource(ID3D12Device* device, int num, int vertexNum, bool useMatrix, bool useIndex, int indexNum) {
-
-    for (int i = 0; i < num; ++i) {
-        vertexResource_.push_back(CreateBufferResource(device, sizeof(VertexData) * vertexNum));
-        materialResource_.push_back(CreateBufferResource(device, sizeof(MaterialData)));
-        //directionalLightの処遇は後で考える
-        directionalLightResource_.push_back(CreateBufferResource(device, sizeof(DirectionalLightData)));
-
-        if (useMatrix) {
-            wvpResource_.push_back(CreateBufferResource(device, sizeof(TramsformMatrixData)));
-        }
-        if (useIndex) {
-            indexResource_.push_back(CreateBufferResource(device, sizeof(uint32_t)));
-        }
-    }
-
+DrawResource::DrawResource(int vertexNum, int indexNum) {
+    vertexNum_ = vertexNum;
+	indexNum_ = indexNum;
 }
 
-void DrawResource::ClearResource() {
-    for (int j = 0; j < vertexResource_.size(); ++j) {
-        vertexResource_[j]->Release();
-        materialResource_[j]->Release();
-        directionalLightResource_[j]->Release();
+void DrawResource::Initialize(ID3D12Device* device, int num, bool useMatrix) {
+	vertexResource_ = CreateBufferResource(device, sizeof(VertexData) * vertexNum_ * num);
+	materialResource_ = CreateBufferResource(device, sizeof(MaterialData) * num);
+	directionalLightResource_ = CreateBufferResource(device, sizeof(DirectionalLightData) * num);
+    if (indexNum_ > 0) {
+        indexResource_ = CreateBufferResource(device, sizeof(uint32_t) * indexNum_ * num);
     }
+    if (useMatrix) {
+        wvpResource_ = CreateBufferResource(device, sizeof(TramsformMatrixData) * num);
+	}
+}
 
-    for (auto& indexResource : indexResource_) {
-        indexResource->Release();
-    }
+std::array<ID3D12Resource*, static_cast<size_t>(ResourceType::Count)> DrawResourceManager::GetPrimitiveResource(int type) {
+    return primitiveResource_[type].GetResource();
+}
 
-    for (auto& wvpResource : wvpResource_) {
-        wvpResource->Release();
-    }
+std::array<ID3D12Resource*, static_cast<size_t>(ResourceType::Count)> DrawResourceManager::GetModelResource(int type, std::string materialName) {
+	return modelResource_[type][materialName].GetResource();
+}
+
+std::array<ID3D12Resource*, static_cast<size_t>(ResourceType::Count)> DrawResource::GetResource() {
+	std::array<ID3D12Resource*, static_cast<size_t>(ResourceType::Count)> resources = {
+        vertexResource_.Get(),
+        indexResource_.Get(),
+        materialResource_.Get(),
+        directionalLightResource_.Get(),
+        wvpResource_.Get()
+    };
+
+    return resources;
 }

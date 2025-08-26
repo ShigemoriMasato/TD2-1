@@ -22,8 +22,8 @@ void RailCameraController::Initialize() {
 	controllPoints_ = { {0.0f, 0.0f, -800.0f},
 		{0.0f, 0.0f, -400.0f},
 		{ 0.0f, 3.0f, 0.0f },
-		{0.0f, -18.0f, 300.0f},
-		{0.0f, 3.0f, 600.0f},
+		{0.0f, -10.0f, 300.0f},
+		{0.0f, 0.0f, 600.0f},
 		{0.0f, 0.0f, 1000.0f}
 	};
 
@@ -59,10 +59,20 @@ void RailCameraController::Update() {
 }
 
 void RailCameraController::Draw(Camera* camera) {
+	float currentT = GetTFromDistance(distanceSamples_, moveDistance_);
+	int totalSegments = static_cast<int>(catmullPoints_.size()) - 1;
 
-	for (int i = 0; i < catmullPoints_.size() - 1; ++i) {
-		Render::DrawLine(MyMath::ConvertVector(catmullPoints_[i], 1.0f) + Vector4(0.0f, 0.0f, 20.0f), MyMath::ConvertVector(catmullPoints_[i + 1], 1.0f) + Vector4(0.0f, 0.0f, 20.0f),
-			MakeIdentity4x4(), camera, { 1.0f, 0.0f, 0.0f, 1.0f });
+	// 現在のtに対応するインデックスを計算
+	int maxIndex = static_cast<int>(currentT * totalSegments);
+	maxIndex = std::clamp(maxIndex, 0, totalSegments - 1);
+
+	for (int i = maxIndex; i < catmullPoints_.size() - 1; ++i) {
+		Render::DrawLine(
+			MyMath::ConvertVector(catmullPoints_[i], 1.0f) + Vector4(0.0f, 0.0f, 20.0f),
+			MyMath::ConvertVector(catmullPoints_[i + 1], 1.0f) + Vector4(0.0f, 0.0f, 20.0f),
+			MakeIdentity4x4(), camera,
+			{ 1.0f, 0.0f, 0.0f, 1.0f }
+		);
 	}
 
 }

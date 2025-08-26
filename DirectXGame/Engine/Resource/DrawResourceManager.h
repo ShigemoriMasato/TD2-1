@@ -5,26 +5,51 @@
 #include <Logger/Logger.h>
 #include <Data/DrawData.h>
 #include <array>
+#include <unordered_map>
+#include <wrl.h>
 
-struct DrawResource {
-	std::vector<ID3D12Resource*> vertexResource_;
-	std::vector<ID3D12Resource*> materialResource_;
-	std::vector<ID3D12Resource*> directionalLightResource_;
-	std::vector<ID3D12Resource*> indexResource_;
-	std::vector<ID3D12Resource*> wvpResource_;
+enum class ResourceType {
+	Vertex,
+	Index,
+	Material,
+	DirectionalLight,
+	Matrix,
+	Count
+};
 
-	void CreateResource(ID3D12Device* device, int num, int vertexNum, bool useMatrix = false, bool useIndex = false, int indexNum = 0);
-	void ClearResource();
+class DrawResource {
+public:
+	DrawResource() = default;
+	DrawResource(int vertexNum, int indexNum);
+	~DrawResource() = default;
+
+	void Initialize(ID3D12Device* device, int num, bool useMatrix = false);
+
+	std::array<ID3D12Resource*, static_cast<size_t>(ResourceType::Count)> GetResource();
+
+private:
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_ = nullptr;
+
+	int vertexNum_ = 0;
+	int indexNum_ = 0;
 };
 
 class DrawResourceManager {
 public:
 
-	DrawResourceManager();
+	DrawResourceManager(ID3D12Device* device);
 	~DrawResourceManager();
 
 	void CreateResource(MyDirectX::DrawKind kind, int num);
 	void CreateModelResource(int modelHandle, int num);
+
+	std::array<ID3D12Resource*, static_cast<size_t>(ResourceType::Count)> GetPrimitiveResource(int type);
+	std::array<ID3D12Resource*, static_cast<size_t>(ResourceType::Count)> GetModelResource(int type, std::string materialName);
 
 	void AddModelKind(ModelData modelData, int handle);
 
@@ -34,12 +59,8 @@ private:
 	std::vector<uint32_t> drawCount;
 
 	std::array<DrawResource, size_t(MyDirectX::DrawKindCount)> primitiveResource_;
-	DrawResource modelResource_;
+	std::vector<std::unordered_map<std::string, DrawResource>> modelResource_{};
 
 	//modelとsphereだけ使う
-
-	std::vector<int> vertexNum_;
-	std::vector<int> indexNum_;
-
 	ID3D12Device* device_ = nullptr;
 };

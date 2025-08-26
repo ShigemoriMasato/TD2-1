@@ -43,6 +43,7 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	commonData_->modelHandle_[int(ModelType::lowCommet)] = myDirectX_->LoadObjFile("Resources/Commet", "Commet1.obj");
 	commonData_->modelHandle_[int(ModelType::middleCommet)] = myDirectX_->LoadObjFile("Resources/Commet", "Commet2.obj");
 	commonData_->modelHandle_[int(ModelType::highCommet)] = myDirectX_->LoadObjFile("Resources/Commet", "Commet3.obj");
+	commonData_->modelHandle_[int(ModelType::Title)] = myDirectX_->LoadObjFile("Resources/Title", "Title.obj");
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたいモデル↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓描画したい量↓↓↓↓↓↓↓↓↓↓↓↓↓
@@ -55,10 +56,11 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Bullet)], 100);
 	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::AccelerateGate)], 10);
 	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::lowCommet)], 100);
+	myDirectX_->CreateModelDrawResource(commonData_->modelHandle_[int(ModelType::Title)], 1);
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑描画したい量↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	//最初のシーンを挿入
-	scene_ = std::make_unique<GameScene>(commonData_);
+	scene_ = std::make_unique<TitleScene>(commonData_);
 	scene_->Initialize();
 
 }

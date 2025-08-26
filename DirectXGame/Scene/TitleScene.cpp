@@ -7,6 +7,7 @@
 using namespace MyMath;
 
 TitleScene::TitleScene(std::shared_ptr<CommonData> commonData) : Scene(commonData) {
+
 }
 
 TitleScene::~TitleScene() {
@@ -21,6 +22,8 @@ void TitleScene::Initialize() {
 }
 
 std::unique_ptr<Scene> TitleScene::Update() {
+
+	
 
 	return nullptr;
 }

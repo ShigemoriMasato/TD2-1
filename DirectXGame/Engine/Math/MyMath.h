@@ -83,6 +83,10 @@ Matrix4x4 operator/=(Matrix4x4& a, const Matrix4x4& b);
 bool operator==(const Matrix4x4& a, const Matrix4x4& b);
 bool operator!=(const Matrix4x4& a, const Matrix4x4& b);
 
+Vector4 operator*(const Matrix4x4& a, const Vector4& b);
+Vector4 operator*(const Vector4& a, const Matrix4x4& b);
+Vector4 operator*=(Vector4& a, const Matrix4x4& b);
+
 namespace Matrix {
 
 	Matrix4x4 Inverse(const Matrix4x4& m);
