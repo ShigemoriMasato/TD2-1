@@ -11,13 +11,11 @@ AccelerateGateDebugger::AccelerateGateDebugger(AccelerateGateManager* manager) {
 	for (auto& file : files) {
 		configFileNames_.push_back(dynamic_cast<Value<std::string>&>(*file).value);
 	}
+
+	LoadState("AccelerationGate.dat", true);
 }
 
 AccelerateGateDebugger::~AccelerateGateDebugger() {
-	for (auto& file : configFileNames_) {
-		binaryManager_->RegistOutput(file, "s");
-	}
-	binaryManager_->Write(basePath_ + "ConfigFiles.dat");
 }
 
 void AccelerateGateDebugger::Update() {
@@ -58,6 +56,10 @@ void AccelerateGateDebugger::Update() {
 		if (ImGui::Button("Erase")) {
 			manager_->EraseGate(selectedGateIndex_);
 			selectedGateIndex_ = std::max(0, selectedGateIndex_ - 1);
+		}
+
+		if (ImGui::Button("SetCameraPos")) {
+			 gateConfig.transform.position = gate->GetCameraPos();
 		}
 
 		ImGui::End();
@@ -103,7 +105,12 @@ void AccelerateGateDebugger::Update() {
 	if (ImGui::Button("Delete")) {
 		configFileNames_.erase(configFileNames_.begin() + selectedConfigIndex_);
 		selectedConfigIndex_ = 0;
-	}	
+
+		for (auto& file : configFileNames_) {
+			binaryManager_->RegistOutput(file, "s");
+		}
+		binaryManager_->Write(basePath_ + "ConfigFiles.dat");
+	}
 
 #pragma endregion
 
@@ -113,7 +120,7 @@ void AccelerateGateDebugger::Update() {
 
 	if (ImGui::Button("MakeNewFile")) {
 		configFileNames_.push_back(newFileName_);
-		binaryManager_->MakeFile("Comet/" + std::string(newFileName_));
+		binaryManager_->MakeFile(basePath_ + std::string(newFileName_));
 
 		for (auto& file : configFileNames_) {
 			binaryManager_->RegistOutput(file, "s");

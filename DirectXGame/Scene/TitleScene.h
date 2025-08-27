@@ -1,5 +1,6 @@
 #pragma once
 #include "Common/Scene.h"
+#include "../TitleLogo.h"
 
 class TitleScene : public Scene {
 public:
@@ -11,5 +12,6 @@ public:
 	void Draw() const override;
 
 private:
-	Camera* camera_ = nullptr;
+	std::shared_ptr<Camera> camera_ = nullptr;
+	std::unique_ptr<TitleLogo> titleLogo_ = nullptr;
 };

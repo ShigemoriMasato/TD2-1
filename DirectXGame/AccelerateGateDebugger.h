@@ -28,4 +28,3 @@ private:
 
 	std::string basePath_ = "AccelerateGate/";
 };
-

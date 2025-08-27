@@ -14,13 +14,14 @@ public:
 	void Update();
 	void Draw(const Matrix4x4* worldMatrix = nullptr) const override;
 
+	void OnCollision(Object* other);
+
 	void SetPosition(Vector3 pos) { transform_->position = pos; }
 	void SetConfig(AccelerateGateConfig config);
 
-	void OnCollision(Object* other);
-
 	Collision* GetCollision() { return collision_.get(); }
 	AccelerateGateConfig GetConfig() const;
+	Vector3 GetCameraPos();
 
 private:
 

@@ -7,7 +7,8 @@
 using namespace MyMath;
 
 TitleScene::TitleScene(std::shared_ptr<CommonData> commonData) : Scene(commonData) {
-
+	camera_ = std::make_unique<Camera>();
+	titleLogo_ = std::make_unique<TitleLogo>(camera_.get(), commonData_->modelHandle_[int(ModelType::Title)]);
 }
 
 TitleScene::~TitleScene() {
@@ -23,10 +24,15 @@ void TitleScene::Initialize() {
 
 std::unique_ptr<Scene> TitleScene::Update() {
 
-	
+	titleLogo_->Update();
+
+	if (Input::GetKeyState(DIK_SPACE) && !Input::GetPreKeyState(DIK_SPACE)) {
+		return std::make_unique<GameScene>(commonData_);
+	}
 
 	return nullptr;
 }
 
 void TitleScene::Draw() const {
+	titleLogo_->Draw();
 }

@@ -43,6 +43,9 @@ public:
 	virtual Vector3 GetPosition() const {
 		return transform_->position;
 	}
+	Vector3 GetWorldPosition() const {
+		return { -transformMatrix_.m[3][0], -transformMatrix_.m[3][1] , -transformMatrix_.m[3][2] };
+	}
 	Transform GetTransform() const { return *transform_; }
 
 private:

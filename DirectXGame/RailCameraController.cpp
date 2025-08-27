@@ -1,6 +1,7 @@
 #include "RailCameraController.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/Render/Render.h"
+#include "Scene/GameScene.h"
 #include <algorithm>
 
 using namespace Matrix;
@@ -47,10 +48,13 @@ void RailCameraController::Update() {
 	moveDistance_ += speed_ + effectSpeed_;
 	float t = GetTFromDistance(distanceSamples_, moveDistance_);
 	if (t >= 1.0f) {
-		moveDistance_ = 0.0f;
-		t = 0.0f;
+		t = 1.0f;
 	}
 	transform_->position = GetCatmullPoint(catmullPoints_, t);
+
+	if (t == 1.0f) {
+		GameScene::isGoal_ = true;
+	}
 
 	camera_->MakeMatrix();
 
@@ -59,14 +63,9 @@ void RailCameraController::Update() {
 }
 
 void RailCameraController::Draw(Camera* camera) {
-	float currentT = GetTFromDistance(distanceSamples_, moveDistance_);
-	int totalSegments = static_cast<int>(catmullPoints_.size()) - 1;
+#ifdef _DEBUG
 
-	// 現在のtに対応するインデックスを計算
-	int maxIndex = static_cast<int>(currentT * totalSegments);
-	maxIndex = std::clamp(maxIndex, 0, totalSegments - 1);
-
-	for (int i = maxIndex; i < catmullPoints_.size() - 1; ++i) {
+	for(int i = 0; i < catmullPoints_.size() - 1; ++i) {
 		Render::DrawLine(
 			MyMath::ConvertVector(catmullPoints_[i], 1.0f) + Vector4(0.0f, 0.0f, 20.0f),
 			MyMath::ConvertVector(catmullPoints_[i + 1], 1.0f) + Vector4(0.0f, 0.0f, 20.0f),
@@ -74,5 +73,32 @@ void RailCameraController::Draw(Camera* camera) {
 			{ 1.0f, 0.0f, 0.0f, 1.0f }
 		);
 	}
+
+#else
+
+	float currentT = GetTFromDistance(distanceSamples_, moveDistance_);
+	int totalSegments = static_cast<int>(catmullPoints_.size()) - 1;
+
+	// 現在のtに対応するインデックスを計算
+	int maxIndex = static_cast<int>(currentT * totalSegments);
+	maxIndex = std::clamp(maxIndex, 0, totalSegments - 1);
+
+	Render::DrawLine(
+		Vector4(transform_->position.x, transform_->position.y, transform_->position.z, 1.0f) + Vector4(0.0f, 0.0f, 20.0f),
+		MyMath::ConvertVector(catmullPoints_[maxIndex + 1], 1.0f) + Vector4(0.0f, 0.0f, 20.0f),
+		MakeIdentity4x4(), camera,
+		{ 1.0f, 0.0f, 0.0f, 1.0f }
+	);
+
+	for (int i = maxIndex + 1; i < catmullPoints_.size() - 1; ++i) {
+		Render::DrawLine(
+			MyMath::ConvertVector(catmullPoints_[i], 1.0f) + Vector4(0.0f, 0.0f, 20.0f),
+			MyMath::ConvertVector(catmullPoints_[i + 1], 1.0f) + Vector4(0.0f, 0.0f, 20.0f),
+			MakeIdentity4x4(), camera,
+			{ 1.0f, 0.0f, 0.0f, 1.0f }
+		);
+	}
+
+#endif
 
 }

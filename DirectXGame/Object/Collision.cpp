@@ -33,7 +33,7 @@ void RenderCollision::Update() {
 	Collision::Update();
 
 	//当たり判定のconfigを描画クラスに渡す
-	transform_->position = collisionTransform_.position;
+	*transform_ = collisionTransform_;
 	
 	switch (GetCollisionType()) {
 	case CollisionType::Sphere:

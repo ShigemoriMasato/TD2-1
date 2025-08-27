@@ -32,11 +32,15 @@ void Comet::Update() {
 
 	if (distance > 500.0f) {
 		handle_ = modelHandle_[0]; // low Commet
+		transform_->rotation.x -= float(rand() % 3140) / 100;
 	} else if(distance > 300.0f) {
 		handle_ = modelHandle_[0]; // Middle Commet
 	} else {
 		handle_ = modelHandle_[0]; // high Commet
 	}
+
+	transform_->rotation.x += 0.05f;
+	transform_->rotation.y += 0.03f;
 
 	mainCollision_->Update();
 	nearCollision_->Update();

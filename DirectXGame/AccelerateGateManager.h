@@ -4,13 +4,11 @@
 #include "AccelerateGateConfig.h"
 #include "AccelerateGateDebugger.h"
 
-class AccelerateGateDebugger;
-
 class AccelerateGateManager {
 public:
 
 	AccelerateGateManager(Camera* camera, CommonData* commonData);
-	~AccelerateGateManager() = default;
+	~AccelerateGateManager() {};
 
 	void Initialize();
 	void Update();

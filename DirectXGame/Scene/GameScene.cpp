@@ -2,6 +2,9 @@
 #include <Input/Input.h>
 #include <imgui.h>
 #include <Math/MyMath.h>
+#include "TitleScene.h"
+
+bool GameScene::isGoal_ = false;
 
 using namespace Matrix;
 
@@ -9,6 +12,7 @@ GameScene::GameScene(std::shared_ptr<CommonData> commonData) : Scene(commonData)
 camera_(new Camera()),
 debugCamera_(new DebugCamera()),
 collisionManager_(std::make_unique<CollisionManager>()) {
+	isGoal_ = false;
 	railCameraController_ = std::make_unique<RailCameraController>();
 	player_ = std::make_shared<Player>(camera_, railCameraController_->GetCameraPtr(), commonData.get(), railCameraController_->GetSpeedPtr());
 	isDebugCamera = false;
@@ -16,6 +20,7 @@ collisionManager_(std::make_unique<CollisionManager>()) {
 	belowGrid_ = std::make_unique<GridMaker>(camera_, false);
 	cometManager_ = std::make_unique<CometManager>(camera_, player_->GetPositionPtr(), commonData.get());
 	accelerateGateManager_ = std::make_unique<AccelerateGateManager>(camera_, commonData.get());
+	clearMessage_ = std::make_unique<ClearMessage>(commonData.get());
 }
 
 GameScene::~GameScene() {
@@ -28,9 +33,9 @@ void GameScene::Initialize() {
 	player_->Initialize();
 	railCameraController_->Initialize();
 	camera_->SetProjectionMatrix(PerspectiveFovDesc());
-	adoveGrid_->SetPos({ 0.0f, 10.0f });
+	adoveGrid_->SetPos({ 50.0f, 10.0f });
 	adoveGrid_->Initialize();
-	belowGrid_->SetPos({ 0.0f, -15.0f });
+	belowGrid_->SetPos({ 50.0f, -15.0f });
 	belowGrid_->Initialize();
 
 	AccelerateGate::SetHandle(commonData_->modelHandle_[int(ModelType::AccelerateGate)]);
@@ -38,6 +43,8 @@ void GameScene::Initialize() {
 	accelerateGateManager_->Initialize();
 
 	cometManager_->Initialize();
+
+	clearMessage_->Initialize();
 }
 
 std::unique_ptr<Scene> GameScene::Update() {
@@ -67,6 +74,13 @@ std::unique_ptr<Scene> GameScene::Update() {
 
 	accelerateGateManager_->Update();
 
+	if (isGoal_) {
+		clearMessage_->Update();
+		if(Input::GetKeyState(DIK_SPACE) && !Input::GetPreKeyState(DIK_SPACE)) {
+			return std::make_unique<TitleScene>(commonData_);
+		}
+	}
+
 	AllCollisionCheck();
 
 	return nullptr;
@@ -82,6 +96,8 @@ void GameScene::Draw() const {
 	accelerateGateManager_->Draw();
 
 	player_->Draw();
+
+	clearMessage_->Draw();
 }
 
 void GameScene::AllCollisionCheck() {

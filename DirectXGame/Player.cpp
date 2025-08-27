@@ -2,6 +2,7 @@
 #include "Engine/Input/Input.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/Render/Render.h"
+#include "Scene/GameScene.h"
 #include <algorithm>
 #include <numbers>
 
@@ -23,15 +24,18 @@ parentCamera_(parent) {
 
 		if (other->tag_ == "Enemy") {
 
-			collisionCooltime_ = 5;
-			*speed_ -= 3.0f;
+			collisionCooltime_ = 10;
+			*speed_ = -2.0f;
 		
 		} else if (other->tag_ == "smallBuff") {
 
 			// クールタイム中は無効
 			if (collisionCooltime_ > 0) {
+				collisionCooltime_ = 5;
 				return;
 			}
+
+			collisionCooltime_ = 5;
 
 			*speed_ += 1.0f;
 
@@ -39,6 +43,7 @@ parentCamera_(parent) {
 
 			//クールタイム中は無効
 			if (collisionCooltime_ > 0) {
+				collisionCooltime_ = 5;
 				return;
 			}
 
@@ -48,7 +53,7 @@ parentCamera_(parent) {
 
 		}
 
-		};
+	};
 }
 
 void Player::Initialize() {
@@ -95,8 +100,8 @@ void Player::Update() {
 	playerTransform_->position.x = std::clamp(playerTransform_->position.x, -7.2f, 7.2f);
 	playerTransform_->position.y = std::clamp(playerTransform_->position.y, -4.0f, 4.0f);
 
-	if (cooltime_ > 0) {
-		--cooltime_;
+	if (GameScene::isGoal_) {
+		playerTransform_->position.z += 0.5f + *speed_;
 	}
 
 	screenTransform_ = MakeAffineMatrix(*playerTransform_) *
@@ -105,6 +110,10 @@ void Player::Update() {
 		MakeTranslationMatrix(parentCamera_->GetTransform().position);
 
 	Vector3 pos = { screenTransform_.m[3][0], screenTransform_.m[3][1] , screenTransform_.m[3][2] };
+
+	if (cooltime_ > 0) {
+		--cooltime_;
+	}
 
 	if (cooltime_ <= 0 && Input::GetKeyState(DIK_SPACE)) {
 		cooltime_ = maxCooltime_;

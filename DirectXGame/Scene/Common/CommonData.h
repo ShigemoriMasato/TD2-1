@@ -11,6 +11,12 @@ enum class ModelType {
 	middleCommet,
 	highCommet,
 	Title,
+	C,
+	l,
+	e,
+	a,
+	r,
+	Bikkuri,
 
 	ModelCount
 };

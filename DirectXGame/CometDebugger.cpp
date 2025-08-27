@@ -11,6 +11,8 @@ CometDebugger::CometDebugger(CometManager* cometManager) {
 	for (auto& file : files) {
 		configFileNames_.push_back(dynamic_cast<Value<std::string>&>(*file).value);
 	}
+
+	LoadCometConfig("Comet.dat");
 }
 
 CometDebugger::~CometDebugger() {
@@ -40,7 +42,7 @@ void CometDebugger::Update() {
 
 	//操作するCometを選択
 	ImGui::Combo("target", &selectedCometIndex_, cometIDs.data(), int(cometIDs.size()));
-	selectedCometIndex_ = std::clamp(selectedCometIndex_, 0, int(comets.size()));
+	selectedCometIndex_ = std::clamp(selectedCometIndex_, 0, std::max(int(comets.size() - 1), 0));
 
 	//nullじゃなかったら編集画面を開く
 	if (comets.size() > 0) {
@@ -78,6 +80,7 @@ void CometDebugger::Update() {
 	}
 
 	ImGui::Combo("ConfigFile", &selectedCometConfigIndex_, fileNames.data(), int(fileNames.size()));
+	selectedCometConfigIndex_ = std::clamp(selectedCometConfigIndex_, 0, std::max(int(fileNames.size() - 1), 0));
 
 	if (ImGui::Button("Load")) {
 		LoadCometConfig(configFileNames_[selectedCometConfigIndex_]);

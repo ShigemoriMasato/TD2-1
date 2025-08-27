@@ -8,6 +8,7 @@
 #include "../GridMaker.h"
 #include "../AccelerateGatemanager.h"
 #include "../CometManager.h"
+#include "../ClearMessage.h"
 
 class GameScene : public Scene {
 public:
@@ -17,6 +18,8 @@ public:
 	void Initialize() override;
 	std::unique_ptr<Scene> Update() override;
 	void Draw() const override;
+
+	static bool isGoal_;
 
 private:
 
@@ -37,4 +40,6 @@ private:
 	std::unique_ptr<CometManager> cometManager_ = nullptr;
 
 	std::unique_ptr<AccelerateGateManager> accelerateGateManager_ = nullptr;
+
+	std::unique_ptr<ClearMessage> clearMessage_ = nullptr;
 };
