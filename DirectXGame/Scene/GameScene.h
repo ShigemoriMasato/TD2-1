@@ -9,6 +9,7 @@
 #include "../AccelerateGatemanager.h"
 #include "../CometManager.h"
 #include "../ClearMessage.h"
+#include "../RankingBoard.h"
 
 class GameScene : public Scene {
 public:
@@ -42,4 +43,9 @@ private:
 	std::unique_ptr<AccelerateGateManager> accelerateGateManager_ = nullptr;
 
 	std::unique_ptr<ClearMessage> clearMessage_ = nullptr;
+
+	std::unique_ptr<RankingBoard> rankingBoard_ = nullptr;
+
+	bool isPreGoal_ = false;
+	long long startTime_ = 0;
 };

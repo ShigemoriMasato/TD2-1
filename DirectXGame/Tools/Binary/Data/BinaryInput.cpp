@@ -46,6 +46,10 @@ std::shared_ptr<ValueBase> BinaryInput::ReadBinaryFile(std::istream& in) {
 
 		return std::make_unique<Value<std::string>>(stringData, name);
 	}
+	case TypeID::Double:
+	{
+		return ValueDeserialize<double>(name, in);
+	}
 	case TypeID::Bool:
 	{
 		return ValueDeserialize<bool>(name, in);

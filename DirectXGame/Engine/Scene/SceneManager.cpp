@@ -25,11 +25,16 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	std::srand(uint32_t(time(nullptr)));
 
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい音↓↓↓↓↓↓↓↓↓↓↓↓↓
-
+	sound_->LoadAudio("resources/BGM.wav", true);
+	sound_->LoadAudio("resources/Accel.wav");
+	sound_->LoadAudio("resources/Brake.wav");
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい音↑↑↑↑↑↑↑↑↑↑↑↑↑
-
+	
 	commonData_->textureHandle_.resize(int(TextureType::TextureCount));
 	//↓↓↓↓↓↓↓↓↓↓↓↓↓↓読み込みたい画像↓↓↓↓↓↓↓↓↓↓↓↓↓
+	for (int i = 0; i < 10; ++i) {
+		commonData_->textureHandle_[int(TextureType::t0) + i] = myDirectX_->LoadTexture("Resources/number/" + std::to_string(i) + ".png");
+	}
 	//↑↑↑↑↑↑↑↑↑↑↑↑↑↑読み込みたい画像↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 	commonData_->modelHandle_.resize(int(ModelType::ModelCount));
@@ -67,6 +72,7 @@ SceneManager::SceneManager(const int32_t kWindowWidth, const int32_t kWindowHeig
 	scene_ = std::make_unique<TitleScene>(commonData_);
 	scene_->Initialize();
 
+	Sound::bgm[0] = true;
 }
 
 SceneManager::~SceneManager() {

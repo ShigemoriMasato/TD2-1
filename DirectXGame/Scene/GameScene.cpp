@@ -2,6 +2,7 @@
 #include <Input/Input.h>
 #include <imgui.h>
 #include <Math/MyMath.h>
+#include <chrono>
 #include "TitleScene.h"
 
 bool GameScene::isGoal_ = false;
@@ -21,6 +22,7 @@ collisionManager_(std::make_unique<CollisionManager>()) {
 	cometManager_ = std::make_unique<CometManager>(camera_, player_->GetPositionPtr(), commonData.get());
 	accelerateGateManager_ = std::make_unique<AccelerateGateManager>(camera_, commonData.get());
 	clearMessage_ = std::make_unique<ClearMessage>(commonData.get());
+	rankingBoard_ = std::make_unique<RankingBoard>();
 }
 
 GameScene::~GameScene() {
@@ -45,6 +47,9 @@ void GameScene::Initialize() {
 	cometManager_->Initialize();
 
 	clearMessage_->Initialize();
+
+	auto start = std::chrono::high_resolution_clock::now();
+	startTime_ = std::chrono::duration_cast<std::chrono::milliseconds>(start.time_since_epoch()).count();
 }
 
 std::unique_ptr<Scene> GameScene::Update() {
@@ -75,6 +80,13 @@ std::unique_ptr<Scene> GameScene::Update() {
 	accelerateGateManager_->Update();
 
 	if (isGoal_) {
+		if (!isPreGoal_) {
+			isPreGoal_ = true;
+			auto goal = std::chrono::high_resolution_clock::now();
+			auto goalTime = std::chrono::duration_cast<std::chrono::milliseconds>(goal.time_since_epoch()).count();
+			rankingBoard_->Regist(goalTime - startTime_);
+		}
+
 		clearMessage_->Update();
 		if(Input::GetKeyState(DIK_SPACE) && !Input::GetPreKeyState(DIK_SPACE)) {
 			return std::make_unique<TitleScene>(commonData_);

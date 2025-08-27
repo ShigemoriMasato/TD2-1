@@ -2,6 +2,7 @@
 #include "Object/Object.h"
 #include "Object/Collision.h"
 #include "AccelerateGateConfig.h"
+#include "RankBan.h"
 
 class AccelerateGate : public Object {
 public:
