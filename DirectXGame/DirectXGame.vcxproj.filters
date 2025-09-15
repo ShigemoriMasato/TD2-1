@@ -138,9 +138,6 @@
     <ClCompile Include="Scene\TitleScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\PSOManager.cpp">
-      <Filter>MyEngine\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Object\Actor.cpp">
       <Filter>Object</Filter>
     </ClCompile>
@@ -171,25 +168,31 @@
     <ClCompile Include="Tools\Binary\Data\BinaryOutput.cpp">
       <Filter>Tools\Binary\Data</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Shelf\ShaderShelf.cpp">
-      <Filter>MyEngine\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\Shelf\BlendStateShelf.cpp">
+    <ClCompile Include="Engine\Core\PSO\Shelf\DepthStencilShelf.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Shelf\DepthStencilShelf.cpp">
+    <ClCompile Include="Engine\Core\PSO\Shelf\BlendStateShelf.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Shelf\RasterizerShelf.cpp">
+    <ClCompile Include="Engine\Core\PSO\PSOManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Shelf\RootSignatureShelf.cpp">
+    <ClCompile Include="Engine\Core\PSO\Shelf\InputLayoutShelf.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Shelf\InputLayoutShelf.cpp">
+    <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\PSOEditor.cpp">
+    <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\PSO\PSOEditor.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\PSO\Shelf\ShaderShelf.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\DXDevice.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -266,9 +269,6 @@
     <ClInclude Include="Scene\TitleScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\PSOManager.h">
-      <Filter>MyEngine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Object\Action.h">
       <Filter>Object</Filter>
     </ClInclude>
@@ -302,25 +302,34 @@
     <ClInclude Include="Tools\Binary\Data\BinaryOutput.h">
       <Filter>Tools\Binary\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Shelf\ShaderShelf.h">
-      <Filter>MyEngine\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\Shelf\BlendStateShelf.h">
+    <ClInclude Include="Engine\Core\PSO\PSOConfig.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Shelf\DepthStencilShelf.h">
+    <ClInclude Include="Engine\Core\PSO\Shelf\DepthStencilShelf.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Shelf\RasterizerShelf.h">
+    <ClInclude Include="Engine\Core\PSO\Shelf\BlendStateShelf.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Shelf\RootSignatureShelf.h">
+    <ClInclude Include="Engine\Core\PSO\PSOManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Shelf\InputLayoutShelf.h">
+    <ClInclude Include="Engine\Core\PSO\Shelf\InputLayoutShelf.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\PSOEditor.h">
+    <ClInclude Include="Engine\Core\PSO\Shelf\RasterizerShelf.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\Shelf\RootSignatureShelf.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\PSOEditor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\PSO\Shelf\ShaderShelf.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\DXDevice.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

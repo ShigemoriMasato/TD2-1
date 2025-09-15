@@ -443,7 +443,7 @@ MyDirectX::~MyDirectX() {
 }
 
 void MyDirectX::Initialize() {
-    wndHandle_ = myWindow_->CreateWindowForApp();
+    myWindow_->CreateWindowForApp();
     InitDirectX();
     InitImGui();
     //0と1の固定番号として扱うためここだけ返り値を破棄
@@ -714,7 +714,7 @@ void MyDirectX::InitDirectX() {
     //コマンドキュー、ウィンドウハンドル、設定を渡して生成する
     hr = dxgiFactory->CreateSwapChainForHwnd(
         commandQueue.Get(),		        		//コマンドキュー
-        myWindow_->GetHwnd(wndHandle_),			           			//ウィンドウハンドル
+        myWindow_->GetHwnd(),			           			//ウィンドウハンドル
         &swapChainDesc,	        		    //設定
         nullptr,		    	    		//モニタの設定
         nullptr,			    		    //出力の設定
@@ -875,7 +875,7 @@ void MyDirectX::InitImGui() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
-    ImGui_ImplWin32_Init(myWindow_->GetHwnd(wndHandle_));
+    ImGui_ImplWin32_Init(myWindow_->GetHwnd());
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // ドッキングを有効化
     ImGui_ImplDX12_Init(device.Get(),

@@ -13,7 +13,6 @@
 
 #include "../Logger/Logger.h"
 #include "../Math/MyMath.h"
-#include "../Sound/Audio.h"
 #include "../Core/MyWindow.h"
 #include "../Core/PSO/PSOEditor.h"
 
@@ -82,9 +81,9 @@ public:
 
 	void Finalize();
 
-	HWND GetMyHwnd() const { return myWindow_->GetHwnd(wndHandle_); }
+	HWND GetMyHwnd() const { return myWindow_->GetHwnd(); }
 
-	WNDCLASS GetMyWndClass() const { return myWindow_->GetWndClass(wndHandle_); }
+	WNDCLASS GetMyWndClass() const { return myWindow_->GetWndClass(); }
 
 	bool* GetIsCanDraw() const { return isCanDraw_; }
 

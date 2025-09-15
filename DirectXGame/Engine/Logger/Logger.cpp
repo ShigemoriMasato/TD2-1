@@ -17,10 +17,11 @@ Logger::Logger() {
     logStreamHandle = 0;
 }
 
-int Logger::RegistLogFile(std::string logName) {
+void Logger::RegistLogFile(std::string logName) {
     for(int i = 0; i < logStreamNames.size(); ++i) {
         if (logStreamNames[i] == logName) {
-            return i; // 既に存在する場合はそのハンドルを返す
+            logStreamHandle = i; // 既に存在する場合はそのハンドルを返す
+            return;
         }
 	}
 
@@ -67,28 +68,12 @@ int Logger::RegistLogFile(std::string logName) {
 
 	logStreamNames.push_back(logName);
 
-	return int(logStreams.size() - 1);
+	logStreamHandle = logStreams.size() - 1;
 }
 
 void Logger::Log(const std::string &message) {
 	//ログファイルに出力
 	this->logStreams[logStreamHandle] << message << std::endl;
-}
-
-void Logger::SetLogStreamHandle(int handle) {
-    if (handle < 0 || handle >= logStreams.size()) {
-        throw std::out_of_range("Invalid log stream handle.");
-    }
-	logStreamHandle = handle;
-}
-
-void Logger::SetLogStreamName(std::string& logName) {
-    for (int i = 0; i < logStreamNames.size(); ++i) {
-        if(logStreamNames[i] == logName) {
-            logStreamHandle = i;
-            return;
-		}
-    }
 }
 
 

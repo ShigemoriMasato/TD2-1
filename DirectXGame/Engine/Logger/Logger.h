@@ -9,13 +9,9 @@ public:
 	//初期設定はmaster.log
 	Logger();
 	//ログファイルを登録する
-	int RegistLogFile(std::string logName);
+	void RegistLogFile(std::string logName);
 	//ログを出力する
 	void Log(const std::string &message);
-
-	void SetLogStreamHandle(int handle);
-
-	void SetLogStreamName(std::string& logName);
 
 private:
 
