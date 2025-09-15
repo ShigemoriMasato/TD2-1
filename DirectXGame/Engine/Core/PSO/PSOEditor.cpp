@@ -3,8 +3,7 @@
 PSOEditor::PSOEditor(ID3D12Device* device) {
 	logger_ = std::make_shared<Logger>();
 
-	int logHandle = logger_->RegistLogFile("PSO");
-	logger_->SetLogStreamHandle(logHandle);
+	logger_->RegistLogFile("PSO");
 
 	psoManager_ = std::make_unique<PSOManager>(device, logger_.get());
 }

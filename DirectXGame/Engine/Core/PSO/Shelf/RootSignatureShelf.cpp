@@ -4,8 +4,7 @@
 RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
 
 	logger_ = std::make_unique<Logger>();
-	int logHandle = logger_->RegistLogFile("RootSignature");
-	logger_->SetLogStreamHandle(logHandle);
+	logger_->RegistLogFile("RootSignature");
 
 	rootSignatures_.resize(int(RootSignatureID::Count));
 

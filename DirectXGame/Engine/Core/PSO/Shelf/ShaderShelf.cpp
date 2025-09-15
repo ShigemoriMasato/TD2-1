@@ -103,7 +103,7 @@ ShaderShelf::ShaderShelf() {
     assert(SUCCEEDED(hr));
 
 	logger_ = std::make_unique<Logger>();
-    logger_->SetLogStreamHandle((logger_->RegistLogFile("Shader")));
+    logger_->RegistLogFile("Shader");
 
 	compileVersions_[0] = L"vs_6_0"; // Vertex Shader
     compileVersions_[1] = L"ps_6_0"; // Pixel Shader

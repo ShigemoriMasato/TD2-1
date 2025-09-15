@@ -68,7 +68,7 @@ void Logger::RegistLogFile(std::string logName) {
 
 	logStreamNames.push_back(logName);
 
-	logStreamHandle = logStreams.size() - 1;
+	logStreamHandle = static_cast<int>(logStreams.size() - 1);
 }
 
 void Logger::Log(const std::string &message) {

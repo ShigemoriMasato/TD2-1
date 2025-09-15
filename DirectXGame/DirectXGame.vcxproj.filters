@@ -156,9 +156,6 @@
     <ClCompile Include="Engine\Data\Value.cpp">
       <Filter>MyEngine\Data</Filter>
     </ClCompile>
-    <ClCompile Include="GridMaker.cpp">
-      <Filter>Tools\Grid</Filter>
-    </ClCompile>
     <ClCompile Include="Tools\Binary\BinaryManager.cpp">
       <Filter>Tools\Binary</Filter>
     </ClCompile>
@@ -193,6 +190,15 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\DXDevice.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Binary\BinaryManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Binary\Data\BinaryInput.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Binary\Data\BinaryOutput.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -290,9 +296,6 @@
     <ClInclude Include="Engine\Data\Value.h">
       <Filter>MyEngine\Data</Filter>
     </ClInclude>
-    <ClInclude Include="GridMaker.h">
-      <Filter>Tools\Grid</Filter>
-    </ClInclude>
     <ClInclude Include="Tools\Binary\BinaryManager.h">
       <Filter>Tools\Binary</Filter>
     </ClInclude>
@@ -330,6 +333,15 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\DXDevice.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Binary\BinaryManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Binary\Data\BinaryInput.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Binary\Data\BinaryOutput.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

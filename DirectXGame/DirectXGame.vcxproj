@@ -11,6 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Binary\BinaryManager.cpp" />
+    <ClCompile Include="Engine\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Engine\Binary\Data\BinaryOutput.cpp" />
     <ClCompile Include="Engine\Core\DXDevice.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\DepthStencilShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\BlendStateShelf.cpp" />
@@ -35,7 +38,6 @@
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="GridMaker.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\InputLayoutShelf.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Object\Actor.cpp" />
@@ -53,6 +55,9 @@
     <ClCompile Include="Tools\Binary\Data\BinaryOutput.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Binary\BinaryManager.h" />
+    <ClInclude Include="Engine\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Engine\Binary\Data\BinaryOutput.h" />
     <ClInclude Include="Engine\Core\DXDevice.h" />
     <ClInclude Include="Engine\Core\PSO\PSOConfig.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\DepthStencilShelf.h" />
@@ -82,7 +87,6 @@
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="GridMaker.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\InputLayoutShelf.h" />
     <ClInclude Include="Object\Action.h" />
     <ClInclude Include="Object\Actor.h" />

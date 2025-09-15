@@ -1,6 +1,6 @@
 #include "MyWindow.h"
 
-std::unordered_map<HWND, MyWindow*> MyWindow::hwndMap_;
+std::unordered_map<HWND, std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)>> MyWindow::wndProcMap_;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
