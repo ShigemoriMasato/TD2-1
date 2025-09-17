@@ -58,6 +58,9 @@ void PSOEditor::Setting(ID3D12GraphicsCommandList* commandList) {
 	if (nextConfig_.rootID != nowConfig_.rootID) {
 		commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(nextConfig_.rootID));
 	}
+	if (nextConfig_.topology != nowConfig_.topology) {
+		commandList->IASetPrimitiveTopology(static_cast<D3D12_PRIMITIVE_TOPOLOGY>(nextConfig_.topology));
+	}
 
 	commandList->SetPipelineState(psoManager_->GetPSO(nextConfig_));
 

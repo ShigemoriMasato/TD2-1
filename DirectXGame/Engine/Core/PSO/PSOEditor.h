@@ -28,6 +28,8 @@ public:
 
 	void SetOffScreen(bool isOffScreen);
 
+	void SetPSOConfig(const PSOConfig& config) { nextConfig_ = config; }
+
 	/// <summary>
 	/// 設定した内容でPSOを設定し、内部の設定をデフォルトに戻す。(デフォルトはEngine/Core/PSO/PSOConfigへ)
 	/// </summary>

@@ -12,7 +12,7 @@ public:
 	void RegistLogFile(std::string logName);
 	//ログを出力する
 	void Log(const std::string &message);
-
+	
 private:
 
 	int logStreamHandle = 0;

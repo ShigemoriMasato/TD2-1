@@ -1,4 +1,5 @@
 #include "Logger.h"
+#define NOMINMAX
 #include <Windows.h>
 #include <chrono>
 #include <filesystem>
@@ -13,7 +14,7 @@ Logger::Logger() {
     if (logStreams.size() == 0) {
         RegistLogFile(a);
     }
-
+    
     logStreamHandle = 0;
 }
 

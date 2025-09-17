@@ -1,33 +1,56 @@
 #pragma once
-#include "../Math/MyMath.h"
-#include "MyDirectX.h"
-
-class Camera;
+#include <Core/DXDevice.h>
+#include <Core/PSO/PSOEditor.h>
+#include <Render/DXResource.h>
+#include <Resource/Texture/TextureManager.h>
 
 class Render {
 public:
-	Render(MyDirectX* myDirectX);
-	~Render() = default;
 
-	static void DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);
+	Render(DXDevice* device);
+	~Render();
 
-	static void DrawSphere(float radius, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);
+	void Initialize();
 
-	static void DrawModel(int modelHandle, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {});
-
-	static void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);
-
-	static void DrawSprite(Matrix4x4 worldMatrix, Camera* camera, MaterialData material = { 1.0f, 1.0f, 1.0f, 1.0f, true }, DirectionalLightData dLightData = {}, int textureHandle = 2);
-
-	static void DrawPrism(Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);
-
-	static void DrawBox(Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);
-
-	static void DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = { 1.0f, 1.0f, 1.0f, 1.0f, true }, DirectionalLightData dLightData = {}, int textureHandle = 2);
+	void PreDraw();
+	void Draw(DXResource* resource);
 
 private:
 
-	static MyDirectX* myDirectX_;
-	static bool* isCanDraw_;
+	//Logger
+	std::unique_ptr<Logger> logger_ = nullptr;
 
+	//Device
+	DXDevice* device_ = nullptr;
+
+	//Command関連
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
+
+	//RTV
+	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+
+	//スワップチェーンの設定
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[2] = { nullptr, nullptr };
+
+	//フェンス
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
+	HANDLE fenceEvent;
+	uint64_t fenceValue;
+
+	//PSO管理
+	std::unique_ptr<PSOEditor> psoEditor_ = nullptr;
+
+	//Depth
+	ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
+	ID3D12Resource* depthStencilResource = nullptr;
+
+	//Descriptorサイズ
+	uint32_t descriptorSizeRTV;
+
+	//テクスチャ
+	std::unique_ptr<TextureManager> textureManager_ = nullptr;
 };

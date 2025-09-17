@@ -11,9 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Engine\Binary\BinaryManager.cpp" />
-    <ClCompile Include="Engine\Binary\Data\BinaryInput.cpp" />
-    <ClCompile Include="Engine\Binary\Data\BinaryOutput.cpp" />
+    <ClCompile Include="Engine\Core\DXCommonFunction.cpp" />
+    <ClCompile Include="Engine\Render\DXResource.cpp" />
     <ClCompile Include="Engine\Core\DXDevice.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\DepthStencilShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\BlendStateShelf.cpp" />
@@ -21,16 +20,11 @@
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
     <ClCompile Include="Engine\Core\PSO\PSOManager.cpp" />
     <ClCompile Include="Engine\Core\MyWindow.cpp" />
-    <ClCompile Include="Engine\Data\Data.cpp" />
-    <ClCompile Include="Engine\Data\Value.cpp" />
+    <ClCompile Include="Engine\Transform\Data.cpp" />
+    <ClCompile Include="Engine\Transform\Value.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Math\MyMath.cpp" />
-    <ClCompile Include="Engine\Render\MyDirectX.cpp" />
-    <ClCompile Include="Engine\Render\Render.cpp" />
-    <ClCompile Include="Engine\Scene\SceneManager.cpp" />
-    <ClCompile Include="Engine\Sound\Audio.cpp" />
-    <ClCompile Include="Engine\Sound\Sound.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -39,25 +33,21 @@
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\InputLayoutShelf.cpp" />
+    <ClCompile Include="Engine\Render\ImGuiRapper.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Object\Actor.cpp" />
-    <ClCompile Include="Object\Object.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\PSOEditor.cpp" />
-    <ClCompile Include="Scene\Common\CommonData.cpp" />
-    <ClCompile Include="Scene\Common\Scene.cpp" />
-    <ClCompile Include="Scene\GameScene.cpp" />
-    <ClCompile Include="Scene\TitleScene.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\ShaderShelf.cpp" />
-    <ClCompile Include="Tools\Binary\BinaryManager.cpp" />
-    <ClCompile Include="Tools\Binary\Data\BinaryInput.cpp" />
-    <ClCompile Include="Tools\Binary\Data\BinaryOutput.cpp" />
+    <ClCompile Include="Engine\Render\Render.cpp" />
+    <ClCompile Include="Engine\Resource\OffScreen\OffScreenManager.cpp" />
+    <ClCompile Include="Engine\Resource\Texture\TextureManager.cpp" />
+    <ClCompile Include="Engine\Resource\Texture\TextureData.cpp" />
+    <ClCompile Include="Engine\Resource\OffScreen\OffScreenData.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\Binary\BinaryManager.h" />
-    <ClInclude Include="Engine\Binary\Data\BinaryInput.h" />
-    <ClInclude Include="Engine\Binary\Data\BinaryOutput.h" />
+    <ClInclude Include="Engine\Core\DXCommonFunction.h" />
+    <ClInclude Include="Engine\Render\DXResource.h" />
     <ClInclude Include="Engine\Core\DXDevice.h" />
     <ClInclude Include="Engine\Core\PSO\PSOConfig.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\DepthStencilShelf.h" />
@@ -66,19 +56,14 @@
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\Core\PSO\PSOManager.h" />
     <ClInclude Include="Engine\Core\MyWindow.h" />
-    <ClInclude Include="Engine\Data\Data.h" />
-    <ClInclude Include="Engine\Data\Matrix.h" />
-    <ClInclude Include="Engine\Data\Transform.h" />
-    <ClInclude Include="Engine\Data\Value.h" />
-    <ClInclude Include="Engine\Data\Vector.h" />
+    <ClInclude Include="Engine\Transform\Data.h" />
+    <ClInclude Include="Engine\Transform\Matrix.h" />
+    <ClInclude Include="Engine\Transform\Transform.h" />
+    <ClInclude Include="Engine\Transform\Value.h" />
+    <ClInclude Include="Engine\Transform\Vector.h" />
     <ClInclude Include="Engine\Input\Input.h" />
     <ClInclude Include="Engine\Logger\Logger.h" />
     <ClInclude Include="Engine\Math\MyMath.h" />
-    <ClInclude Include="Engine\Render\MyDirectX.h" />
-    <ClInclude Include="Engine\Render\Render.h" />
-    <ClInclude Include="Engine\Scene\SceneManager.h" />
-    <ClInclude Include="Engine\Sound\Audio.h" />
-    <ClInclude Include="Engine\Sound\Sound.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -88,39 +73,19 @@
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\InputLayoutShelf.h" />
-    <ClInclude Include="Object\Action.h" />
-    <ClInclude Include="Object\Actor.h" />
-    <ClInclude Include="Object\Object.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\RasterizerShelf.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\RootSignatureShelf.h" />
     <ClInclude Include="Engine\Core\PSO\PSOEditor.h" />
-    <ClInclude Include="Scene\Common\CommonData.h" />
-    <ClInclude Include="Scene\Common\Scene.h" />
-    <ClInclude Include="Scene\GameScene.h" />
-    <ClInclude Include="Scene\TitleScene.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\ShaderShelf.h" />
-    <ClInclude Include="Tools\Binary\BinaryManager.h" />
-    <ClInclude Include="Tools\Binary\Data\BinaryInput.h" />
-    <ClInclude Include="Tools\Binary\Data\BinaryOutput.h" />
+    <ClInclude Include="Engine\Render\ImGuiRapper.h" />
+    <ClInclude Include="Engine\Render\Render.h" />
+    <ClInclude Include="Engine\Resource\OffScreen\OffScreenManager.h" />
+    <ClInclude Include="Engine\Resource\Texture\TextureManager.h" />
+    <ClInclude Include="Engine\Resource\Texture\TextureData.h" />
+    <ClInclude Include="Engine\Resource\OffScreen\OffScreenData.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Engine\Shader\Object3d.hlsli">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Engine\Shader\Object3d.PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Engine\Shader\Object3d.VS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -170,7 +135,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals/imgui;$(ProjectDir)Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -181,8 +146,7 @@
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-xcopy /E /I /Y "$(ProjectDir)resources\*" "$(TargetDir)resources\"
-xcopy /E /I /Y "$(ProjectDir)Engine\Shader\*" "$(TargetDir)Engine\Shader\"</Command>
+xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -197,7 +161,7 @@ xcopy /E /I /Y "$(ProjectDir)Engine\Shader\*" "$(TargetDir)Engine\Shader\"</Comm
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals/imgui;$(ProjectDir)Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -207,7 +171,8 @@ xcopy /E /I /Y "$(ProjectDir)Engine\Shader\*" "$(TargetDir)Engine\Shader\"</Comm
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
-copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"</Command>
+copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
+xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

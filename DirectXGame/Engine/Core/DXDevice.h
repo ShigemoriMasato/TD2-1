@@ -23,13 +23,22 @@ struct D3DResourceLeakChecker {
 /// </summary>
 class DXDevice {
 public:
-
-	DXDevice(uint32_t windowWidth, uint32_t windowHeight);
+	
+	DXDevice(int32_t windowWidth, int32_t windowHeight);
 	~DXDevice();
 
 	void Initialize();
 
 	void SetWindowProc(std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> windowProc);
+
+	ID3D12Device* GetDevice() { return device.Get(); }
+	IDXGIFactory7* GetDxgiFactory() { return dxgiFactory.Get(); }
+	HWND GetHwnd() const { return window_->GetHwnd(); }
+	std::pair<int32_t, int32_t> GetWindowSize() const { return { windowWidth_,windowHeight_ }; }
+
+	uint32_t GetDescriptorSizeSRV() const { return descriptorSizeSRV; }
+	uint32_t GetDescriptorSizeRTV() const { return descriptorSizeRTV; }
+	uint32_t GetDescriptorSizeDSV() const { return descriptorSizeDSV; }
 
 private:
 
@@ -48,5 +57,7 @@ private:
 	uint32_t descriptorSizeRTV;
 	uint32_t descriptorSizeDSV;
 
+	int32_t windowWidth_;
+	int32_t windowHeight_;
 };
 

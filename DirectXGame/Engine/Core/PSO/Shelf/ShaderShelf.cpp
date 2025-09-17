@@ -1,6 +1,8 @@
 #include "ShaderShelf.h"
 #include <cassert>
 
+#pragma comment(lib, "dxcompiler.lib")
+
 namespace fs = std::filesystem;
 
 namespace {

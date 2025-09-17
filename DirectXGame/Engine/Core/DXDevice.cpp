@@ -1,7 +1,10 @@
 #include "DXDevice.h"
 #include <cassert>
 
-DXDevice::DXDevice(uint32_t windowWidth, uint32_t windowHeight) {
+#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "dxgi.lib")
+
+DXDevice::DXDevice(int32_t windowWidth, int32_t windowHeight) {
 	window_ = std::make_unique<MyWindow>(windowWidth, windowHeight);
     logger = std::make_unique<Logger>();
     logger->RegistLogFile("DXDevice");

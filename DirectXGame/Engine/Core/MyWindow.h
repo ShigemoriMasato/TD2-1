@@ -1,8 +1,7 @@
 #pragma once
-#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
-#include <imgui_impl_win32.h>
+#include <imgui/imgui_impl_win32.h>
 #include <cstdint>
 #include <vector>
 #include <string>
@@ -10,7 +9,7 @@
 
 class MyWindow {
 public:
-
+	
 	MyWindow(const int32_t kClientWidth, const int32_t kClientHeight);
 	~MyWindow();
 	HWND GetHwnd();
