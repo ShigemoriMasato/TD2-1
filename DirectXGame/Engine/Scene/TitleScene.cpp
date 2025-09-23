@@ -7,6 +7,7 @@ TitleScene::~TitleScene() {
 }
 
 void TitleScene::Initialize() {
+	modelManager_->LoadModel("")
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update() {

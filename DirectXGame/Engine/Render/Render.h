@@ -45,7 +45,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
 
 	//RTV
-	ID3D12DescriptorHeap* rtvDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
 
 	//スワップチェーンの設定
@@ -66,8 +66,8 @@ private:
 	std::unique_ptr<PSOEditor> psoEditor_ = nullptr;
 
 	//Depth
-	ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
-	ID3D12Resource* depthStencilResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = nullptr;
 
 	//テクスチャ
 	TextureManager* textureManager_ = nullptr;

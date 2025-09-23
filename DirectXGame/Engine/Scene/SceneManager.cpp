@@ -3,6 +3,8 @@
 
 SceneManager::SceneManager() {
 	engineTerminal_ = std::make_unique<EngineTerminal>();
+	engineTerminal_->Initialize(1280, 720);
+
 	commonData_ = std::make_shared<CommonData>();
 	currentScene_ = std::make_unique<TitleScene>(commonData_.get());
 }
@@ -11,27 +13,13 @@ SceneManager::~SceneManager() {
 }
 
 bool SceneManager::IsLoop() {
-
-	
-
-	return true;
+	return engineTerminal_->IsLoop();
 }
 
 void SceneManager::Update() {
 
-	if (nextScene_) {
-		currentScene_ = std::move(nextScene_);
-		currentScene_->MoveScene(engineTerminal_.get());
-		currentScene_->Initialize();
-		nextScene_ = nullptr;
-	}
-
-	nextScene_ = currentScene_->Update();
-
 }
 
 void SceneManager::Draw() {
-	engineTerminal_->GetRender()->PreDraw();
-	currentScene_->Draw();
-	engineTerminal_->GetRender()->PostDraw();
+	
 }

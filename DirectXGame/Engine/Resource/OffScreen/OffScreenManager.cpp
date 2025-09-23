@@ -10,8 +10,11 @@ OffScreenManager::~OffScreenManager() {
 void OffScreenManager::Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList) {
 	device_ = device;
 	commandList_ = commandList;
-	srvDescriptorHeap_ = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, maxOffScreenCount_, true);
-	rtvDescriptorHeap_ = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, maxOffScreenCount_, false);
+	ID3D12DescriptorHeap* rawHeap = nullptr;
+	rawHeap = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, maxOffScreenCount_, true);
+	srvDescriptorHeap_.Attach(rawHeap);
+	rawHeap = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, maxOffScreenCount_, false);
+	rtvDescriptorHeap_.Attach(rawHeap);
 }
 
 int OffScreenManager::CreateOffScreen(int width, int height, float* clearColor) {

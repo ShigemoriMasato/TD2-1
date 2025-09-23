@@ -68,7 +68,9 @@ void Render::Initialize(TextureManager* textureManager, OffScreenManager* offScr
     assert(SUCCEEDED(hr));
 
     //ディスクリプタヒープの生成(swapchain用なので二つ)
-    rtvDescriptorHeap = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	ID3D12DescriptorHeap* rawHeap = nullptr;
+    rawHeap = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
+	rtvDescriptorHeap.Attach(rawHeap);
     logger_->Log("Complete create DescriptorHeap\n");
 
     //RTVの設定
@@ -102,14 +104,17 @@ void Render::Initialize(TextureManager* textureManager, OffScreenManager* offScr
 
     //=======================================================
 
-    dsvDescriptorHeap = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+    rawHeap = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+	dsvDescriptorHeap.Attach(rawHeap);
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
     dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 
-    depthStencilResource = CreateDepthStencilTextureResource(device_->GetDevice(), windowSize.first, windowSize.second);
+	ID3D12Resource* rawResource = nullptr;
+    rawResource = CreateDepthStencilTextureResource(device_->GetDevice(), windowSize.first, windowSize.second);
+	depthStencilResource.Attach(rawResource);
 
-    device_->GetDevice()->CreateDepthStencilView(depthStencilResource, &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+    device_->GetDevice()->CreateDepthStencilView(depthStencilResource.Get(), &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
     //PSOの初期化
     psoEditor_ = std::make_unique<PSOEditor>(device_->GetDevice());
@@ -181,18 +186,6 @@ void Render::PostDraw() {
         ResetResourceBarrier();
         PreDraw();
     }
-
-    //ImGuiの描画
-#ifdef _DEBUG
-
-    ImGui::Render();
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
-
-#else
-
-    ImGui::EndFrame();
-
-#endif
 
     ResetResourceBarrier();
 

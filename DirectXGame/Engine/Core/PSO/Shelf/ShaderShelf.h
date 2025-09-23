@@ -38,7 +38,7 @@ private:
 	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 
-	std::filesystem::path basePath_ = "Data/Shader";
+	std::filesystem::path basePath_ = "Assets/Shader";
 
 	std::array<std::wstring, static_cast<size_t>(ShaderType::Count)> compileVersions_;
 

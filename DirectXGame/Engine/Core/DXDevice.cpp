@@ -8,6 +8,8 @@ DXDevice::DXDevice(int32_t windowWidth, int32_t windowHeight) {
 	window_ = std::make_unique<MyWindow>(windowWidth, windowHeight);
     logger = std::make_unique<Logger>();
     logger->RegistLogFile("DXDevice");
+	windowWidth_ = windowWidth;
+	windowHeight_ = windowHeight;
 }
 
 DXDevice::~DXDevice() {

@@ -6,6 +6,17 @@ EngineTerminal::EngineTerminal() {
 EngineTerminal::~EngineTerminal() {
 }
 
+bool EngineTerminal::IsLoop() {
+	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	else if (msg.message == WM_QUIT) {
+		return false;
+	}
+	return true;
+}
+
 void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	dxDevice_ = std::make_unique<DXDevice>(windowWidth, windowHeight);
 	dxDevice_->Initialize();

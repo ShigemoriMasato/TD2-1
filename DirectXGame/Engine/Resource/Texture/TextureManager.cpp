@@ -5,10 +5,15 @@ TextureManager::TextureManager() {
 }
 
 TextureManager::~TextureManager() {
+	textures_.clear();
+	srvDescriptorHeap.Reset();
 }
 
 void TextureManager::Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList) {
-	srvDescriptorHeap = CreateDescriptorHeap(device->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, maxTextureCount, true);
+	ID3D12DescriptorHeap* rawHeap = nullptr;
+	rawHeap = CreateDescriptorHeap(device->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, maxTextureCount, true);
+	srvDescriptorHeap.Attach(rawHeap);
+
 	device_ = device;
 	commandList_ = commandList;
 }

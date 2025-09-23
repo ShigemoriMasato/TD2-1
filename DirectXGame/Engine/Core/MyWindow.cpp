@@ -68,6 +68,11 @@ LRESULT MyWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
         return true;
     }
 
+    if(msg == WM_DESTROY) {
+        PostQuitMessage(0);	//OSに対して、アプリの終了を伝える
+        return 0;
+	}
+
     auto it = wndProcMap_.find(hwnd);
     if (it != wndProcMap_.end()) {
         //登録されているウィンドウプロシージャを呼ぶ
