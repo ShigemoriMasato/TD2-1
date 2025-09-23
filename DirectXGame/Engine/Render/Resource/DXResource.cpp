@@ -10,6 +10,8 @@ DXResource::~DXResource() {
 }
 
 void DXResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMatrix) {
+	psoConfig_ = PSOConfig{};
+
 	auto device = dxDevice_->GetDevice();
 
 	//リソースの生成とマップ
@@ -37,7 +39,7 @@ void DXResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMatri
 	materialResource->Map(0, nullptr, (void**)&material_);
 
 	if (useMatrix) {
-		matrixResource = CreateBufferResource(device, sizeof(TramsformMatrixData));
+		matrixResource = CreateBufferResource(device, sizeof(MatrixData));
 		matrixResource->Map(0, nullptr, (void**)&matrix_);
 	}
 
@@ -46,6 +48,11 @@ void DXResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMatri
 
 	vertexNum_ = vertexNum;
 	indexNum_ = indexNum;
+
+	if (!useMatrix) {
+		psoConfig_.rootID = RootSignatureID::NonMatrix;
+		psoConfig_.vs = "NonMatrix3d.VS.hlsl";
+	}
 }
 
 D3D12_INDEX_BUFFER_VIEW DXResource::GetIndexBufferView() const {

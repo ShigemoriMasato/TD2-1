@@ -84,9 +84,6 @@
     <ClCompile Include="Engine\Logger\Logger.cpp">
       <Filter>MyEngine\Logger</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Transform\Data.cpp">
-      <Filter>MyEngine\Data</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Transform\Value.cpp">
       <Filter>MyEngine\Data</Filter>
     </ClCompile>
@@ -120,10 +117,10 @@
     <ClCompile Include="Engine\Render\Render.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Render\ImGuiRapper.cpp">
+    <ClCompile Include="Engine\Render\ImGuiWrapper.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Render\DXResource.cpp">
+    <ClCompile Include="Engine\Render\Resource\DXResource.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\DXCommonFunction.cpp">
@@ -139,6 +136,30 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Resource\OffScreen\OffScreenData.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resource\Model\ModelData.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Render\Resource\ModelResource.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resource\Model\ModelManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\SceneManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\Data\BaseScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\Data\CommonData.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\EngineTerminal.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\TitleScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -194,9 +215,6 @@
     <ClInclude Include="Engine\Transform\Vector.h">
       <Filter>MyEngine\Data</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Transform\Data.h">
-      <Filter>MyEngine\Data</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Transform\Value.h">
       <Filter>MyEngine\Data</Filter>
     </ClInclude>
@@ -233,10 +251,10 @@
     <ClInclude Include="Engine\Render\Render.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Render\ImGuiRapper.h">
+    <ClInclude Include="Engine\Render\ImGuiWrapper.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Render\DXResource.h">
+    <ClInclude Include="Engine\Render\Resource\DXResource.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\DXCommonFunction.h">
@@ -252,6 +270,30 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Resource\OffScreen\OffScreenData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\Model\ModelData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Render\Resource\ModelResource.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\Model\ModelManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\SceneManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\Data\BaseScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\Data\CommonData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\EngineTerminal.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\TitleScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

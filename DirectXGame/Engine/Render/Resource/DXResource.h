@@ -32,7 +32,7 @@ public:
 	VertexData* vertex_ = nullptr;
 	uint32_t* index_ = nullptr;
 	MaterialData* material_ = nullptr;
-	TramsformMatrixData* matrix_ = nullptr;
+	MatrixData* matrix_ = nullptr;
 	DirectionalLightData* light_ = nullptr;
 
 private:
@@ -44,7 +44,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> lightResource = nullptr;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-	D3D12_INDEX_BUFFER_VIEW indexBufferView;
+	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 
 	static DXDevice* dxDevice_;
 

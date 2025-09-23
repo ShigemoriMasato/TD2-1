@@ -1,13 +1,15 @@
-#define NOMINMAX
-#include <Windows.h>
-#include <cstdint>
-#include <iostream>
+#include <Scene/SceneManager.h>
 
 int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	const int32_t kWindowWidth = 1280;
-	const int32_t kWindowHeight = 720;
+	
+	std::unique_ptr<SceneManager> sceneManager = std::make_unique<SceneManager>();
 
-	std::cout << "Window Width: " << kWindowWidth << ", Height: " << kWindowHeight << std::endl;
+	while(sceneManager->IsLoop()) {
+
+		sceneManager->Update();
+
+		sceneManager->Draw();
+	}
 
 	return 0;
 }

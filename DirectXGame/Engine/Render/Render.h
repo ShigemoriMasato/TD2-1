@@ -1,8 +1,9 @@
 #pragma once
 #include <Core/DXDevice.h>
 #include <Core/PSO/PSOEditor.h>
-#include <Render/DXResource.h>
+#include <Render/Resource/DXResource.h>
 #include <Resource/Texture/TextureManager.h>
+#include <Resource/OffScreen/OffScreenManager.h>
 
 class Render {
 public:
@@ -10,12 +11,27 @@ public:
 	Render(DXDevice* device);
 	~Render();
 
-	void Initialize();
+	void Initialize(TextureManager* textureManager, OffScreenManager* offScreenManager);
 
-	void PreDraw();
+	void PreDraw(int offscreenHandle = -1);
 	void Draw(DXResource* resource);
+	void PostDraw();
+
+	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+
+	void SetClearColor(float r, float g, float b, float a) {
+		clearColor_[0] = r;
+		clearColor_[1] = g;
+		clearColor_[2] = b;
+		clearColor_[3] = a;
+	}
 
 private:
+
+	void PreDrawSwapChain();
+	void PreDrawOffScreen(OffScreenData* offScreen);
+
+	void ResetResourceBarrier();
 
 	//Logger
 	std::unique_ptr<Logger> logger_ = nullptr;
@@ -35,6 +51,11 @@ private:
 	//スワップチェーンの設定
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[2] = { nullptr, nullptr };
+	D3D12_RESOURCE_STATES resourcestates_[2] = { D3D12_RESOURCE_STATE_PRESENT,D3D12_RESOURCE_STATE_PRESENT };
+	float clearColor_[4] = { 0.1f,0.1f,0.1f,1.0f };
+	int offScreenHandle_ = -1;			//現在描画対象にしてるOffScreenのハンドル。swapchainは-1
+
+	bool isFrameFirst_ = true;	//PreDrawが初回かどうか
 
 	//フェンス
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
@@ -48,9 +69,7 @@ private:
 	ID3D12DescriptorHeap* dsvDescriptorHeap = nullptr;
 	ID3D12Resource* depthStencilResource = nullptr;
 
-	//Descriptorサイズ
-	uint32_t descriptorSizeRTV;
-
 	//テクスチャ
-	std::unique_ptr<TextureManager> textureManager_ = nullptr;
+	TextureManager* textureManager_ = nullptr;
+	OffScreenManager* offScreenManager_ = nullptr;
 };

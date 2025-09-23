@@ -7,10 +7,12 @@
 class OffScreenManager {
 public:
 
-	OffScreenManager(DXDevice* device, ID3D12GraphicsCommandList* commandList);
+	OffScreenManager();
 	~OffScreenManager();
 
-	int CreateOffScreen(int width, int height);
+	void Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList);
+
+	int CreateOffScreen(int width, int height, float* clearColor);
 	OffScreenData* GetOffScreenData(int handle);
 
 private:

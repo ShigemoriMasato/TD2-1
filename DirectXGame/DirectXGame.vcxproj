@@ -11,8 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Core\EngineTerminal.cpp" />
+    <ClCompile Include="Engine\Scene\Data\BaseScene.cpp" />
+    <ClCompile Include="Engine\Scene\Data\CommonData.cpp" />
     <ClCompile Include="Engine\Core\DXCommonFunction.cpp" />
-    <ClCompile Include="Engine\Render\DXResource.cpp" />
+    <ClCompile Include="Engine\Render\Resource\DXResource.cpp" />
     <ClCompile Include="Engine\Core\DXDevice.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\DepthStencilShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\BlendStateShelf.cpp" />
@@ -20,7 +23,6 @@
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
     <ClCompile Include="Engine\Core\PSO\PSOManager.cpp" />
     <ClCompile Include="Engine\Core\MyWindow.cpp" />
-    <ClCompile Include="Engine\Transform\Data.cpp" />
     <ClCompile Include="Engine\Transform\Value.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
@@ -33,7 +35,7 @@
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\InputLayoutShelf.cpp" />
-    <ClCompile Include="Engine\Render\ImGuiRapper.cpp" />
+    <ClCompile Include="Engine\Render\ImGuiWrapper.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp" />
@@ -44,10 +46,18 @@
     <ClCompile Include="Engine\Resource\Texture\TextureManager.cpp" />
     <ClCompile Include="Engine\Resource\Texture\TextureData.cpp" />
     <ClCompile Include="Engine\Resource\OffScreen\OffScreenData.cpp" />
+    <ClCompile Include="Engine\Resource\Model\ModelData.cpp" />
+    <ClCompile Include="Engine\Render\Resource\ModelResource.cpp" />
+    <ClCompile Include="Engine\Resource\Model\ModelManager.cpp" />
+    <ClCompile Include="Engine\Scene\SceneManager.cpp" />
+    <ClCompile Include="Engine\Scene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Core\EngineTerminal.h" />
+    <ClInclude Include="Engine\Scene\Data\BaseScene.h" />
+    <ClInclude Include="Engine\Scene\Data\CommonData.h" />
     <ClInclude Include="Engine\Core\DXCommonFunction.h" />
-    <ClInclude Include="Engine\Render\DXResource.h" />
+    <ClInclude Include="Engine\Render\Resource\DXResource.h" />
     <ClInclude Include="Engine\Core\DXDevice.h" />
     <ClInclude Include="Engine\Core\PSO\PSOConfig.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\DepthStencilShelf.h" />
@@ -56,7 +66,6 @@
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\Core\PSO\PSOManager.h" />
     <ClInclude Include="Engine\Core\MyWindow.h" />
-    <ClInclude Include="Engine\Transform\Data.h" />
     <ClInclude Include="Engine\Transform\Matrix.h" />
     <ClInclude Include="Engine\Transform\Transform.h" />
     <ClInclude Include="Engine\Transform\Value.h" />
@@ -77,12 +86,17 @@
     <ClInclude Include="Engine\Core\PSO\Shelf\RootSignatureShelf.h" />
     <ClInclude Include="Engine\Core\PSO\PSOEditor.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\ShaderShelf.h" />
-    <ClInclude Include="Engine\Render\ImGuiRapper.h" />
+    <ClInclude Include="Engine\Render\ImGuiWrapper.h" />
     <ClInclude Include="Engine\Render\Render.h" />
     <ClInclude Include="Engine\Resource\OffScreen\OffScreenManager.h" />
     <ClInclude Include="Engine\Resource\Texture\TextureManager.h" />
     <ClInclude Include="Engine\Resource\Texture\TextureData.h" />
     <ClInclude Include="Engine\Resource\OffScreen\OffScreenData.h" />
+    <ClInclude Include="Engine\Resource\Model\ModelData.h" />
+    <ClInclude Include="Engine\Render\Resource\ModelResource.h" />
+    <ClInclude Include="Engine\Resource\Model\ModelManager.h" />
+    <ClInclude Include="Engine\Scene\SceneManager.h" />
+    <ClInclude Include="Engine\Scene\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

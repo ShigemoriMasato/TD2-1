@@ -36,7 +36,7 @@ public:
 	/// <param name="commandList"></param>
 	void Setting(ID3D12GraphicsCommandList* commandList);
 
-	void BeginFrame(ID3D12GraphicsCommandList* commandList);
+	void FrameInitialize(ID3D12GraphicsCommandList* commandList);
 
 private:
 

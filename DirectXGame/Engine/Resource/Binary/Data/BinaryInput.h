@@ -1,6 +1,6 @@
 #pragma once
 #include <istream>
-#include <Data/Value.h>
+#include <Transform/Value.h>
 
 class BinaryInput {
 public:

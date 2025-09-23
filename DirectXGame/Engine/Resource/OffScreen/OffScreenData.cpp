@@ -1,7 +1,9 @@
 #include "OffScreenData.h"
 #include <Core/DXCommonFunction.h>
 
-OffScreenData::OffScreenData(int width, int height, DXDevice* device, ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* srv, ID3D12DescriptorHeap* rtv) {
+int OffScreenData::offScreenTextureCount_ = 0;
+
+OffScreenData::OffScreenData(int width, int height, float* clearColor, DXDevice* device, ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* srv, ID3D12DescriptorHeap* rtv) {
 
     //PostEffect用のリソースの作成
     D3D12_RESOURCE_DESC desc = {};
@@ -18,6 +20,10 @@ OffScreenData::OffScreenData(int width, int height, DXDevice* device, ID3D12Grap
     D3D12_CLEAR_VALUE clearValue = {};
     clearValue.DepthStencil.Depth = 1.0f;
     clearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    for(int i = 0; i < 4; ++i) {
+        clearValue.Color[i] = clearColor[i];
+        clearColor_[i] = clearColor[i];
+	}
 
     D3D12_HEAP_PROPERTIES heapProps = {};
     heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;              // defaultのヒープを使用
@@ -58,5 +64,56 @@ OffScreenData::OffScreenData(int width, int height, DXDevice* device, ID3D12Grap
 
     //バリアの初期状態を設定
     resourceState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+    dsvDescriptorHeap_ = CreateDescriptorHeap(device->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+    dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+
+    depthStencilResource_ = CreateDepthStencilTextureResource(device->GetDevice(), width, height);
+
+    device->GetDevice()->CreateDepthStencilView(depthStencilResource_, &dsvDesc, dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart());
+
+}
+
+void OffScreenData::EditBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESOURCE_STATES stateAfter, D3D12_RESOURCE_BARRIER_TYPE type, D3D12_RESOURCE_BARRIER_FLAGS flags) {
+	InsertBarrier(commandlist, resourceState_, stateAfter, textureResource_.Get(), type, flags);
+}
+
+void OffScreenData::DrawReady(ID3D12GraphicsCommandList* commandList) {
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+
+    //バリアを変更
+    InsertBarrier(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET, resourceState_, textureResource_.Get());
+
+    //RenderTargetの切り替え
+    commandList->OMSetRenderTargets(1, &rtvHandle_, false, &dsvHandle);
+
+    //指定した色で画面全体をクリアする
+    commandList->ClearRenderTargetView(rtvHandle_, clearColor_, 0, nullptr);
+
+    //深度バッファをクリアする
+    commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+    //ビューポート
+    D3D12_VIEWPORT viewport{};
+    //クライアント領域のサイズと一緒にして画面全体に表示
+    viewport.Width = static_cast<float>(width_);
+    viewport.Height = static_cast<float>(height_);
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    //シザー矩形
+    D3D12_RECT scissorRect{};
+    //基本的にビューポートと同じく刑が構成されるようにする
+    scissorRect.left = 0;
+    scissorRect.right = width_;
+    scissorRect.top = 0;
+    scissorRect.bottom = height_;
+
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
 
 }

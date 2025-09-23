@@ -68,9 +68,12 @@ void PSOEditor::Setting(ID3D12GraphicsCommandList* commandList) {
 	nextConfig_ = {};
 }
 
-void PSOEditor::BeginFrame(ID3D12GraphicsCommandList* commandList) {
-	nowConfig_ = {};
-	nextConfig_ = {};
-	commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(nowConfig_.rootID));
-	commandList->SetPipelineState(psoManager_->GetPSO(nowConfig_));
+void PSOEditor::FrameInitialize(ID3D12GraphicsCommandList* commandList) {
+	if (nowConfig_.rootID != RootSignatureID::Default) {
+		commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(nowConfig_.rootID));
+	}
+	if (nowConfig_ != PSOConfig{}) {
+		nowConfig_ = {};
+		commandList->SetPipelineState(psoManager_->GetPSO(nowConfig_));
+	}
 }

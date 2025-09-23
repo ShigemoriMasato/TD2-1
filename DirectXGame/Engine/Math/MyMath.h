@@ -4,9 +4,9 @@
 #include <string>
 #include <array>
 #include <cmath>
-#include "../Data/Vector.h"
-#include "../Data/Matrix.h"
-#include "../Data/Transform.h"
+#include "../Transform/Vector.h"
+#include "../Transform/Matrix.h"
+#include "../Transform/Transform.h"
 
 Vector2 operator+(const Vector2& a, const Vector2& b);
 Vector2 operator-(const Vector2& a, const Vector2& b);

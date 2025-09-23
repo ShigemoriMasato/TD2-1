@@ -1,49 +1,41 @@
 #include "Render.h"
 #include <Core/DXCommonFunction.h>
+#include <imgui/imgui_impl_dx12.h>
 
 Render::Render(DXDevice* device) {
     device_ = device;
     logger_ = std::make_unique<Logger>();
 	logger_->RegistLogFile("Render");
     psoEditor_ = std::make_unique<PSOEditor>(device_->GetDevice());
-}
 
-Render::~Render() {
-}
+	// ============================================
 
-void Render::Initialize() {
-
-#pragma region CommandQueue
-
+    //CommandQueue
     D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
     HRESULT hr = device_->GetDevice()->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
     //コマンドキューの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
     logger_->Log("Complete create CommandQueue\n");
 
-#pragma endregion
-
-#pragma region CommandAllocator
-
+    //CommandAllocator
     hr = device_->GetDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
     //コマンドアロケータの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
     logger_->Log("Complete create CommandAllocator\n");
 
-#pragma endregion
-
-#pragma region CommandList
-
+    //CommandList
     hr = device_->GetDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
     //コマンドリストの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
     logger_->Log("Complete create CommandList\n");
 
-#pragma endregion
+}
 
-	//テクスチャマネージャーの生成
-    textureManager_ = std::make_unique<TextureManager>(device_, commandList);
+Render::~Render() {
+}
 
+void Render::Initialize(TextureManager* textureManager, OffScreenManager* offScreenManager) {
+    
 	auto windowSize = device_->GetWindowSize();
 
     //スワップチェーンを生成する
@@ -57,7 +49,7 @@ void Render::Initialize() {
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;   	//モニタに映したら捨てる
 
     //コマンドキュー、ウィンドウハンドル、設定を渡して生成する
-    hr = device_->GetDxgiFactory()->CreateSwapChainForHwnd(
+    HRESULT hr = device_->GetDxgiFactory()->CreateSwapChainForHwnd(
         commandQueue.Get(),		        		//コマンドキュー
         device_->GetHwnd(),			            //ウィンドウハンドル
         &swapChainDesc,	        		        //設定
@@ -122,20 +114,50 @@ void Render::Initialize() {
     //PSOの初期化
     psoEditor_ = std::make_unique<PSOEditor>(device_->GetDevice());
     psoEditor_->Initialize(device_->GetDevice());
+
+}
+
+void Render::PreDraw(int offscreenHandle) {
+    //PSOとRootSignatureを初期化する
+    if (isFrameFirst_) {
+        psoEditor_->FrameInitialize(commandList.Get());
+		isFrameFirst_ = false;
+    } else {
+        
+    }
+
+    offScreenHandle_ = offscreenHandle;
+
+    //描画する画面が指定されている場合はそちらにする
+    if (offscreenHandle != -1) {
+		auto offscreen = offScreenManager_->GetOffScreenData(offscreenHandle);
+		PreDrawOffScreen(offscreen);
+        return;
+    }
+
+	//そうでない場合はスワップチェーンのバッファに描画する
+    PreDrawSwapChain();
+
 }
 
 void Render::Draw(DXResource* resource) {
 
-    commandList->IASetVertexBuffers(0, 1, &resource->GetVertexBufferView());
+    auto vertexBufferView = resource->GetVertexBufferView();
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	uint32_t indexNum = resource->GetIndexNum();
     if (indexNum != 0) {
-		commandList->IASetIndexBuffer(&resource->GetIndexBufferView());
+        auto indexBufferView = resource->GetIndexBufferView();
+		commandList->IASetIndexBuffer(&indexBufferView);
     }
 
     //マテリアルのポインタを設定
     commandList->SetGraphicsRootConstantBufferView(0, resource->GetMaterialResource()->GetGPUVirtualAddress());
+
     //Matrixのポインタを設定
-    commandList->SetGraphicsRootConstantBufferView(1, resource->GetMatrixResource()->GetGPUVirtualAddress());
+    if (resource->GetMatrixResource()) {
+        commandList->SetGraphicsRootConstantBufferView(1, resource->GetMatrixResource()->GetGPUVirtualAddress());
+    }
+
     //Texture
     commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
 	//Lightのポインタを設定
@@ -152,4 +174,106 @@ void Render::Draw(DXResource* resource) {
         commandList->DrawInstanced(resource->GetVertexNum(), 1, 0, 0);
     }
 
+}
+
+void Render::PostDraw() {
+    if (offScreenHandle_ != -1) {
+        ResetResourceBarrier();
+        PreDraw();
+    }
+
+    //ImGuiの描画
+#ifdef _DEBUG
+
+    ImGui::Render();
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+
+#else
+
+    ImGui::EndFrame();
+
+#endif
+
+    ResetResourceBarrier();
+
+	//コマンドリストのクローズ
+    HRESULT hr = commandList->Close();
+    assert(SUCCEEDED(hr));
+
+    // GPUにコマンドリストの実行を行わせる
+    ID3D12CommandList* commandLists[] = { commandList.Get() };
+    commandQueue->ExecuteCommandLists(1, commandLists);
+    //GPUとOSに画面の交換を行うよう通知する
+    swapChain->Present(1, 0);
+
+    //Fenceの値を更新
+    fenceValue++;
+    //GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
+    commandQueue->Signal(fence.Get(), fenceValue);
+
+    //Fenceの値が指定したSignal値にたどり着いてるかを確認する
+    //GetCompletedValueの初期値はFence作成時に渡した初期値
+    if (fence->GetCompletedValue() < fenceValue) {
+        //指定したSignalにたどり着いていないので、たどり着くまで待つようにイベントを設定する
+        fence->SetEventOnCompletion(fenceValue, fenceEvent);
+        //イベントを待つ
+        WaitForSingleObject(fenceEvent, INFINITE);
+    }
+
+    //次のフレームのためのcommandReset
+    commandAllocator->Reset();
+    commandList->Reset(commandAllocator.Get(), nullptr);
+}
+
+void Render::PreDrawSwapChain() {
+    //描画する画面を取得
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+    //バリアを変更
+    InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, resourcestates_[backBufferIndex], swapChainResources[backBufferIndex].Get());
+
+    //RenderTargetの切り替え
+    commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+
+    //指定した色で画面全体をクリアする
+    commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor_, 0, nullptr);
+
+    //深度バッファをクリアする
+    commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+    //ビューポート
+    D3D12_VIEWPORT viewport{};
+    //クライアント領域のサイズと一緒にして画面全体に表示
+    viewport.Width = static_cast<float>(device_->GetWindowSize().first);
+    viewport.Height = static_cast<float>(device_->GetWindowSize().second);
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    //シザー矩形
+    D3D12_RECT scissorRect{};
+    //基本的にビューポートと同じく刑が構成されるようにする
+    scissorRect.left = 0;
+    scissorRect.right = device_->GetWindowSize().first;
+    scissorRect.top = 0;
+    scissorRect.bottom = device_->GetWindowSize().second;
+
+    commandList->RSSetViewports(1, &viewport);
+    commandList->RSSetScissorRects(1, &scissorRect);
+
+}
+
+void Render::PreDrawOffScreen(OffScreenData* offScreen) {
+	offScreenManager_->GetOffScreenData(offScreenHandle_)->DrawReady(commandList.Get());
+}
+
+void Render::ResetResourceBarrier() {
+    if (offScreenHandle_ != -1) {
+        offScreenManager_->GetOffScreenData(offScreenHandle_)->EditBarrier(commandList.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    } else {
+		int backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+        InsertBarrier(commandList.Get(), D3D12_RESOURCE_STATE_PRESENT, resourcestates_[backBufferIndex], swapChainResources[backBufferIndex].Get());
+    }
 }

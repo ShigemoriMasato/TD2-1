@@ -6,25 +6,43 @@
 #include <cassert>
 #include <istream>
 #include <ostream>
-#include <Data/Transform.h>
+#include <Transform/Transform.h>
 
 enum class TypeID : uint8_t {
+	kUnknown = 0x00,	//不明な型
+
 	//もともとある型
 	Int = 0x01,
-	Float = 0x02,
-	Bool = 0x03,
-	String = 0x04,
-	Double = 0x05,
+	Float,
+	Bool,
+	String,
+	Double,
+	uint8_t,
 
 	//VectorとかMatrixとか
 	Vector2 = 0x10,
-	Vector3 = 0x11,
-	Vector4 = 0x12,
+	Vector3,
+	Vector4,
 
 	//構造体とか
 	Custom = 0x80,
 
 };
+
+template<typename T>
+struct TypeIDResolver {
+	static constexpr TypeID id = TypeID::kUnknown;
+};
+
+template<> struct TypeIDResolver<int> { static constexpr TypeID id = TypeID::Int; };
+template<> struct TypeIDResolver<float> { static constexpr TypeID id = TypeID::Float; };
+template<> struct TypeIDResolver<bool> { static constexpr TypeID id = TypeID::Bool; };
+template<> struct TypeIDResolver<std::string> { static constexpr TypeID id = TypeID::String; };
+template<> struct TypeIDResolver<double> { static constexpr TypeID id = TypeID::Double; };
+template<> struct TypeIDResolver<uint8_t> { static constexpr TypeID id = TypeID::uint8_t; };
+template<> struct TypeIDResolver<Vector2> { static constexpr TypeID id = TypeID::Vector2; };
+template<> struct TypeIDResolver<Vector3> { static constexpr TypeID id = TypeID::Vector3; };
+template<> struct TypeIDResolver<Vector4> { static constexpr TypeID id = TypeID::Vector4; };
 
 class ValueBase {
 public:
@@ -52,15 +70,15 @@ public:
 	virtual void Deserialize(std::istream& in) = 0;
 
 	std::string name;		//変数名
-	
+
 protected:
 	ValueBase() = default;
 
 private:
 	//std::anyはできれば使いたくないので、誰も使えないようにprivateにする
-	
+
 	//値を取得する
-	virtual std::any GetValueData() = 0;	
+	virtual std::any GetValueData() = 0;
 };
 
 template<typename T>
@@ -74,7 +92,9 @@ public:
 		value = newValue;
 	};
 
-	uint8_t GetTypeID() const override;
+	uint8_t GetTypeID() const override {
+		return static_cast<uint8_t>(TypeIDResolver<T>::id);
+	};
 
 	void Serialize(std::ostream& out) const override {
 		out.write(reinterpret_cast<const char*>(&value), sizeof(T));
@@ -92,46 +112,3 @@ private:
 		return value;
 	}
 };
-
-template<typename T>
-T operator+(const Value<T>& a, const Value<T>& b);
-template<typename T>
-T operator-(const Value<T>& a, const Value<T>& b);
-template<typename T>
-T operator*(const Value<T>& a, const Value<T>& b);
-template<typename T>
-T operator/(const Value<T>& a, const Value<T>& b);
-template<typename T>
-T operator+=(Value<T>& a, const Value<T>& b);
-template<typename T>
-T operator-=(Value<T>& a, const Value<T>& b);
-template<typename T>
-T operator*=(Value<T>& a, const Value<T>& b);
-template<typename T>
-T operator/=(Value<T>& a, const Value<T>& b);
-template<typename T>
-bool operator==(const Value<T>& a, const Value<T>& b);
-template<typename T>
-bool operator!=(const Value<T>& a, const Value<T>& b);
-template<typename T>
-bool operator<(const Value<T>& a, const Value<T>& b);
-template<typename T>
-bool operator>(const Value<T>& a, const Value<T>& b);
-template<typename T>
-bool operator<=(const Value<T>& a, const Value<T>& b);
-template<typename T>
-bool operator>=(const Value<T>& a, const Value<T>& b);
-template<typename T>
-Value<T> operator++(Value<T>& a);
-template<typename T>
-Value<T> operator--(Value<T>& a);
-template<typename T>
-bool operator!(Value<T>& a);
-template<typename T>
-bool operator&&(const Value<T>& a, const Value<T>& b);
-template<typename T>
-bool operator||(const Value<T>& a, const Value<T>& b);
-template<typename T>
-Value<T> operator<<(const Value<T>& a, int shift);
-template<typename T>
-Value<T> operator>>(const Value<T>& a, int shift);

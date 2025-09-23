@@ -12,8 +12,10 @@
 class TextureManager {
 public:
 
-	TextureManager(DXDevice* device, ID3D12GraphicsCommandList* commandList);
+	TextureManager();
 	~TextureManager();
+
+	void Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList);
 
 	int LoadTexture(std::string filePath);
 

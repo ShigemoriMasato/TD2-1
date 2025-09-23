@@ -34,10 +34,10 @@ struct PSOConfig {
 		return !(*this == other);
 	}
 
-	bool Validate(ShaderShelf& shaderShelf,
-		InputLayoutShelf& inputLayoutShelf,
-		RootSignatureShelf& rootShelf,
-		Logger* logger) const {
+	/// <summary>
+	/// 整合性確認用関数
+	/// </summary>
+	bool Validate(ShaderShelf& shaderShelf, InputLayoutShelf& inputLayoutShelf, RootSignatureShelf& rootShelf, Logger* logger) const {
 		bool valid = true;
 
 		// VS / PS のバイトコード確認
