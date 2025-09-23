@@ -7,7 +7,9 @@ TitleScene::~TitleScene() {
 }
 
 void TitleScene::Initialize() {
-	modelManager_->LoadModel("")
+	bunnyHandle_ = modelManager_->LoadModel("bunny");
+	bunnyModel_ = std::make_unique<ModelResource>();
+	bunnyModel_->Initialize(modelManager_->GetModelData(bunnyHandle_));
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update() {
@@ -15,4 +17,5 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 }
 
 void TitleScene::Draw() {
+	render_->Draw(bunnyModel_.get());
 }

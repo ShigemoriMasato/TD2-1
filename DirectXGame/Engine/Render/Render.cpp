@@ -120,6 +120,8 @@ void Render::Initialize(TextureManager* textureManager, OffScreenManager* offScr
     psoEditor_ = std::make_unique<PSOEditor>(device_->GetDevice());
     psoEditor_->Initialize(device_->GetDevice());
 
+	textureManager_ = textureManager;
+	offScreenManager_ = offScreenManager;
 }
 
 void Render::PreDraw(int offscreenHandle) {
@@ -155,6 +157,9 @@ void Render::Draw(DXResource* resource) {
 		commandList->IASetIndexBuffer(&indexBufferView);
     }
 
+    psoEditor_->SetPSOConfig(resource->psoConfig_);
+    psoEditor_->Setting(commandList.Get());
+
     //マテリアルのポインタを設定
     commandList->SetGraphicsRootConstantBufferView(0, resource->GetMaterialResource()->GetGPUVirtualAddress());
 
@@ -168,9 +173,6 @@ void Render::Draw(DXResource* resource) {
 	//Lightのポインタを設定
     commandList->SetGraphicsRootConstantBufferView(3, resource->GetLightResource()->GetGPUVirtualAddress());
 
-    psoEditor_->SetPSOConfig(resource->psoConfig_);
-    psoEditor_->Setting(commandList.Get());
-
     if (indexNum != 0) {
         //インデックスがある場合は、インデックスを設定して描画
         commandList->DrawIndexedInstanced(indexNum, 1, 0, 0, 0);
@@ -179,6 +181,13 @@ void Render::Draw(DXResource* resource) {
         commandList->DrawInstanced(resource->GetVertexNum(), 1, 0, 0);
     }
 
+}
+
+void Render::Draw(ModelResource* resource) {
+	auto resources = resource->GetResources();
+    for (auto& res : resources) {
+        Draw(res);
+	}
 }
 
 void Render::PostDraw() {
@@ -256,6 +265,7 @@ void Render::PreDrawSwapChain() {
     commandList->RSSetViewports(1, &viewport);
     commandList->RSSetScissorRects(1, &scissorRect);
 
+    isFrameFirst_ = true;
 }
 
 void Render::PreDrawOffScreen(OffScreenData* offScreen) {

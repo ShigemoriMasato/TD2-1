@@ -7,7 +7,7 @@
 
 struct ModelMaterial final {
 	std::string name;
-	int textureHandle;
+	int textureHandle = -1;
 };
 
 class ModelData {

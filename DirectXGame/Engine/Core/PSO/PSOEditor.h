@@ -47,6 +47,8 @@ private:
 
 	std::shared_ptr<Logger> logger_;
 
+	bool isFirst_ = true;
+
 };
 
 

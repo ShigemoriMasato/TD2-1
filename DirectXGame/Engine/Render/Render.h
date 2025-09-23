@@ -2,6 +2,7 @@
 #include <Core/DXDevice.h>
 #include <Core/PSO/PSOEditor.h>
 #include <Render/Resource/DXResource.h>
+#include <Render/Resource/ModelResource.h>
 #include <Resource/Texture/TextureManager.h>
 #include <Resource/OffScreen/OffScreenManager.h>
 
@@ -15,6 +16,7 @@ public:
 
 	void PreDraw(int offscreenHandle = -1);
 	void Draw(DXResource* resource);
+	void Draw(ModelResource* resource);
 	void PostDraw();
 
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }

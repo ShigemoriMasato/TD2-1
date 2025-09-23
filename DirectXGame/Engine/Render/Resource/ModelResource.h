@@ -10,6 +10,8 @@ public:
 
 	void Initialize(ModelData* modelData);
 
+	std::vector<DXResource*> GetResources();
+
 	void SetMatrix(const Matrix4x4& world, const Matrix4x4& vp);
 	void SetMaterial(const Vector4& color, bool enableLighting, const Matrix4x4& uvTransform);
 	void SetLight(const Vector4& color, const Vector3& direction, float intensity);

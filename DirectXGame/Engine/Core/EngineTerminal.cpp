@@ -1,4 +1,5 @@
 #include "EngineTerminal.h"
+#include <Render/Resource/DXResource.h>
 
 EngineTerminal::EngineTerminal() {
 }
@@ -20,6 +21,8 @@ bool EngineTerminal::IsLoop() {
 void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	dxDevice_ = std::make_unique<DXDevice>(windowWidth, windowHeight);
 	dxDevice_->Initialize();
+
+	DXResource::SetDevice(dxDevice_.get());
 
 	render_ = std::make_unique<Render>(dxDevice_.get());
 

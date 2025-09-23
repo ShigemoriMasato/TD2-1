@@ -5,7 +5,6 @@
 #include <sstream>
 
 void ModelData::LoadModel(const std::string& directoryPath, const std::string& filename, TextureManager* textureManager) {
-    ModelData modelData;                    //構築するデータ
     std::vector<Vector4> positions;         //位置
     std::vector<Vector3> normals;           //法線
     std::vector<Vector2> texcoords;         //テクスチャ座標
@@ -78,13 +77,13 @@ void ModelData::LoadModel(const std::string& directoryPath, const std::string& f
                 Vector3 normal = normals[elementIndices[2] - 1];
 
                 VertexData vertex = { position, texcoord, normal };
-                modelData.vertices[materialName].push_back(vertex); //頂点を格納
+                vertices[materialName].push_back(vertex); //頂点を格納
 
             }
         } else if (identifier == "mtllib") {
             std::string materialFilename;
             s >> materialFilename;
-            modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename, textureManager); //マテリアルファイルを読み込む
+            material = LoadMaterialTemplateFile(directoryPath, materialFilename, textureManager); //マテリアルファイルを読み込む
         }
     }
 
@@ -127,9 +126,9 @@ std::vector<ModelMaterial> ModelData::LoadMaterialTemplateFile(const std::string
         }
     }
 
-    if (material[index].textureHandle == 0) {
+    if (material[index].textureHandle == -1) {
         //テクスチャが読み込めなかった場合は白い1x1のテクスチャを使う
-        material[index].textureHandle = 1;
+        material[index].textureHandle = 0;
     }
 
     return material;

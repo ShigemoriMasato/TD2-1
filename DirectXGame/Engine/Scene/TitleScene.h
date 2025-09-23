@@ -1,5 +1,6 @@
 #pragma once
 #include "Data/BaseScene.h"
+#include <Render/Resource/ModelResource.h>
 
 class TitleScene : public BaseScene {
 public:
@@ -13,6 +14,7 @@ public:
 
 private:
 
-
+	int bunnyHandle_ = -1;
+	std::unique_ptr<ModelResource> bunnyModel_ = nullptr;
 
 };

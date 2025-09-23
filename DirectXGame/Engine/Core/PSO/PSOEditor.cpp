@@ -76,4 +76,10 @@ void PSOEditor::FrameInitialize(ID3D12GraphicsCommandList* commandList) {
 		nowConfig_ = {};
 		commandList->SetPipelineState(psoManager_->GetPSO(nowConfig_));
 	}
+
+	if (isFirst_) {
+		isFirst_ = false;
+		commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(RootSignatureID::Default));
+		commandList->SetPipelineState(psoManager_->GetPSO(PSOConfig{}));
+	}
 }

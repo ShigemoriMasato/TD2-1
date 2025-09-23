@@ -101,6 +101,7 @@ ID3D12PipelineState* PSOManager::GetPSO(const PSOConfig& config) {
 	if (it != psoMap_.end()) {
 		return it->second;
 	} else {
+		assert(false && "PSO not found for given config");
 		logger_->Log("PSO not found for given config");
 		return nullptr;
 	}
