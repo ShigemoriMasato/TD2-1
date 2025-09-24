@@ -6,7 +6,7 @@ RasterizerShelf::RasterizerShelf() {
     //RasisterzerStateの設定
     D3D12_RASTERIZER_DESC defaultDesc{};
     //裏面(時計回り)を表示しない
-    defaultDesc.CullMode = D3D12_CULL_MODE_BACK;
+    defaultDesc.CullMode = D3D12_CULL_MODE_NONE;
     //三角形の中を塗りつぶす
     defaultDesc.FillMode = D3D12_FILL_MODE_SOLID;
 

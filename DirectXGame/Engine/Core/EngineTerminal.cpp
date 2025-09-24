@@ -36,4 +36,10 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	input_->Initialize();
 
 	render_->Initialize(textureManager_.get(), offScreenManager_.get(), srvManager_.get());
+
+	textureManager_->LoadTexture("Assets/Texture/white1x1.png");
+}
+
+void EngineTerminal::Update() {
+	input_->Update();
 }

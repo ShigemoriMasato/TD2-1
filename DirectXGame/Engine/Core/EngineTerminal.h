@@ -26,6 +26,8 @@ public:
 
 	bool IsLoop();
 
+	void Update();
+
 	DXDevice* GetDXDevice() { return dxDevice_.get(); }
 	Render* GetRender() { return render_.get(); }
 	TextureManager* GetTextureManager() { return textureManager_.get(); }

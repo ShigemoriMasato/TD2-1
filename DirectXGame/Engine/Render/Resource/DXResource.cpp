@@ -1,5 +1,6 @@
 #include "DXResource.h"
 #include <Core/DXCommonFunction.h>
+#include <Math/MyMath.h>
 
 DXDevice* DXResource::dxDevice_ = nullptr;
 
@@ -29,6 +30,7 @@ void DXResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMatri
 	//マテリアル
 	materialResource.Attach(CreateBufferResource(device, sizeof(MaterialData)));
 	materialResource->Map(0, nullptr, (void**)&material_);
+	*material_ = MaterialData{};
 	
 	lightResource.Attach(CreateBufferResource(device, sizeof(DirectionalLightData)));
 	lightResource->Map(0, nullptr, (void**)&light_);
@@ -45,6 +47,8 @@ void DXResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMatri
 	if (useMatrix) {
 		matrixResource.Attach(CreateBufferResource(device, sizeof(MatrixData)));
 		matrixResource->Map(0, nullptr, (void**)&matrix_);
+		matrix_->world = Matrix::MakeIdentity4x4();
+		matrix_->wvp = Matrix::MakeIdentity4x4();
 	}
 
 	vertexNum_ = vertexNum;

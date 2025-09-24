@@ -19,6 +19,9 @@ bool SceneManager::IsLoop() {
 }
 
 void SceneManager::Update() {
+
+	engineTerminal_->Update();
+
 	if (nextScene_) {
 		nextScene_->MoveScene(engineTerminal_.get());
 		currentScene_ = std::move(nextScene_);

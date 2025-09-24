@@ -27,7 +27,7 @@ public:
 
 	PSOConfig psoConfig_{};
 
-	int textureHandle_ = 1;
+	int textureHandle_ = 0;
 
 	VertexData* vertex_ = nullptr;
 	uint32_t* index_ = nullptr;
