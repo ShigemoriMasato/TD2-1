@@ -5,6 +5,8 @@
 #include <Render/Resource/ModelResource.h>
 #include <Resource/Texture/TextureManager.h>
 #include <Resource/OffScreen/OffScreenManager.h>
+#include <Render/ImGuiWrapper.h>
+#include <imgui/imgui_impl_dx12.h>
 
 class Render {
 public:
@@ -17,9 +19,10 @@ public:
 	void PreDraw(int offscreenHandle = -1);
 	void Draw(DXResource* resource);
 	void Draw(ModelResource* resource);
-	void PostDraw();
+	void PostDraw(ImGuiRapper* imguiRap);
 
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+	ImGui_ImplDX12_InitInfo GetImGuiInitInfo(SRVManager* srv);
 
 	void SetClearColor(float r, float g, float b, float a) {
 		clearColor_[0] = r;

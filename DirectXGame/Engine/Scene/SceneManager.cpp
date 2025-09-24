@@ -33,7 +33,7 @@ void SceneManager::Update() {
 }
 
 void SceneManager::Draw() {
-	engineTerminal_->GetRender()->PreDraw();
+	engineTerminal_->PreDraw();
 	currentScene_->Draw();
-	engineTerminal_->GetRender()->PostDraw();
+	engineTerminal_->PostDraw();
 }

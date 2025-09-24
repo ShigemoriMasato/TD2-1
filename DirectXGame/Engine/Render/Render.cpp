@@ -123,6 +123,32 @@ void Render::Initialize(TextureManager* textureManager, OffScreenManager* offScr
 	textureManager_ = textureManager;
 	offScreenManager_ = offScreenManager;
 	srvManager_ = srvManager;
+
+	//初期化の段階で一度コマンドリストの中身をすべて実行する
+    hr = commandList->Close();
+    assert(SUCCEEDED(hr));
+
+    // GPUにコマンドリストの実行を行わせる
+    ID3D12CommandList* commandLists[] = { commandList.Get() };
+    commandQueue->ExecuteCommandLists(1, commandLists);
+
+    //Fenceの値を更新
+    fenceValue++;
+    //GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
+    commandQueue->Signal(fence.Get(), fenceValue);
+
+    //Fenceの値が指定したSignal値にたどり着いてるかを確認する
+    //GetCompletedValueの初期値はFence作成時に渡した初期値
+    if (fence->GetCompletedValue() < fenceValue) {
+        //指定したSignalにたどり着いていないので、たどり着くまで待つようにイベントを設定する
+        fence->SetEventOnCompletion(fenceValue, fenceEvent);
+        //イベントを待つ
+        WaitForSingleObject(fenceEvent, INFINITE);
+    }
+
+    //次のフレームのためのcommandReset
+    commandAllocator->Reset();
+    commandList->Reset(commandAllocator.Get(), nullptr);
 }
 
 void Render::PreDraw(int offscreenHandle) {
@@ -193,11 +219,13 @@ void Render::Draw(ModelResource* resource) {
 	}
 }
 
-void Render::PostDraw() {
+void Render::PostDraw(ImGuiRapper* imguiRap) {
     if (offScreenHandle_ != -1) {
         ResetResourceBarrier();
         PreDraw();
     }
+
+    imguiRap->EndFrame(commandList.Get());
 
     ResetResourceBarrier();
 
@@ -228,6 +256,18 @@ void Render::PostDraw() {
     //次のフレームのためのcommandReset
     commandAllocator->Reset();
     commandList->Reset(commandAllocator.Get(), nullptr);
+}
+
+ImGui_ImplDX12_InitInfo Render::GetImGuiInitInfo(SRVManager* srv) {
+    ImGui_ImplDX12_InitInfo info;
+	info.Device = device_->GetDevice();
+	info.NumFramesInFlight = 2;
+	info.RTVFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	info.CommandQueue = commandQueue.Get();
+	info.SrvDescriptorHeap = srv->GetHeap();
+	info.LegacySingleSrvCpuDescriptor = srv->GetCPUHandle();
+    info.LegacySingleSrvGpuDescriptor = srv->GetGPUHandle();
+	return info;
 }
 
 void Render::PreDrawSwapChain() {

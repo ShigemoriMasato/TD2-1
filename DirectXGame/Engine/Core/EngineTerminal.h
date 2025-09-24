@@ -4,6 +4,7 @@
 #include <Resource/Texture/TextureManager.h>
 #include <Resource/Model/ModelManager.h>
 #include <Resource/OffScreen/OffScreenManager.h>
+#include <Render/ImGuiWrapper.h>
 #include <Input/Input.h>
 
 struct D3DResourceLeakChecker {
@@ -28,6 +29,9 @@ public:
 
 	void Update();
 
+	void PreDraw();
+	void PostDraw();
+
 	DXDevice* GetDXDevice() { return dxDevice_.get(); }
 	Render* GetRender() { return render_.get(); }
 	TextureManager* GetTextureManager() { return textureManager_.get(); }
@@ -45,6 +49,7 @@ private:
 	std::unique_ptr<ModelManager> modelManager_ = nullptr;
 	std::unique_ptr<OffScreenManager> offScreenManager_ = nullptr;
 	std::unique_ptr<Input> input_ = nullptr;
+	std::unique_ptr<ImGuiRapper> imgui_ = nullptr;
 
 	MSG msg{};
 

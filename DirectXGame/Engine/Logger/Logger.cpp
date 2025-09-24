@@ -57,13 +57,13 @@ void Logger::RegistLogFile(std::string logName) {
 
 	//ディレクトリが見つからなければ作成
     if (!isFind) {
-		fs::create_directories("Logs/" + logName);
+		fs::create_directories("Assets/Logs/" + logName);
     }
 
 #pragma endregion
 
     //ファイル名の決定
-    std::string logFileName = "Logs/" + logName + "/" + dataString + ".log";
+    std::string logFileName = "Assets/Logs/" + logName + "/" + dataString + ".log";
     //ファイルを作成して書き込み準備
     logStreams.push_back(std::ofstream(logFileName));
 
