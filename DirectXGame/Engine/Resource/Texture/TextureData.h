@@ -3,6 +3,7 @@
 #include <wrl.h>
 #include <string>
 #include <Core/DXDevice.h>
+#include <Resource/SRVManager.h>
 
 class TextureData {
 public:
@@ -10,7 +11,8 @@ public:
 	/// <summary>
 	/// 画像を読み込んでSRVを作成する
 	/// </summary>
-	TextureData(std::string filePath, DXDevice* device, ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* srvDescriptorHeap);
+	TextureData(std::string filePath, DXDevice* device, ID3D12GraphicsCommandList* commandList, SRVManager* srvManager);
+	~TextureData() = default;
 
 	int GetWidth() const { return width_; }
 	int GetHeight() const { return height_; }

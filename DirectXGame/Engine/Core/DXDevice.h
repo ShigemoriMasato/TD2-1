@@ -24,6 +24,7 @@ public:
 	IDXGIFactory7* GetDxgiFactory() { return dxgiFactory.Get(); }
 	HWND GetHwnd() const { return window_->GetHwnd(); }
 	std::pair<int32_t, int32_t> GetWindowSize() const { return { windowWidth_,windowHeight_ }; }
+	HINSTANCE GetHInstance() const { return window_->GetWndClass().hInstance; }
 
 	uint32_t GetDescriptorSizeSRV() const { return descriptorSizeSRV; }
 	uint32_t GetDescriptorSizeRTV() const { return descriptorSizeRTV; }

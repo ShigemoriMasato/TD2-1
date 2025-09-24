@@ -3,7 +3,7 @@
 
 int OffScreenData::offScreenTextureCount_ = 0;
 
-OffScreenData::OffScreenData(int width, int height, float* clearColor, DXDevice* device, ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* srv, ID3D12DescriptorHeap* rtv) {
+OffScreenData::OffScreenData(int width, int height, float* clearColor, DXDevice* device, ID3D12GraphicsCommandList* commandList, SRVManager* srvManager, ID3D12DescriptorHeap* rtv) {
 
     //PostEffect用のリソースの作成
     D3D12_RESOURCE_DESC desc = {};
@@ -54,10 +54,8 @@ OffScreenData::OffScreenData(int width, int height, float* clearColor, DXDevice*
     srvDesc.Texture2D.MipLevels = 1;
 
     // SRV用ディスクリプタ位置を確保
-    D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = GetCPUDesscriptorHandle(
-        srv, device->GetDescriptorSizeSRV(), offScreenTextureCount_);
-    gpuHandle_ = GetGPUDesscriptorHandle(
-        srv, device->GetDescriptorSizeSRV(), offScreenTextureCount_);
+    D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvManager->GetCPUHandle();
+	gpuHandle_ = srvManager->GetGPUHandle();
 
     // SRVを作成
     device->GetDevice()->CreateShaderResourceView(textureResource_.Get(), &srvDesc, textureSrvHandleCPU);

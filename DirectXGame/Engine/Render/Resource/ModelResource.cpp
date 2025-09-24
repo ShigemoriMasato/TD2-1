@@ -16,6 +16,7 @@ void ModelResource::Initialize(ModelData* modelData) {
 		std::memcpy(resource->vertex_, v.data(), sizeof(VertexData) * v.size());
 		resource->textureHandle_ = modelData->GetTextureHandle(name);
 		resources_.push_back(std::move(resource));
+		resources_.back()->psoConfig_.isOffScreen = true;
 	}
 
 }

@@ -34,7 +34,7 @@ Render::Render(DXDevice* device) {
 Render::~Render() {
 }
 
-void Render::Initialize(TextureManager* textureManager, OffScreenManager* offScreenManager) {
+void Render::Initialize(TextureManager* textureManager, OffScreenManager* offScreenManager, SRVManager* srvManager) {
     
 	auto windowSize = device_->GetWindowSize();
 
@@ -122,12 +122,15 @@ void Render::Initialize(TextureManager* textureManager, OffScreenManager* offScr
 
 	textureManager_ = textureManager;
 	offScreenManager_ = offScreenManager;
+	srvManager_ = srvManager;
 }
 
 void Render::PreDraw(int offscreenHandle) {
     //PSOとRootSignatureを初期化する
     if (isFrameFirst_) {
         psoEditor_->FrameInitialize(commandList.Get());
+        ID3D12DescriptorHeap* ppHeaps[] = { srvManager_->GetHeap() };
+		commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 		isFrameFirst_ = false;
     } else {
         

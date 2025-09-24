@@ -44,7 +44,7 @@ void PSOEditor::SetRootSignature(const RootSignatureID id) {
 	nextConfig_.rootID = id;
 }
 
-void PSOEditor::SetPrimitiveTopology(const D3D12_PRIMITIVE_TOPOLOGY_TYPE topology) {
+void PSOEditor::SetPrimitiveTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) {
 	nextConfig_.topology = topology;
 }
 
@@ -59,7 +59,7 @@ void PSOEditor::Setting(ID3D12GraphicsCommandList* commandList) {
 		commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(nextConfig_.rootID));
 	}
 	if (nextConfig_.topology != nowConfig_.topology) {
-		commandList->IASetPrimitiveTopology(static_cast<D3D12_PRIMITIVE_TOPOLOGY>(nextConfig_.topology));
+		commandList->IASetPrimitiveTopology(nextConfig_.topology);
 	}
 
 	commandList->SetPipelineState(psoManager_->GetPSO(nextConfig_));
@@ -69,17 +69,8 @@ void PSOEditor::Setting(ID3D12GraphicsCommandList* commandList) {
 }
 
 void PSOEditor::FrameInitialize(ID3D12GraphicsCommandList* commandList) {
-	if (nowConfig_.rootID != RootSignatureID::Default) {
-		commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(nowConfig_.rootID));
-	}
-	if (nowConfig_ != PSOConfig{}) {
-		nowConfig_ = {};
-		commandList->SetPipelineState(psoManager_->GetPSO(nowConfig_));
-	}
-
-	if (isFirst_) {
-		isFirst_ = false;
-		commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(RootSignatureID::Default));
-		commandList->SetPipelineState(psoManager_->GetPSO(PSOConfig{}));
-	}
+	nowConfig_ = {};
+	commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(nowConfig_.rootID));
+	commandList->SetPipelineState(psoManager_->GetPSO(nowConfig_));
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

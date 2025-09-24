@@ -12,7 +12,7 @@ public:
 	Render(DXDevice* device);
 	~Render();
 
-	void Initialize(TextureManager* textureManager, OffScreenManager* offScreenManager);
+	void Initialize(TextureManager* textureManager, OffScreenManager* offScreenManager, SRVManager* srvManager);
 
 	void PreDraw(int offscreenHandle = -1);
 	void Draw(DXResource* resource);
@@ -74,4 +74,7 @@ private:
 	//テクスチャ
 	TextureManager* textureManager_ = nullptr;
 	OffScreenManager* offScreenManager_ = nullptr;
+
+	//SRV
+	SRVManager* srvManager_ = nullptr;
 };

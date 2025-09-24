@@ -38,6 +38,7 @@ private:
 	D3DResourceLeakChecker leakChecker_;
 	std::unique_ptr<DXDevice> dxDevice_ = nullptr;
 	std::unique_ptr<Render> render_ = nullptr;
+	std::unique_ptr<SRVManager> srvManager_ = nullptr;
 	std::unique_ptr<TextureManager> textureManager_ = nullptr;
 	std::unique_ptr<ModelManager> modelManager_ = nullptr;
 	std::unique_ptr<OffScreenManager> offScreenManager_ = nullptr;

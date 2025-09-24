@@ -15,7 +15,7 @@ struct PSOConfig {
 	RasterizerID rasterizerID = RasterizerID::Default;
 	RootSignatureID rootID = RootSignatureID::Default;
 	InputLayoutID inputLayoutID = InputLayoutID::Default;
-	D3D12_PRIMITIVE_TOPOLOGY_TYPE topology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	D3D12_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	bool isOffScreen = false;
 
 	bool operator==(const PSOConfig& other) const {

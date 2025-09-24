@@ -57,7 +57,7 @@ void PSOManager::Initialize() {
 							config.ps = ps;
 							config.depthStencilID = static_cast<DepthStencilID>(ds);
 							config.blendID = static_cast<BlendStateID>(blend);
-							config.topology = (topology == 0) ? D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE : D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+							config.topology = (topology == 0) ? D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST : D3D_PRIMITIVE_TOPOLOGY_LINELIST;
 							config.isOffScreen = bool(offscreen);
 
 							//以下defaultとして上で設定したものを使う
@@ -74,8 +74,10 @@ void PSOManager::Initialize() {
 							psoDesc.PS = shaderShelf_->GetShaderBytecode(ShaderType::PIXEL_SHADER, ps);
 							psoDesc.DepthStencilState = depthStencilShelf_->GetDepthStencilDesc(static_cast<DepthStencilID>(ds));
 							psoDesc.BlendState = blendStateShelf_->GetBlendState(static_cast<BlendStateID>(blend));
-							psoDesc.PrimitiveTopologyType = config.topology;
+
 							psoDesc.RTVFormats[0] = config.isOffScreen ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
+
+							psoDesc.PrimitiveTopologyType = config.topology == D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST ? D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE : D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 
 							ID3D12PipelineState* pso = nullptr;
 

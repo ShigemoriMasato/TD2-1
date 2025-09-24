@@ -39,7 +39,7 @@ void Logger::RegistLogFile(std::string logName) {
 #pragma endregion
 
 #pragma region ディレクトリ検索(作成)
-    std::string path = "Logs";  // 検索対象のディレクトリ
+    std::string path = "Assets/Logs";  // 検索対象のディレクトリ
     
     //logsディレクトリが存在するか確認
     if (!fs::exists(path)) {

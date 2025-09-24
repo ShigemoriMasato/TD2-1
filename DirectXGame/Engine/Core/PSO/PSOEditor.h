@@ -24,7 +24,7 @@ public:
 
 	void SetInputLayout(InputLayoutID inputLayoutID);
 
-	void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY_TYPE topology);
+	void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology);
 
 	void SetOffScreen(bool isOffScreen);
 

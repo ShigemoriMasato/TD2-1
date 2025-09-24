@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <string>
 #include "OffScreenData.h"
+#include <Resource/SRVManager.h>
 
 class OffScreenManager {
 public:
@@ -10,7 +11,7 @@ public:
 	OffScreenManager();
 	~OffScreenManager();
 
-	void Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList);
+	void Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList, SRVManager* srvManager);
 
 	int CreateOffScreen(int width, int height, float* clearColor);
 	OffScreenData* GetOffScreenData(int handle);
@@ -22,8 +23,8 @@ private:
 	DXDevice* device_ = nullptr;
 	ID3D12GraphicsCommandList* commandList_ = nullptr;
 
-	//SRVHeap
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
+	//DescriptorHeap
+	SRVManager* srvManager_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
 
 	const int maxOffScreenCount_ = 32;

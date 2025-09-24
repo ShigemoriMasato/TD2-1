@@ -5,6 +5,7 @@
 #include <wrl.h>
 #include <Core/DXDevice.h>
 #include "TextureData.h"
+#include <Resource/SRVManager.h>
 
 /// <summary>
 /// Textureの入出力をするクラス
@@ -15,7 +16,7 @@ public:
 	TextureManager();
 	~TextureManager();
 
-	void Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList);
+	void Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList, SRVManager* srvManager);
 
 	int LoadTexture(std::string filePath);
 
@@ -29,9 +30,8 @@ private:
 	std::unordered_map<std::string, int> textureHandleMap_;
 	std::vector<std::unique_ptr<TextureData>> textures_;
 
-	//SRVHeap
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;	
-
 	const int maxTextureCount = 128;
+
+	SRVManager* srvManager_ = nullptr;
 
 };

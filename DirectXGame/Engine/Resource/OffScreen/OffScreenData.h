@@ -1,5 +1,6 @@
 #pragma once
 #include <Core/DXDevice.h>
+#include <Resource/SRVManager.h>
 
 class OffScreenData {
 public:
@@ -7,7 +8,7 @@ public:
 	/// <summary>
 	/// OffScreen用にリソースを作成する
 	/// </summary>
-	OffScreenData(int width, int height, float* clearColor, DXDevice* device, ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* srv, ID3D12DescriptorHeap* rtv);
+	OffScreenData(int width, int height, float* clearColor, DXDevice* device, ID3D12GraphicsCommandList* commandList, SRVManager* srvManager, ID3D12DescriptorHeap* rtv);
 	~OffScreenData() = default;
 
 	void EditBarrier(ID3D12GraphicsCommandList* commandlist, D3D12_RESOURCE_STATES stateAfter,

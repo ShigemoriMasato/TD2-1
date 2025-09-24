@@ -6,16 +6,12 @@ TextureManager::TextureManager() {
 
 TextureManager::~TextureManager() {
 	textures_.clear();
-	srvDescriptorHeap.Reset();
 }
 
-void TextureManager::Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList) {
-	ID3D12DescriptorHeap* rawHeap = nullptr;
-	rawHeap = CreateDescriptorHeap(device->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, maxTextureCount, true);
-	srvDescriptorHeap.Attach(rawHeap);
-
+void TextureManager::Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList, SRVManager* srvManager) {
 	device_ = device;
 	commandList_ = commandList;
+	srvManager_ = srvManager;
 }
 
 int TextureManager::LoadTexture(std::string filePath) {
@@ -24,7 +20,7 @@ int TextureManager::LoadTexture(std::string filePath) {
 		return textureHandleMap_[filePath];
 	}
 	
-	textures_.emplace_back(std::make_unique<TextureData>(filePath, device_, commandList_, srvDescriptorHeap.Get()));
+	textures_.emplace_back(std::make_unique<TextureData>(filePath, device_, commandList_, srvManager_));
 	return static_cast<int>(textures_.size() - 1);
 }
 

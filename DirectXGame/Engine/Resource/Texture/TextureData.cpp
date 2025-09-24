@@ -3,12 +3,16 @@
 
 int TextureData::readTextureCount_ = 0;
 
-TextureData::TextureData(std::string filePath, DXDevice* device, ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* srvDescriptorHeap) {
+TextureData::TextureData(std::string filePath, DXDevice* device, ID3D12GraphicsCommandList* commandList, SRVManager* srvManager) {
     //TextureResourceを作成
     DirectX::ScratchImage mipImages = CreateMipImages(filePath);
     const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-    textureResource_ = CreateTextureResource(device->GetDevice(), metadata);
-	intermadiateResource_ = UploadTextureData(textureResource_.Get(), mipImages, device->GetDevice(), commandList);
+
+    ID3D12Resource* rawResource = nullptr;
+    rawResource = CreateTextureResource(device->GetDevice(), metadata);
+	textureResource_.Attach(rawResource);
+	rawResource = UploadTextureData(textureResource_.Get(), mipImages, device->GetDevice(), commandList);
+	intermadiateResource_.Attach(rawResource);
 
     //画像サイズの取得
 	width_ = static_cast<int>(metadata.width);
@@ -22,11 +26,9 @@ TextureData::TextureData(std::string filePath, DXDevice* device, ID3D12GraphicsC
     srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
     //SRVを作成するDescriptorHeapの場所を決める
-    D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    textureGpuHandle_ = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
     //先頭はImGuiが使っているのでその次を使う
-    textureSrvHandleCPU = GetCPUDesscriptorHandle(srvDescriptorHeap, device->GetDescriptorSizeSRV(), ++readTextureCount_);
-    textureGpuHandle_ = GetGPUDesscriptorHandle(srvDescriptorHeap, device->GetDescriptorSizeSRV(), readTextureCount_);
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvManager->GetCPUHandle();
+	textureGpuHandle_ = srvManager->GetGPUHandle();
 
     //SRVを作成する
     device->GetDevice()->CreateShaderResourceView(textureResource_.Get(), &srvDesc, textureSrvHandleCPU);

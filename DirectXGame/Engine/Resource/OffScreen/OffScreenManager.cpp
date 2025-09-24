@@ -7,18 +7,16 @@ OffScreenManager::OffScreenManager() {
 OffScreenManager::~OffScreenManager() {
 }
 
-void OffScreenManager::Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList) {
+void OffScreenManager::Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList, SRVManager* srvManager) {
 	device_ = device;
 	commandList_ = commandList;
-	ID3D12DescriptorHeap* rawHeap = nullptr;
-	rawHeap = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, maxOffScreenCount_, true);
-	srvDescriptorHeap_.Attach(rawHeap);
-	rawHeap = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, maxOffScreenCount_, false);
+	srvManager_ = srvManager;
+	ID3D12DescriptorHeap* rawHeap = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, maxOffScreenCount_, false);
 	rtvDescriptorHeap_.Attach(rawHeap);
 }
 
 int OffScreenManager::CreateOffScreen(int width, int height, float* clearColor) {
-	offScreens_.emplace_back(std::make_unique<OffScreenData>(width, height, clearColor, device_, commandList_, srvDescriptorHeap_.Get(), rtvDescriptorHeap_.Get()));
+	offScreens_.emplace_back(std::make_unique<OffScreenData>(width, height, clearColor, device_, commandList_, srvManager_, rtvDescriptorHeap_.Get()));
 	return static_cast<int>(offScreens_.size() - 1);
 }
 
