@@ -16,14 +16,14 @@ void TitleScene::Initialize() {
 	bunnyHandle_ = modelManager_->LoadModel("bunny");
 	bunnyModel_ = std::make_unique<ModelResource>();
 	bunnyModel_->Initialize(modelManager_->GetModelData(bunnyHandle_));
+	bunnyModel_->SetCamera(camera_.get());
+	bunnyModel_->psoConfig_.isSwapChain = true;
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update() {
 	camera_->Update();
 
 	gridMaker_->Update();
-
-	bunnyModel_->SetMatrix(Matrix::MakeIdentity4x4(), camera_->VPMatrix());
 
 	return std::unique_ptr<BaseScene>();
 }

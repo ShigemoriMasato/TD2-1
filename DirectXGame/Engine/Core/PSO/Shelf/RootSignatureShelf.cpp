@@ -8,11 +8,6 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
 
 	rootSignatures_.resize(int(RootSignatureID::Count));
 
-    //RootSignature作成
-    D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-    descriptionRootSignature.Flags =
-        D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
 #pragma region DescriptorTable
 
 	//テクスチャ1枚用のDescriptorRange
@@ -26,6 +21,11 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
 
     //ありあり
     {
+        //RootSignature作成
+        D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+        descriptionRootSignature.Flags =
+            D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
         //RootParameter作成
         D3D12_ROOT_PARAMETER rootParameters[4] = {};
 
@@ -72,6 +72,11 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
 
     //NonMatrix
     {
+        //RootSignature作成
+        D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+        descriptionRootSignature.Flags =
+            D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
         //RootParameter作成
         D3D12_ROOT_PARAMETER rootParameters[3] = {};
 

@@ -70,13 +70,16 @@ GridMaker::GridMaker(Camera* camera, bool isDebugCamera) {
 	Initialize();
 	lineResource_ = std::make_unique<DXResource>();
 	lineResource_->Initialize(kGridCount * 4, 0, true);
-	lineResource_->psoConfig_.isOffScreen = true;
+	lineResource_->psoConfig_.isSwapChain = true;
 	lineResource_->psoConfig_.topology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
-	lineResource_->material_->color = { 0.5f, 0.5f, 0.5f, 1.0f };
+	lineResource_->color_ = 0x808080ff;
+	lineResource_->camera_ = camera_;
+
 	thickLineResource_ = std::make_unique<DXResource>();
 	thickLineResource_->Initialize(240, 0, true);
-	thickLineResource_->psoConfig_.isOffScreen = true;
-	thickLineResource_->material_->color = { 1.0f, 0.5f, 0.0f, 1.0f };
+	thickLineResource_->psoConfig_.isSwapChain = true;
+	thickLineResource_->color_ = 0xff8000ff;
+	thickLineResource_->camera_ = camera_;
 }
 
 void GridMaker::Initialize() {
@@ -190,14 +193,15 @@ void GridMaker::Update() {
 		lines_[1][i]->AdjustCenter(mid.x);
 	}
 
+	//以下、エンジン固有の処理。今回の場合、DXResourceに各種情報を登録する
 	uint32_t lineCount = 0;
 	uint32_t thickLineCount = 0;
 	int vertexIndex[] = { 0, 1, 2, 1, 2, 3 };
 	for (int i = 0; i < 2; ++i) {
 		for (auto& line : lines_[i]) {
 			if (line->GetShapeType() == ShapeType::kLine) {
-				lineResource_->vertex_[lineCount++] = { {line->GetStart().x, line->GetStart().y, line->GetStart().z, 1.0f}, {0.0f, 0.0f}, {0.0f, 1.0f, 0.0f} };
-				lineResource_->vertex_[lineCount++] = { {line->GetEnd().x, line->GetEnd().y, line->GetEnd().z, 1.0f}, {0.0f, 0.0f}, {0.0f, 1.0f, 0.0f} };
+				lineResource_->localPos_[lineCount++] = line->GetStart();
+				lineResource_->localPos_[lineCount++] = line->GetEnd();
 			} else {
 
 				Vector3 dir = (line->GetStart() - line->GetEnd()).Normalize();				// 線の方向
@@ -209,16 +213,11 @@ void GridMaker::Update() {
 				Vector3 pos[4] = { line->GetStart() + offset, line->GetStart() - offset, line->GetEnd() + offset, line->GetEnd() - offset };
 
 				for (int i = 0; i < 6; ++i) {
-					thickLineResource_->vertex_[thickLineCount++] = { {pos[vertexIndex[i]].x, pos[vertexIndex[i]].y, pos[vertexIndex[i]].z, 1.0f}, {0.0f, 0.0f}, {0.0f, 1.0f, 0.0f} };
+					thickLineResource_->localPos_[thickLineCount++] = pos[vertexIndex[i]];
 				}
 			}
 		}
 	}
-	/*thickLineResource_->vertex_[0] = { 0.0f, 0.5f, 0.0f, 1.0f };
-	thickLineResource_->vertex_[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
-	thickLineResource_->vertex_[2] = { -0.5f, -0.5f, 0.0f, 1.0f };*/
-	lineResource_->matrix_->wvp = camera_->VPMatrix();
-	thickLineResource_->matrix_->wvp = camera_->VPMatrix();
 }
 
 void GridMaker::Draw(Render* render) const {

@@ -37,7 +37,7 @@ void PSOEditor::SetInputLayout(const InputLayoutID id) {
 }
 
 void PSOEditor::SetOffScreen(const bool offScreen) {
-	nextConfig_.isOffScreen = offScreen;
+	nextConfig_.isSwapChain = offScreen;
 }
 
 void PSOEditor::SetRootSignature(const RootSignatureID id) {

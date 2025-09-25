@@ -38,19 +38,35 @@ void PSOManager::Initialize() {
 	basicDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	basicDesc.RasterizerState = rasterizerShelf_->GetRasterizerDesc(RasterizerID::Default);
 	basicDesc.InputLayout = inputLayoutShelf_->GetInputLayoutDesc(InputLayoutID::Default);
-	basicDesc.pRootSignature = rootSignatureShelf_->GetRootSignature(RootSignatureID::Default);
 	basicDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	basicDesc.NumRenderTargets = 1;
 
 	std::list<std::string> vsList = shaderShelf_->GetShaderNames(ShaderType::VERTEX_SHADER);
 	std::list<std::string> psList = shaderShelf_->GetShaderNames(ShaderType::PIXEL_SHADER);
 
-	for (int offscreen = false; offscreen < 2; ++offscreen) {
-		for (int topology = 0; topology < 2; ++topology) {
-			for (const auto& vs : vsList) {
-				for (const auto& ps : psList) {
-					for (int ds = 0; ds < int(DepthStencilID::Count); ++ds) {
-						for (int blend = 0; blend < int(BlendStateID::Count); ++blend) {
+	//=====================================================================
+	//全通りだと作成に時間がかかるので、いくつかif文で制限をかける
+	//必要になったら増やす
+	//=====================================================================
+
+	for (int isSwapChain = false; isSwapChain < 2; ++isSwapChain) {
+		for (int blend = 0; blend < int(BlendStateID::Count); ++blend) {
+
+			//SwapChain用はAddとNormalのみ
+			if (isSwapChain && (blend != int(BlendStateID::Add) && blend != int(BlendStateID::Normal))) {
+				continue;
+			}
+
+			for (int ds = 0; ds < int(DepthStencilID::Count); ++ds) {
+
+				//SwapChain用はDefaultのみ
+				if (isSwapChain && ds != int(DepthStencilID::Default)) {
+					continue;
+				}
+
+				for (int topology = 0; topology < 2; ++topology) {
+					for (const auto& vs : vsList) {
+						for (const auto& ps : psList) {
 
 							PSOConfig config;
 							config.vs = vs;
@@ -58,24 +74,30 @@ void PSOManager::Initialize() {
 							config.depthStencilID = static_cast<DepthStencilID>(ds);
 							config.blendID = static_cast<BlendStateID>(blend);
 							config.topology = (topology == 0) ? D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST : D3D_PRIMITIVE_TOPOLOGY_LINELIST;
-							config.isOffScreen = bool(offscreen);
+							config.isSwapChain = bool(isSwapChain);
+
+							if(vs == "Object3d.VS.hlsl" || vs == "Sprite.VS.hlsl") {
+								config.rootID = RootSignatureID::Default;
+							} else {
+								config.rootID = RootSignatureID::NonMatrix;
+							}
 
 							//以下defaultとして上で設定したものを使う
 							config.inputLayoutID = InputLayoutID::Default;
 							config.rasterizerID = RasterizerID::Default;
-							config.rootID = RootSignatureID::Default;
 
 							config.Validate(*shaderShelf_.get(), *inputLayoutShelf_.get(), *rootSignatureShelf_.get(), logger_);
 
 							//defaultとして設定したPSOを持ってくる
 							D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = basicDesc;
 
-							psoDesc.VS = shaderShelf_->GetShaderBytecode(ShaderType::VERTEX_SHADER, vs);
-							psoDesc.PS = shaderShelf_->GetShaderBytecode(ShaderType::PIXEL_SHADER, ps);
-							psoDesc.DepthStencilState = depthStencilShelf_->GetDepthStencilDesc(static_cast<DepthStencilID>(ds));
-							psoDesc.BlendState = blendStateShelf_->GetBlendState(static_cast<BlendStateID>(blend));
+							psoDesc.pRootSignature = rootSignatureShelf_->GetRootSignature(config.rootID);
+							psoDesc.VS = shaderShelf_->GetShaderBytecode(ShaderType::VERTEX_SHADER, config.vs);
+							psoDesc.PS = shaderShelf_->GetShaderBytecode(ShaderType::PIXEL_SHADER, config.ps);
+							psoDesc.DepthStencilState = depthStencilShelf_->GetDepthStencilDesc(config.depthStencilID);
+							psoDesc.BlendState = blendStateShelf_->GetBlendState(config.blendID);
 
-							psoDesc.RTVFormats[0] = config.isOffScreen ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
+							psoDesc.RTVFormats[0] = config.isSwapChain ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
 
 							psoDesc.PrimitiveTopologyType = config.topology == D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST ? D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE : D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 
@@ -94,8 +116,8 @@ void PSOManager::Initialize() {
 				}
 			}
 		}
-	}
 
+	}
 }
 
 ID3D12PipelineState* PSOManager::GetPSO(const PSOConfig& config) {

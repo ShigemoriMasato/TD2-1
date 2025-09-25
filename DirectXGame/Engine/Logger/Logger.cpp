@@ -19,9 +19,10 @@ Logger::Logger() {
 }
 
 void Logger::RegistLogFile(std::string logName) {
+    //既に存在する場合はそのハンドルを返す
     for(int i = 0; i < logStreamNames.size(); ++i) {
         if (logStreamNames[i] == logName) {
-            logStreamHandle = i; // 既に存在する場合はそのハンドルを返す
+            logStreamHandle = i; 
             return;
         }
 	}
@@ -39,7 +40,7 @@ void Logger::RegistLogFile(std::string logName) {
 #pragma endregion
 
 #pragma region ディレクトリ検索(作成)
-    std::string path = "Assets/Logs";  // 検索対象のディレクトリ
+    std::string path = "Logs";  // 検索対象のディレクトリ
     
     //logsディレクトリが存在するか確認
     if (!fs::exists(path)) {
@@ -57,13 +58,13 @@ void Logger::RegistLogFile(std::string logName) {
 
 	//ディレクトリが見つからなければ作成
     if (!isFind) {
-		fs::create_directories("Assets/Logs/" + logName);
+		fs::create_directories("Logs/" + logName);
     }
 
 #pragma endregion
 
     //ファイル名の決定
-    std::string logFileName = "Assets/Logs/" + logName + "/" + dataString + ".log";
+    std::string logFileName = "Logs/" + logName + "/" + dataString + ".log";
     //ファイルを作成して書き込み準備
     logStreams.push_back(std::ofstream(logFileName));
 

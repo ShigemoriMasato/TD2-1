@@ -117,7 +117,6 @@ void Render::Initialize(TextureManager* textureManager, OffScreenManager* offScr
     device_->GetDevice()->CreateDepthStencilView(depthStencilResource.Get(), &dsvDesc, dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
     //PSOの初期化
-    psoEditor_ = std::make_unique<PSOEditor>(device_->GetDevice());
     psoEditor_->Initialize(device_->GetDevice());
 
 	textureManager_ = textureManager;
@@ -178,6 +177,8 @@ void Render::PreDraw(int offscreenHandle) {
 
 void Render::Draw(DXResource* resource) {
 
+	resource->DrawReady();
+
     auto vertexBufferView = resource->GetVertexBufferView();
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	uint32_t indexNum = resource->GetIndexNum();
@@ -195,12 +196,17 @@ void Render::Draw(DXResource* resource) {
     //Matrixのポインタを設定
     if (resource->GetMatrixResource()) {
         commandList->SetGraphicsRootConstantBufferView(1, resource->GetMatrixResource()->GetGPUVirtualAddress());
+        //Texture
+        commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
+        //Lightのポインタを設定
+        commandList->SetGraphicsRootConstantBufferView(3, resource->GetLightResource()->GetGPUVirtualAddress());
+    } else {
+        //Texture
+        commandList->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
+        //Lightのポインタを設定
+        commandList->SetGraphicsRootConstantBufferView(2, resource->GetLightResource()->GetGPUVirtualAddress());
     }
 
-    //Texture
-    commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
-	//Lightのポインタを設定
-    commandList->SetGraphicsRootConstantBufferView(3, resource->GetLightResource()->GetGPUVirtualAddress());
 
     if (indexNum != 0) {
         //インデックスがある場合は、インデックスを設定して描画
@@ -213,6 +219,7 @@ void Render::Draw(DXResource* resource) {
 }
 
 void Render::Draw(ModelResource* resource) {
+	resource->DrawReady();
 	auto resources = resource->GetResources();
     for (auto& res : resources) {
         Draw(res);
