@@ -1,16 +1,22 @@
 #pragma once
 #include "CommonData.h"
-#include <Core/EngineTerminal.h>
+
+class EngineTerminal;
+class ModelManager;
+class TextureManager;
+class OffScreenManager;
+class Render;
+class Input;
 
 class BaseScene {
 public:
 
-	BaseScene(CommonData* commonData) : commonData(commonData) {}
+	BaseScene() = default;
 	virtual ~BaseScene() = default;
 	virtual void Initialize() = 0;
 	virtual std::unique_ptr<BaseScene> Update() = 0;
 	virtual void Draw() = 0;
-	void MoveScene(EngineTerminal* engineTerminal);
+	void MoveScene(EngineTerminal* engineTerminal, CommonData* commonData);
 
 protected:
 

@@ -84,9 +84,6 @@
     <ClCompile Include="Engine\Logger\Logger.cpp">
       <Filter>MyEngine\Logger</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Transform\Value.cpp">
-      <Filter>MyEngine\Data</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\PSO\Shelf\DepthStencilShelf.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -120,7 +117,7 @@
     <ClCompile Include="Engine\Render\ImGuiWrapper.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Render\Resource\DXResource.cpp">
+    <ClCompile Include="Engine\Render\Resource\DrawResource.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\DXCommonFunction.cpp">
@@ -166,6 +163,24 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Tools\GridMaker.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Render\Resource\CustomResource.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\Engine\ShaderEditScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resource\Binary\Data\BinaryInput.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resource\Binary\Data\BinaryOutput.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resource\Binary\BinaryManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\MyString.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -260,7 +275,7 @@
     <ClInclude Include="Engine\Render\ImGuiWrapper.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Render\Resource\DXResource.h">
+    <ClInclude Include="Engine\Render\Resource\DrawResource.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\DXCommonFunction.h">
@@ -306,6 +321,24 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Tools\GridMaker.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Render\Resource\CustomResource.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\Engine\ShaderEditScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\Binary\BinaryManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\Binary\Data\BinaryInput.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resource\Binary\Data\BinaryOutput.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\MyString.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

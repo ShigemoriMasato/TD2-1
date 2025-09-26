@@ -7,7 +7,7 @@
 class TitleScene : public BaseScene {
 public:
 
-	TitleScene(CommonData* commonData);
+	TitleScene();
 	~TitleScene() override;
 
 	void Initialize() override;
@@ -20,6 +20,6 @@ private:
 	std::unique_ptr<ModelResource> bunnyModel_ = nullptr;
 	std::unique_ptr<DebugCamera> camera_ = nullptr;
 
-	std::unique_ptr<GridMaker> gridMaker_ = nullptr;
-	std::unique_ptr<DXResource> triangle_ = nullptr;
+	std::list<std::unique_ptr<GridMaker>> gridMaker_;
+	std::unique_ptr<DrawResource> triangle_ = nullptr;
 };

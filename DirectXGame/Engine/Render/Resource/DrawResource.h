@@ -7,11 +7,14 @@
 #include <Core/PSO/PSOConfig.h>
 #include <Camera/Camera.h>
 
-class DXResource {
+/// <summary>
+/// CG2で作成した基本的(?)な描画情報
+/// </summary>
+class DrawResource {
 public:
 
-	DXResource();
-	~DXResource();
+	DrawResource();
+	~DrawResource();
 
 	static void SetDevice(DXDevice* device) { dxDevice_ = device; }
 

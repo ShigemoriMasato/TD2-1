@@ -175,7 +175,7 @@ void Render::PreDraw(int offscreenHandle) {
 
 }
 
-void Render::Draw(DXResource* resource) {
+void Render::Draw(DrawResource* resource) {
 
 	resource->DrawReady();
 
@@ -207,7 +207,6 @@ void Render::Draw(DXResource* resource) {
         commandList->SetGraphicsRootConstantBufferView(2, resource->GetLightResource()->GetGPUVirtualAddress());
     }
 
-
     if (indexNum != 0) {
         //インデックスがある場合は、インデックスを設定して描画
         commandList->DrawIndexedInstanced(indexNum, 1, 0, 0, 0);
@@ -229,6 +228,10 @@ void Render::Draw(ModelResource* resource) {
 void Render::PostDraw(ImGuiRapper* imguiRap) {
     if (offScreenHandle_ != -1) {
         ResetResourceBarrier();
+        PreDraw();
+    }
+
+    if (isFrameFirst_) {
         PreDraw();
     }
 
@@ -263,6 +266,8 @@ void Render::PostDraw(ImGuiRapper* imguiRap) {
     //次のフレームのためのcommandReset
     commandAllocator->Reset();
     commandList->Reset(commandAllocator.Get(), nullptr);
+
+    isFrameFirst_ = true;
 }
 
 ImGui_ImplDX12_InitInfo Render::GetImGuiInitInfo(SRVManager* srv) {
@@ -314,8 +319,6 @@ void Render::PreDrawSwapChain() {
 
     commandList->RSSetViewports(1, &viewport);
     commandList->RSSetScissorRects(1, &scissorRect);
-
-    isFrameFirst_ = true;
 }
 
 void Render::PreDrawOffScreen(OffScreenData* offScreen) {

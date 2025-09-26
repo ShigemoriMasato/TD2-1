@@ -3,6 +3,7 @@
 #include <fstream>
 #include <format>
 #include <vector>
+#include <Math/MyString.h>
 
 class Logger {
 public:
@@ -21,7 +22,3 @@ private:
 	static std::vector<std::string> logStreamNames; //ログファイル名一覧
 
 };
-
-std::wstring ConvertString(const std::string &str);
-
-std::string ConvertString(const std::wstring &str);

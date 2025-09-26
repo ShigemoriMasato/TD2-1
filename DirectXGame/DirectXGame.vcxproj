@@ -11,11 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Render\Resource\CustomResource.cpp" />
     <ClCompile Include="Engine\Core\EngineTerminal.cpp" />
+    <ClCompile Include="Engine\Resource\Binary\BinaryManager.cpp" />
+    <ClCompile Include="Engine\Resource\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Engine\Resource\Binary\Data\BinaryOutput.cpp" />
     <ClCompile Include="Engine\Scene\Data\BaseScene.cpp" />
     <ClCompile Include="Engine\Scene\Data\CommonData.cpp" />
     <ClCompile Include="Engine\Core\DXCommonFunction.cpp" />
-    <ClCompile Include="Engine\Render\Resource\DXResource.cpp" />
+    <ClCompile Include="Engine\Render\Resource\DrawResource.cpp" />
     <ClCompile Include="Engine\Core\DXDevice.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\DepthStencilShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\BlendStateShelf.cpp" />
@@ -24,7 +28,6 @@
     <ClCompile Include="Engine\Core\PSO\PSOManager.cpp" />
     <ClCompile Include="Engine\Core\MyWindow.cpp" />
     <ClCompile Include="Engine\Tools\GridMaker.cpp" />
-    <ClCompile Include="Engine\Transform\Value.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Math\MyMath.cpp" />
@@ -53,13 +56,19 @@
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\Scene\TitleScene.cpp" />
     <ClCompile Include="Engine\Resource\SRVManager.cpp" />
+    <ClCompile Include="Engine\Scene\Engine\ShaderEditScene.cpp" />
+    <ClCompile Include="Engine\Math\MyString.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Render\Resource\CustomResource.h" />
     <ClInclude Include="Engine\Core\EngineTerminal.h" />
+    <ClInclude Include="Engine\Resource\Binary\BinaryManager.h" />
+    <ClInclude Include="Engine\Resource\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Engine\Resource\Binary\Data\BinaryOutput.h" />
     <ClInclude Include="Engine\Scene\Data\BaseScene.h" />
     <ClInclude Include="Engine\Scene\Data\CommonData.h" />
     <ClInclude Include="Engine\Core\DXCommonFunction.h" />
-    <ClInclude Include="Engine\Render\Resource\DXResource.h" />
+    <ClInclude Include="Engine\Render\Resource\DrawResource.h" />
     <ClInclude Include="Engine\Core\DXDevice.h" />
     <ClInclude Include="Engine\Core\PSO\PSOConfig.h" />
     <ClInclude Include="Engine\Core\PSO\Shelf\DepthStencilShelf.h" />
@@ -101,6 +110,8 @@
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\Scene\TitleScene.h" />
     <ClInclude Include="Engine\Resource\SRVManager.h" />
+    <ClInclude Include="Engine\Scene\Engine\ShaderEditScene.h" />
+    <ClInclude Include="Engine\Math\MyString.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

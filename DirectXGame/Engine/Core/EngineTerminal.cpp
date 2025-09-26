@@ -1,7 +1,9 @@
 #include "EngineTerminal.h"
-#include <Render/Resource/DXResource.h>
+#include <Scene/TitleScene.h>
+#include <Scene/Engine/ShaderEditScene.h>
 
-EngineTerminal::EngineTerminal() {
+EngineTerminal::EngineTerminal(BootMode mode) {
+	mode_ = mode;
 }
 
 EngineTerminal::~EngineTerminal() {
@@ -20,9 +22,37 @@ bool EngineTerminal::IsLoop() {
 
 void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	dxDevice_ = std::make_unique<DXDevice>(windowWidth, windowHeight);
+
+	//WindowProc
+	std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> windowProc =
+		[this](HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) -> LRESULT {
+
+		switch (msg) {
+		case WM_DESTROY:
+
+			PostQuitMessage(0);
+
+			return 0;
+
+		case WM_KEYDOWN:
+
+			//ESCで終了
+			if (wparam == VK_ESCAPE) {
+				PostQuitMessage(0);
+				return 0;
+			}
+
+			break;
+		}
+
+		return DefWindowProc(hwnd, msg, wparam, lparam);
+		};
+
+	dxDevice_->SetWindowProc(windowProc);
+
 	dxDevice_->Initialize();
 
-	DXResource::SetDevice(dxDevice_.get());
+	DrawResource::SetDevice(dxDevice_.get());
 
 	render_ = std::make_unique<Render>(dxDevice_.get());
 	srvManager_ = std::make_unique<SRVManager>(dxDevice_.get(), 256);
@@ -41,7 +71,31 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	render_->Initialize(textureManager_.get(), offScreenManager_.get(), srvManager_.get());
 
 	textureManager_->LoadTexture("Assets/Texture/white1x1.png");
+
+	switch (mode_) {
+	case BootMode::Game:
+		sceneManager_ = std::make_unique<SceneManager>(std::make_unique<TitleScene>(), this);
+		break;
+	case BootMode::ShaderEdit:
+		sceneManager_ = std::make_unique<SceneManager>(std::make_unique<ShaderEditScene>(), this);
+		break;
+	}
 }
+
+// =========================- MainLoop -===============================
+void EngineTerminal::Run() {
+	while (IsLoop()) {
+
+		Update();
+
+		sceneManager_->Update();
+
+		sceneManager_->Draw();
+		PostDraw();
+	}
+}
+
+
 
 void EngineTerminal::Update() {
 	imgui_->StartFrame(static_cast<float>(dxDevice_->GetWindowSize().first), static_cast<float>(dxDevice_->GetWindowSize().second));
@@ -49,7 +103,6 @@ void EngineTerminal::Update() {
 }
 
 void EngineTerminal::PreDraw() {
-	render_->PreDraw();
 }
 
 void EngineTerminal::PostDraw() {

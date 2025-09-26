@@ -2,13 +2,13 @@
 #include <memory>
 #include "Data/BaseScene.h"
 
+class EngineTerminal;
+
 class SceneManager {
 public:
 
-	SceneManager();
+	SceneManager(std::unique_ptr<BaseScene> firstScene, EngineTerminal* engine);
 	~SceneManager();
-
-	void Initialize();
 
 	bool IsLoop();
 	void Update();
@@ -16,7 +16,7 @@ public:
 	
 private:
 
-	std::unique_ptr<EngineTerminal> engineTerminal_ = nullptr;
+	EngineTerminal* engineTerminal_ = nullptr;
 	std::shared_ptr<CommonData> commonData_ = nullptr;
 	std::unique_ptr<BaseScene> currentScene_ = nullptr;
 	std::unique_ptr<BaseScene> nextScene_ = nullptr;

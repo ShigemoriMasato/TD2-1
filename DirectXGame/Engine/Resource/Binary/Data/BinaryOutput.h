@@ -9,7 +9,7 @@
 class BinaryOutput {
 public:
 
-	void WriteVBin(std::ostream& out, const ValueBase* value);
+	void WriteBinary(std::ostream& out, const ValueBase* value);
 
 private:
 

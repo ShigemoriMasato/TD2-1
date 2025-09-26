@@ -19,6 +19,8 @@ public:
 
 	ID3D12RootSignature* GetRootSignature(const RootSignatureID id) const;
 
+	ShaderShelf* GetShaderShelf() const { return shaderShelf_.get(); }
+
 private:
 
 	ID3D12Device* device_ = nullptr;
@@ -31,6 +33,10 @@ private:
 	std::unique_ptr<RasterizerShelf> rasterizerShelf_{};
 	std::unique_ptr<RootSignatureShelf> rootSignatureShelf_{};
 	std::unique_ptr<InputLayoutShelf> inputLayoutShelf_{};
+
+	std::unique_ptr<BinaryManager> binaryManager_ = nullptr;
+	const std::string shaderDataFile = "ShaderEditData.bin";
+	std::vector<ShaderData> shaderData_{};
 
 	Logger* logger_ = nullptr;
 };

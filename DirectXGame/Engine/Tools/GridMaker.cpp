@@ -68,15 +68,15 @@ GridMaker::GridMaker(Camera* camera, bool isDebugCamera) {
 	}
 
 	Initialize();
-	lineResource_ = std::make_unique<DXResource>();
-	lineResource_->Initialize(kGridCount * 4, 0, true);
+	lineResource_ = std::make_unique<DrawResource>();
+	lineResource_->Initialize(724, 0, true);
 	lineResource_->psoConfig_.isSwapChain = true;
 	lineResource_->psoConfig_.topology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
 	lineResource_->color_ = 0x808080ff;
 	lineResource_->camera_ = camera_;
 
-	thickLineResource_ = std::make_unique<DXResource>();
-	thickLineResource_->Initialize(240, 0, true);
+	thickLineResource_ = std::make_unique<DrawResource>();
+	thickLineResource_->Initialize(252, 0, true);
 	thickLineResource_->psoConfig_.isSwapChain = true;
 	thickLineResource_->color_ = 0xff8000ff;
 	thickLineResource_->camera_ = camera_;
@@ -220,7 +220,7 @@ void GridMaker::Update() {
 	}
 }
 
-void GridMaker::Draw(Render* render) const {
+void GridMaker::Draw(Render* render) {
 	render->Draw(thickLineResource_.get());
 	render->Draw(lineResource_.get());
 }

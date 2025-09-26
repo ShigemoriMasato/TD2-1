@@ -1,17 +1,17 @@
-#include "DXResource.h"
+#include "DrawResource.h"
 #include <Core/DXCommonFunction.h>
 #include <Math/MyMath.h>
 
-DXDevice* DXResource::dxDevice_ = nullptr;
+DXDevice* DrawResource::dxDevice_ = nullptr;
 using namespace Matrix;
 
-DXResource::DXResource() {
+DrawResource::DrawResource() {
 }
 
-DXResource::~DXResource() {
+DrawResource::~DrawResource() {
 }
 
-void DXResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMatrix) {
+void DrawResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMatrix) {
 	psoConfig_ = PSOConfig{};
 
 	auto device = dxDevice_->GetDevice();
@@ -64,7 +64,7 @@ void DXResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMatri
 	}
 }
 
-void DXResource::DrawReady() {
+void DrawResource::DrawReady() {
 	//InputLayout
 	localPos_.resize(vertexNum_);
 	texcoord_.resize(vertexNum_);
@@ -138,14 +138,14 @@ void DXResource::DrawReady() {
 	}
 }
 
-D3D12_INDEX_BUFFER_VIEW DXResource::GetIndexBufferView() const {
+D3D12_INDEX_BUFFER_VIEW DrawResource::GetIndexBufferView() const {
 	if (!indexResource) {
 		return D3D12_INDEX_BUFFER_VIEW{};
 	}
 	return indexBufferView;
 }
 
-ID3D12Resource* DXResource::GetMatrixResource() const {
+ID3D12Resource* DrawResource::GetMatrixResource() const {
 	if(matrixResource) {
 		return matrixResource.Get();
 	}

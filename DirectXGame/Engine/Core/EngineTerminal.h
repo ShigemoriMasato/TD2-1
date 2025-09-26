@@ -4,8 +4,9 @@
 #include <Resource/Texture/TextureManager.h>
 #include <Resource/Model/ModelManager.h>
 #include <Resource/OffScreen/OffScreenManager.h>
-#include <Render/ImGuiWrapper.h>
 #include <Input/Input.h>
+#include <Render/ImGuiWrapper.h>
+#include <Scene/SceneManager.h>
 
 struct D3DResourceLeakChecker {
 	~D3DResourceLeakChecker() {
@@ -18,19 +19,21 @@ struct D3DResourceLeakChecker {
 	}
 };
 
+enum class BootMode {
+	Game,
+	ShaderEdit,
+
+	Count
+};
+
 class EngineTerminal {
 public:
 
-	EngineTerminal();
+	EngineTerminal(BootMode mode);
 	~EngineTerminal();
 	void Initialize(int32_t windowWidth, int32_t windowHeight);
 
-	bool IsLoop();
-
-	void Update();
-
-	void PreDraw();
-	void PostDraw();
+	void Run();
 
 	DXDevice* GetDXDevice() { return dxDevice_.get(); }
 	Render* GetRender() { return render_.get(); }
@@ -40,6 +43,13 @@ public:
 	Input* GetInput() { return input_.get(); }
 
 private:
+
+	bool IsLoop();
+
+	void Update();
+
+	void PreDraw();
+	void PostDraw();
 
 	D3DResourceLeakChecker leakChecker_;
 	std::unique_ptr<DXDevice> dxDevice_ = nullptr;
@@ -51,7 +61,9 @@ private:
 	std::unique_ptr<Input> input_ = nullptr;
 	std::unique_ptr<ImGuiRapper> imgui_ = nullptr;
 
-	MSG msg{};
+	std::unique_ptr<SceneManager> sceneManager_ = nullptr;
 
+	MSG msg{};
+	BootMode mode_;
 };
 

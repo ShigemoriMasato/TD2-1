@@ -51,7 +51,7 @@ public:
 	
 	void Update();
 
-	void Draw(Render* render) const;
+	void Draw(Render* render);
 
 private:
 
@@ -61,8 +61,8 @@ private:
 	Camera* camera_;
 	DebugCamera* debugCamera_ = nullptr;
 
-	std::unique_ptr<DXResource> lineResource_ = nullptr;
-	std::unique_ptr<DXResource> thickLineResource_ = nullptr;
+	std::unique_ptr<DrawResource> lineResource_ = nullptr;
+	std::unique_ptr<DrawResource> thickLineResource_ = nullptr;
 
 	Vector3 nowMid = { 0.0f, 0.0f, 0.0f };
 

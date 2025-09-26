@@ -20,7 +20,7 @@ void BinaryManager::Write(std::string fileName) {
 	}
 
 	for (auto v : buffer) {
-		output->WriteVBin(file, v.get());
+		output->WriteBinary(file, v.get());
 	}
 
 	file.close();
@@ -36,7 +36,7 @@ std::vector<std::shared_ptr<ValueBase>> BinaryManager::Read(std::string fileName
 	std::vector<std::shared_ptr<ValueBase>> ans;
 
 	while(file.peek() != EOF) {
-		auto val = input->ReadVBin(file);
+		auto val = input->ReadBinary(file);
 		if (!val) {
 			break;
 		}

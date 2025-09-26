@@ -1,7 +1,10 @@
 #pragma once
-#include "DXResource.h"
+#include "DrawResource.h"
 #include <Resource/Model/ModelData.h>
 
+/// <summary>
+/// ModelDataをもとにDXResourceを生成するクラス
+/// </summary>
 class ModelResource {
 public:
 
@@ -15,7 +18,7 @@ public:
 	/// </summary>
 	void DrawReady();
 
-	std::vector<DXResource*> GetResources();
+	std::vector<DrawResource*> GetResources();
 
 	void SetMatrixData(Vector3 scale, Vector3 rotate, Vector3 pos);
 	void SetCamera(Camera* camera);
@@ -26,6 +29,6 @@ public:
 
 private:
 
-	std::vector<std::unique_ptr<DXResource>> resources_;
+	std::vector<std::unique_ptr<DrawResource>> resources_;
 
 };

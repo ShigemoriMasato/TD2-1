@@ -1,7 +1,7 @@
 #pragma once
 #include <Core/DXDevice.h>
 #include <Core/PSO/PSOEditor.h>
-#include <Render/Resource/DXResource.h>
+#include <Render/Resource/DrawResource.h>
 #include <Render/Resource/ModelResource.h>
 #include <Resource/Texture/TextureManager.h>
 #include <Resource/OffScreen/OffScreenManager.h>
@@ -17,7 +17,7 @@ public:
 	void Initialize(TextureManager* textureManager, OffScreenManager* offScreenManager, SRVManager* srvManager);
 
 	void PreDraw(int offscreenHandle = -1);
-	void Draw(DXResource* resource);
+	void Draw(DrawResource* resource);
 	void Draw(ModelResource* resource);
 	void PostDraw(ImGuiRapper* imguiRap);
 

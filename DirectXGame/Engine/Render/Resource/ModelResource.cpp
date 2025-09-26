@@ -11,7 +11,7 @@ void ModelResource::Initialize(ModelData* modelData) {
 	auto vertices = modelData->GetVertices();
 
 	for(auto& [name, vertex] : vertices) {
-		auto resource = std::make_unique<DXResource>();
+		auto resource = std::make_unique<DrawResource>();
 		resource->Initialize(static_cast<uint32_t>(vertex.size()), 0, true);
 
 		for (int i = 0; i < vertex.size(); ++i) {
@@ -49,8 +49,8 @@ void ModelResource::SetLight(bool enableLighting, const uint32_t& color, const V
 	}
 }
 
-std::vector<DXResource*> ModelResource::GetResources() {
-	std::vector<DXResource*> res;
+std::vector<DrawResource*> ModelResource::GetResources() {
+	std::vector<DrawResource*> res;
 	for (auto& r : resources_) {
 		res.push_back(r.get());
 	}
