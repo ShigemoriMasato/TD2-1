@@ -4,8 +4,12 @@
 #include <vector>
 
 enum class BlendStateID : uint8_t {
-	Default,
-	Alpha,
+	NonBlend,
+	Normal,
+	Add,
+	Subtract,
+	Multiply,
+	Screen,
 
 	Count
 };

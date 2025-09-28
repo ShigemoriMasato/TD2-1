@@ -8,12 +8,21 @@
 #include <Logger/Logger.h>
 #include <unordered_map>
 #include <filesystem>
+#include "InputLayoutShelf.h"
+#include "RootSignatureShelf.h"
 
 enum class ShaderType {
 	VERTEX_SHADER,
 	PIXEL_SHADER,
 
 	Count
+};
+
+struct ShaderData {
+	std::string ps;
+	std::string vs;
+	InputLayoutID inputLayoutID;
+	RootSignatureID rootSignatureID;
 };
 
 class ShaderShelf {
@@ -38,7 +47,7 @@ private:
 	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler = nullptr;
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler = nullptr;
 
-	std::filesystem::path basePath_ = "Data/Shader";
+	std::filesystem::path basePath_ = "Assets/Shader";
 
 	std::array<std::wstring, static_cast<size_t>(ShaderType::Count)> compileVersions_;
 

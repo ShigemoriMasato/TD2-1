@@ -10,13 +10,13 @@
 struct PSOConfig {
 	std::string vs = "Object3d.VS.hlsl";
 	std::string ps = "Object3d.PS.hlsl";
-	BlendStateID blendID = BlendStateID::Alpha;
+	BlendStateID blendID = BlendStateID::Normal;
 	DepthStencilID depthStencilID = DepthStencilID::Default;
 	RasterizerID rasterizerID = RasterizerID::Default;
 	RootSignatureID rootID = RootSignatureID::Default;
 	InputLayoutID inputLayoutID = InputLayoutID::Default;
-	D3D12_PRIMITIVE_TOPOLOGY_TYPE topology = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	bool isOffScreen = false;
+	D3D12_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	bool isSwapChain = false;
 
 	bool operator==(const PSOConfig& other) const {
 		return vs == other.vs &&
@@ -27,17 +27,17 @@ struct PSOConfig {
 			rootID == other.rootID &&
 			inputLayoutID == other.inputLayoutID &&
 			topology == other.topology &&
-			isOffScreen == other.isOffScreen;
+			isSwapChain == other.isSwapChain;
 	}
 
 	bool operator!=(const PSOConfig& other) const {
 		return !(*this == other);
 	}
 
-	bool Validate(ShaderShelf& shaderShelf,
-		InputLayoutShelf& inputLayoutShelf,
-		RootSignatureShelf& rootShelf,
-		Logger* logger) const {
+	/// <summary>
+	/// 整合性確認用関数
+	/// </summary>
+	bool Validate(ShaderShelf& shaderShelf, InputLayoutShelf& inputLayoutShelf, RootSignatureShelf& rootShelf, Logger* logger) const {
 		bool valid = true;
 
 		// VS / PS のバイトコード確認
@@ -69,7 +69,7 @@ struct PSOConfig {
 		}
 
 		// RTVFormat の妥当性
-		DXGI_FORMAT format = isOffScreen ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
+		DXGI_FORMAT format = isSwapChain ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
 		if (format == DXGI_FORMAT_UNKNOWN) {
 			logger->Log("RTVFormat is DXGI_FORMAT_UNKNOWN");
 			valid = false;
@@ -99,7 +99,7 @@ namespace std {
 			hash_combine(h, hash<int>()(static_cast<int>(cfg.rootID)));
 			hash_combine(h, hash<int>()(static_cast<int>(cfg.inputLayoutID)));
 			hash_combine(h, hash<int>()(static_cast<int>(cfg.topology)));
-			hash_combine(h, hash<bool>()(cfg.isOffScreen));
+			hash_combine(h, hash<bool>()(cfg.isSwapChain));
 			return h;
 		}
 

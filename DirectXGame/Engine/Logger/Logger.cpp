@@ -1,5 +1,4 @@
 #include "Logger.h"
-#include <Windows.h>
 #include <chrono>
 #include <filesystem>
 
@@ -13,14 +12,16 @@ Logger::Logger() {
     if (logStreams.size() == 0) {
         RegistLogFile(a);
     }
-
+    
     logStreamHandle = 0;
 }
 
-int Logger::RegistLogFile(std::string logName) {
+void Logger::RegistLogFile(std::string logName) {
+    //既に存在する場合はそのハンドルを返す
     for(int i = 0; i < logStreamNames.size(); ++i) {
         if (logStreamNames[i] == logName) {
-            return i; // 既に存在する場合はそのハンドルを返す
+            logStreamHandle = i; 
+            return;
         }
 	}
 
@@ -67,7 +68,7 @@ int Logger::RegistLogFile(std::string logName) {
 
 	logStreamNames.push_back(logName);
 
-	return int(logStreams.size() - 1);
+	logStreamHandle = static_cast<int>(logStreams.size() - 1);
 }
 
 void Logger::Log(const std::string &message) {
@@ -75,47 +76,3 @@ void Logger::Log(const std::string &message) {
 	this->logStreams[logStreamHandle] << message << std::endl;
 }
 
-void Logger::SetLogStreamHandle(int handle) {
-    if (handle < 0 || handle >= logStreams.size()) {
-        throw std::out_of_range("Invalid log stream handle.");
-    }
-	logStreamHandle = handle;
-}
-
-void Logger::SetLogStreamName(std::string& logName) {
-    for (int i = 0; i < logStreamNames.size(); ++i) {
-        if(logStreamNames[i] == logName) {
-            logStreamHandle = i;
-            return;
-		}
-    }
-}
-
-
-std::wstring ConvertString(const std::string &str) {
-    if (str.empty()) {
-        return std::wstring();
-    }
-
-    auto sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char *>(&str[0]), static_cast<int>(str.size()), NULL, 0);
-    if (sizeNeeded == 0) {
-        return std::wstring();
-    }
-    std::wstring result(sizeNeeded, 0);
-    MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<const char *>(&str[0]), static_cast<int>(str.size()), &result[0], sizeNeeded);
-    return result;
-}
-
-std::string ConvertString(const std::wstring &str) {
-    if (str.empty()) {
-        return std::string();
-    }
-
-    auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), NULL, 0, NULL, NULL);
-    if (sizeNeeded == 0) {
-        return std::string();
-    }
-    std::string result(sizeNeeded, 0);
-    WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
-    return result;
-}

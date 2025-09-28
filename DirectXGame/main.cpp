@@ -1,28 +1,11 @@
-#include "Engine/Scene/SceneManager.h"
+#include <Core/EngineTerminal.h>
 
 int WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-	const int32_t kWindowWidth = 1280;
-	const int32_t kWindowHeight = 720;
-
-	std::unique_ptr<SceneManager> sceneManager = std::make_unique<SceneManager>(kWindowWidth, kWindowHeight);
 	
-	MSG msg{};
+	std::unique_ptr<EngineTerminal> engine = std::make_unique<EngineTerminal>(BootMode::Game);
+	engine->Initialize(1280, 720);
 
-	try {
-
-	//ウィンドウのxボタンが押されるまでループ
-	while (sceneManager->IsLoop()) {
-		//更新処理
-		sceneManager->Update();
-	
-		//描画処理
-		sceneManager->Draw();
-	}
-
-	} catch (const std::exception& err) {
-		err;
-		return 0;
-	}
+	engine->Run();
 
 	return 0;
 }

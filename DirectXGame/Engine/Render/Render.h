@@ -1,33 +1,83 @@
 #pragma once
-#include "../Math/MyMath.h"
-#include "MyDirectX.h"
-
-class Camera;
+#include <Core/DXDevice.h>
+#include <Core/PSO/PSOEditor.h>
+#include <Render/Resource/DrawResource.h>
+#include <Render/Resource/ModelResource.h>
+#include <Resource/Texture/TextureManager.h>
+#include <Resource/OffScreen/OffScreenManager.h>
+#include <Render/ImGuiWrapper.h>
+#include <imgui/imgui_impl_dx12.h>
 
 class Render {
 public:
-	Render(MyDirectX* myDirectX);
-	~Render() = default;
 
-	static void DrawTriangle(Vector4 left, Vector4 top, Vector4 right, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);
+	Render(DXDevice* device);
+	~Render();
 
-	static void DrawSphere(float radius, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);
+	void Initialize(TextureManager* textureManager, OffScreenManager* offScreenManager, SRVManager* srvManager);
 
-	static void DrawModel(int modelHandle, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {});
+	void PreDraw(int offscreenHandle = -1);
+	void Draw(DrawResource* resource);
+	void Draw(ModelResource* resource);
+	void PostDraw(ImGuiRapper* imguiRap);
 
-	static void DrawSprite(Vector4 lt, Vector4 rt, Vector4 lb, Vector4 rb, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);
+	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+	ImGui_ImplDX12_InitInfo GetImGuiInitInfo(SRVManager* srv);
 
-	static void DrawSprite(Matrix4x4 worldMatrix, Camera* camera, MaterialData material = { 1.0f, 1.0f, 1.0f, 1.0f, true }, DirectionalLightData dLightData = {}, int textureHandle = 2);
-
-	static void DrawPrism(Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);
-
-	static void DrawBox(Matrix4x4 worldMatrix, Camera* camera, MaterialData material = {1.0f, 1.0f, 1.0f, 1.0f, true}, DirectionalLightData dLightData = {}, int textureHandle = 2);
-
-	static void DrawLine(Vector4 start, Vector4 end, Matrix4x4 worldMatrix, Camera* camera, MaterialData material = { 1.0f, 1.0f, 1.0f, 1.0f, true }, DirectionalLightData dLightData = {}, int textureHandle = 2);
+	void SetClearColor(float r, float g, float b, float a) {
+		clearColor_[0] = r;
+		clearColor_[1] = g;
+		clearColor_[2] = b;
+		clearColor_[3] = a;
+	}
 
 private:
 
-	static MyDirectX* myDirectX_;
-	static bool* isCanDraw_;
+	void PreDrawSwapChain();
+	void PreDrawOffScreen(OffScreenData* offScreen);
 
+	void ResetResourceBarrier();
+
+	//Logger
+	std::unique_ptr<Logger> logger_ = nullptr;
+
+	//Device
+	DXDevice* device_ = nullptr;
+
+	//Command関連
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList = nullptr;
+
+	//RTV
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
+
+	//スワップチェーンの設定
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[2] = { nullptr, nullptr };
+	D3D12_RESOURCE_STATES resourcestates_[2] = { D3D12_RESOURCE_STATE_PRESENT,D3D12_RESOURCE_STATE_PRESENT };
+	float clearColor_[4] = { 0.1f,0.1f,0.1f,1.0f };
+	int offScreenHandle_ = -1;			//現在描画対象にしてるOffScreenのハンドル。swapchainは-1
+
+	bool isFrameFirst_ = true;	//PreDrawが初回かどうか
+
+	//フェンス
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
+	HANDLE fenceEvent;
+	uint64_t fenceValue;
+
+	//PSO管理
+	std::unique_ptr<PSOEditor> psoEditor_ = nullptr;
+
+	//Depth
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = nullptr;
+
+	//テクスチャ
+	TextureManager* textureManager_ = nullptr;
+	OffScreenManager* offScreenManager_ = nullptr;
+
+	//SRV
+	SRVManager* srvManager_ = nullptr;
 };

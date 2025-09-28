@@ -24,9 +24,13 @@ public:
 
 	void SetInputLayout(InputLayoutID inputLayoutID);
 
-	void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY_TYPE topology);
+	void SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology);
 
 	void SetOffScreen(bool isOffScreen);
+
+	void SetPSOConfig(const PSOConfig& config) { nextConfig_ = config; }
+
+	PSOManager* GetPSOManager() { return psoManager_.get(); }
 
 	/// <summary>
 	/// 設定した内容でPSOを設定し、内部の設定をデフォルトに戻す。(デフォルトはEngine/Core/PSO/PSOConfigへ)
@@ -34,7 +38,7 @@ public:
 	/// <param name="commandList"></param>
 	void Setting(ID3D12GraphicsCommandList* commandList);
 
-	void BeginFrame(ID3D12GraphicsCommandList* commandList);
+	void FrameInitialize(ID3D12GraphicsCommandList* commandList);
 
 private:
 
@@ -44,6 +48,8 @@ private:
 	PSOConfig nowConfig_{};
 
 	std::shared_ptr<Logger> logger_;
+
+	bool isFirst_ = true;
 
 };
 

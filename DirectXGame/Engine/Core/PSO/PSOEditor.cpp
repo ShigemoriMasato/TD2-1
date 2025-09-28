@@ -3,8 +3,7 @@
 PSOEditor::PSOEditor(ID3D12Device* device) {
 	logger_ = std::make_shared<Logger>();
 
-	int logHandle = logger_->RegistLogFile("PSO");
-	logger_->SetLogStreamHandle(logHandle);
+	logger_->RegistLogFile("PSO");
 
 	psoManager_ = std::make_unique<PSOManager>(device, logger_.get());
 }
@@ -38,14 +37,14 @@ void PSOEditor::SetInputLayout(const InputLayoutID id) {
 }
 
 void PSOEditor::SetOffScreen(const bool offScreen) {
-	nextConfig_.isOffScreen = offScreen;
+	nextConfig_.isSwapChain = offScreen;
 }
 
 void PSOEditor::SetRootSignature(const RootSignatureID id) {
 	nextConfig_.rootID = id;
 }
 
-void PSOEditor::SetPrimitiveTopology(const D3D12_PRIMITIVE_TOPOLOGY_TYPE topology) {
+void PSOEditor::SetPrimitiveTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) {
 	nextConfig_.topology = topology;
 }
 
@@ -59,6 +58,9 @@ void PSOEditor::Setting(ID3D12GraphicsCommandList* commandList) {
 	if (nextConfig_.rootID != nowConfig_.rootID) {
 		commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(nextConfig_.rootID));
 	}
+	if (nextConfig_.topology != nowConfig_.topology) {
+		commandList->IASetPrimitiveTopology(nextConfig_.topology);
+	}
 
 	commandList->SetPipelineState(psoManager_->GetPSO(nextConfig_));
 
@@ -66,9 +68,9 @@ void PSOEditor::Setting(ID3D12GraphicsCommandList* commandList) {
 	nextConfig_ = {};
 }
 
-void PSOEditor::BeginFrame(ID3D12GraphicsCommandList* commandList) {
+void PSOEditor::FrameInitialize(ID3D12GraphicsCommandList* commandList) {
 	nowConfig_ = {};
-	nextConfig_ = {};
 	commandList->SetGraphicsRootSignature(psoManager_->GetRootSignature(nowConfig_.rootID));
 	commandList->SetPipelineState(psoManager_->GetPSO(nowConfig_));
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

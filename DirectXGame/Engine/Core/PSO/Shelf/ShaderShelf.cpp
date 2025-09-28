@@ -1,5 +1,8 @@
 #include "ShaderShelf.h"
 #include <cassert>
+#include <Math/MyString.h>
+
+#pragma comment(lib, "dxcompiler.lib")
 
 namespace fs = std::filesystem;
 
@@ -71,23 +74,6 @@ namespace {
         return shaderBlob;
     }
 
-    //どっかに置きたいけど場所が思いつかないのでとりあえず匿名名前空間に置いとく。多分ConvertStringとかと一緒にどっか新しく作る
-    std::vector<std::string> SearchFilesWithExtension(const fs::path& directory, const std::string& extension) {
-        std::vector<std::string> contents;
-
-        if (!fs::exists(directory) || !fs::is_directory(directory)) {
-            throw std::runtime_error("Invalid directory: " + directory.string());
-        }
-
-        for (const auto& entry : fs::directory_iterator(directory)) {
-            std::string path = entry.path().string();
-            path.erase(0, directory.string().length() + 1);
-			contents.push_back(path);
-        }
-
-        return contents;
-    }
-
 }
 
 ShaderShelf::ShaderShelf() {
@@ -103,7 +89,7 @@ ShaderShelf::ShaderShelf() {
     assert(SUCCEEDED(hr));
 
 	logger_ = std::make_unique<Logger>();
-    logger_->SetLogStreamHandle((logger_->RegistLogFile("Shader")));
+    logger_->RegistLogFile("Shader");
 
 	compileVersions_[0] = L"vs_6_0"; // Vertex Shader
     compileVersions_[1] = L"ps_6_0"; // Pixel Shader
@@ -169,6 +155,10 @@ std::list<std::string> ShaderShelf::GetShaderNames(ShaderType shaderType) {
 }
 
 D3D12_SHADER_BYTECODE ShaderShelf::GetShaderBytecode(ShaderType shaderType, std::string shaderName) {
+    //登録されていなければCompileする
+    if (shaderBytecodes_[static_cast<int>(shaderType)][shaderName].pShaderBytecode == D3D12_SHADER_BYTECODE().pShaderBytecode) {
+		RegistShaderByteCode(ConvertString(shaderName), shaderType);
+    }
 	return shaderBytecodes_[static_cast<int>(shaderType)][shaderName];
 }
 
