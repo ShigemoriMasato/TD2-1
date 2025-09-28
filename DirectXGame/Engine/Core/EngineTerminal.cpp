@@ -10,14 +10,20 @@ EngineTerminal::~EngineTerminal() {
 }
 
 bool EngineTerminal::IsLoop() {
-	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+	while (msg.message != WM_QUIT) {
+
+		//メッセージがあれば処理する
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		} else {
+			//メッセージがなければ処理を始める
+			return true;
+		}
+
 	}
-	else if (msg.message == WM_QUIT) {
-		return false;
-	}
-	return true;
+	//ウィンドウのxボタンが押されたらfalseを返す
+	return false;
 }
 
 void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {

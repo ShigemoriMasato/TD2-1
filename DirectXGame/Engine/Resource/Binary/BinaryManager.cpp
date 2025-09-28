@@ -15,9 +15,6 @@ void BinaryManager::Write(std::string fileName) {
 	values.clear();
 
 	std::ofstream file(basePath + fileName, std::ios::binary);
-	if (!file.is_open()) {
-		throw std::runtime_error("Could not open file for writing: " + fileName);
-	}
 
 	for (auto v : buffer) {
 		output->WriteBinary(file, v.get());
@@ -30,7 +27,7 @@ std::vector<std::shared_ptr<ValueBase>> BinaryManager::Read(std::string fileName
 
 	std::ifstream file(basePath + fileName, std::ios::binary);
 	if (!file.is_open()) {
-		throw std::runtime_error("Could not open file for writing: " + fileName);
+		return {};
 	}
 
 	std::vector<std::shared_ptr<ValueBase>> ans;

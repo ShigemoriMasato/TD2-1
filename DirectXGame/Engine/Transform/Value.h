@@ -27,8 +27,6 @@ enum class TypeID : uint8_t {
 
 	//構造体とか
 	Custom = 0x80,
-	ShaderData,
-
 };
 
 template<typename T>
@@ -45,7 +43,6 @@ template<> struct TypeIDResolver<uint8_t> { static constexpr TypeID id = TypeID:
 template<> struct TypeIDResolver<Vector2> { static constexpr TypeID id = TypeID::Vector2; };
 template<> struct TypeIDResolver<Vector3> { static constexpr TypeID id = TypeID::Vector3; };
 template<> struct TypeIDResolver<Vector4> { static constexpr TypeID id = TypeID::Vector4; };
-template<> struct TypeIDResolver<ShaderData> { static constexpr TypeID id = TypeID::ShaderData; };
 
 class ValueBase {
 public:

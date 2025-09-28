@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Render\Resource\Data\DXResource.cpp" />
     <ClCompile Include="Engine\Render\Resource\CustomResource.cpp" />
     <ClCompile Include="Engine\Core\EngineTerminal.cpp" />
     <ClCompile Include="Engine\Resource\Binary\BinaryManager.cpp" />
@@ -60,6 +61,7 @@
     <ClCompile Include="Engine\Math\MyString.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Render\Resource\Data\DXResource.h" />
     <ClInclude Include="Engine\Render\Resource\CustomResource.h" />
     <ClInclude Include="Engine\Core\EngineTerminal.h" />
     <ClInclude Include="Engine\Resource\Binary\BinaryManager.h" />

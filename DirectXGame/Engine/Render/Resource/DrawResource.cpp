@@ -78,14 +78,7 @@ void DrawResource::DrawReady() {
 	//IndexBuffer
 	if (indexNum_ > 0) {
 		index_.resize(indexNum_);
-		for (uint32_t i = 0; i < indexNum_; ++i) {
-			
-			if (index_[i] < 0 || index_[i] >= vertexNum_) {
-				index_[i] = 0;
-			}
-
-			indices_[i] = index_[i];
-		}
+		std::memcpy(indices_, index_.data(), sizeof(uint32_t) * indexNum_);
 	}
 
 	//Material
