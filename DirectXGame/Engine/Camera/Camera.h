@@ -37,7 +37,7 @@ public:
 	void SetTransform(Transform* transform);
 	void SetTransform(Matrix4x4 mat);
 
-	Matrix4x4 VPMatrix() const;
+	Matrix4x4 GetVPMatrix() const;
 
 	virtual Vector3 GetPosition() const {
 		return transform_->position;

@@ -3,6 +3,7 @@
 #include <Core/PSO/PSOEditor.h>
 #include <Render/Resource/DrawResource.h>
 #include <Render/Resource/ModelResource.h>
+#include <Render/Resource/ParticleResource.h>
 #include <Resource/Texture/TextureManager.h>
 #include <Resource/OffScreen/OffScreenManager.h>
 #include <Render/ImGuiWrapper.h>
@@ -19,6 +20,7 @@ public:
 	void PreDraw(int offscreenHandle = -1);
 	void Draw(DrawResource* resource);
 	void Draw(ModelResource* resource);
+	void Draw(ParticleResource* resource);
 	void PostDraw(ImGuiRapper* imguiRap);
 
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }

@@ -58,6 +58,6 @@ void Camera::SetTransform(Matrix4x4 mat) {
 	isSetMatrix = true;
 }
 
-Matrix4x4 Camera::VPMatrix() const {
+Matrix4x4 Camera::GetVPMatrix() const {
 	return vpMatrix;
 }

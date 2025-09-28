@@ -50,6 +50,7 @@ void ShaderEditScene::Initialize() {
 
 	rootSignatures_[static_cast<int>(RootSignatureID::Default)] = "Default";
 	rootSignatures_[static_cast<int>(RootSignatureID::NonMatrix)] = "NonMatrix";
+	rootSignatures_[static_cast<int>(RootSignatureID::Particle)] = "Particle";
 
 	auto rawData = binaryManager_->Read(saveFileName);
 	shaderDataIndex_.clear();

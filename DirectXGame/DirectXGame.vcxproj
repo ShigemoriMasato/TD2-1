@@ -59,6 +59,7 @@
     <ClCompile Include="Engine\Resource\SRVManager.cpp" />
     <ClCompile Include="Engine\Scene\Engine\ShaderEditScene.cpp" />
     <ClCompile Include="Engine\Math\MyString.cpp" />
+    <ClCompile Include="Engine\Render\Resource\ParticleResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Render\Resource\Data\DXResource.h" />
@@ -114,6 +115,7 @@
     <ClInclude Include="Engine\Resource\SRVManager.h" />
     <ClInclude Include="Engine\Scene\Engine\ShaderEditScene.h" />
     <ClInclude Include="Engine\Math\MyString.h" />
+    <ClInclude Include="Engine\Render\Resource\ParticleResource.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

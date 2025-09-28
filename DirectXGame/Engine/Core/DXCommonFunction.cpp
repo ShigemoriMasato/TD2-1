@@ -27,7 +27,7 @@ IDxcBlob* CompileShader(
 
     LPCWSTR arguments[] = {
         filePath.c_str(),	//コンパイル対象のhlslファイル名
-        L"-E", L"main",     //エントリーポイントの指定。基本的にmain以外には市内
+        L"-E", L"main",     //エントリーポイントの指定。基本的にmain以外にはしない
         L"-T", profile,    //ShaderProfileの設定
         L"-Zi", L"-Qembed_debug", //デバッグ用の情報を埋め込む
         L"-Od",     //最適化を行わない
@@ -134,7 +134,7 @@ ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMe
     resourceDesc.SampleDesc.Count = 1;
     resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
 
-    //利用するHeapの設定。非常に特殊な運用。02-04exで一般的なケース版がある。
+    //利用するHeapの設定。非常に特殊な運用。
     D3D12_HEAP_PROPERTIES heapProperties{};
     heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 

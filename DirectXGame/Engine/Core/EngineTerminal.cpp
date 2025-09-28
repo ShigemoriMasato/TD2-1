@@ -58,10 +58,11 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 
 	dxDevice_->Initialize();
 
-	DrawResource::SetDevice(dxDevice_.get());
-
 	render_ = std::make_unique<Render>(dxDevice_.get());
 	srvManager_ = std::make_unique<SRVManager>(dxDevice_.get(), 256);
+
+	DrawResource::SetDevice(dxDevice_.get());
+	ParticleResource::StaticInitialize(dxDevice_.get(), srvManager_.get());
 
 	imgui_ = std::make_unique<ImGuiRapper>();
 	imgui_->Initialize(dxDevice_.get(), render_.get(), srvManager_.get());

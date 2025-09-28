@@ -8,6 +8,7 @@
 enum class RootSignatureID : uint8_t {
 	Default,
 	NonMatrix,
+	Particle,
 
 	Count
 };

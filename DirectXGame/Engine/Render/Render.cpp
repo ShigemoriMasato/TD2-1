@@ -225,6 +225,39 @@ void Render::Draw(ModelResource* resource) {
 	}
 }
 
+void Render::Draw(ParticleResource* resource) {
+
+    resource->DrawReady();
+
+    auto vertexBufferView = resource->GetVertexBufferView();
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+    uint32_t indexNum = resource->GetIndexNum();
+	//Indexがある場合はViewを取り込む
+    if (indexNum != 0) {
+        auto indexBufferView = resource->GetIndexBufferView();
+        commandList->IASetIndexBuffer(&indexBufferView);
+    }
+
+    psoEditor_->SetPSOConfig(resource->psoConfig_);
+    psoEditor_->Setting(commandList.Get());
+
+    //マテリアルのポインタを設定
+    commandList->SetGraphicsRootConstantBufferView(0, resource->GetMaterialResource()->GetGPUVirtualAddress());
+	//Matrixのポインタを設定
+	commandList->SetGraphicsRootDescriptorTable(1, resource->GetMatrixSRVDesc());
+	//Texture
+	commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
+
+    if (indexNum != 0) {
+        //インデックスがある場合は、インデックスを設定して描画
+        commandList->DrawIndexedInstanced(indexNum, resource->GetInstanceNum(), 0, 0, 0);
+    } else {
+        //インデックスがない場合は、インデックスなしで描画
+        commandList->DrawInstanced(resource->GetVertexNum(), resource->GetInstanceNum(), 0, 0);
+    }
+
+}
+
 void Render::PostDraw(ImGuiRapper* imguiRap) {
     if (offScreenHandle_ != -1) {
         ResetResourceBarrier();

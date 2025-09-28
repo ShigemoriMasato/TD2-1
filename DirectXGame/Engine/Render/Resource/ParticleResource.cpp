@@ -1,17 +1,18 @@
-#include "DrawResource.h"
+#include "ParticleResource.h"
 #include <Core/DXCommonFunction.h>
 #include <Math/MyMath.h>
 
-DXDevice* DrawResource::dxDevice_ = nullptr;
+DXDevice* ParticleResource::dxDevice_ = nullptr;
+SRVManager* ParticleResource::srvManager_ = nullptr;
 using namespace Matrix;
 
-DrawResource::DrawResource() {
+ParticleResource::ParticleResource() {
 }
 
-DrawResource::~DrawResource() {
+ParticleResource::~ParticleResource() {
 }
 
-void DrawResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMatrix) {
+void ParticleResource::Initialize(uint32_t vertexNum, uint32_t instanceNum, uint32_t indexNum) {
 	psoConfig_ = PSOConfig{};
 
 	auto device = dxDevice_->GetDevice();
@@ -30,14 +31,11 @@ void DrawResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMat
 	vertexBufferView.SizeInBytes = sizeof(VertexData) * vertexNum;
 	//1頂点当たりのサイズ
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
-	
+
 	//マテリアル
 	materialResource.Attach(CreateBufferResource(device, sizeof(MaterialData)));
 	materialResource->Map(0, nullptr, (void**)&material_);
 	*material_ = MaterialData{};
-	
-	lightResource.Attach(CreateBufferResource(device, sizeof(DirectionalLightData)));
-	lightResource->Map(0, nullptr, (void**)&light_);
 
 	if (indexNum > 0) {
 		indexResource.Attach(CreateBufferResource(device, sizeof(uint32_t) * indexNum));
@@ -48,23 +46,41 @@ void DrawResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMat
 		indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 	}
 
-	if (useMatrix) {
-		matrixResource.Attach(CreateBufferResource(device, sizeof(MatrixData)));
-		matrixResource->Map(0, nullptr, (void**)&matrix_);
-		matrix_->world = Matrix::MakeIdentity4x4();
-		matrix_->wvp = Matrix::MakeIdentity4x4();
+	//Matrix
+	matrixResource.Attach(CreateBufferResource(device, sizeof(MatrixData) * instanceNum));
+	matrixResource->Map(0, nullptr, reinterpret_cast<void**>(&matrix_));
+
+	for(uint32_t i = 0; i < instanceNum; ++i) {
+		matrix_[i].world = MakeIdentity4x4();
+		matrix_[i].wvp = MakeIdentity4x4();
 	}
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	srvDesc.Buffer.FirstElement = 0;
+	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	srvDesc.Buffer.NumElements = instanceNum;
+	srvDesc.Buffer.StructureByteStride = sizeof(MatrixData);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE matrixCPUHandle = srvManager_->GetCPUHandle();
+	matrixGPUHandle_ = srvManager_->GetGPUHandle();
+
+	device->CreateShaderResourceView(matrixResource.Get(), &srvDesc, matrixCPUHandle);
+
+	position_.resize(instanceNum);
+	rotate_.resize(instanceNum);
+	scale_.resize(instanceNum, { 1.0f, 1.0f, 1.0f });
 
 	vertexNum_ = vertexNum;
 	indexNum_ = indexNum;
+	instanceNum_ = instanceNum;
 
-	if (!useMatrix) {
-		psoConfig_.rootID = RootSignatureID::NonMatrix;
-		psoConfig_.vs = "NonMatrix3d.VS.hlsl";
-	}
+	psoConfig_.rootID = RootSignatureID::Particle;
 }
 
-void DrawResource::DrawReady() {
+void ParticleResource::DrawReady() {
 	//InputLayout
 	localPos_.resize(vertexNum_);
 	texcoord_.resize(vertexNum_);
@@ -95,52 +111,29 @@ void DrawResource::DrawReady() {
 	};
 
 	//Matrix
-	Matrix4x4 worldMat = MakeScaleMatrix(scale_) * MakeRotationMatrix(rotate_) * MakeTranslationMatrix(position_);
-
-	if (matrix_) {
-		matrix_->world = worldMat;
-		
+	for (uint32_t i = 0; i < instanceNum_; ++i) {
+		matrix_[i].world = MakeScaleMatrix(scale_[i]) * MakeRotationMatrix(rotate_[i]) * MakeTranslationMatrix(position_[i]);
 		if (camera_) {
-			matrix_->wvp = matrix_->world * camera_->GetVPMatrix();
-		}
-	} else {
-
-		Matrix4x4 wvpMat = worldMat * camera_->GetVPMatrix();
-
-		//Shaderの代わりに行列計算を受け持つ
-		for (uint32_t i = 0; i < vertexNum_; ++i) {
-			Vector3 prePos = Vector3(vertex_[i].position.x, vertex_[i].position.y, vertex_[i].position.z);
-			Vector3 pos = prePos * wvpMat;
-			vertex_[i].position = { pos.x, pos.y, pos.z, 1.0f };
-			vertex_[i].normal = (normal_[i] * worldMat).Normalize();
+			matrix_[i].wvp = matrix_[i].world * camera_->GetVPMatrix();
+		} else {
+			matrix_[i].wvp = matrix_[i].world;
 		}
 	}
 
-	light_->enableLighting = static_cast<int32_t>(enableLighting_);
-
-	//Lighting
-	if (enableLighting_) {
-		light_->color = {
-			((lightColor_ >> 24) & 0xff) / 255.0f,
-			((lightColor_ >> 16) & 0xff) / 255.0f,
-			((lightColor_ >> 8) & 0xff) / 255.0f,
-			((lightColor_ >> 0) & 0xff) / 255.0f
-		};
-		light_->intensity = lightIntensity_;
-		lightDirection_ = lightDirection_.Normalize();
-		light_->direction = lightDirection_;
-	}
+	psoConfig_.rootID = RootSignatureID::Particle;
+	psoConfig_.vs = "Particle.VS.hlsl";
+	psoConfig_.ps = "Particle.PS.hlsl";
 }
 
-D3D12_INDEX_BUFFER_VIEW DrawResource::GetIndexBufferView() const {
+D3D12_INDEX_BUFFER_VIEW ParticleResource::GetIndexBufferView() const {
 	if (!indexResource) {
 		return D3D12_INDEX_BUFFER_VIEW{};
 	}
 	return indexBufferView;
 }
 
-ID3D12Resource* DrawResource::GetMatrixResource() const {
-	if(matrixResource) {
+ID3D12Resource* ParticleResource::GetMatrixResource() const {
+	if (matrixResource) {
 		return matrixResource.Get();
 	}
 	return nullptr;

@@ -23,6 +23,8 @@ void ModelResource::Initialize(ModelData* modelData) {
 		resource->textureHandle_ = modelData->GetTextureHandle(name);
 		resources_.push_back(std::move(resource));
 	}
+
+	psoConfig_ = resources_.back()->psoConfig_;
 }
 
 void ModelResource::DrawReady() {

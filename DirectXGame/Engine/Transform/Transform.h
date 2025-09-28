@@ -23,8 +23,6 @@ struct VertexData final {
 
 struct MaterialData final {
 	Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	int32_t enableLighting = 0;
-	float padding[3];
 	Matrix4x4 uvTransform = {
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
@@ -38,6 +36,7 @@ struct MatrixData final {
 };
 
 struct DirectionalLightData final {
+	int32_t enableLighting = 0;
 	Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	Vector3 direction = { -0.68f, 0.72f, -0.12f };
 	float intensity = 1.0f;

@@ -21,6 +21,12 @@ void TitleScene::Initialize() {
 	bunnyModel_->Initialize(modelManager_->GetModelData(bunnyHandle_));
 	bunnyModel_->SetCamera(camera_.get());
 	bunnyModel_->psoConfig_.isSwapChain = true;
+
+	triangle_ = std::make_unique<ParticleResource>();
+	triangle_->Initialize(3, 10);
+	triangle_->localPos_ = { {0.0f,1.0f,0.0f},{1.0f,-1.0f,0.0f},{-1.0f,-1.0f,0.0f} };
+	triangle_->psoConfig_.isSwapChain = true;
+	triangle_->camera_ = camera_.get();
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update() {
@@ -28,6 +34,10 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 
 	for (auto& grid : gridMaker_) {
 		grid->Update();
+	}
+
+	for (int i = 0; i < 10; ++i) {
+		triangle_->position_[i] = { (float)i - 5.0f, 0.0f, 0.0f };
 	}
 
 	return std::unique_ptr<BaseScene>();
@@ -41,4 +51,5 @@ void TitleScene::Draw() {
 		grid->Draw(render_);
 	}
 	render_->Draw(bunnyModel_.get());
+	render_->Draw(triangle_.get());
 }

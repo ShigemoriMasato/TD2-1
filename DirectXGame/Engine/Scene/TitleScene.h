@@ -21,5 +21,5 @@ private:
 	std::unique_ptr<DebugCamera> camera_ = nullptr;
 
 	std::list<std::unique_ptr<GridMaker>> gridMaker_;
-	std::unique_ptr<DrawResource> triangle_ = nullptr;
+	std::unique_ptr<ParticleResource> triangle_ = nullptr;
 };
