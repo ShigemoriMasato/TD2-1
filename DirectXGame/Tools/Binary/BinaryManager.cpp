@@ -1,6 +1,7 @@
 #include "BinaryManager.h"
 #include <fstream>
 #include <filesystem>
+#include <Windows.h>
 
 
 namespace fs = std::filesystem;
@@ -28,6 +29,8 @@ void BinaryManager::Write(std::string fileName) {
 	}
 
 	file.close();
+
+	MessageBoxA(nullptr, "Save Completed!", fileName.c_str(), 0);
 }
 
 std::vector<std::shared_ptr<ValueBase>> BinaryManager::Read(std::string fileName) {
@@ -39,7 +42,7 @@ std::vector<std::shared_ptr<ValueBase>> BinaryManager::Read(std::string fileName
 
 	std::vector<std::shared_ptr<ValueBase>> ans;
 
-	while(file.peek() != EOF) {
+	while (file.peek() != EOF) {
 		auto val = input->ReadBinaryFile(file);
 		if (!val) {
 			break;
@@ -48,6 +51,8 @@ std::vector<std::shared_ptr<ValueBase>> BinaryManager::Read(std::string fileName
 	}
 
 	file.close();
+
+	MessageBoxA(nullptr, "Load Completed!", fileName.c_str(), 0);
 
 	return ans;
 }
@@ -69,6 +74,8 @@ void BinaryManager::MakeFile(std::string path) {
 	}
 
 	ofs.close();
+
+	MessageBoxA(nullptr, "File Created!", path.c_str(), 0);
 
 	return;
 }

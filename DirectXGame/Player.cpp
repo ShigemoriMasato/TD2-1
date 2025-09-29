@@ -27,7 +27,6 @@ parentCamera_(parent) {
 
 			collisionCooltime_ = 10;
 			*speed_ = -2.0f;
-			Sound::se[1] = true;
 		
 		} else if (other->tag_ == "smallBuff") {
 
@@ -41,8 +40,6 @@ parentCamera_(parent) {
 
 			*speed_ += 1.0f;
 
-			Sound::se[0] = true;
-
 		} else if (other->tag_ == "middleBuff") {
 
 			//クールタイム中は無効
@@ -54,8 +51,6 @@ parentCamera_(parent) {
 			collisionCooltime_ = 5;
 
 			*speed_ += 2.0f;
-
-			Sound::se[0] = true;
 
 		}
 
