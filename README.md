@@ -1,1 +1,5 @@
-[![DebugBuild](https://github.com/ShigemoriMasato/CG2/actions/workflows/DebugBuild.yml/badge.svg)](https://github.com/ShigemoriMasato/CG2/actions/workflows/DebugBuild.yml)
+## Master Build State
+
+| 状態       | Debug                                                                 | Development                                                                 | Release                                                                 |
+|------------|----------------------------------------------------------------------|-----------------------------------------------------------------------------|------------------------------------------------------------------------|
+| CI / CD    | [![DebugBuild](https://github.com/ShigemoriMasato/CG2/actions/workflows/DebugBuild.yml/badge.svg)](https://github.com/ShigemoriMasato/CG2/actions/workflows/DebugBuild.yml) | [![DevelopmentBuild](https://github.com/ShigemoriMasato/CG2/actions/workflows/DevelopmentBuild.yml/badge.svg)](https://github.com/ShigemoriMasato/CG2/actions/workflows/DevelopmentBuild.yml) | [![ReleaseBuild](https://github.com/ShigemoriMasato/CG2/actions/workflows/ReleaseBuild.yml/badge.svg)](https://github.com/ShigemoriMasato/CG2/actions/workflows/ReleaseBuild.yml) |
