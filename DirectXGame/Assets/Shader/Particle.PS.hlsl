@@ -1,9 +1,10 @@
-#include "object3d.hlsli"
+#include "Particle.hlsli"
 
 struct Material
 {
     float32_t4 color;
     float32_t4x4 uvTransform;
+    float32_t shininess;
 };
 
 ConstantBuffer<Material> gMaterial : register(b0);

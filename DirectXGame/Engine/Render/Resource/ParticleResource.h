@@ -65,7 +65,7 @@ private:
 
 	VertexData* vertex_ = nullptr;
 	uint32_t* indices_ = nullptr;
-	MaterialData* material_ = nullptr;
+	Material* material_ = nullptr;
 	MatrixData* matrix_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;

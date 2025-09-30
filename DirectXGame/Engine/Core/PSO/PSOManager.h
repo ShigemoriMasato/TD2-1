@@ -14,7 +14,7 @@ public:
 	~PSOManager();
 
 	void Initialize();
-
+	
 	ID3D12PipelineState* GetPSO(const PSOConfig& config);
 
 	ID3D12RootSignature* GetRootSignature(const RootSignatureID id) const;
@@ -22,6 +22,11 @@ public:
 	ShaderShelf* GetShaderShelf() const { return shaderShelf_.get(); }
 
 private:
+
+	/// <summary>
+	/// ShaderDataが破損した時用
+	/// </summary>
+	void CreateAllPSO();
 
 	ID3D12Device* device_ = nullptr;
 

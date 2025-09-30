@@ -33,9 +33,9 @@ void ParticleResource::Initialize(uint32_t vertexNum, uint32_t instanceNum, uint
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	//マテリアル
-	materialResource.Attach(CreateBufferResource(device, sizeof(MaterialData)));
+	materialResource.Attach(CreateBufferResource(device, sizeof(Material)));
 	materialResource->Map(0, nullptr, (void**)&material_);
-	*material_ = MaterialData{};
+	*material_ = Material{};
 
 	if (indexNum > 0) {
 		indexResource.Attach(CreateBufferResource(device, sizeof(uint32_t) * indexNum));

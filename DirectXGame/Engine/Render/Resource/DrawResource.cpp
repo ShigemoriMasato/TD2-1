@@ -32,9 +32,9 @@ void DrawResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMat
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 	
 	//マテリアル
-	materialResource.Attach(CreateBufferResource(device, sizeof(MaterialData)));
+	materialResource.Attach(CreateBufferResource(device, sizeof(Material)));
 	materialResource->Map(0, nullptr, (void**)&material_);
-	*material_ = MaterialData{};
+	*material_ = Material{};
 	
 	lightResource.Attach(CreateBufferResource(device, sizeof(DirectionalLightData)));
 	lightResource->Map(0, nullptr, (void**)&light_);
