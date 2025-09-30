@@ -24,4 +24,4 @@ jobs:
 
       - name: Build
         run:
-          msbuild ${{env.SORUTION_FILE_PATH}} /p:Plarform=x64,Configuration=${{env,CONFIGURATION}}
+          msbuild ${{env.SORUTION_FILE_PATH}} /p:Plarform=x64,Configuration=${{env.CONFIGURATION}}
