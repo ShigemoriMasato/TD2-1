@@ -27,6 +27,9 @@ void TitleScene::Initialize() {
 	triangle_->localPos_ = { {0.0f,1.0f,0.0f},{1.0f,-1.0f,0.0f},{-1.0f,-1.0f,0.0f} };
 	triangle_->psoConfig_.isSwapChain = true;
 	triangle_->camera_ = camera_.get();
+
+	testEmitter_ = std::make_unique<TestEmitter>(10000);
+	testEmitter_->Initialize(camera_.get());
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update() {
@@ -40,6 +43,8 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 		triangle_->position_[i] = { (float)i - 5.0f, 0.0f, 0.0f };
 	}
 
+	testEmitter_->Update();
+
 	return std::unique_ptr<BaseScene>();
 }
 
@@ -52,4 +57,5 @@ void TitleScene::Draw() {
 	}
 	render_->Draw(bunnyModel_.get());
 	render_->Draw(triangle_.get());
+	testEmitter_->Draw(render_);
 }

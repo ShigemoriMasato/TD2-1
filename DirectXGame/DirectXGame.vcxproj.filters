@@ -225,6 +225,9 @@
     <ClCompile Include="Engine\Tools\FPS\FPSObserver.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Emitter\TestEmitter.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -390,6 +393,9 @@
       <Filter>MyEngine\Math</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Tools\FPS\FPSObserver.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Emitter\TestEmitter.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

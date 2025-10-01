@@ -194,8 +194,8 @@ void Render::Draw(DrawResource* resource) {
     commandList->SetGraphicsRootConstantBufferView(0, resource->GetMaterialResource()->GetGPUVirtualAddress());
 
     //Matrixのポインタを設定
-    if (resource->GetMatrixResource()) {
-        commandList->SetGraphicsRootConstantBufferView(1, resource->GetMatrixResource()->GetGPUVirtualAddress());
+    if (resource->GetParticleDataResource()) {
+        commandList->SetGraphicsRootConstantBufferView(1, resource->GetParticleDataResource()->GetGPUVirtualAddress());
         //Texture
         commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
         //Lightのポインタを設定
@@ -241,12 +241,10 @@ void Render::Draw(ParticleResource* resource) {
     psoEditor_->SetPSOConfig(resource->psoConfig_);
     psoEditor_->Setting(commandList.Get());
 
-    //マテリアルのポインタを設定
-    commandList->SetGraphicsRootConstantBufferView(0, resource->GetMaterialResource()->GetGPUVirtualAddress());
-	//Matrixのポインタを設定
-	commandList->SetGraphicsRootDescriptorTable(1, resource->GetMatrixSRVDesc());
+	//ParticleDataのポインタを設定
+	commandList->SetGraphicsRootDescriptorTable(0, resource->GetMatrixSRVDesc());
 	//Texture
-	commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
+	commandList->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
 
     if (indexNum != 0) {
         //インデックスがある場合は、インデックスを設定して描画

@@ -28,7 +28,7 @@ public:
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() const { return vertexBufferView; }
 	D3D12_INDEX_BUFFER_VIEW GetIndexBufferView() const;
 	ID3D12Resource* GetMaterialResource() const { return materialResource.Get(); }
-	ID3D12Resource* GetMatrixResource() const;
+	ID3D12Resource* GetParticleDataResource() const;
 	ID3D12Resource* GetLightResource() const { return lightResource.Get(); }
 
 	uint32_t GetVertexNum() const { return vertexNum_; }
@@ -66,13 +66,13 @@ private:
 	VertexData* vertex_ = nullptr;
 	uint32_t* indices_ = nullptr;
 	Material* material_ = nullptr;
-	MatrixData* matrix_ = nullptr;
+	MatrixData* particle_ = nullptr;
 	DirectionalLightData* light_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> matrixResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> particleDataResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> lightResource = nullptr;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};

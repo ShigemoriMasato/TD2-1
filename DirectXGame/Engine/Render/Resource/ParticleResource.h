@@ -28,8 +28,7 @@ public:
 
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() const { return vertexBufferView; }
 	D3D12_INDEX_BUFFER_VIEW GetIndexBufferView() const;
-	ID3D12Resource* GetMaterialResource() const { return materialResource.Get(); }
-	ID3D12Resource* GetMatrixResource() const;
+	ID3D12Resource* GetParticleDataResource() const;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetMatrixSRVDesc() const { return matrixGPUHandle_; }
 
@@ -53,11 +52,7 @@ public:		//以下描画設定項目 ---==================
 	std::vector<Vector3> rotate_{};
 	std::vector<Vector3> scale_ = {};
 
-	Vector2 texturePos_{};
-	Vector2 textureScale_{ 1.0f, 1.0f };
-	float textureRotate_ = 0.0f;
-
-	uint32_t color_ = 0xffffffff;
+	std::vector<uint32_t> color_{};
 
 	Camera* camera_ = nullptr;
 
@@ -65,13 +60,11 @@ private:
 
 	VertexData* vertex_ = nullptr;
 	uint32_t* indices_ = nullptr;
-	Material* material_ = nullptr;
-	MatrixData* matrix_ = nullptr;
+	ParticleData* particle_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> matrixResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> particleDataResource = nullptr;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE matrixGPUHandle_{};
 

@@ -23,6 +23,7 @@ void ParticleResource::Initialize(uint32_t vertexNum, uint32_t instanceNum, uint
 	localPos_.resize(vertexNum);
 	texcoord_.resize(vertexNum);
 	normal_.resize(vertexNum);
+	color_.resize(instanceNum_, 0xffffffff);
 
 	//頂点のバッファビューを作成する
 	//リソースの先頭のアドレスから使う
@@ -32,11 +33,7 @@ void ParticleResource::Initialize(uint32_t vertexNum, uint32_t instanceNum, uint
 	//1頂点当たりのサイズ
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
-	//マテリアル
-	materialResource.Attach(CreateBufferResource(device, sizeof(Material)));
-	materialResource->Map(0, nullptr, (void**)&material_);
-	*material_ = Material{};
-
+	//Index
 	if (indexNum > 0) {
 		indexResource.Attach(CreateBufferResource(device, sizeof(uint32_t) * indexNum));
 		indexResource->Map(0, nullptr, (void**)&indices_);
@@ -46,13 +43,14 @@ void ParticleResource::Initialize(uint32_t vertexNum, uint32_t instanceNum, uint
 		indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 	}
 
-	//Matrix
-	matrixResource.Attach(CreateBufferResource(device, sizeof(MatrixData) * instanceNum));
-	matrixResource->Map(0, nullptr, reinterpret_cast<void**>(&matrix_));
+	//ParticleData
+	particleDataResource.Attach(CreateBufferResource(device, sizeof(ParticleData) * instanceNum));
+	particleDataResource->Map(0, nullptr, reinterpret_cast<void**>(&particle_));
 
-	for(uint32_t i = 0; i < instanceNum; ++i) {
-		matrix_[i].world = MakeIdentity4x4();
-		matrix_[i].wvp = MakeIdentity4x4();
+	for (uint32_t i = 0; i < instanceNum; ++i) {
+		particle_[i].world = MakeIdentity4x4();
+		particle_[i].wvp = MakeIdentity4x4();
+		particle_[i].color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -67,7 +65,7 @@ void ParticleResource::Initialize(uint32_t vertexNum, uint32_t instanceNum, uint
 	D3D12_CPU_DESCRIPTOR_HANDLE matrixCPUHandle = srvManager_->GetCPUHandle();
 	matrixGPUHandle_ = srvManager_->GetGPUHandle();
 
-	device->CreateShaderResourceView(matrixResource.Get(), &srvDesc, matrixCPUHandle);
+	device->CreateShaderResourceView(particleDataResource.Get(), &srvDesc, matrixCPUHandle);
 
 	position_.resize(instanceNum);
 	rotate_.resize(instanceNum);
@@ -97,30 +95,24 @@ void ParticleResource::DrawReady() {
 		std::memcpy(indices_, index_.data(), sizeof(uint32_t) * indexNum_);
 	}
 
-	//Material
-	material_->color = {
-		((color_ >> 24) & 0xff) / 255.0f,
-		((color_ >> 16) & 0xff) / 255.0f,
-		((color_ >> 8) & 0xff) / 255.0f,
-		((color_ >> 0) & 0xff) / 255.0f
-	};
-	material_->uvTransform = {
-		textureScale_.x * cosf(textureRotate_), -textureScale_.y * sinf(textureRotate_), 0.0f, 0.0f,
-		textureScale_.x * sinf(textureRotate_), textureScale_.y * cosf(textureRotate_), 0.0f, 0.0f,
-		texturePos_.x, texturePos_.y, 1.0f, 0.0f,
-	};
-
 	//Matrix
 	for (uint32_t i = 0; i < instanceNum_; ++i) {
-		matrix_[i].world = MakeScaleMatrix(scale_[i]) * MakeRotationMatrix(rotate_[i]) * MakeTranslationMatrix(position_[i]);
+		particle_[i].world = MakeScaleMatrix(scale_[i]) * MakeRotationMatrix(rotate_[i]) * MakeTranslationMatrix(position_[i]);
 		if (camera_) {
-			matrix_[i].wvp = matrix_[i].world * camera_->GetVPMatrix();
+			particle_[i].wvp = particle_[i].world * camera_->GetVPMatrix();
 		} else {
-			matrix_[i].wvp = matrix_[i].world;
+			particle_[i].wvp = particle_[i].world;
 		}
+		particle_[i].color = {
+		((color_[i] >> 24) & 0xff) / 255.0f,
+		((color_[i] >> 16) & 0xff) / 255.0f,
+		((color_[i] >> 8) & 0xff) / 255.0f,
+		((color_[i] >> 0) & 0xff) / 255.0f
+		};
 	}
 
 	psoConfig_.rootID = RootSignatureID::Particle;
+	psoConfig_.inputLayoutID = InputLayoutID::Default;
 	psoConfig_.vs = "Particle.VS.hlsl";
 	psoConfig_.ps = "Particle.PS.hlsl";
 }
@@ -132,9 +124,9 @@ D3D12_INDEX_BUFFER_VIEW ParticleResource::GetIndexBufferView() const {
 	return indexBufferView;
 }
 
-ID3D12Resource* ParticleResource::GetMatrixResource() const {
-	if (matrixResource) {
-		return matrixResource.Get();
+ID3D12Resource* ParticleResource::GetParticleDataResource() const {
+	if (particleDataResource) {
+		return particleDataResource.Get();
 	}
 	return nullptr;
 }

@@ -49,10 +49,10 @@ void DrawResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMat
 	}
 
 	if (useMatrix) {
-		matrixResource.Attach(CreateBufferResource(device, sizeof(MatrixData)));
-		matrixResource->Map(0, nullptr, (void**)&matrix_);
-		matrix_->world = Matrix::MakeIdentity4x4();
-		matrix_->wvp = Matrix::MakeIdentity4x4();
+		particleDataResource.Attach(CreateBufferResource(device, sizeof(MatrixData)));
+		particleDataResource->Map(0, nullptr, (void**)&particle_);
+		particle_->world = Matrix::MakeIdentity4x4();
+		particle_->wvp = Matrix::MakeIdentity4x4();
 	}
 
 	vertexNum_ = vertexNum;
@@ -97,11 +97,11 @@ void DrawResource::DrawReady() {
 	//Matrix
 	Matrix4x4 worldMat = MakeScaleMatrix(scale_) * MakeRotationMatrix(rotate_) * MakeTranslationMatrix(position_);
 
-	if (matrix_) {
-		matrix_->world = worldMat;
+	if (particle_) {
+		particle_->world = worldMat;
 		
 		if (camera_) {
-			matrix_->wvp = matrix_->world * camera_->GetVPMatrix();
+			particle_->wvp = particle_->world * camera_->GetVPMatrix();
 		}
 	} else {
 
@@ -139,9 +139,9 @@ D3D12_INDEX_BUFFER_VIEW DrawResource::GetIndexBufferView() const {
 	return indexBufferView;
 }
 
-ID3D12Resource* DrawResource::GetMatrixResource() const {
-	if(matrixResource) {
-		return matrixResource.Get();
+ID3D12Resource* DrawResource::GetParticleDataResource() const {
+	if(particleDataResource) {
+		return particleDataResource.Get();
 	}
 	return nullptr;
 }

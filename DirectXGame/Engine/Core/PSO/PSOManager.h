@@ -44,4 +44,6 @@ private:
 	std::vector<ShaderData> shaderData_{};
 
 	Logger* logger_ = nullptr;
+
+	static std::unordered_map<D3D12_PRIMITIVE_TOPOLOGY, D3D12_PRIMITIVE_TOPOLOGY_TYPE> topologyMap_;
 };

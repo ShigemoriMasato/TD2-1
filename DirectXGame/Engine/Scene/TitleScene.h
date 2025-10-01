@@ -3,6 +3,7 @@
 #include <Render/Resource/ModelResource.h>
 #include <Camera/DebugCamera.h>
 #include <Tools/Grid/GridMaker.h>
+#include <Emitter/TestEmitter.h>
 
 class TitleScene : public BaseScene {
 public:
@@ -22,4 +23,5 @@ private:
 
 	std::list<std::unique_ptr<GridMaker>> gridMaker_;
 	std::unique_ptr<ParticleResource> triangle_ = nullptr;
+	std::unique_ptr<TestEmitter> testEmitter_ = nullptr;
 };

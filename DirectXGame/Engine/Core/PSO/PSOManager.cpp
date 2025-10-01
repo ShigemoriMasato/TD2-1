@@ -1,6 +1,8 @@
 #include "PSOManager.h"
 #include <cassert>
 
+std::unordered_map<D3D12_PRIMITIVE_TOPOLOGY, D3D12_PRIMITIVE_TOPOLOGY_TYPE> PSOManager::topologyMap_{};
+
 PSOManager::PSOManager(ID3D12Device* device, Logger* logger) {
 	shaderShelf_ = std::make_unique<ShaderShelf>();
 	depthStencilShelf_ = std::make_unique<DepthStencilShelf>();
@@ -13,6 +15,10 @@ PSOManager::PSOManager(ID3D12Device* device, Logger* logger) {
 	logger_ = logger;
 
 	device_ = device;
+
+	topologyMap_[D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST] = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	topologyMap_[D3D_PRIMITIVE_TOPOLOGY_LINELIST] = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+	topologyMap_[D3D_PRIMITIVE_TOPOLOGY_POINTLIST] = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 }
 
 PSOManager::~PSOManager() {
@@ -37,7 +43,6 @@ void PSOManager::Initialize() {
 	basicDesc.SampleDesc.Count = 1;
 	basicDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	basicDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	basicDesc.NumRenderTargets = 1;
 
 	//ShaderData召喚
 	auto rawData = binaryManager_->Read(shaderDataFile);
@@ -62,9 +67,9 @@ void PSOManager::Initialize() {
 				continue;
 			}
 
-			for (int ds = 0; ds < int(DepthStencilID::Count); ++ds) {
+			for (auto& [commandT, psoT] : topologyMap_) {
 
-				for (int topology = 0; topology < 2; ++topology) {
+				for (int ds = 0; ds < int(DepthStencilID::Count); ++ds) {
 
 					for (int shader = 0; shader < shaderData_.size(); ++shader) {
 
@@ -75,7 +80,7 @@ void PSOManager::Initialize() {
 						config.rootID = shaderData_[shader].rootSignatureID;
 						config.depthStencilID = static_cast<DepthStencilID>(ds);
 						config.blendID = static_cast<BlendStateID>(blend);
-						config.topology = (topology == 0) ? D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST : D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+						config.topology = commandT;
 						config.isSwapChain = bool(isSwapChain);
 
 						//以下defaultとして上で設定したものを使う
@@ -95,7 +100,7 @@ void PSOManager::Initialize() {
 						psoDesc.InputLayout = inputLayoutShelf_->GetInputLayoutDesc(config.inputLayoutID);
 
 						psoDesc.RTVFormats[0] = config.isSwapChain ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
-						psoDesc.PrimitiveTopologyType = config.topology == D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST ? D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE : D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+						psoDesc.PrimitiveTopologyType = topologyMap_[config.topology];
 
 						ID3D12PipelineState* pso = nullptr;
 
@@ -144,7 +149,7 @@ void PSOManager::CreateAllPSO() {
 	psoDesc.InputLayout = inputLayoutShelf_->GetInputLayoutDesc(config.inputLayoutID);
 
 	psoDesc.RTVFormats[0] = config.isSwapChain ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
-	psoDesc.PrimitiveTopologyType = config.topology == D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST ? D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE : D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+	psoDesc.PrimitiveTopologyType = topologyMap_[config.topology];
 
 	ID3D12PipelineState* pso = nullptr;
 
