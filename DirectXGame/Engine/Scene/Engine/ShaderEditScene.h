@@ -1,6 +1,6 @@
 #pragma once
 #include <Scene/Data/BaseScene.h>
-#include <Resource/Binary/BinaryManager.h>
+#include <Tools/Binary/BinaryManager.h>
 #include <Core/PSO/Shelf/ShaderShelf.h>
 
 struct ShaderDataIndex {

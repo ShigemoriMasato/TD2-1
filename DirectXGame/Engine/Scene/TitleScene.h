@@ -2,7 +2,7 @@
 #include "Data/BaseScene.h"
 #include <Render/Resource/ModelResource.h>
 #include <Camera/DebugCamera.h>
-#include <Tools/GridMaker.h>
+#include <Tools/Grid/GridMaker.h>
 
 class TitleScene : public BaseScene {
 public:

@@ -1,4 +1,5 @@
 #include "FPSObserver.h"
+#pragma comment(lib,"winmm.lib")
 
 bool FPSObserver::isFix_ = true;
 float FPSObserver::deltatime_ = 0.0f;

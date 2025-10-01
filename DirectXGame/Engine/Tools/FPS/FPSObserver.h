@@ -12,7 +12,7 @@ public:
     /// </summary>
     /// <param name="isfix">fpsを固定するかどうか</param>
     /// <param name="targetfps">固定するときの目標fps</param>
-    FPSObserver(bool isfix = true, double targetfps = 60.0f);
+    FPSObserver(bool isfix = true, double targetfps = 60.0);
     ~FPSObserver();
 
     void SetIsFix(bool isfix) { isFix_ = isfix; };
