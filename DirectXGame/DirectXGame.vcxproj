@@ -18,9 +18,9 @@
     <ClCompile Include="Engine\Render\Resource\Data\DXResource.cpp" />
     <ClCompile Include="Engine\Render\Resource\CustomResource.cpp" />
     <ClCompile Include="Engine\Core\EngineTerminal.cpp" />
-    <ClCompile Include="Engine\Resource\Binary\BinaryManager.cpp" />
-    <ClCompile Include="Engine\Resource\Binary\Data\BinaryInput.cpp" />
-    <ClCompile Include="Engine\Resource\Binary\Data\BinaryOutput.cpp" />
+    <ClCompile Include="Engine\Tools\Binary\BinaryManager.cpp" />
+    <ClCompile Include="Engine\Tools\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Engine\Tools\Binary\Data\BinaryOutput.cpp" />
     <ClCompile Include="Engine\Scene\Data\BaseScene.cpp" />
     <ClCompile Include="Engine\Scene\Data\CommonData.cpp" />
     <ClCompile Include="Engine\Core\DXCommonFunction.cpp" />
@@ -32,7 +32,7 @@
     <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
     <ClCompile Include="Engine\Core\PSO\PSOManager.cpp" />
     <ClCompile Include="Engine\Core\MyWindow.cpp" />
-    <ClCompile Include="Engine\Tools\GridMaker.cpp" />
+    <ClCompile Include="Engine\Tools\Grid\GridMaker.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Math\MyMath.cpp" />
@@ -45,6 +45,7 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\InputLayoutShelf.cpp" />
     <ClCompile Include="Engine\Render\ImGuiWrapper.cpp" />
+    <ClCompile Include="Engine\Tools\FPS\FPSObserver.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp" />
@@ -69,9 +70,9 @@
     <ClInclude Include="Engine\Render\Resource\Data\DXResource.h" />
     <ClInclude Include="Engine\Render\Resource\CustomResource.h" />
     <ClInclude Include="Engine\Core\EngineTerminal.h" />
-    <ClInclude Include="Engine\Resource\Binary\BinaryManager.h" />
-    <ClInclude Include="Engine\Resource\Binary\Data\BinaryInput.h" />
-    <ClInclude Include="Engine\Resource\Binary\Data\BinaryOutput.h" />
+    <ClInclude Include="Engine\Tools\Binary\BinaryManager.h" />
+    <ClInclude Include="Engine\Tools\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Engine\Tools\Binary\Data\BinaryOutput.h" />
     <ClInclude Include="Engine\Scene\Data\BaseScene.h" />
     <ClInclude Include="Engine\Scene\Data\CommonData.h" />
     <ClInclude Include="Engine\Core\DXCommonFunction.h" />
@@ -84,7 +85,7 @@
     <ClInclude Include="Engine\Camera\DebugCamera.h" />
     <ClInclude Include="Engine\Core\PSO\PSOManager.h" />
     <ClInclude Include="Engine\Core\MyWindow.h" />
-    <ClInclude Include="Engine\Tools\GridMaker.h" />
+    <ClInclude Include="Engine\Tools\Grid\GridMaker.h" />
     <ClInclude Include="Engine\Transform\Matrix.h" />
     <ClInclude Include="Engine\Transform\Transform.h" />
     <ClInclude Include="Engine\Transform\Value.h" />
@@ -120,6 +121,7 @@
     <ClInclude Include="Engine\Scene\Engine\ShaderEditScene.h" />
     <ClInclude Include="Engine\Math\MyString.h" />
     <ClInclude Include="Engine\Render\Resource\ParticleResource.h" />
+    <ClInclude Include="Engine\Tools\FPS\FPSObserver.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -188,7 +190,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;SH_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -214,7 +216,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;SH_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -240,7 +242,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;SH_DEVELOP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>

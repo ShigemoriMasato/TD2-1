@@ -87,6 +87,9 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 		sceneManager_ = std::make_unique<SceneManager>(std::make_unique<ShaderEditScene>(), this);
 		break;
 	}
+
+
+	fpsObserver_ = std::make_unique<FPSObserver>(true, 60.0);
 }
 
 // =========================- MainLoop -===============================
@@ -114,4 +117,5 @@ void EngineTerminal::PreDraw() {
 
 void EngineTerminal::PostDraw() {
 	render_->PostDraw(imgui_.get());
+	fpsObserver_->TimeAdjustment();
 }

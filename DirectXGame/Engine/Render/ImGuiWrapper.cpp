@@ -1,6 +1,7 @@
 #include "ImGuiWrapper.h"
 #include <imgui/imgui_impl_win32.h>
 #include <Render/Render.h>
+#include <Core/EngineTerminal.h>
 
 ImGuiRapper::~ImGuiRapper() {
     ImGui_ImplDX12_Shutdown();
@@ -52,7 +53,7 @@ void ImGuiRapper::StartFrame(float kClientWidth, float kClientHeight) {
 
 void ImGuiRapper::EndFrame(ID3D12GraphicsCommandList* commandList) {
 
-#ifdef _DEBUG
+#if SH_DEBUG || SH_DEVELOP
 
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);

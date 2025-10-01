@@ -144,13 +144,13 @@
     <ClCompile Include="Engine\Core\DXDevice.cpp">
       <Filter>MyEngine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Resource\Binary\Data\BinaryInput.cpp">
+    <ClCompile Include="Engine\Tools\Binary\Data\BinaryInput.cpp">
       <Filter>MyEngine\Tools\Binary</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Resource\Binary\BinaryManager.cpp">
+    <ClCompile Include="Engine\Tools\Binary\BinaryManager.cpp">
       <Filter>MyEngine\Tools\Binary</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Resource\Binary\Data\BinaryOutput.cpp">
+    <ClCompile Include="Engine\Tools\Binary\Data\BinaryOutput.cpp">
       <Filter>MyEngine\Tools\Binary</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Render\Resource\DrawResource.cpp">
@@ -195,7 +195,7 @@
     <ClCompile Include="Engine\Core\PSO\PSOManager.cpp">
       <Filter>MyEngine\Core\PSO</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Tools\GridMaker.cpp">
+    <ClCompile Include="Engine\Tools\Grid\GridMaker.cpp">
       <Filter>MyEngine\Tools\Grid</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Render\ImGuiWrapper.cpp">
@@ -221,6 +221,9 @@
     </ClCompile>
     <ClCompile Include="Engine\Math\MyString.cpp">
       <Filter>MyEngine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Tools\FPS\FPSObserver.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -302,13 +305,13 @@
     <ClInclude Include="Engine\Core\DXDevice.h">
       <Filter>MyEngine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Resource\Binary\Data\BinaryOutput.h">
+    <ClInclude Include="Engine\Tools\Binary\Data\BinaryOutput.h">
       <Filter>MyEngine\Tools\Binary</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Resource\Binary\Data\BinaryInput.h">
+    <ClInclude Include="Engine\Tools\Binary\Data\BinaryInput.h">
       <Filter>MyEngine\Tools\Binary</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Resource\Binary\BinaryManager.h">
+    <ClInclude Include="Engine\Tools\Binary\BinaryManager.h">
       <Filter>MyEngine\Tools\Binary</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Render\Resource\ParticleResource.h">
@@ -362,7 +365,7 @@
     <ClInclude Include="Engine\Core\PSO\PSOManager.h">
       <Filter>MyEngine\Core\PSO</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Tools\GridMaker.h">
+    <ClInclude Include="Engine\Tools\Grid\GridMaker.h">
       <Filter>MyEngine\Tools\Grid</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Render\ImGuiWrapper.h">
@@ -385,6 +388,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Math\MyString.h">
       <Filter>MyEngine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Tools\FPS\FPSObserver.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
