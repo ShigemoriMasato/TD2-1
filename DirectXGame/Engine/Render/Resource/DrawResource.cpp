@@ -50,9 +50,9 @@ void DrawResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMat
 
 	if (useMatrix) {
 		particleDataResource.Attach(CreateBufferResource(device, sizeof(MatrixData)));
-		particleDataResource->Map(0, nullptr, (void**)&particle_);
-		particle_->world = Matrix::MakeIdentity4x4();
-		particle_->wvp = Matrix::MakeIdentity4x4();
+		particleDataResource->Map(0, nullptr, (void**)&matrix_);
+		matrix_->world = Matrix::MakeIdentity4x4();
+		matrix_->wvp = Matrix::MakeIdentity4x4();
 	}
 
 	vertexNum_ = vertexNum;
@@ -97,11 +97,11 @@ void DrawResource::DrawReady() {
 	//Matrix
 	Matrix4x4 worldMat = MakeScaleMatrix(scale_) * MakeRotationMatrix(rotate_) * MakeTranslationMatrix(position_);
 
-	if (particle_) {
-		particle_->world = worldMat;
+	if (matrix_) {
+		matrix_->world = worldMat;
 		
 		if (camera_) {
-			particle_->wvp = particle_->world * camera_->GetVPMatrix();
+			matrix_->wvp = matrix_->world * camera_->GetVPMatrix();
 		}
 	} else {
 

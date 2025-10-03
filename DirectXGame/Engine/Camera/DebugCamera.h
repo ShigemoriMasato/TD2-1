@@ -10,7 +10,6 @@ public:
 
 	void Update();
 
-	Transform GetTransform();
 	Vector3 GetPosition() const override;
 	Vector3 GetCenter() const;
 
@@ -24,9 +23,6 @@ private:
 
 	//親からの距離
 	float distance_ = -10.0f;
-
-	//最終的なカメラの位置
-	Transform transform_{};
 
 	const float speed_ = 0.003f;
 };

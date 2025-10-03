@@ -231,6 +231,7 @@ void Render::Draw(ParticleResource* resource) {
 
     auto vertexBufferView = resource->GetVertexBufferView();
     commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
     uint32_t indexNum = resource->GetIndexNum();
 	//Indexがある場合はViewを取り込む
     if (indexNum != 0) {
@@ -242,7 +243,7 @@ void Render::Draw(ParticleResource* resource) {
     psoEditor_->Setting(commandList.Get());
 
 	//ParticleDataのポインタを設定
-	commandList->SetGraphicsRootDescriptorTable(0, resource->GetMatrixSRVDesc());
+	commandList->SetGraphicsRootDescriptorTable(0, resource->GetParticleDataSRVDesc());
 	//Texture
 	commandList->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
 
@@ -278,7 +279,16 @@ void Render::PostDraw(ImGuiRapper* imguiRap) {
     ID3D12CommandList* commandLists[] = { commandList.Get() };
     commandQueue->ExecuteCommandLists(1, commandLists);
     //GPUとOSに画面の交換を行うよう通知する
-    swapChain->Present(1, 0);
+    hr = swapChain->Present(1, 0);
+    
+    if (true) {
+        // ログに hr を出す (8桁16進などで)
+		logger_->Log(std::format("Failed to Present. hr = 0x{}\n", hr));
+    }
+
+    //presentするとBarrierが自動でCommonになる。
+    int backBufferIndex = swapChain->GetCurrentBackBufferIndex();
+    resourcestates_[backBufferIndex] = D3D12_RESOURCE_STATE_COMMON;
 
     //Fenceの値を更新
     fenceValue++;

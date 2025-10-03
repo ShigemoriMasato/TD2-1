@@ -32,8 +32,8 @@ struct Material final {
 };
 
 struct ParticleData final {
-	Matrix4x4 wvp;
 	Matrix4x4 world;
+	Matrix4x4 vp;
 	Vector4 color;
 };
 

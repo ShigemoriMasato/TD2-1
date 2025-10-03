@@ -12,7 +12,7 @@ struct PSOConfig {
 	std::string ps = "Object3d.PS.hlsl";
 	BlendStateID blendID = BlendStateID::Normal;
 	DepthStencilID depthStencilID = DepthStencilID::Default;
-	RasterizerID rasterizerID = RasterizerID::Default;
+	RasterizerID rasterizerID = RasterizerID::Fill;
 	RootSignatureID rootID = RootSignatureID::Default;
 	InputLayoutID inputLayoutID = InputLayoutID::Default;
 	D3D12_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;

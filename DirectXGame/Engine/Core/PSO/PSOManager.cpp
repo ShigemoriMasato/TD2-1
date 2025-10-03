@@ -84,7 +84,7 @@ void PSOManager::Initialize() {
 						config.isSwapChain = bool(isSwapChain);
 
 						//以下defaultとして上で設定したものを使う
-						config.rasterizerID = RasterizerID::Default;
+						config.rasterizerID = RasterizerID::Fill;
 
 						config.Validate(*shaderShelf_.get(), *inputLayoutShelf_.get(), *rootSignatureShelf_.get(), logger_);
 

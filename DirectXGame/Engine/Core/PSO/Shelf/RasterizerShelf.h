@@ -4,7 +4,8 @@
 #include <d3d12.h>
 
 enum class RasterizerID : uint8_t {
-	Default,
+	Fill,
+	Wireframe,
 
 	Count
 };

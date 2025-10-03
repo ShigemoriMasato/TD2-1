@@ -20,6 +20,7 @@ private:
 	int bunnyHandle_ = -1;
 	std::unique_ptr<ModelResource> bunnyModel_ = nullptr;
 	std::unique_ptr<DebugCamera> camera_ = nullptr;
+	std::unique_ptr<Camera> mainCamera_ = nullptr;
 
 	std::list<std::unique_ptr<GridMaker>> gridMaker_;
 	std::unique_ptr<ParticleResource> triangle_ = nullptr;

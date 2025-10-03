@@ -48,6 +48,14 @@ void Camera::MakeMatrix() {
 	vpMatrix = transformMatrix_ * projectionMatrix;
 }
 
+void Camera::DrawImGui() {
+	ImGui::Begin("Camera");
+	ImGui::DragFloat3("Position", &transform_->position.x, 0.1f);
+	ImGui::DragFloat3("Rotation", &transform_->rotation.x, 0.01f);
+	ImGui::DragFloat3("Scale", &transform_->scale.x, 0.1f);
+	ImGui::End();
+}
+
 void Camera::SetTransform(Transform* transform) {
 	transform_ = std::shared_ptr<Transform>(transform);
 	isSetMatrix = false;

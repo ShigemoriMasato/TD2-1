@@ -10,8 +10,11 @@ void TitleScene::Initialize() {
 	camera_ = std::make_unique<DebugCamera>();
 	camera_->Initialize();
 
+	mainCamera_ = std::make_unique<Camera>();
+	mainCamera_->SetProjectionMatrix(PerspectiveFovDesc{});
+
 	for (int i = 0; i < 1; ++i) {
-		auto grid = std::make_unique<GridMaker>(camera_.get(), true);
+		auto grid = std::make_unique<GridMaker>(mainCamera_.get(), false);
 		grid->Initialize();
 		gridMaker_.push_back(std::move(grid));
 	}
@@ -19,17 +22,17 @@ void TitleScene::Initialize() {
 	bunnyHandle_ = modelManager_->LoadModel("DefaultDesc");
 	bunnyModel_ = std::make_unique<ModelResource>();
 	bunnyModel_->Initialize(modelManager_->GetModelData(bunnyHandle_));
-	bunnyModel_->SetCamera(camera_.get());
+	bunnyModel_->SetCamera(mainCamera_.get());
 	bunnyModel_->psoConfig_.isSwapChain = true;
 
 	triangle_ = std::make_unique<ParticleResource>();
-	triangle_->Initialize(3, 10);
+	triangle_->Initialize(3, 0, 10);
 	triangle_->localPos_ = { {0.0f,1.0f,0.0f},{1.0f,-1.0f,0.0f},{-1.0f,-1.0f,0.0f} };
 	triangle_->psoConfig_.isSwapChain = true;
-	triangle_->camera_ = camera_.get();
+	triangle_->camera_ = mainCamera_.get();
 
-	testEmitter_ = std::make_unique<TestEmitter>(10000);
-	testEmitter_->Initialize(camera_.get());
+	testEmitter_ = std::make_unique<TestEmitter>(1000);
+	testEmitter_->Initialize(mainCamera_.get());
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update() {
@@ -42,6 +45,9 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 	for (int i = 0; i < 10; ++i) {
 		triangle_->position_[i] = { (float)i - 5.0f, 0.0f, 0.0f };
 	}
+
+	mainCamera_->DrawImGui();
+	mainCamera_->MakeMatrix();
 
 	testEmitter_->Update();
 
@@ -56,6 +62,6 @@ void TitleScene::Draw() {
 		grid->Draw(render_);
 	}
 	render_->Draw(bunnyModel_.get());
-	render_->Draw(triangle_.get());
+
 	testEmitter_->Draw(render_);
 }

@@ -19,7 +19,7 @@ public:
 
 	static void StaticInitialize(DXDevice* device, SRVManager* srvManager) { dxDevice_ = device; srvManager_ = srvManager; }
 
-	void Initialize(uint32_t vertexNum, uint32_t instanceNum, uint32_t indexNum = 0);
+	void Initialize(uint32_t vertexNum, uint32_t indexNum = 0, uint32_t instanceNum = 1);
 
 	/// <summary>
 	/// 描画前準備(Render内で呼ばれるため、プログラム時に呼ぶ必要はない)
@@ -28,9 +28,9 @@ public:
 
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() const { return vertexBufferView; }
 	D3D12_INDEX_BUFFER_VIEW GetIndexBufferView() const;
-	ID3D12Resource* GetParticleDataResource() const;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetMatrixSRVDesc() const { return matrixGPUHandle_; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetParticleDataSRVDesc() const { return particleDataGPUHandle_; }
 
 	uint32_t GetVertexNum() const { return vertexNum_; }
 	uint32_t GetIndexNum() const { return indexNum_; }
@@ -60,13 +60,14 @@ private:
 
 	VertexData* vertex_ = nullptr;
 	uint32_t* indices_ = nullptr;
-	ParticleData* particle_ = nullptr;
+	ParticleData* particleData_ = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleDataResource = nullptr;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE matrixGPUHandle_{};
+	D3D12_GPU_DESCRIPTOR_HANDLE particleDataGPUHandle_{};
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};

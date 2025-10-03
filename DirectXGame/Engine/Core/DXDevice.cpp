@@ -28,7 +28,7 @@ void DXDevice::SetWindowProc(std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> 
 
 void DXDevice::CreateDevice() {
 
-#ifdef _DEBUG
+#if _DEBUG || SH_DEVELOP
 
     if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
         //デバッグレイヤーを有効化する
@@ -36,6 +36,13 @@ void DXDevice::CreateDevice() {
         //さらにGPU側でもチェックを行うようにする
         debugController->SetEnableGPUBasedValidation(TRUE);
     }
+    
+    Microsoft::WRL::ComPtr<ID3D12Debug1> debugController1;
+    if (SUCCEEDED(debugController->QueryInterface(IID_PPV_ARGS(&debugController1)))) {
+        debugController1->SetEnableGPUBasedValidation(TRUE);
+        debugController1->SetEnableSynchronizedCommandQueueValidation(TRUE);
+    }
+
 #endif
 
     // dxgiFactory
@@ -100,7 +107,7 @@ void DXDevice::CreateDevice() {
 
 #pragma region DebugLayer
 
-#ifdef _DEBUG
+#if _DEBUG || SH_DEVELOP
 
     Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
     if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {

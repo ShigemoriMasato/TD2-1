@@ -33,6 +33,7 @@ public:
 	void SetProjectionMatrix(OrthographicDesc desc);
 
 	void MakeMatrix();
+	void DrawImGui();
 
 	void SetTransform(Transform* transform);
 	void SetTransform(Matrix4x4 mat);
@@ -43,8 +44,9 @@ public:
 		return transform_->position;
 	}
 	Transform GetTransform() const { return *transform_; }
+	Matrix4x4 GetTranformMatrix() const { return transformMatrix_; }
 
-private:
+protected:
 
 	Matrix4x4 projectionMatrix = Matrix::MakeIdentity4x4();		//ワールド行列にこれをかけると正射影になる
 	Matrix4x4 vpMatrix = Matrix::MakeIdentity4x4();			//w抜きviewport変換行列
