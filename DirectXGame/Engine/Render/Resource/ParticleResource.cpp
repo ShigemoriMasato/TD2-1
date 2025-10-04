@@ -48,7 +48,7 @@ void ParticleResource::Initialize(uint32_t vertexNum, uint32_t indexNum, uint32_
 
 	for (uint32_t i = 0; i < instanceNum; ++i) {
 		particleData_[i].world = MakeIdentity4x4();
-		particleData_[i].vp = MakeIdentity4x4();
+		particleData_[i].wvp = MakeIdentity4x4();
 		particleData_[i].color = { 1.0f,1.0f,1.0f,1.0f };
 	}
 
@@ -98,26 +98,25 @@ void ParticleResource::DrawReady() {
 	}
 
 	//particleData
-	//! ビルボード
-	Matrix4x4 bill = camera_->GetTranformMatrix();
-	for (int i = 0; i < 3; ++i) {
-		bill.m[3][i] = 0.0f;
+	Matrix4x4 bill = MakeIdentity4x4();
+	if (billboard_) {
+		// ビルボード
+		bill = Inverse(camera_->GetTranformMatrix());
+		for (int i = 0; i < 3; ++i) {
+			bill.m[3][i] = 0.0f;
+		}
 	}
 
-	//! 臨時 | パーティクルの角度を変更(全パーティクル共通)
-	ImGui::Begin("PerticleRotate");
-	ImGui::DragFloat3("Rotate", &rotate_[0].x, 0.01f);
+	ImGui::Begin("a");
+	ImGui::DragFloat3("rotate", &rotate_[0].x, 0.01f);
 	ImGui::End();
-
-	//パーティクルの回転行列
-	Matrix4x4 rotate = MakeRotationMatrix(rotate_[0]);
 
 	//各行列の作成
 	for (uint32_t i = 0; i < instanceNum_; ++i) {
-		particleData_[i].world = MakeScaleMatrix(scale_[i]) * rotate * MakeTranslationMatrix(position_[i]);
+		particleData_[i].world = MakeScaleMatrix(scale_[i]) * MakeRotationMatrix(rotate_[0]) * bill * MakeTranslationMatrix(position_[i]);
 		
 		if (camera_) {
-			particleData_[i].vp = camera_->GetVPMatrix();
+			particleData_[i].wvp = particleData_[i].world * camera_->GetVPMatrix();
 		}
 
 		particleData_[i].color = {

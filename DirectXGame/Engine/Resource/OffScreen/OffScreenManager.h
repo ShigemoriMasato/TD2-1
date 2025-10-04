@@ -5,19 +5,34 @@
 #include "OffScreenData.h"
 #include <Resource/SRVManager.h>
 
+enum class OffScreenIndex {
+	None = -1,
+	ImGuiDocking,
+	PostEffect,
+
+	MaxCount
+};
+
+/// <summary>
+/// offscreenの管理クラス。作成時の設定は初期化関数の中身をいじって変えること
+/// </summary>
 class OffScreenManager {
 public:
 
 	OffScreenManager();
 	~OffScreenManager();
 
+	/// <summary>
+	/// OffScreenを初期化、作成する
+	/// </summary>
 	void Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList, SRVManager* srvManager);
 
-	int CreateOffScreen(int width, int height, float* clearColor);
 	OffScreenData* GetOffScreenData(int handle);
 
 private:
-	
+
+	int CreateOffScreen(int width, int height, float* clearColor);
+
 	std::vector<std::unique_ptr<OffScreenData>> offScreens_;
 
 	DXDevice* device_ = nullptr;

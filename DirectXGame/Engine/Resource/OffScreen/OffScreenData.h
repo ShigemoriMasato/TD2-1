@@ -34,8 +34,8 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_ = {};
 
 	//Depth
-	ID3D12DescriptorHeap* dsvDescriptorHeap_ = nullptr;
-	ID3D12Resource* depthStencilResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
 
 	//バリアの状態
 	D3D12_RESOURCE_STATES resourceState_ = D3D12_RESOURCE_STATE_COMMON;

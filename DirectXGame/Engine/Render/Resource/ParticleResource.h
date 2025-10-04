@@ -21,6 +21,10 @@ public:
 
 	void Initialize(uint32_t vertexNum, uint32_t indexNum = 0, uint32_t instanceNum = 1);
 
+	void IsBillboard(bool isBillboard) {
+		billboard_ = isBillboard;
+	}
+
 	/// <summary>
 	/// 描画前準備(Render内で呼ばれるため、プログラム時に呼ぶ必要はない)
 	/// </summary>
@@ -78,4 +82,7 @@ private:
 	uint32_t vertexNum_ = 0;
 	uint32_t indexNum_ = 0;
 	uint32_t instanceNum_ = 0;
+
+
+	bool billboard_ = true;
 };

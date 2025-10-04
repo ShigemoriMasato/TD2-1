@@ -19,7 +19,7 @@ OffScreenData::OffScreenData(int width, int height, float* clearColor, DXDevice*
 
     D3D12_CLEAR_VALUE clearValue = {};
     clearValue.DepthStencil.Depth = 1.0f;
-    clearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     for(int i = 0; i < 4; ++i) {
         clearValue.Color[i] = clearColor[i];
         clearColor_[i] = clearColor[i];
@@ -37,7 +37,7 @@ OffScreenData::OffScreenData(int width, int height, float* clearColor, DXDevice*
     );
     assert(SUCCEEDED(hr) && "Failed to create off-screen resource");
 
-    rtvHandle_.ptr = rtv->GetCPUDescriptorHandleForHeapStart().ptr + device->GetDescriptorSizeRTV() * (2 + offScreenTextureCount_++);
+    rtvHandle_.ptr = rtv->GetCPUDescriptorHandleForHeapStart().ptr + device->GetDescriptorSizeRTV() * (offScreenTextureCount_++);
 
     //RTVの設定
     D3D12_RENDER_TARGET_VIEW_DESC rtvDescOffScreen{};
@@ -63,14 +63,14 @@ OffScreenData::OffScreenData(int width, int height, float* clearColor, DXDevice*
     //バリアの初期状態を設定
     resourceState_ = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
-    dsvDescriptorHeap_ = CreateDescriptorHeap(device->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+    dsvDescriptorHeap_.Attach(CreateDescriptorHeap(device->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false));
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
     dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 
-    depthStencilResource_ = CreateDepthStencilTextureResource(device->GetDevice(), width, height);
+    depthStencilResource_.Attach(CreateDepthStencilTextureResource(device->GetDevice(), width, height));
 
-    device->GetDevice()->CreateDepthStencilView(depthStencilResource_, &dsvDesc, dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart());
+    device->GetDevice()->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc, dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart());
 
 }
 
