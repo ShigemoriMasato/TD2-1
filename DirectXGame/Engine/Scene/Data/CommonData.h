@@ -7,6 +7,9 @@
 class CommonData {
 public:
 
+	CommonData();
+	~CommonData();
+
 private:
 
 };
