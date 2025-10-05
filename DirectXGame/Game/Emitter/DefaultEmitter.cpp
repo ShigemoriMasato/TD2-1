@@ -317,28 +317,53 @@ void DefaultEmitter::Save() {
 void DefaultEmitter::Load() {
 	auto data = binaryManager_->Read(saveFileFolder + name_ + ".bin");
 
+	//? よくわかってない
+	// ハッシュ関数（コンパイル時定数）
+	constexpr auto hash = [](const char* str) constexpr -> uint32_t {
+		uint32_t hash = 2166136261u;
+		while (*str) {
+			hash ^= static_cast<uint32_t>(*str++);
+			hash *= 16777619u;
+		}
+		return hash;
+	};
+
 	for (const auto& d : data) {
-		if (d->name == "scatterMax") {
+		switch (hash(d->name.c_str())) {
+		case hash("scatterMax"):
 			scatterMax_ = d->get<Vector3>();
-		} else if (d->name == "scatterMin") {
+			break;
+		case hash("scatterMin"):
 			scatterMin_ = d->get<Vector3>();
-		} else if (d->name == "gravity") {
+			break;
+		case hash("gravity"):
 			gravity_ = d->get<Vector3>();
-		} else if (d->name == "rotateSpeed") {
+			break;
+		case hash("rotateSpeed"):
 			rotateSpeed_ = d->get<Vector3>();
-		} else if (d->name == "isRotateInverse") {
+			break;
+		case hash("isRotateInverse"):
 			isRotateInverse_ = d->get<bool>();
-		} else if (d->name == "position") {
+			break;
+		case hash("position"):
 			position_ = d->get<Vector3>();
-		} else if (d->name == "lifeTime") {
+			break;
+		case hash("lifeTime"):
 			lifeTime_ = d->get<float>();
 			std::fill(lifeSpan_.begin(), lifeSpan_.end(), lifeTime_);
-		} else if (d->name == "coolTime") {
+			break;
+		case hash("coolTime"):
 			coolTime_ = d->get<float>();
-		} else if (d->name == "generateNum") {
+			break;
+		case hash("generateNum"):
 			generateNum_ = d->get<int>();
-		} else if (d->name == "emitterJobs") {
+			break;
+		case hash("emitterJobs"):
 			emitterJobs_ = d->get<uint32_t>();
+			break;
+		default:
+			// 未知のパラメータの場合は何もしない
+			break;
 		}
 	}
 }
