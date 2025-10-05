@@ -10,6 +10,8 @@ EngineTerminal::~EngineTerminal() {
 }
 
 bool EngineTerminal::IsLoop() {
+	fpsObserver_->TimeAdjustment();
+
 	while (msg.message != WM_QUIT) {
 
 		//メッセージがあれば処理する
@@ -61,7 +63,7 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	render_ = std::make_unique<Render>(dxDevice_.get());
 	srvManager_ = std::make_unique<SRVManager>(dxDevice_.get(), 256);
 
-	DrawResource::SetDevice(dxDevice_.get());
+	BaseResource::StaticInitialize(dxDevice_.get());
 	ParticleResource::StaticInitialize(dxDevice_.get(), srvManager_.get());
 
 	imgui_ = std::make_unique<ImGuiRapper>();
@@ -89,7 +91,7 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	}
 
 
-	fpsObserver_ = std::make_unique<FPSObserver>(true, 60.0);
+	fpsObserver_ = std::make_unique<FPSObserver>(false, 60.0);
 }
 
 // =========================- MainLoop -===============================

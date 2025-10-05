@@ -7,11 +7,12 @@
 #include <Core/PSO/PSOConfig.h>
 #include <Resource/SRVManager.h>
 #include <Camera/Camera.h>
+#include "Data/BaseResource.h"
 
 /// <summary>
 /// CG2で作成した基本的(?)な描画情報
 /// </summary>
-class ParticleResource {
+class ParticleResource : public BaseResource {
 public:
 
 	ParticleResource();
@@ -42,13 +43,7 @@ public:
 
 public:		//以下描画設定項目 ---==================
 
-	PSOConfig psoConfig_{};
-
 	int textureHandle_ = 0;
-
-	std::vector<Vector3> localPos_{};
-	std::vector<Vector2> texcoord_{};
-	std::vector<Vector3> normal_{};
 
 	std::vector<uint32_t> index_{};
 
@@ -62,24 +57,19 @@ public:		//以下描画設定項目 ---==================
 
 private:
 
-	VertexData* vertex_ = nullptr;
 	uint32_t* indices_ = nullptr;
 	ParticleData* particleData_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleDataResource = nullptr;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE matrixGPUHandle_{};
 	D3D12_GPU_DESCRIPTOR_HANDLE particleDataGPUHandle_{};
 
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 
-	static DXDevice* dxDevice_;
 	static SRVManager* srvManager_;
 
-	uint32_t vertexNum_ = 0;
 	uint32_t indexNum_ = 0;
 	uint32_t instanceNum_ = 0;
 

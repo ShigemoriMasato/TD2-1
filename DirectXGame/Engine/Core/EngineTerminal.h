@@ -40,7 +40,7 @@ public:
 	Render* GetRender() { return render_.get(); }
 	TextureManager* GetTextureManager() { return textureManager_.get(); }
 	ModelManager* GetModelManager() { return modelManager_.get(); }
-	OffScreenManager* GetOffScreenManager() { return offScreenManager_.get(); }
+	FPSObserver* GetFPSObserver() { return fpsObserver_.get(); }
 	Input* GetInput() { return input_.get(); }
 
 private:

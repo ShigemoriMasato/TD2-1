@@ -156,9 +156,6 @@
     <ClCompile Include="Engine\Render\Resource\DrawResource.cpp">
       <Filter>MyEngine\Render\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Render\Resource\Data\DXResource.cpp">
-      <Filter>MyEngine\Render\Resource</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Render\Resource\ParticleResource.cpp">
       <Filter>MyEngine\Render\Resource</Filter>
     </ClCompile>
@@ -213,9 +210,6 @@
     <ClCompile Include="Engine\Core\EngineTerminal.cpp">
       <Filter>MyEngine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Render\Resource\CustomResource.cpp">
-      <Filter>MyEngine\Render\Resource</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Scene\Engine\ShaderEditScene.cpp">
       <Filter>MyEngine\Scene\Engine</Filter>
     </ClCompile>
@@ -225,7 +219,13 @@
     <ClCompile Include="Engine\Tools\FPS\FPSObserver.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Emitter\TestEmitter.cpp">
+    <ClCompile Include="Game\Emitter\DefaultEmitter.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Render\Resource\PostEffectResource.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -278,7 +278,7 @@
     <ClInclude Include="Engine\Transform\Vector.h">
       <Filter>MyEngine\Transform</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Transform\Value.h">
+    <ClInclude Include="Engine\Tools\Binary\Data\Value.h">
       <Filter>MyEngine\Transform</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Resource\Texture\TextureManager.h">
@@ -318,12 +318,6 @@
       <Filter>MyEngine\Tools\Binary</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Render\Resource\ParticleResource.h">
-      <Filter>MyEngine\Render\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Render\Resource\CustomResource.h">
-      <Filter>MyEngine\Render\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Render\Resource\Data\DXResource.h">
       <Filter>MyEngine\Render\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Render\Resource\DrawResource.h">
@@ -395,7 +389,13 @@
     <ClInclude Include="Engine\Tools\FPS\FPSObserver.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Emitter\TestEmitter.h">
+    <ClInclude Include="Game\Emitter\DefaultEmitter.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Render\Resource\PostEffectResource.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Render\Resource\Data\BaseResource.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -403,5 +403,8 @@
     <Text Include="externals\imgui\LICENSE.txt">
       <Filter>externals\imgui</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Game\Emitter\ReadMe.md" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 #pragma once
 #include "CommonData.h"
+#include <Tools/FPS/FPSObserver.h>
 
 class EngineTerminal;
 class ModelManager;
@@ -24,9 +25,9 @@ protected:
 
 	ModelManager* modelManager_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
-	OffScreenManager* offScreenManager_ = nullptr;
 	Render* render_ = nullptr;
 	Input* input_ = nullptr;
+	FPSObserver* fpsObserver_ = nullptr;
 
 };
 

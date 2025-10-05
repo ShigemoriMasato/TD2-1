@@ -2,7 +2,6 @@
 #include <Core/DXCommonFunction.h>
 #include <Math/MyMath.h>
 
-DXDevice* ParticleResource::dxDevice_ = nullptr;
 SRVManager* ParticleResource::srvManager_ = nullptr;
 using namespace Matrix;
 
@@ -107,13 +106,9 @@ void ParticleResource::DrawReady() {
 		}
 	}
 
-	ImGui::Begin("a");
-	ImGui::DragFloat3("rotate", &rotate_[0].x, 0.01f);
-	ImGui::End();
-
 	//各行列の作成
 	for (uint32_t i = 0; i < instanceNum_; ++i) {
-		particleData_[i].world = MakeScaleMatrix(scale_[i]) * MakeRotationMatrix(rotate_[0]) * bill * MakeTranslationMatrix(position_[i]);
+		particleData_[i].world = MakeScaleMatrix(scale_[i]) * MakeRotationMatrix(rotate_[i]) * bill * MakeTranslationMatrix(position_[i]);
 		
 		if (camera_) {
 			particleData_[i].wvp = particleData_[i].world * camera_->GetVPMatrix();

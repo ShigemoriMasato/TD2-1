@@ -6,19 +6,18 @@
 #include <Transform/Transform.h>
 #include <Core/PSO/PSOConfig.h>
 #include <Camera/Camera.h>
+#include "Data/BaseResource.h"
 
 /// <summary>
 /// CG2で作成した基本的(?)な描画情報
 /// </summary>
-class DrawResource {
+class DrawResource : public BaseResource {
 public:
 
 	DrawResource();
 	~DrawResource();
 
-	static void SetDevice(DXDevice* device) { dxDevice_ = device; }
-
-	void Initialize(uint32_t vertexNum, uint32_t indexNum = 0, bool useMatrix = false);
+	void Initialize(uint32_t vertexNum, uint32_t indexNum = 0, bool useMatrix = true);
 
 	/// <summary>
 	/// 描画前準備(Render内で呼ばれるため、プログラム時に呼ぶ必要はない)
@@ -34,13 +33,7 @@ public:
 	uint32_t GetVertexNum() const { return vertexNum_; }
 	uint32_t GetIndexNum() const { return indexNum_; }
 
-	PSOConfig psoConfig_{};
-
 	int textureHandle_ = 0;
-
-	std::vector<Vector3> localPos_{};
-	std::vector<Vector2> texcoord_{};
-	std::vector<Vector3> normal_{};
 
 	std::vector<uint32_t> index_{};
 
@@ -63,24 +56,18 @@ public:
 
 private:
 
-	VertexData* vertex_ = nullptr;
 	uint32_t* indices_ = nullptr;
 	Material* material_ = nullptr;
 	MatrixData* matrix_ = nullptr;
 	DirectionalLightData* light_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> particleDataResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> matrixResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> lightResource = nullptr;
 
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 
-	static DXDevice* dxDevice_;
-
-	uint32_t vertexNum_ = 0;
 	uint32_t indexNum_ = 0;
 
 };

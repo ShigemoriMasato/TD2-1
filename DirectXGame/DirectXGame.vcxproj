@@ -15,8 +15,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Engine\Render\Resource\Data\DXResource.cpp" />
-    <ClCompile Include="Engine\Render\Resource\CustomResource.cpp" />
+    <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp" />
     <ClCompile Include="Engine\Core\EngineTerminal.cpp" />
     <ClCompile Include="Engine\Tools\Binary\BinaryManager.cpp" />
     <ClCompile Include="Engine\Tools\Binary\Data\BinaryInput.cpp" />
@@ -65,11 +64,11 @@
     <ClCompile Include="Engine\Scene\Engine\ShaderEditScene.cpp" />
     <ClCompile Include="Engine\Math\MyString.cpp" />
     <ClCompile Include="Engine\Render\Resource\ParticleResource.cpp" />
-    <ClCompile Include="Game\Emitter\TestEmitter.cpp" />
+    <ClCompile Include="Game\Emitter\DefaultEmitter.cpp" />
+    <ClCompile Include="Engine\Render\Resource\PostEffectResource.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\Render\Resource\Data\DXResource.h" />
-    <ClInclude Include="Engine\Render\Resource\CustomResource.h" />
+    <ClInclude Include="Engine\Render\Resource\Data\BaseResource.h" />
     <ClInclude Include="Engine\Core\EngineTerminal.h" />
     <ClInclude Include="Engine\Tools\Binary\BinaryManager.h" />
     <ClInclude Include="Engine\Tools\Binary\Data\BinaryInput.h" />
@@ -89,7 +88,7 @@
     <ClInclude Include="Engine\Tools\Grid\GridMaker.h" />
     <ClInclude Include="Engine\Transform\Matrix.h" />
     <ClInclude Include="Engine\Transform\Transform.h" />
-    <ClInclude Include="Engine\Transform\Value.h" />
+    <ClInclude Include="Engine\Tools\Binary\Data\Value.h" />
     <ClInclude Include="Engine\Transform\Vector.h" />
     <ClInclude Include="Engine\Input\Input.h" />
     <ClInclude Include="Engine\Logger\Logger.h" />
@@ -123,7 +122,8 @@
     <ClInclude Include="Engine\Math\MyString.h" />
     <ClInclude Include="Engine\Render\Resource\ParticleResource.h" />
     <ClInclude Include="Engine\Tools\FPS\FPSObserver.h" />
-    <ClInclude Include="Game\Emitter\TestEmitter.h" />
+    <ClInclude Include="Game\Emitter\DefaultEmitter.h" />
+    <ClInclude Include="Engine\Render\Resource\PostEffectResource.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -132,6 +132,9 @@
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Game\Emitter\ReadMe.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

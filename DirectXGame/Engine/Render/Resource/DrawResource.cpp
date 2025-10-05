@@ -2,7 +2,6 @@
 #include <Core/DXCommonFunction.h>
 #include <Math/MyMath.h>
 
-DXDevice* DrawResource::dxDevice_ = nullptr;
 using namespace Matrix;
 
 DrawResource::DrawResource() {
@@ -49,8 +48,8 @@ void DrawResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMat
 	}
 
 	if (useMatrix) {
-		particleDataResource.Attach(CreateBufferResource(device, sizeof(MatrixData)));
-		particleDataResource->Map(0, nullptr, (void**)&matrix_);
+		matrixResource.Attach(CreateBufferResource(device, sizeof(MatrixData)));
+		matrixResource->Map(0, nullptr, (void**)&matrix_);
 		matrix_->world = Matrix::MakeIdentity4x4();
 		matrix_->wvp = Matrix::MakeIdentity4x4();
 	}
@@ -140,8 +139,8 @@ D3D12_INDEX_BUFFER_VIEW DrawResource::GetIndexBufferView() const {
 }
 
 ID3D12Resource* DrawResource::GetParticleDataResource() const {
-	if(particleDataResource) {
-		return particleDataResource.Get();
+	if (matrixResource) {
+		return matrixResource.Get();
 	}
 	return nullptr;
 }

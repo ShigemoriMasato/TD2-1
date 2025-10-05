@@ -28,7 +28,7 @@ void TitleScene::Initialize() {
 	triangle_->psoConfig_.isSwapChain = true;
 	triangle_->camera_ = camera_.get();
 
-	testEmitter_ = std::make_unique<TestEmitter>(1000);
+	testEmitter_ = std::make_unique<DefaultEmitter>(1000);
 	testEmitter_->Initialize(camera_.get());
 }
 
@@ -47,6 +47,7 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 	camera_->MakeMatrix();
 
 	testEmitter_->Update();
+	testEmitter_->DrawImGui();
 
 	return std::unique_ptr<BaseScene>();
 }

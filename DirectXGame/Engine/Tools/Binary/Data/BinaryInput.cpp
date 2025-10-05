@@ -53,9 +53,22 @@ std::shared_ptr<ValueBase> BinaryInput::ReadBinary(std::istream& in) {
 	{
 		return ValueDeserialize<double>(name, in);
 	}
+	case TypeID::Vector:
+	{
+		//todo std::vectorは未実装。いつかやる。工夫すればできるので各自工夫して
+		return {};
+	}
 	case TypeID::uint8_t:
 	{
 		return ValueDeserialize<uint8_t>(name, in);
+	}
+	case TypeID::uint16_t:
+	{
+		return ValueDeserialize<uint16_t>(name, in);
+	}
+	case TypeID::uint32_t:
+	{
+		return ValueDeserialize<uint32_t>(name, in);
 	}
 	case TypeID::Vector2:
 	{
@@ -71,7 +84,7 @@ std::shared_ptr<ValueBase> BinaryInput::ReadBinary(std::istream& in) {
 	}
 	// 他の型も同様に追加
 	default:
-		assert(false && "Unknown TypeID in ReadVBin");
+		assert(false && "Unknown TypeID in File");
 		return nullptr;
 	}
 }

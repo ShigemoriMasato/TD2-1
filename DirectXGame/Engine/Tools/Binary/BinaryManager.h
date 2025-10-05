@@ -5,8 +5,10 @@
 #include <string>
 #include <vector>
 
+//std::vectorと、std::stringやstd::vectorを含むクラス以外の型に対応
+
 /// <summary>
-/// Data/Parameterの中身をバイナリ形式で色々するクラス
+/// Assets/Binの中身をバイナリ形式で色々するクラス
 /// </summary>
 class BinaryManager {
 public:

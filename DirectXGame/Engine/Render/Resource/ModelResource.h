@@ -5,7 +5,7 @@
 /// <summary>
 /// ModelDataをもとにDXResourceを生成するクラス
 /// </summary>
-class ModelResource {
+class ModelResource : public BaseResource {
 public:
 
 	ModelResource();
@@ -24,8 +24,6 @@ public:
 	void SetCamera(Camera* camera);
 	void SetMaterial(const uint32_t& color = 0xffffffff, const int textureHandle = 0, const Vector2 texturePos = { 0,0 }, const float textureRotate = 0.0f);
 	void SetLight(bool enableLighting = false, const uint32_t& color = 0xffffffff, const Vector3& direction = {0.0f, 0.0f, 1.0f}, float intensity = 0.0f);
-
-	PSOConfig psoConfig_{};
 
 private:
 
