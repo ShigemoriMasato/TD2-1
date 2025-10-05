@@ -4,7 +4,7 @@
 
 namespace fs = std::filesystem;
 
-std::vector<std::string> SearchFilesWithExtension(const std::filesystem::path& directory, const std::string& extension) {
+std::vector<std::string> SearchFiles(const std::filesystem::path& directory, const std::string& extension) {
     std::vector<std::string> contents;
 
     if (!fs::exists(directory) || !fs::is_directory(directory)) {
@@ -12,12 +12,31 @@ std::vector<std::string> SearchFilesWithExtension(const std::filesystem::path& d
     }
 
     for (const auto& entry : fs::directory_iterator(directory)) {
-        std::string path = entry.path().string();
-        path.erase(0, directory.string().length() + 1);
-        contents.push_back(path);
+        if (entry.is_regular_file() && entry.path().extension() == extension) {
+            fs::path relativePath = entry.path().lexically_relative(directory);
+            contents.push_back(relativePath.string());
+        }
     }
 
     return contents;
+
+}
+
+std::vector<std::string> SerchFilesPathsAddChild(const fs::path& directory, const std::string& extension) {
+    std::vector<std::string> result;
+
+    if (!fs::exists(directory) || !fs::is_directory(directory)) {
+        throw std::runtime_error("Invalid directory: " + directory.string());
+    }
+
+    for (const auto& entry : fs::recursive_directory_iterator(directory)) {
+        if (entry.is_regular_file() && entry.path().extension() == extension) {
+            fs::path relativePath = entry.path().lexically_relative(directory);
+            result.push_back(relativePath.string());
+        }
+    }
+
+    return result;
 }
 
 std::wstring ConvertString(const std::string& str) {

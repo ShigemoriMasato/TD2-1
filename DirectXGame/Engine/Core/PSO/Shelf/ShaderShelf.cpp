@@ -105,7 +105,7 @@ void ShaderShelf::CompileAllShader() {
 
     //shaderNameBufferを削除するためのスコープ
     {
-        std::vector<std::string> shaderNameBuffer = SearchFilesWithExtension(basePath_, ".hlsl");
+        std::vector<std::string> shaderNameBuffer = SearchFiles(basePath_, ".hlsl");
         for (const auto& name : shaderNameBuffer) {
             shaderNames.push_back(ConvertString(name));
         }

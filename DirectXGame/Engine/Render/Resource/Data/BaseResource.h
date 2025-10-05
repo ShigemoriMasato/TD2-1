@@ -6,11 +6,13 @@
 #include <Transform/Transform.h>
 #include <vector>
 #include <Core/PSO/PSOConfig.h>
+#include <Core/DXCommonFunction.h>
+#include <Resource/SRVManager.h>
 
 class BaseResource {
 public:
 
-	static void StaticInitialize(DXDevice* device) { dxDevice_ = device; }
+	static void StaticInitialize(DXDevice* device, SRVManager* srvManager) { dxDevice_ = device; srvManager_ = srvManager; }
 
 	BaseResource() = default;
 	virtual ~BaseResource() = default;
@@ -30,5 +32,6 @@ protected:
 	uint32_t vertexNum_ = 0;
 
 	static DXDevice* dxDevice_;
+	static SRVManager* srvManager_;
 
 };

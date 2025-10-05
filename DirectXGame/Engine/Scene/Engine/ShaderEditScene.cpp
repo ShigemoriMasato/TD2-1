@@ -22,7 +22,7 @@ void ShaderEditScene::Initialize() {
 
 	std::vector<std::string> shaderNames;
 
-	std::vector<std::string> shaderNameBuffer = SearchFilesWithExtension("Assets/Shader", ".hlsl");
+	std::vector<std::string> shaderNameBuffer = SearchFiles("Assets/Shader", ".hlsl");
 	for (const auto& name : shaderNameBuffer) {
 		shaderNames.push_back(name);
 	}

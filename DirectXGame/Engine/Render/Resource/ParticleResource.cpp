@@ -2,7 +2,6 @@
 #include <Core/DXCommonFunction.h>
 #include <Math/MyMath.h>
 
-SRVManager* ParticleResource::srvManager_ = nullptr;
 using namespace Matrix;
 
 ParticleResource::ParticleResource() {

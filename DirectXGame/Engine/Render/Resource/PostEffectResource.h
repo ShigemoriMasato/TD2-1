@@ -5,6 +5,7 @@
 #include <d3d12.h>
 #include <Core/DXDevice.h>
 #include "Data/BaseResource.h"
+#include <Resource/OffScreen/OffScreenData.h>
 
 class PostEffectResource : public BaseResource {
 public:
@@ -18,7 +19,12 @@ public:
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetInfoGPUHandle() const { return infoGPUHandle_; }
 
+	//描画したいOffScreenのSRVGPUHandle
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle_{};
+
 private:
+
+	static const int postEffectNum;
 
 	/// <summary>
 	/// GPUにポストエフェクトのデータを送るためだけのマジックナンバーだらけの構造体。使うな！！！
@@ -31,11 +37,10 @@ private:
 		int32_t enablePostEffect = 0;
 	};
 
-	Matrix4x4* matrix_ = nullptr;
 	PostEffectInfo* postEffectInfo_ = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> matrixResource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> infoResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> infoResource_ = nullptr;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE infoGPUHandle_{};
+
 };

@@ -68,8 +68,6 @@ private:
 
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 
-	static SRVManager* srvManager_;
-
 	uint32_t indexNum_ = 0;
 	uint32_t instanceNum_ = 0;
 
