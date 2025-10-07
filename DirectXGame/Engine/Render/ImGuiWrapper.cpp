@@ -107,11 +107,13 @@ void ImGuiWrapper::UseGuizmo(ImGuizmo::OPERATION operationType, GuizmoData& data
 
     float worldMat[16];
     std::memcpy(worldMat, data.matrix->m, sizeof(float) * 16);
+	data.transform->rotation *= 180.0f / 3.141592f;
     ImGuizmo::DecomposeMatrixToComponents(worldMat, &data.transform->position.x, &data.transform->rotation.x, &data.transform->scale.x);
     ImGui::InputFloat3("Tr", &data.transform->position.x);
     ImGui::InputFloat3("Rt", &data.transform->rotation.x);
     ImGui::InputFloat3("Sc", &data.transform->scale.x);
     ImGuizmo::RecomposeMatrixFromComponents(&data.transform->position.x, &data.transform->rotation.x, &data.transform->scale.x, worldMat);
+	data.transform->rotation *= 3.141592f / 180.0f;
 
     float viewMat[16];
 	float projMat[16];

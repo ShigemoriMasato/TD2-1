@@ -22,7 +22,7 @@ std::vector<std::string> SearchFiles(const fs::path& directory, const std::strin
 
 }
 
-std::vector<std::string> SerchFilesPathsAddChild(const fs::path& directory, const std::string& extension) {
+std::vector<std::string> SerchFilePathsAddChild(const fs::path& directory, const std::string& extension) {
     std::vector<std::string> result;
 
     if (!fs::exists(directory) || !fs::is_directory(directory)) {

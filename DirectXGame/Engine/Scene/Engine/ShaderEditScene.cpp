@@ -22,17 +22,14 @@ void ShaderEditScene::Initialize() {
 
 	std::vector<std::string> shaderNames;
 
-	std::vector<std::string> shaderNameBuffer = SearchFiles("Assets/Shader", ".hlsl");
+	std::vector<std::string> shaderNameBuffer = SerchFilePathsAddChild("Assets/Shader", ".hlsl");
 	for (const auto& name : shaderNameBuffer) {
 		shaderNames.push_back(name);
 	}
 
 	for (const auto& sn : shaderNames) {
-		if (sn.find(".hlsli") != std::string::npos) {
-			continue;
-		}
 		//VertexShaderだったら
-		else if (sn.find("VS") != std::string::npos) {
+		if (sn.find("VS") != std::string::npos) {
 			buffer_[1].push_back(sn);
 			vss_.push_back(buffer_[1].back().c_str());
 		}

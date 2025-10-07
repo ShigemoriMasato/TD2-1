@@ -18,8 +18,10 @@ public:
 
 private:
 
-	int bunnyHandle_ = -1;
-	std::unique_ptr<ModelResource> bunnyModel_ = nullptr;
+	int descHandle_ = -1;
+	std::unique_ptr<ModelResource> descModel_ = nullptr;
+	Transform descTransform_;
+
 	std::unique_ptr<DebugCamera> camera_ = nullptr;
 
 	std::list<std::unique_ptr<GridMaker>> gridMaker_;

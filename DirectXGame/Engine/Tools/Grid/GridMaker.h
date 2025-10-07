@@ -44,7 +44,7 @@ private:
 class GridMaker {
 public:
 
-	GridMaker(Camera* camera, bool isDebugCamera);
+	GridMaker(Camera* camera);
 	~GridMaker() = default;
 
 	void Initialize();

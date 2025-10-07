@@ -59,13 +59,12 @@ void GridLine::AdjustCenter(float center) {
 	}
 }
 
-GridMaker::GridMaker(Camera* camera, bool isDebugCamera) {
-	if (isDebugCamera) {
+GridMaker::GridMaker(Camera* camera) {
+	if (dynamic_cast<DebugCamera*>(camera)) {
 		debugCamera_ = dynamic_cast<DebugCamera*>(camera);
-		camera_ = debugCamera_;
-	} else {
-		camera_ = camera;
 	}
+
+	camera_ = camera;
 
 	Initialize();
 	lineResource_ = std::make_unique<DrawResource>();
