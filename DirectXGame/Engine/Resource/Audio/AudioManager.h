@@ -26,7 +26,7 @@ public:
 	/// </summary>
 	/// <param name="handle">Loadで取得した音のハンドル</param>
 	/// <returns>再生ハンドル。流し終わるかStopを押すと破棄される</returns>
-	int Play(int soundHandle);
+	int Play(int soundHandle, bool isLoop);
 
 	//Volumeを変更
 	void SetVolume(int soundHandle, float volume);

@@ -33,6 +33,9 @@ void TitleScene::Initialize() {
 	testEmitter_->Initialize(camera_.get());
 
 	imguiWrapper_->SetCamera(camera_.get());
+
+	wavHandle = audio_->Load("fanfare.wav");
+	mp3Handle = audio_->Load("Clear.mp3");
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update() {
@@ -47,8 +50,20 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 	}
 
 	camera_->MakeMatrix();
-
 	testEmitter_->Update();
+
+	ImGui::Begin("Audio");
+
+	if (ImGui::Button("WAV")) {
+		audio_->Play(wavHandle, false);
+	}
+
+	if (ImGui::Button("MP3")) {
+		audio_->Play(mp3Handle, false);
+	}
+
+	ImGui::End();
+
 
 	return std::unique_ptr<BaseScene>();
 }

@@ -20,7 +20,7 @@ protected:
 	TextureManager* textureManager_ = nullptr;
 	Render* render_ = nullptr;
 	Input* input_ = nullptr;
-	FPSObserver* fpsObserver_ = nullptr;
+	AudioManager* audio_ = nullptr;
 
 };
 

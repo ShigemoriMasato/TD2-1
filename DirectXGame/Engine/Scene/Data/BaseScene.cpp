@@ -6,6 +6,6 @@ void BaseScene::MoveScene(EngineTerminal* engineTerminal, CommonData* commonData
 	textureManager_ = engineTerminal->GetTextureManager();
 	render_ = engineTerminal->GetRender();
 	input_ = engineTerminal->GetInput();
-	fpsObserver_ = engineTerminal->GetFPSObserver();
+	audio_ = engineTerminal->GetAudioManager();
 	this->commonData = commonData;
 }

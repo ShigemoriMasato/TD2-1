@@ -70,13 +70,11 @@ void WAVData::Load(fs::path filepath) {
 
 	fs::path path = filepath;
 	
-	std::string fileName = path.filename().string();
-
 	// returnする為の音声データ
 	wfex_ = format.fmt;
 	pBuffer_ = reinterpret_cast<BYTE*>(pBuffer);
 	bufferSize_ = data.size;
-	name_ = fileName;
+	name_ = path.string();
 	type_ = AudioType::wav;
 }
 

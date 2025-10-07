@@ -4,6 +4,7 @@
 #include <Resource/Texture/TextureManager.h>
 #include <Resource/Model/ModelManager.h>
 #include <Resource/OffScreen/OffScreenManager.h>
+#include <Resource/Audio/AudioManager.h>
 #include <Input/Input.h>
 #include <Render/ImGuiWrapper.h>
 #include <Scene/SceneManager.h>
@@ -42,6 +43,7 @@ public:
 	ModelManager* GetModelManager() { return modelManager_.get(); }
 	FPSObserver* GetFPSObserver() { return fpsObserver_.get(); }
 	Input* GetInput() { return input_.get(); }
+	AudioManager* GetAudioManager() { return audioManager_.get(); }
 
 private:
 
@@ -60,6 +62,7 @@ private:
 	std::unique_ptr<ModelManager> modelManager_ = nullptr;
 	std::unique_ptr<OffScreenManager> offScreenManager_ = nullptr;
 	std::unique_ptr<Input> input_ = nullptr;
+	std::unique_ptr<AudioManager> audioManager_ = nullptr;
 	std::unique_ptr<ImGuiWrapper> imgui_ = nullptr;
 	std::unique_ptr<FPSObserver> fpsObserver_ = nullptr;
 

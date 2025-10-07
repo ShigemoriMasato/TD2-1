@@ -74,6 +74,8 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	offScreenManager_->Initialize(dxDevice_.get(), render_->GetCommandList(), srvManager_.get());
 	input_ = std::make_unique<Input>(dxDevice_->GetWndClass().hInstance, dxDevice_->GetHwnd());
 	input_->Initialize();
+	audioManager_ = std::make_unique<AudioManager>();
+	audioManager_->Initialize();
 
 	render_->Initialize(textureManager_.get(), offScreenManager_.get(), srvManager_.get());
 

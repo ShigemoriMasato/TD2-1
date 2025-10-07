@@ -29,4 +29,7 @@ private:
 	std::unique_ptr<ImGuiWrapper> imguiWrapper_ = nullptr;
 	Matrix4x4 worldMatrix_ = Matrix::MakeIdentity4x4();
 	Transform gizmoTransform_;
+
+	int mp3Handle;
+	int wavHandle;
 };

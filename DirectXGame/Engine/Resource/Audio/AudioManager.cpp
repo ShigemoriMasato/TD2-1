@@ -49,8 +49,13 @@ int AudioManager::Load(fs::path filePath) {
 	return static_cast<int>(audioData_.size() - 1);
 }
 
-int AudioManager::Play(int handle) {
-	return 0;
+int AudioManager::Play(int handle, bool isLoop) {
+	if(handle < 0 || handle >= audioData_.size()) {
+		return -1;
+	}
+
+	int playHandle = audioData_[handle]->Play(xAudio2_.Get(), isLoop);
+	return handle * 10 + playHandle;
 }
 
 void AudioManager::SetVolume(int soundHandle, float volume) {
@@ -59,4 +64,25 @@ void AudioManager::SetVolume(int soundHandle, float volume) {
 	}
 
 	audioData_[soundHandle]->SetVolume(volume);
+}
+
+bool AudioManager::IsPlay(int playHandle) {
+	int soundHandle = playHandle / 10;
+	int handle = playHandle % 10;
+	if (soundHandle < 0 || soundHandle >= audioData_.size()) {
+		return false;
+	}
+
+	return audioData_[soundHandle]->IsPlay(handle);
+}
+
+void AudioManager::Stop(int playHandle) {
+	int soundHandle = playHandle / 10;
+	int handle = playHandle % 10;
+
+	if (soundHandle < 0 || soundHandle >= audioData_.size()) {
+		return;
+	}
+
+	audioData_[soundHandle]->Stop(handle);
 }
