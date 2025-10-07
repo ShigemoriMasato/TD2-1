@@ -1,4 +1,5 @@
 #include "TitleScene.h"
+#include <imgui/ImGuizmo.h>
 
 TitleScene::TitleScene() : BaseScene() {
 }
@@ -30,6 +31,8 @@ void TitleScene::Initialize() {
 
 	testEmitter_ = std::make_unique<DefaultEmitter>(1000);
 	testEmitter_->Initialize(camera_.get());
+
+	imguiWrapper_->SetCamera(camera_.get());
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update() {
@@ -43,11 +46,9 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 		triangle_->position_[i] = { (float)i - 5.0f, 0.0f, 0.0f };
 	}
 
-	camera_->DrawImGui();
 	camera_->MakeMatrix();
 
 	testEmitter_->Update();
-	testEmitter_->DrawImGui();
 
 	return std::unique_ptr<BaseScene>();
 }

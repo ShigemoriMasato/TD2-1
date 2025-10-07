@@ -60,7 +60,7 @@ private:
 	std::unique_ptr<ModelManager> modelManager_ = nullptr;
 	std::unique_ptr<OffScreenManager> offScreenManager_ = nullptr;
 	std::unique_ptr<Input> input_ = nullptr;
-	std::unique_ptr<ImGuiRapper> imgui_ = nullptr;
+	std::unique_ptr<ImGuiWrapper> imgui_ = nullptr;
 	std::unique_ptr<FPSObserver> fpsObserver_ = nullptr;
 
 	std::unique_ptr<SceneManager> sceneManager_ = nullptr;

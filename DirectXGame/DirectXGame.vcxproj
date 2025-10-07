@@ -15,6 +15,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
+    <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp" />
     <ClCompile Include="Engine\Core\EngineTerminal.cpp" />
     <ClCompile Include="Engine\Tools\Binary\BinaryManager.cpp" />
@@ -36,6 +38,7 @@
     <ClCompile Include="Engine\Logger\Logger.cpp" />
     <ClCompile Include="Engine\Math\MyMath.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
+    <ClCompile Include="externals\imgui\ImGuizmo.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
     <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp" />
@@ -66,8 +69,12 @@
     <ClCompile Include="Engine\Render\Resource\ParticleResource.cpp" />
     <ClCompile Include="Game\Emitter\DefaultEmitter.cpp" />
     <ClCompile Include="Engine\Render\Resource\PostEffectResource.cpp" />
+    <ClCompile Include="Engine\Resource\Audio\Data\MP3Data.cpp" />
+    <ClCompile Include="Engine\Resource\Audio\Data\WAVData.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
+    <ClInclude Include="Engine\Resource\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Render\Resource\Data\BaseResource.h" />
     <ClInclude Include="Engine\Core\EngineTerminal.h" />
     <ClInclude Include="Engine\Tools\Binary\BinaryManager.h" />
@@ -95,6 +102,7 @@
     <ClInclude Include="Engine\Math\MyMath.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
+    <ClInclude Include="externals\imgui\ImGuizmo.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
     <ClInclude Include="externals\imgui\imgui_impl_win32.h" />
     <ClInclude Include="externals\imgui\imgui_internal.h" />
@@ -124,6 +132,8 @@
     <ClInclude Include="Engine\Tools\FPS\FPSObserver.h" />
     <ClInclude Include="Game\Emitter\DefaultEmitter.h" />
     <ClInclude Include="Engine\Render\Resource\PostEffectResource.h" />
+    <ClInclude Include="Engine\Resource\Audio\Data\MP3Data.h" />
+    <ClInclude Include="Engine\Resource\Audio\Data\WAVData.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

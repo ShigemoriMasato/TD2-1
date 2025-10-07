@@ -94,7 +94,7 @@ void DrawResource::DrawReady() {
 	};
 
 	//Matrix
-	Matrix4x4 worldMat = MakeScaleMatrix(scale_) * MakeRotationMatrix(rotate_) * MakeTranslationMatrix(position_);
+	Matrix4x4 worldMat = GetWorldMatrix(scale_, rotate_, position_);
 
 	if (matrix_) {
 		matrix_->world = worldMat;

@@ -257,7 +257,7 @@ void Render::Draw(ParticleResource* resource) {
 
 }
 
-void Render::PostDraw(ImGuiRapper* imguiRap) {
+void Render::PostDraw(ImGuiWrapper* imguiRap) {
     if (offScreenHandle_ != -1) {
         ResetResourceBarrier();
         PreDraw();
@@ -267,7 +267,7 @@ void Render::PostDraw(ImGuiRapper* imguiRap) {
         PreDraw();
     }
 
-    imguiRap->EndFrame(commandList.Get());
+    ImGuiOperator::EndFrame(commandList.Get());
 
     ResetResourceBarrier();
 

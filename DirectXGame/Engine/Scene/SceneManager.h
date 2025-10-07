@@ -1,8 +1,9 @@
 #pragma once
 #include <memory>
-#include "Data/BaseScene.h"
 
+class BaseScene;
 class EngineTerminal;
+class CommonData;
 
 class SceneManager {
 public:

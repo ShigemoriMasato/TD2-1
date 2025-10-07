@@ -5,7 +5,7 @@
 /// <summary>
 /// ModelDataをもとにDXResourceを生成するクラス
 /// </summary>
-class ModelResource : public BaseResource {
+class ModelResource {
 public:
 
 	ModelResource();
@@ -21,9 +21,12 @@ public:
 	std::vector<DrawResource*> GetResources();
 
 	void SetMatrixData(Vector3 scale, Vector3 rotate, Vector3 pos);
+	void SetMatrixData(Matrix4x4 world);
 	void SetCamera(Camera* camera);
 	void SetMaterial(const uint32_t& color = 0xffffffff, const int textureHandle = 0, const Vector2 texturePos = { 0,0 }, const float textureRotate = 0.0f);
 	void SetLight(bool enableLighting = false, const uint32_t& color = 0xffffffff, const Vector3& direction = {0.0f, 0.0f, 1.0f}, float intensity = 0.0f);
+
+	PSOConfig psoConfig_{};
 
 private:
 

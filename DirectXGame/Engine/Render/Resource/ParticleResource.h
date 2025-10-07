@@ -29,7 +29,7 @@ public:
 	/// <summary>
 	/// 描画前準備(Render内で呼ばれるため、プログラム時に呼ぶ必要はない)
 	/// </summary>
-	void DrawReady();
+	void DrawReady() override;
 
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() const { return vertexBufferView; }
 	D3D12_INDEX_BUFFER_VIEW GetIndexBufferView() const;

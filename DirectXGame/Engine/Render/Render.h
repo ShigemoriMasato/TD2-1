@@ -21,7 +21,7 @@ public:
 	void Draw(DrawResource* resource);
 	void Draw(ModelResource* resource);
 	void Draw(ParticleResource* resource);
-	void PostDraw(ImGuiRapper* imguiRap);
+	void PostDraw(ImGuiWrapper* imguiRap);
 
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
 	ImGui_ImplDX12_InitInfo GetImGuiInitInfo(SRVManager* srv);

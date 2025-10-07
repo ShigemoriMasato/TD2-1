@@ -67,6 +67,12 @@ void ModelResource::SetMatrixData(Vector3 scale, Vector3 rotate, Vector3 pos) {
 	}
 }
 
+void ModelResource::SetMatrixData(Matrix4x4 world) {
+	for (auto& res : resources_) {
+		res->SetWorldMatrix(world);
+	}
+}
+
 void ModelResource::SetCamera(Camera* camera) {
 	for (auto& res : resources_) {
 		res->camera_ = camera;

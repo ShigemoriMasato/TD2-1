@@ -45,6 +45,7 @@ public:
 	}
 	Transform GetTransform() const { return *transform_; }
 	Matrix4x4 GetTranformMatrix() const { return transformMatrix_; }
+	Matrix4x4 GetProjectionMatrix() const { return projectionMatrix; }
 
 protected:
 

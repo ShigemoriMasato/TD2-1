@@ -7,6 +7,7 @@ EngineTerminal::EngineTerminal(BootMode mode) {
 }
 
 EngineTerminal::~EngineTerminal() {
+	ImGuiOperator::Finalize();
 }
 
 bool EngineTerminal::IsLoop() {
@@ -63,11 +64,8 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	render_ = std::make_unique<Render>(dxDevice_.get());
 	srvManager_ = std::make_unique<SRVManager>(dxDevice_.get(), 256);
 
-	BaseResource::StaticInitialize(dxDevice_.get());
+	BaseResource::StaticInitialize(dxDevice_.get(), srvManager_.get());
 	ParticleResource::StaticInitialize(dxDevice_.get(), srvManager_.get());
-
-	imgui_ = std::make_unique<ImGuiRapper>();
-	imgui_->Initialize(dxDevice_.get(), render_.get(), srvManager_.get());
 
 	textureManager_ = std::make_unique<TextureManager>();
 	textureManager_->Initialize(dxDevice_.get(), render_->GetCommandList(), srvManager_.get());
@@ -78,6 +76,8 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	input_->Initialize();
 
 	render_->Initialize(textureManager_.get(), offScreenManager_.get(), srvManager_.get());
+
+	ImGuiOperator::Initialize(dxDevice_.get(), render_.get(), srvManager_.get());
 
 	textureManager_->LoadTexture("Assets/Texture/white1x1.png");
 
@@ -110,8 +110,9 @@ void EngineTerminal::Run() {
 
 
 void EngineTerminal::Update() {
-	imgui_->StartFrame(static_cast<float>(dxDevice_->GetWindowSize().first), static_cast<float>(dxDevice_->GetWindowSize().second));
 	input_->Update();
+	auto windowSize = dxDevice_->GetWindowSize();
+	ImGuiOperator::StartFrame(static_cast<float>(windowSize.first), static_cast<float>(windowSize.second));
 }
 
 void EngineTerminal::PreDraw() {

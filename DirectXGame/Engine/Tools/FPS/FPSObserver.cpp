@@ -47,8 +47,9 @@ void FPSObserver::TimeAdjustment() {
                 static_cast<double>(timeFreq_.QuadPart);
         }
 
-        deltatime_ = static_cast<float>(frameTime);
     }
+
+    deltatime_ = static_cast<float>(frameTime);
 
     // 次のフレームの開始時間を設定
     timeStart_ = timeEnd_;

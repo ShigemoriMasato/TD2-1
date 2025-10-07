@@ -15,7 +15,7 @@ public:
 
 	void Initialize();
 	
-	void DrawReady();
+	void DrawReady() override;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetInfoGPUHandle() const { return infoGPUHandle_; }
 

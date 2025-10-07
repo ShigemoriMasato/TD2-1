@@ -4,7 +4,7 @@
 
 namespace fs = std::filesystem;
 
-std::vector<std::string> SearchFiles(const std::filesystem::path& directory, const std::string& extension) {
+std::vector<std::string> SearchFiles(const fs::path& directory, const std::string& extension) {
     std::vector<std::string> contents;
 
     if (!fs::exists(directory) || !fs::is_directory(directory)) {

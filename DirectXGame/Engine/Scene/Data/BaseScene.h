@@ -1,13 +1,6 @@
 #pragma once
 #include "CommonData.h"
-#include <Tools/FPS/FPSObserver.h>
-
-class EngineTerminal;
-class ModelManager;
-class TextureManager;
-class OffScreenManager;
-class Render;
-class Input;
+#include <Core/EngineTerminal.h>
 
 class BaseScene {
 public:

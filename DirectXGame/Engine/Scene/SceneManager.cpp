@@ -1,5 +1,6 @@
 #include "SceneManager.h"
 #include <Core/EngineTerminal.h>
+#include "Data/BaseScene.h"
 
 SceneManager::SceneManager(std::unique_ptr<BaseScene> firstScene, EngineTerminal* engine) {
 	engineTerminal_ = engine;

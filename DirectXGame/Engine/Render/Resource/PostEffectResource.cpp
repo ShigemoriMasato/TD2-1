@@ -45,3 +45,6 @@ void PostEffectResource::Initialize() {
 
 	dxDevice_->GetDevice()->CreateShaderResourceView(infoResource_.Get(), &srvDesc, matrixCPUHandle);
 }
+
+void PostEffectResource::DrawReady() {
+}
