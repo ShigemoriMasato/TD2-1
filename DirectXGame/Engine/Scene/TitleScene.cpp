@@ -44,6 +44,8 @@ void TitleScene::Initialize() {
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update() {
+	keys_ = commonData->keyManager_->GetKeyStates();
+
 	camera_->Update();
 
 	for (auto& grid : gridMaker_) {
@@ -72,6 +74,13 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 	imguiWrapper_->GuizmoUpdate();
 	descModel_->SetMatrixData(descTransform_.scale, descTransform_.rotation, descTransform_.position);
 
+
+	// ====================- Input系のテスト -==========================
+	ImGui::Begin("Input");
+	for(int i = 0; i < int(Key::Count); ++i) {
+		ImGui::Text("%d : %d", i, keys_[Key(i)]);
+	}
+	ImGui::End();
 
 	return std::unique_ptr<BaseScene>();
 }

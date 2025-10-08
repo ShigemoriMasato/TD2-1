@@ -11,8 +11,6 @@ EngineTerminal::~EngineTerminal() {
 }
 
 bool EngineTerminal::IsLoop() {
-	fpsObserver_->TimeAdjustment();
-
 	while (msg.message != WM_QUIT) {
 
 		//メッセージがあれば処理する
@@ -93,7 +91,7 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	}
 
 
-	fpsObserver_ = std::make_unique<FPSObserver>(false, 60.0);
+	fpsObserver_ = std::make_unique<FPSObserver>(true, 60.0);
 }
 
 // =========================- MainLoop -===============================
@@ -115,6 +113,8 @@ void EngineTerminal::Update() {
 	input_->Update();
 	auto windowSize = dxDevice_->GetWindowSize();
 	ImGuiOperator::StartFrame(static_cast<float>(windowSize.first), static_cast<float>(windowSize.second));
+
+	fpsObserver_->TimeAdjustment();
 }
 
 void EngineTerminal::PreDraw() {
@@ -122,5 +122,4 @@ void EngineTerminal::PreDraw() {
 
 void EngineTerminal::PostDraw() {
 	render_->PostDraw(imgui_.get());
-	fpsObserver_->TimeAdjustment();
 }

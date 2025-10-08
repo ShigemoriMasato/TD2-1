@@ -48,6 +48,8 @@
     <ClCompile Include="Engine\Core\PSO\Shelf\InputLayoutShelf.cpp" />
     <ClCompile Include="Engine\Render\ImGuiWrapper.cpp" />
     <ClCompile Include="Engine\Tools\FPS\FPSObserver.cpp" />
+    <ClCompile Include="AppSource\Game\Field\Field.cpp" />
+    <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp" />
@@ -67,10 +69,13 @@
     <ClCompile Include="Engine\Scene\Engine\ShaderEditScene.cpp" />
     <ClCompile Include="Engine\Math\MyString.cpp" />
     <ClCompile Include="Engine\Render\Resource\ParticleResource.cpp" />
-    <ClCompile Include="Game\Emitter\DefaultEmitter.cpp" />
+    <ClCompile Include="AppSource\Game\Emitter\DefaultEmitter.cpp" />
     <ClCompile Include="Engine\Render\Resource\PostEffectResource.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\MP3Data.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\WAVData.cpp" />
+    <ClCompile Include="AppSource\Game\Player\MoveNumManager.cpp" />
+    <ClCompile Include="AppSource\Game\Player\Player.cpp" />
+    <ClCompile Include="AppSource\Game\Player\Wire.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
@@ -130,10 +135,15 @@
     <ClInclude Include="Engine\Math\MyString.h" />
     <ClInclude Include="Engine\Render\Resource\ParticleResource.h" />
     <ClInclude Include="Engine\Tools\FPS\FPSObserver.h" />
-    <ClInclude Include="Game\Emitter\DefaultEmitter.h" />
+    <ClInclude Include="AppSource\Game\Field\Field.h" />
+    <ClInclude Include="AppSource\Game\Emitter\DefaultEmitter.h" />
     <ClInclude Include="Engine\Render\Resource\PostEffectResource.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\MP3Data.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\WAVData.h" />
+    <ClInclude Include="AppSource\Game\Player\MoveNumManager.h" />
+    <ClInclude Include="AppSource\Game\Player\Player.h" />
+    <ClInclude Include="AppSource\Game\Player\Wire.h" />
+    <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -142,9 +152,6 @@
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Game\Emitter\ReadMe.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -211,7 +218,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Engine;$(ProjectDir)AppSource</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -222,7 +229,7 @@
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -237,7 +244,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Engine;$(ProjectDir)AppSource</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -263,7 +270,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Game;$(ProjectDir)Engine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Engine;$(ProjectDir)AppSource</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
@@ -277,7 +284,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
