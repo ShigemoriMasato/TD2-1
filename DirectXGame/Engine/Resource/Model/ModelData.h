@@ -5,6 +5,8 @@
 #include <Transform/Transform.h>
 #include <Resource/Texture/TextureManager.h>
 
+#include <assimp/Importer.hpp>
+
 struct ModelMaterial final {
 	std::string name;
 	int textureHandle = -1;
@@ -27,6 +29,5 @@ private:
 
 	std::unordered_map<std::string, std::vector<VertexData>> vertices;
 	std::vector<ModelMaterial> material{};
-
 };
 

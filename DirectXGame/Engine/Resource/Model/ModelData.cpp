@@ -4,86 +4,54 @@
 #include <fstream>
 #include <sstream>
 
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 void ModelData::LoadModel(const std::string& directoryPath, const std::string& filename, TextureManager* textureManager) {
-    std::vector<Vector4> positions;         //位置
-    std::vector<Vector3> normals;           //法線
-    std::vector<Vector2> texcoords;         //テクスチャ座標
-    std::string line;                       //ファイルから読んだ行を格納するバッファ
+    Assimp::Importer importer;
+    std::string path = (directoryPath + "/" + filename);
+    const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder);
 
-    std::ifstream file(directoryPath + "/" + filename); //ファイルを開く
-    assert(file.is_open() && "MyDirectX::LoadObjFile / cannot open obj file");
+    for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
+        aiMaterial* material = scene->mMaterials[materialIndex];
 
-    std::string materialName; //マテリアル名を格納する変数
+		this->material.push_back(ModelMaterial());
+        this->material[materialIndex].name = material->GetName().C_Str();
 
-    while (std::getline(file, line)) {
-        std::string identifier;
-        std::istringstream s(line);
-        s >> identifier; //行の先頭の文字列を取得
+        if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+            aiString textureFilePath;
+            material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
+            this->material.back().textureHandle = textureManager->LoadTexture(directoryPath + "/" + std::string(textureFilePath.C_Str()));
+        }
+    }
 
-        if (identifier == "usemtl") {
-            s >> materialName; //マテリアル名を取得
+    for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
+		aiMesh* mesh = scene->mMeshes[meshIndex];
+        
+		assert(mesh->HasNormals());
+        assert(mesh->HasTextureCoords(0));
 
-        } else if (identifier == "v") {
-            Vector4 position;
-            s >> position.x >> position.y >> position.z;
-            position.x *= -1.0f;
-            position.z *= -1.0f;
-            position.w = 1.0f;
-            positions.push_back(position); //位置を格納
+        for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
+            aiFace& face = mesh->mFaces[faceIndex];
+			assert(face.mNumIndices == 3); //三角形限定
 
-        } else if (identifier == "vt") {
-            Vector2 texcoord;
-            s >> texcoord.x >> texcoord.y; //テクスチャ座標を格納
-            texcoord.y = 1.0f - texcoord.y;
-            texcoords.push_back(texcoord);
+            for (uint32_t element = 0; element < face.mNumIndices; ++element) {
+                uint32_t vertexIndex = face.mIndices[element];
 
-        } else if (identifier == "vn") {
-            Vector3 normal;
-            s >> normal.x >> normal.y >> normal.z; //法線を格納
-            normal.x *= -1.0f; //y軸も反転
-            normals.push_back(normal);
+                aiVector3D& position = mesh->mVertices[vertexIndex];
+                aiVector3D& normal = mesh->mNormals[vertexIndex];
+				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
 
-        } else if (identifier == "f") {
+				VertexData vertex = {};
+				vertex.position = { position.x * -1.0f, position.y, position.z * -1.0f, 1.0f };
+				vertex.normal = { normal.x * -1.0f, normal.y, normal.z };
+				vertex.texcoord = { texcoord.x, 1.0f - texcoord.y };
 
-            //面は三角形限定なので、読み込む前にEditor等で三角化させること。そのほかは未対応
-            for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
-                std::string vertexDefinition;
-                s >> vertexDefinition; //頂点の定義を取得
+                vertex.position.x *= -1.0f;
+                vertex.normal.x *= -1.0f;
 
-                //頂点の要素へのIndexは。「位置/UV/法線」で格納されているので、分解してIndexを取得する
-                std::istringstream v(vertexDefinition);
-                uint32_t elementIndices[3];
-                for (int32_t element = 0; element < 3; ++element) {
-                    std::string index;
-                    std::getline(v, index, '/');// /区切りでインデックスを読む
-                    if (index != "") {
-                        elementIndices[element] = std::stoi(index);
-                    } else {
-                        elementIndices[element] = -1;
-                    }
-                }
-
-
-                //要素へのIndexから、実際の要素の値を取得して頂点を構築する
-                Vector4 position = positions[elementIndices[0] - 1];
-
-                Vector2 texcoord;
-                if (elementIndices[1] != -1) {
-                    texcoord = texcoords[elementIndices[1] - 1];
-                } else {
-                    texcoord = { 0.0f, 0.0f }; //テクスチャ座標がない場合はデフォルト値を設定
-                }
-
-                Vector3 normal = normals[elementIndices[2] - 1];
-
-                VertexData vertex = { position, texcoord, normal };
-                vertices[materialName].push_back(vertex); //頂点を格納
-
+				vertices[material[mesh->mMaterialIndex].name].push_back(vertex);
             }
-        } else if (identifier == "mtllib") {
-            std::string materialFilename;
-            s >> materialFilename;
-            material = LoadMaterialTemplateFile(directoryPath, materialFilename, textureManager); //マテリアルファイルを読み込む
         }
     }
 
