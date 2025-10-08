@@ -1,6 +1,6 @@
 #pragma once
 #include "DrawResource.h"
-#include <Resource/Model/ModelData.h>
+#include <Resource/Model/SkinningModelData.h>
 
 /// <summary>
 /// ModelDataをもとにDXResourceを生成するクラス
@@ -31,5 +31,7 @@ public:
 private:
 
 	std::vector<std::unique_ptr<DrawResource>> resources_;
+
+	Node node_{};
 
 };

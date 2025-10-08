@@ -19,7 +19,7 @@ void TitleScene::Initialize() {
 		gridMaker_.push_back(std::move(grid));
 	}
 
-	descHandle_ = modelManager_->LoadModel("DefaultDesc");
+	descHandle_ = modelManager_->LoadModel("cube");
 	descModel_ = std::make_unique<ModelResource>();
 	descModel_->Initialize(modelManager_->GetModelData(descHandle_));
 	descModel_->SetCamera(camera_.get());

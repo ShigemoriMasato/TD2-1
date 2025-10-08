@@ -24,6 +24,9 @@ public:
 	/// </summary>
 	void DrawReady() override;
 
+	//親の行列をかける。毎フレーム呼ばないといけない。ごめん。
+	void AddParentMatrix(const Matrix4x4& parentMatrix);
+
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() const { return vertexBufferView; }
 	D3D12_INDEX_BUFFER_VIEW GetIndexBufferView() const;
 	ID3D12Resource* GetMaterialResource() const { return materialResource.Get(); }
@@ -69,5 +72,7 @@ private:
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 
 	uint32_t indexNum_ = 0;
+
+	std::vector<Matrix4x4> parentMatrices_{};
 
 };

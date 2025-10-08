@@ -15,9 +15,30 @@ int ModelManager::LoadModel(const std::string& directoryPath) {
 		return modelHandleMap_[directoryPath];
 	}
 
-	models_.push_back(std::make_unique<ModelData>());
-	fs::path dirPath(directoryPath);
-	models_.back()->LoadModel(basePath_ + directoryPath, dirPath.filename().string() + ".obj", textureManager_);
+	auto objfile = SearchFiles(basePath_ + directoryPath, ".obj");
+
+	//objが見つからなかったら
+	if (objfile.size() != 1) {
+
+		auto glbfile = SearchFiles(basePath_ + directoryPath, ".gltf");
+
+		//glbも見つからなかったら
+		if (glbfile.size() != 1) {
+			assert(false && "Can't find .obj or glb file");
+			return -1;
+		}
+
+		//glbが見つかったら
+		LoadGlbFile(directoryPath, glbfile[0]);
+
+	} else {
+
+		//objが見つかったら
+		LoadObjFile(directoryPath, objfile[0]);
+
+	}
+
+	this->modelHandleMap_[directoryPath] = int(models_.size() - 1);
 
 	return int(models_.size() - 1);
 }
@@ -27,4 +48,14 @@ ModelData* ModelManager::GetModelData(int modelHandle) {
 		return nullptr;
 	}
 	return models_[modelHandle].get();
+}
+
+void ModelManager::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
+	models_.push_back(std::make_unique<ModelData>());
+	models_.back()->LoadModel(basePath_ + directoryPath, filename, textureManager_);
+}
+
+void ModelManager::LoadGlbFile(const std::string& directoryPath, const std::string& filename) {
+	models_.push_back(std::make_unique<SkinningModelData>());
+	models_.back()->LoadModel(basePath_ + directoryPath, filename, textureManager_);
 }

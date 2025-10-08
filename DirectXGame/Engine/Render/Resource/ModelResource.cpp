@@ -24,12 +24,22 @@ void ModelResource::Initialize(ModelData* modelData) {
 		resources_.push_back(std::move(resource));
 	}
 
+	if (dynamic_cast<SkinningModelData*>(modelData)) {
+		node_ = dynamic_cast<SkinningModelData*>(modelData)->GetNode();
+	}
+
 	psoConfig_ = resources_.back()->psoConfig_;
 }
 
 void ModelResource::DrawReady() {
 	for (auto& res : resources_) {
 		res->psoConfig_ = psoConfig_;
+	}
+
+	if (node_.name != "") {
+		for(auto& res : resources_) {
+			res->AddParentMatrix(node_.localMatrix);
+		}
 	}
 }
 
