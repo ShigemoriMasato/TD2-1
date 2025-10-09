@@ -14,7 +14,7 @@
 class DrawResource : public BaseResource {
 public:
 
-	DrawResource();
+	DrawResource() = default;
 	~DrawResource();
 
 	void Initialize(uint32_t vertexNum, uint32_t indexNum = 0, bool useMatrix = true);

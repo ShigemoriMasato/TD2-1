@@ -4,9 +4,6 @@
 
 using namespace Matrix;
 
-DrawResource::DrawResource() {
-}
-
 DrawResource::~DrawResource() {
 }
 
@@ -138,6 +135,9 @@ void DrawResource::DrawReady() {
 		lightDirection_ = lightDirection_.Normalize();
 		light_->direction = lightDirection_;
 	}
+
+	parentMatrices_.clear();
+
 }
 
 void DrawResource::AddParentMatrix(const Matrix4x4& parentMatrix) {

@@ -30,8 +30,14 @@ public:
 
 private:
 
-	std::vector<std::unique_ptr<DrawResource>> resources_;
+	Node CreateResource(Node node);
+
+	Node DrawReadyNode(Node node, PSOConfig config);
 
 	Node node_{};
 
+	std::unordered_map<std::string, int> textureMap_{};
+	std::vector<std::unique_ptr<DrawResource>> resources_{};
+
+	
 };

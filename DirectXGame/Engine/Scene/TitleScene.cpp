@@ -28,12 +28,6 @@ void TitleScene::Initialize() {
 	descModel_->psoConfig_.isSwapChain = true;
 	imguiWrapper_->AddItem("Desc", &worldMatrix_, &descTransform_);
 
-	triangle_ = std::make_unique<ParticleResource>();
-	triangle_->Initialize(3, 0, 10);
-	triangle_->localPos_ = { {0.0f,1.0f,0.0f},{1.0f,-1.0f,0.0f},{-1.0f,-1.0f,0.0f} };
-	triangle_->psoConfig_.isSwapChain = true;
-	triangle_->camera_ = camera_.get();
-
 	testEmitter_ = std::make_unique<DefaultEmitter>(1000);
 	testEmitter_->Initialize(camera_.get());
 
@@ -50,10 +44,6 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 
 	for (auto& grid : gridMaker_) {
 		grid->Update();
-	}
-
-	for (int i = 0; i < 10; ++i) {
-		triangle_->position_[i] = { (float)i - 5.0f, 0.0f, 0.0f };
 	}
 
 	camera_->MakeMatrix();
@@ -92,7 +82,8 @@ void TitleScene::Draw() {
 	for(auto& grid : gridMaker_) {
 		grid->Draw(render_);
 	}
-	render_->Draw(descModel_.get());
 
 	testEmitter_->Draw(render_);
+
+	render_->Draw(descModel_.get());
 }

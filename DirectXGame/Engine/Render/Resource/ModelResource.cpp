@@ -7,84 +7,83 @@ ModelResource::~ModelResource() {
 }
 
 void ModelResource::Initialize(ModelData* modelData) {
-	
-	auto vertices = modelData->GetVertices();
+	resources_.clear();
 
-	for(auto& [name, vertex] : vertices) {
-		auto resource = std::make_unique<DrawResource>();
-		resource->Initialize(static_cast<uint32_t>(vertex.size()), 0, true);
+	//ノードの保存
+	node_ = modelData->GetParentNode();
 
-		for (int i = 0; i < vertex.size(); ++i) {
-			resource->localPos_[i] = { vertex[i].position.x, vertex[i].position.y, vertex[i].position.z};
-			resource->texcoord_[i] = { vertex[i].texcoord.x, vertex[i].texcoord.y };
-			resource->normal_[i] = { vertex[i].normal.x, vertex[i].normal.y, vertex[i].normal.z };
-		}
-
-		resource->textureHandle_ = modelData->GetTextureHandle(name);
-		resources_.push_back(std::move(resource));
-	}
-
-	if (dynamic_cast<SkinningModelData*>(modelData)) {
-		node_ = dynamic_cast<SkinningModelData*>(modelData)->GetNode();
-	}
-
-	psoConfig_ = resources_.back()->psoConfig_;
+	//ノードのリソースを作成
+	node_ = CreateResource(node_);
 }
 
 void ModelResource::DrawReady() {
-	for (auto& res : resources_) {
-		res->psoConfig_ = psoConfig_;
-	}
+	node_ = DrawReadyNode(node_, psoConfig_);
+}
 
-	if (node_.name != "") {
-		for(auto& res : resources_) {
-			res->AddParentMatrix(node_.localMatrix);
+Node ModelResource::CreateResource(Node node) {
+	//ノードを元としてリソースをマテリアルの数だけ作成
+	for (const auto& [materialName, vertexData] : node.vertices) {
+		auto resource = std::make_unique<DrawResource>();
+		resource->Initialize(static_cast<uint32_t>(vertexData.size()), 0, true);
+
+		for (int i = 0; i < vertexData.size(); ++i) {
+
+			//頂点情報の入力
+			resource->localPos_[i] = { vertexData[i].position.x, vertexData[i].position.y, vertexData[i].position.z };
+			resource->texcoord_[i] = { vertexData[i].texcoord.x, vertexData[i].texcoord.y };
+			resource->normal_[i] = { vertexData[i].normal.x, vertexData[i].normal.y, vertexData[i].normal.z };
+
 		}
+
+		resources_.push_back(std::move(resource));
+		node.drawResource[materialName] = resources_.back().get();
 	}
+
+	//子ノードに対しても同様の処理
+	for(int i = 0; i < node.children.size(); ++i) {
+		node.children[i] = CreateResource(node.children[i]);
+	}
+
+	return node;
 }
 
-void ModelResource::SetMaterial(const uint32_t& color, const int textureHandle, const Vector2 texturePos, const float textureRotate) {
-	for (auto& res : resources_) {
-		res->color_ = color;
-		res->texturePos_ = texturePos;
-		res->textureRotate_ = textureRotate;
-		res->textureHandle_ = textureHandle;
+Node ModelResource::DrawReadyNode(Node node, PSOConfig config) {
+	for (const auto& [materialName, resource] : node.drawResource) {
+		resource->psoConfig_ = config;
+		resource->textureHandle_ = textureMap_[materialName];
+		resource->AddParentMatrix(node.localMatrix);
 	}
-}
 
-void ModelResource::SetLight(bool enableLighting, const uint32_t& color, const Vector3& direction, float intensity) {
-	for (auto& res : resources_) {
-		res->enableLighting_ = enableLighting;
-		res->lightColor_ = color;
-		res->lightDirection_ = direction;
-		res->lightIntensity_ = intensity;
+	for(auto& child : node.children) {
+		child = DrawReadyNode(child, config);
 	}
+
+	return node;
 }
 
 std::vector<DrawResource*> ModelResource::GetResources() {
 	std::vector<DrawResource*> res;
-	for (auto& r : resources_) {
-		res.push_back(r.get());
+	for (const auto& resource : resources_) {
+		res.push_back(resource.get());
 	}
 	return res;
 }
 
+void ModelResource::SetMaterial(const uint32_t& color, const int textureHandle, const Vector2 texturePos, const float textureRotate) {
+}
+
+void ModelResource::SetLight(bool enableLighting, const uint32_t& color, const Vector3& direction, float intensity) {
+}
+
 void ModelResource::SetMatrixData(Vector3 scale, Vector3 rotate, Vector3 pos) {
-	for (auto& res : resources_) {
-		res->scale_ = scale;
-		res->rotate_ = rotate;
-		res->position_ = pos;
-	}
+
 }
 
 void ModelResource::SetMatrixData(Matrix4x4 world) {
-	for (auto& res : resources_) {
-		res->SetWorldMatrix(world);
-	}
 }
 
 void ModelResource::SetCamera(Camera* camera) {
-	for (auto& res : resources_) {
-		res->camera_ = camera;
+	for(auto& resource : resources_) {
+		resource->camera_ = camera;
 	}
 }

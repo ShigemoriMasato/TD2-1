@@ -20,16 +20,24 @@ int ModelManager::LoadModel(const std::string& directoryPath) {
 	//objが見つからなかったら
 	if (objfile.size() != 1) {
 
-		auto glbfile = SearchFiles(basePath_ + directoryPath, ".gltf");
+		auto glbfile = SearchFiles(basePath_ + directoryPath, ".glb");
 
 		//glbも見つからなかったら
 		if (glbfile.size() != 1) {
+
+			auto gltffile = SearchFiles(basePath_ + directoryPath, ".gltf");
+
+			//gltfも見つからなかったら
+			if(gltffile.size() != 1) {
 			assert(false && "Can't find .obj or glb file");
 			return -1;
+			}
+
+			glbfile = gltffile;
 		}
 
 		//glbが見つかったら
-		LoadGlbFile(directoryPath, glbfile[0]);
+		LoadObjFile(directoryPath, glbfile[0]);
 
 	} else {
 
