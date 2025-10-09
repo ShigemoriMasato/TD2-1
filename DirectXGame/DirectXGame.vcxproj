@@ -15,6 +15,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AppSource\Game\BaseObject.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
     <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp" />
@@ -50,6 +51,7 @@
     <ClCompile Include="Engine\Tools\FPS\FPSObserver.cpp" />
     <ClCompile Include="AppSource\Game\Field\Field.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp" />
@@ -78,6 +80,7 @@
     <ClCompile Include="AppSource\Game\Player\Wire.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppSource\Game\BaseObject.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
     <ClInclude Include="Engine\Resource\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Render\Resource\Data\BaseResource.h" />
@@ -144,6 +147,7 @@
     <ClInclude Include="AppSource\Game\Player\Player.h" />
     <ClInclude Include="AppSource\Game\Player\Wire.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
+    <ClInclude Include="AppSource\Game\Scene\GameScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

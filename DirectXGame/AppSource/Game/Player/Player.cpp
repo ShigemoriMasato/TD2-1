@@ -6,17 +6,15 @@ Player::Player() {
 Player::~Player() {
 }
 
-void Player::Initialize(ModelData* modelData) {
-	//モデルリソースの作成
-	modelResource_ = std::make_unique<ModelResource>();
-	modelResource_->Initialize(modelData);
+void Player::Initialize(ModelData* modelData, Camera* camera) {
+	BaseObject::Initialize(modelData,camera);
+
+	modelResource_->psoConfig_.isSwapChain = true;
 }
 
 void Player::Update() {
 	//更新
+
+
 }
 
-void Player::Draw(Render* render) {
-	//描画
-	render->Draw(modelResource_.get());
-}
