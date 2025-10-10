@@ -6,7 +6,7 @@
 
 #include <assimp/postprocess.h>
 
-void ModelData::LoadModel(const std::string& directoryPath, const std::string& filename, TextureManager* textureManager) {
+void ModelData::LoadModel(const std::string& directoryPath, const std::string& filename, TextureManager* textureManager, DXDevice* device) {
     Assimp::Importer importer;
     std::string path = (directoryPath + "/" + filename);
     const aiScene* scene = nullptr;
@@ -15,39 +15,23 @@ void ModelData::LoadModel(const std::string& directoryPath, const std::string& f
 	LoadMaterial(scene, directoryPath, textureManager);
 
 	rootNode_ = LoadNode(scene->mRootNode, scene);
-}
 
-void ModelData::SetTextureHandle(std::string materialName, int textureHandle) {
-    for (auto& m : material) {
-        if (m.name == materialName) {
-            m.textureHandle = textureHandle;
-            return;
-        }
-	}
-}
-
-int ModelData::GetTextureHandle(std::string materialName) const {
-    for (auto m : material) {
-        if (m.name == materialName) {
-            return m.textureHandle;
-        }
-    }
-    return -1;
+	CreateID3D12Resource(device->GetDevice());
 }
 
 void ModelData::LoadMaterial(const aiScene* scene, std::string directoryPath, TextureManager* textureManager) {
     for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
         aiMaterial* material = scene->mMaterials[materialIndex];
 
-        this->material.push_back(ModelMaterial());
-        this->material[materialIndex].name = material->GetName().C_Str();
+        this->material_.push_back(ModelMaterial());
+        this->material_[materialIndex].name = material->GetName().C_Str();
 
         if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
             aiString textureFilePath;
             material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-            this->material.back().textureHandle = textureManager->LoadTexture(directoryPath + "/" + std::string(textureFilePath.C_Str()));
+            this->material_.back().textureHandle = textureManager->LoadTexture(directoryPath + "/" + std::string(textureFilePath.C_Str()));
         } else {
-            this->material.back().textureHandle = 0; //テクスチャがなかったら白テクスチャを使う
+            this->material_.back().textureHandle = 0; //テクスチャがなかったら白テクスチャを使う
         }
     }
 
@@ -56,15 +40,14 @@ void ModelData::LoadMaterial(const aiScene* scene, std::string directoryPath, Te
 Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
     Node result{};
 	result.name = node->mName.C_Str();
+    result.nodeIndex = nodeCount_;
 	aiMatrix4x4 mat = node->mTransformation;
-
+    
     for(int i = 0; i < 4; ++i) {
         for(int j = 0; j < 4; ++j) {
             result.localMatrix.m[i][j] = mat[j][i];
         }
 	}
-
-    std::unordered_map<std::string, std::vector<VertexData>> vertices;
 
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
         unsigned int meshIndex = node->mMeshes[i];
@@ -73,7 +56,7 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
 		assert(mesh->HasTextureCoords(0));
 
         for (unsigned int v = 0; v < mesh->mNumVertices; ++v) {
-            VertexData vertex{};
+            ModelVertexData vertex{};
 
             vertex.position.x = mesh->mVertices[v].x;
             vertex.position.y = mesh->mVertices[v].y;
@@ -89,7 +72,9 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
             vertex.position.x *= -1.0f;
             vertex.normal.x *= -1.0f;
 
-            vertices[""].push_back(vertex);
+			vertex.nodeIndex = nodeCount_;
+
+            vertices_[scene->mMaterials[mesh->mMaterialIndex]->GetName().C_Str()].push_back(vertex);
         }
 
         for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
@@ -98,14 +83,14 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
 
             for (unsigned int v = 0; v < face.mNumIndices; v++) {
                 int localIndex = face.mIndices[v];
-				//indecies.push_back(localIndex);
+				indices_[scene->mMaterials[mesh->mMaterialIndex]->GetName().C_Str()].push_back(localIndex);
             }//vertex
 
         }//mesh
 
     }//node
 
-    result.vertices = vertices;
+    nodeCount_++;
 
     // --- 子ノードを再帰的に処理する ---
     for (unsigned int i = 0; i < node->mNumChildren; i++) {
@@ -113,4 +98,54 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
     }
 
     return result;
+}
+
+void ModelData::CreateID3D12Resource(ID3D12Device* device) {
+    for (auto& [material, vertex] : vertices_) {
+        VertexResource res{};
+        //超点数
+        res.vertexNum = static_cast<int>(vertex.size());
+
+        //頂点リソースの作成
+        res.resource = CreateBufferResource(device, sizeof(ModelVertexData) * res.vertexNum);
+
+        //データの読み込み
+		ModelVertexData* mappedData = nullptr;
+        res.resource->Map(0, nullptr, (void**)&mappedData);
+        memcpy(mappedData, vertex.data(), sizeof(ModelVertexData) * res.vertexNum);
+		res.resource->Unmap(0, nullptr);
+
+        //BufferViewの作成
+		res.bufferView = std::make_shared<D3D12_VERTEX_BUFFER_VIEW>();
+        res.bufferView->BufferLocation = res.resource->GetGPUVirtualAddress();
+        res.bufferView->SizeInBytes = sizeof(ModelVertexData) * res.vertexNum;
+        res.bufferView->StrideInBytes = sizeof(ModelVertexData);
+
+		//登録
+		vertexBufferViews_[material] = res;
+    }
+
+    for (auto& [material, index] : indices_) {
+        IndexResource res{};
+        //インデックス数
+        res.indexNum = static_cast<int>(index.size());
+
+        //頂点リソースの作成
+        res.indexBuffer = CreateBufferResource(device, sizeof(uint32_t) * res.indexNum);
+
+        //データの読み込み
+		uint32_t* mappedData = nullptr;
+        res.indexBuffer->Map(0, nullptr, (void**)&mappedData);
+		memcpy(mappedData, index.data(), sizeof(uint32_t) * res.indexNum);
+		res.indexBuffer->Unmap(0, nullptr);
+
+        //BufferViewの作成
+		res.bufferView = std::make_shared<D3D12_INDEX_BUFFER_VIEW>();
+        res.bufferView->BufferLocation = res.indexBuffer->GetGPUVirtualAddress();
+        res.bufferView->SizeInBytes = sizeof(uint32_t) * res.indexNum;
+		res.bufferView->Format = DXGI_FORMAT_R32_UINT;
+
+		//登録
+		indexBufferViews_[material] = res;
+    }
 }

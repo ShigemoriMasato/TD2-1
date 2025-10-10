@@ -3,8 +3,9 @@
 
 namespace fs = std::filesystem;
 
-ModelManager::ModelManager(TextureManager* textureManager) {
+ModelManager::ModelManager(TextureManager* textureManager, DXDevice* device) {
 	textureManager_ = textureManager;
+	device_ = device;
 }
 
 ModelManager::~ModelManager() {
@@ -33,18 +34,18 @@ int ModelManager::LoadModel(const std::string& directoryPath) {
 			return -1;
 			}
 
+			//gltfが見つかったら
 			glbfile = gltffile;
 		}
 
 		//glbが見つかったら
-		LoadObjFile(directoryPath, glbfile[0]);
+		objfile = glbfile;
 
-	} else {
+	} 
 
-		//objが見つかったら
-		LoadObjFile(directoryPath, objfile[0]);
-
-	}
+	//モデルの読み込み
+	models_.push_back(std::make_unique<ModelData>());
+	models_.back()->LoadModel(basePath_ + directoryPath, objfile[0], textureManager_, device_);
 
 	this->modelHandleMap_[directoryPath] = int(models_.size() - 1);
 
@@ -56,14 +57,4 @@ ModelData* ModelManager::GetModelData(int modelHandle) {
 		return nullptr;
 	}
 	return models_[modelHandle].get();
-}
-
-void ModelManager::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
-	models_.push_back(std::make_unique<ModelData>());
-	models_.back()->LoadModel(basePath_ + directoryPath, filename, textureManager_);
-}
-
-void ModelManager::LoadGlbFile(const std::string& directoryPath, const std::string& filename) {
-	models_.push_back(std::make_unique<SkinningModelData>());
-	models_.back()->LoadModel(basePath_ + directoryPath, filename, textureManager_);
 }

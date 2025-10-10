@@ -9,7 +9,6 @@ Player::~Player() {
 void Player::Initialize(ModelData* modelData) {
 	//モデルリソースの作成
 	modelResource_ = std::make_unique<ModelResource>();
-	modelResource_->Initialize(modelData);
 }
 
 void Player::Update() {

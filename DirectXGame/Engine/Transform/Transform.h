@@ -21,6 +21,13 @@ struct VertexData final {
 	Vector3 normal;
 };
 
+struct ModelVertexData final {
+	Vector4 position;
+	Vector2 texcoord;
+	Vector3 normal;
+	int nodeIndex;
+};
+
 struct Material final {
 	Vector4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	Matrix4x4 uvTransform = {

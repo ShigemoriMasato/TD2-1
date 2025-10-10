@@ -19,10 +19,10 @@ void TitleScene::Initialize() {
 		gridMaker_.push_back(std::move(grid));
 	}
 
-	descHandle_ = modelManager_->LoadModel("cube");
+	descHandle_ = modelManager_->LoadModel("DefaultDesc");
 	descModel_ = std::make_unique<ModelResource>();
-	descModel_->Initialize(modelManager_->GetModelData(descHandle_));
-	descModel_->SetCamera(camera_.get());
+	descModel_->Initialize(modelManager_, descHandle_);
+	descModel_->camera_ = camera_.get();
 	descTransform_ = {};
 	descTransform_.scale = { 1.0f, 1.0f, 1.0f };
 	descModel_->psoConfig_.isSwapChain = true;
@@ -62,8 +62,6 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 
 	// ====================- GuIzmoテスト -============================
 	imguiWrapper_->GuizmoUpdate();
-	descModel_->SetMatrixData(descTransform_.scale, descTransform_.rotation, descTransform_.position);
-
 
 	// ====================- Input系のテスト -==========================
 	ImGui::Begin("Input");
