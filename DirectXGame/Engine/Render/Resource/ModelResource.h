@@ -15,6 +15,16 @@ struct ModelDrawData {
 class ModelResource {
 public:
 
+	struct NodeTransform {
+		Vector3 scale = { 1.0f, 1.0f, 1.0f };
+		Vector3 rotate = { 0.0f, 0.0f, 0.0f };
+		Vector3 translate = { 0.0f, 0.0f, 0.0f };
+		Matrix4x4 localMatrix = Matrix::MakeIdentity4x4();
+		std::string name;
+		std::vector<NodeTransform> children;
+		int nodeIndex = -1;
+	};
+
 	static void StaticInitialize(DXDevice* device, SRVManager* srvManager) {
 		dxDevice_ = device;
 		srvManager_ = srvManager;
@@ -40,15 +50,17 @@ public:
 
 	uint32_t color_ = 0xffffffff;
 
+	NodeTransform node_{};
+
 	Camera* camera_ = nullptr;
 
 	PSOConfig psoConfig_{};
 
 private:
 
-	void DrawReadyNode(Node node, const Matrix4x4& parentMatrix);
+	NodeTransform ConvertNodeToTransform(const Node& node);
 
-	Node node_{};
+	void DrawReadyNode(NodeTransform node, const Matrix4x4& parentMatrix);
 
 	std::unordered_map<std::string, ModelDrawData> modelDrawDatas_{};
 

@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.4.56",
+		"generator":"Khronos glTF Blender I/O v4.5.48",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -16,9 +16,15 @@
 		{
 			"mesh":0,
 			"name":"Cube.001",
+			"rotation":[
+				0,
+				0.9170660972595215,
+				0,
+				0.39873525500297546
+			],
 			"translation":[
 				0,
-				2.6974408626556396,
+				2.6974411010742188,
 				0
 			]
 		},
@@ -27,7 +33,13 @@
 				0
 			],
 			"mesh":1,
-			"name":"Cube"
+			"name":"Cube",
+			"rotation":[
+				-0.13010753691196442,
+				-0.02405793033540249,
+				0.003110636258497834,
+				0.9912031292915344
+			]
 		}
 	],
 	"materials":[
@@ -203,7 +215,7 @@
 	"buffers":[
 		{
 			"byteLength":1608,
-			"uri":"Cube.bin"
+			"uri":"cube.bin"
 		}
 	]
 }

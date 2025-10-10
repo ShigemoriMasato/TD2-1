@@ -10,7 +10,7 @@ void ModelData::LoadModel(const std::string& directoryPath, const std::string& f
     Assimp::Importer importer;
     std::string path = (directoryPath + "/" + filename);
     const aiScene* scene = nullptr;
-    scene = importer.ReadFile(path.c_str(), aiProcess_FlipWindingOrder | aiProcess_MakeLeftHanded | aiProcess_Triangulate);
+    scene = importer.ReadFile(path.c_str(), aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate);
 
 	LoadMaterial(scene, directoryPath, textureManager);
 
@@ -42,7 +42,7 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
 	result.name = node->mName.C_Str();
     result.nodeIndex = nodeCount_;
 	aiMatrix4x4 mat = node->mTransformation;
-    
+
     for(int i = 0; i < 4; ++i) {
         for(int j = 0; j < 4; ++j) {
             result.localMatrix.m[i][j] = mat[j][i];
@@ -50,39 +50,30 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
 	}
 
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-        unsigned int meshIndex = node->mMeshes[i];
-        aiMesh* mesh = scene->mMeshes[meshIndex];
-		assert(mesh->HasNormals());
-		assert(mesh->HasTextureCoords(0));
+        aiMesh* mesh = scene->mMeshes[i];
 
-        for (unsigned int v = 0; v < mesh->mNumVertices; ++v) {
-            ModelVertexData vertex{};
+        for (uint32_t v = 0; v < mesh->mNumVertices; ++v) {
+            aiVector3D pos = mesh->mVertices[v];
+            aiVector3D normal = mesh->HasNormals() ? mesh->mNormals[v] : aiVector3D(0, 1, 0);
+            aiVector3D tex = mesh->HasTextureCoords(0) ? mesh->mTextureCoords[0][v] : aiVector3D(0, 0, 0);
 
-            vertex.position.x = mesh->mVertices[v].x;
-            vertex.position.y = mesh->mVertices[v].y;
-            vertex.position.z = mesh->mVertices[v].z;
+            ModelVertexData vertexData{};
+            vertexData.position = { pos.x,pos.y,pos.z,1.0f };
+            vertexData.normal = { normal.x,normal.y,normal.z };
+            vertexData.texcoord = { tex.x,tex.y };
 
-            vertex.normal.x = mesh->mNormals[v].x;
-            vertex.normal.y = mesh->mNormals[v].y;
-            vertex.normal.z = mesh->mNormals[v].z;
+			vertexData.nodeIndex = result.nodeIndex;
 
-            vertex.texcoord.x = mesh->mTextureCoords[0][v].x;
-            vertex.texcoord.y = mesh->mTextureCoords[0][v].y;
-
-            vertex.position.x *= -1.0f;
-            vertex.normal.x *= -1.0f;
-
-			vertex.nodeIndex = nodeCount_;
-
-            vertices_[scene->mMaterials[mesh->mMaterialIndex]->GetName().C_Str()].push_back(vertex);
+            vertices_[scene->mMaterials[mesh->mMaterialIndex]->GetName().C_Str()].push_back(vertexData);
         }
 
         for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
+			int indexOffset = static_cast<int>(vertices_[scene->mMaterials[mesh->mMaterialIndex]->GetName().C_Str()].size()) - static_cast<int>(mesh->mNumVertices);
             assert(face.mNumIndices == 3); //三角形以外は非対応
 
             for (unsigned int v = 0; v < face.mNumIndices; v++) {
-                int localIndex = face.mIndices[v];
+                int localIndex = face.mIndices[v] + indexOffset;
 				indices_[scene->mMaterials[mesh->mMaterialIndex]->GetName().C_Str()].push_back(localIndex);
             }//vertex
 
@@ -107,7 +98,7 @@ void ModelData::CreateID3D12Resource(ID3D12Device* device) {
         res.vertexNum = static_cast<int>(vertex.size());
 
         //頂点リソースの作成
-        res.resource = CreateBufferResource(device, sizeof(ModelVertexData) * res.vertexNum);
+        res.resource.Attach(CreateBufferResource(device, sizeof(ModelVertexData) * res.vertexNum));
 
         //データの読み込み
 		ModelVertexData* mappedData = nullptr;
@@ -131,7 +122,7 @@ void ModelData::CreateID3D12Resource(ID3D12Device* device) {
         res.indexNum = static_cast<int>(index.size());
 
         //頂点リソースの作成
-        res.indexBuffer = CreateBufferResource(device, sizeof(uint32_t) * res.indexNum);
+        res.indexBuffer.Attach(CreateBufferResource(device, sizeof(uint32_t) * res.indexNum));
 
         //データの読み込み
 		uint32_t* mappedData = nullptr;

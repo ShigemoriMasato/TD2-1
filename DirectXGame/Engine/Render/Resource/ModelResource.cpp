@@ -16,7 +16,7 @@ void ModelResource::Initialize(ModelManager* manager, int modelHandle) {
 		return;
 	}
 
-	node_ = modelData->GetParentNode();
+	node_ = ConvertNodeToTransform(modelData->GetParentNode());
 
 	//データのコピー
 	auto vertex = modelData->GetVertexResource();
@@ -73,11 +73,24 @@ void ModelResource::DrawReady() {
 	DrawReadyNode(node_, Matrix::MakeIdentity4x4());
 }
 
-void ModelResource::DrawReadyNode(Node node, const Matrix4x4& parentMatrix) {
+ModelResource::NodeTransform ModelResource::ConvertNodeToTransform(const Node& node) {
+	NodeTransform result{};
+	result.localMatrix = node.localMatrix;
+	result.name = node.name;
+	result.nodeIndex = node.nodeIndex;
+	for (const auto& child : node.children) {
+		result.children.push_back(ConvertNodeToTransform(child));
+	}
+
+	return result;
+}
+
+void ModelResource::DrawReadyNode(NodeTransform node, const Matrix4x4& parentMatrix) {
 
 	Matrix4x4 worldMatrix = Matrix::MakeScaleMatrix(scale_) * Matrix::MakeRotationMatrix(rotate_) * Matrix::MakeTranslationMatrix(position_);
+	Matrix4x4 localMatrix = Matrix::MakeScaleMatrix(node.scale) * Matrix::MakeRotationMatrix(node.rotate) * Matrix::MakeTranslationMatrix(node.translate);
 
-	matrix_[node.nodeIndex].world = parentMatrix * node.localMatrix * worldMatrix;
+	matrix_[node.nodeIndex].world = parentMatrix * node.localMatrix * localMatrix * worldMatrix;
 	matrix_[node.nodeIndex].wvp = matrix_[node.nodeIndex].world * camera_->GetVPMatrix();
 
 	for(auto& child : node.children) {
