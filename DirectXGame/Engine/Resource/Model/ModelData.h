@@ -17,9 +17,26 @@ struct ModelMaterial final {
 
 struct Node {
 	Matrix4x4 localMatrix = Matrix::MakeIdentity4x4();
+	Matrix4x4 worldMatrix = Matrix::MakeIdentity4x4();
 	std::string name{};
+	int parentIndex = -1;
+
+	int boneIndex = -1;
+
+	//アニメーション関係
+	Vector3 translation = { 0.0f,0.0f,0.0f };
+	Quaternion rotation = { 1.0f,0.0f,0.0f,0.0f };
+	Vector3 scale = { 1.0f,1.0f,1.0f };
+};
+
+struct Bone {
+	std::string name;
+	int parentIndex = -1;
+	Matrix4x4 offsetMatrix = Matrix::MakeIdentity4x4();
+	Matrix4x4 localMatrix = Matrix::MakeIdentity4x4();
+	Matrix4x4 worldMatrix = Matrix::MakeIdentity4x4();
+
 	int nodeIndex = -1;
-	std::vector<Node> children{};
 };
 
 class ModelData {
@@ -42,16 +59,17 @@ public:
 
 	virtual void LoadModel(const std::string& directoryPath, const std::string& filename, TextureManager* textureManager, DXDevice* device);
 
-	Node GetParentNode() { return rootNode_; }
+	std::vector<Node> GetParentNode() { return nodes_; }
 	std::unordered_map<std::string, VertexResource> GetVertexResource() const { return vertexBufferViews_; }
 	std::unordered_map<std::string, IndexResource> GetIndexResource() const { return indexBufferViews_; }
 	std::vector<ModelMaterial> GetMaterials() const { return material_; }
 	int GetNodeCount() const { return nodeCount_; }
+	std::vector<Bone> GetBones() const { return bones_; }
 
 protected:
 
 	void LoadMaterial(const aiScene* scene, std::string directoryPath, TextureManager* textureManager);
-	Node LoadNode(aiNode* node, const aiScene* scene);
+	void LoadNode(aiNode* node, const aiScene* scene, int parentIndex = -1);
 	void CreateID3D12Resource(ID3D12Device* device);
 
 	std::vector<ModelMaterial> material_{};
@@ -61,9 +79,13 @@ protected:
 	std::unordered_map<std::string, VertexResource> vertexBufferViews_{};
 	std::unordered_map<std::string, IndexResource> indexBufferViews_{};
 
-	int nodeCount_ = 0;
+	std::unordered_map<std::string, int> boneMap_{};
+	std::vector<Bone> bones_{};
 
-	Node rootNode_{};
+	std::unordered_map<std::string, int> nodeMap_{};
+	std::vector<Node> nodes_{};
+
+	int nodeCount_ = 0;
 
 };
 

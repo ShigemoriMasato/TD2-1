@@ -19,7 +19,7 @@ void TitleScene::Initialize() {
 		gridMaker_.push_back(std::move(grid));
 	}
 
-	descHandle_ = modelManager_->LoadModel("cube");
+	descHandle_ = modelManager_->LoadModel("Cube");
 	descModel_ = std::make_unique<ModelResource>();
 	descModel_->Initialize(modelManager_, descHandle_);
 	descModel_->camera_ = camera_.get();
@@ -69,6 +69,13 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 		ImGui::Text("%d : %d", i, keys_[Key(i)]);
 	}
 	ImGui::End();
+
+	// ====================- Quaternion -==========================
+	ImGui::Begin("Quaternion");
+	ImGui::DragFloat4("Quaternion", &descModel_->rotate_.w, 0.01f);
+	ImGui::End();
+
+	descModel_->rotate_ = descModel_->rotate_.Normalize();
 
 	return std::unique_ptr<BaseScene>();
 }

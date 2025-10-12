@@ -1,13 +1,11 @@
 #include "Model.hlsli"
 
-struct Material
+cbuffer Material : register(b0)
 {
     float4 color;
     float4x4 uvTransform;
     float shininess;
 };
-
-ConstantBuffer<Material> gMaterial : register(b0);
 
 struct PixelShaderOutput
 {
@@ -20,10 +18,10 @@ SamplerState gSampler : register(s0);
 PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
-    float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
+    float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, input.texcoord);
     
-    output.color = textureColor * gMaterial.color;
+    output.color = textureColor * color;
     
     if (output.color.w < 0.02f)
     {

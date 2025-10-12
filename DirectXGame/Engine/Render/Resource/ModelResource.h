@@ -15,16 +15,6 @@ struct ModelDrawData {
 class ModelResource {
 public:
 
-	struct NodeTransform {
-		Vector3 scale = { 1.0f, 1.0f, 1.0f };
-		Vector3 rotate = { 0.0f, 0.0f, 0.0f };
-		Vector3 translate = { 0.0f, 0.0f, 0.0f };
-		Matrix4x4 localMatrix = Matrix::MakeIdentity4x4();
-		std::string name;
-		std::vector<NodeTransform> children;
-		int nodeIndex = -1;
-	};
-
 	static void StaticInitialize(DXDevice* device, SRVManager* srvManager) {
 		dxDevice_ = device;
 		srvManager_ = srvManager;
@@ -38,6 +28,7 @@ public:
 	std::unordered_map<std::string, ModelDrawData> GetModelDrawDatas() const { return modelDrawDatas_; }
 	ID3D12Resource* GetMaterialResource() const { return materialResource_.Get(); }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetMatrixSRVDesc() const { return matrixGPUHandle_; }
+	ID3D12Resource* GetBoneResource() const { return boneResource_.Get(); }
 
 	/// <summary>
 	/// 描画前準備(Render内で呼ばれるため、プログラム時に呼ぶ必要はない)
@@ -45,30 +36,33 @@ public:
 	void DrawReady();
 
 	Vector3 position_{};
-	Vector3 rotate_{};
+	Quaternion rotate_{};
 	Vector3 scale_ = { 1.0f, 1.0f, 1.0f };
 
 	uint32_t color_ = 0xffffffff;
 
-	NodeTransform node_{};
+	std::vector<Node> node_{};
 
 	Camera* camera_ = nullptr;
+
+	std::vector<Bone> bones_{};
 
 	PSOConfig psoConfig_{};
 
 private:
 
-	NodeTransform ConvertNodeToTransform(const Node& node);
-
-	void DrawReadyNode(NodeTransform node, const Matrix4x4& parentMatrix);
+	void DrawReadyNodeAndBone();
 
 	std::unordered_map<std::string, ModelDrawData> modelDrawDatas_{};
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> matrixResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> boneResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
 	D3D12_GPU_DESCRIPTOR_HANDLE matrixGPUHandle_ = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE boneGPUHandle_ = {};
 
-	MatrixData* matrix_ = nullptr;
+	ModelMatrixData* matrix_ = nullptr;
+	BoneMatrix* bone_ = nullptr;
 	Material* material_ = nullptr;
 
 	static DXDevice* dxDevice_;

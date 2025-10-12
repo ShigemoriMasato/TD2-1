@@ -10,19 +10,26 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
 
 #pragma region DescriptorTable
 
-	//テクスチャ1枚用のDescriptorRange
+	//PIXELShader,Register0
     D3D12_DESCRIPTOR_RANGE textureDescriptor[1] = {};
     textureDescriptor[0].BaseShaderRegister = 0;
     textureDescriptor[0].NumDescriptors = 1;
     textureDescriptor[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
     textureDescriptor[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	//ParticleDataのDescriptorRange
+	//VertexShader,Register0
 	D3D12_DESCRIPTOR_RANGE instancingDescriptor[1] = {};
     instancingDescriptor[0].BaseShaderRegister = 0;
     instancingDescriptor[0].NumDescriptors = 1;
     instancingDescriptor[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
     instancingDescriptor[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	//VertexShader,Register1
+    D3D12_DESCRIPTOR_RANGE matrixDescriptor[1] = {};
+    matrixDescriptor[0].BaseShaderRegister = 1;
+    matrixDescriptor[0].NumDescriptors = 1;
+    matrixDescriptor[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	matrixDescriptor[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 #pragma endregion
 
@@ -149,7 +156,7 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
         descriptionRootSignature.Flags =
             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
         //RootParameter作成
-        D3D12_ROOT_PARAMETER rootParameters[3] = {};
+        D3D12_ROOT_PARAMETER rootParameters[4] = {};
         //Material
         rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
         rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     //PixelShaderで使う
@@ -159,11 +166,15 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
         rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;                //VertexShaderで使う
         rootParameters[1].DescriptorTable.pDescriptorRanges = instancingDescriptor;         //テーブルの中身
         rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(instancingDescriptor); //テーブルの数
+		//BoneMatrix
+        rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
+        rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;     //PixelShaderで使う
+        rootParameters[2].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
 		//Texture
-		rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
-		rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
-		rootParameters[2].DescriptorTable.pDescriptorRanges = textureDescriptor;	//テーブルの中身
-		rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(textureDescriptor);	//テーブルの数
+		rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
+		rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
+		rootParameters[3].DescriptorTable.pDescriptorRanges = textureDescriptor;	//テーブルの中身
+		rootParameters[3].DescriptorTable.NumDescriptorRanges = _countof(textureDescriptor);	//テーブルの数
 
         descriptionRootSignature.pParameters = rootParameters;                  //ルートパラメータ配列へのポインタ
         descriptionRootSignature.NumParameters = _countof(rootParameters);      //配列の長さ

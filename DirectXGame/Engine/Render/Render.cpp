@@ -233,8 +233,10 @@ void Render::Draw(ModelResource* resource) {
 		commandList->SetGraphicsRootConstantBufferView(0, resource->GetMaterialResource()->GetGPUVirtualAddress());
         //Matrixのポインタを設定
         commandList->SetGraphicsRootDescriptorTable(1, resource->GetMatrixSRVDesc());
+        //bone
+        commandList->SetGraphicsRootConstantBufferView(2, resource->GetBoneResource()->GetGPUVirtualAddress());
         //Texture
-        commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureData(drawData.textureHandle)->GetTextureGPUHandle());
+        commandList->SetGraphicsRootDescriptorTable(3, textureManager_->GetTextureData(drawData.textureHandle)->GetTextureGPUHandle());
         //インデックスがある場合は、インデックスを設定して描画
         commandList->DrawIndexedInstanced(drawData.indexNum, 1, 0, 0, 0);
 	}
