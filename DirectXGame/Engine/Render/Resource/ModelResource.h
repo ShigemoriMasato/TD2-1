@@ -34,6 +34,7 @@ public:
 	~ModelResource();
 
 	void Initialize(ModelManager* manager, int modelHandle);
+	void Initialize(ModelData* modelData);
 
 	std::unordered_map<std::string, ModelDrawData> GetModelDrawDatas() const { return modelDrawDatas_; }
 	ID3D12Resource* GetMaterialResource() const { return materialResource_.Get(); }

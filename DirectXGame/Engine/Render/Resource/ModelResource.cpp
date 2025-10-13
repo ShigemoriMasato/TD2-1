@@ -16,6 +16,10 @@ void ModelResource::Initialize(ModelManager* manager, int modelHandle) {
 		return;
 	}
 
+	Initialize(modelData);
+}
+
+void ModelResource::Initialize(ModelData* modelData) {
 	node_ = ConvertNodeToTransform(modelData->GetParentNode());
 
 	//データのコピー
