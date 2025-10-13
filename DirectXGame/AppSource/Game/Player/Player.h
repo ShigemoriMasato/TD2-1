@@ -1,29 +1,17 @@
 #pragma once
-#include <Render/Resource/ModelResource.h>
-#include <Render/Render.h>
+#include"../BaseObject.h"
 
-#include <memory>
 
-class Player {
+class Player : public BaseObject {
 public:
 
 	Player();
 	~Player();
 
-	void Initialize(ModelData* modelData);
-	void Update();
-	void Draw(Render* render);
-
-
+	void Initialize(ModelData* modelData, Camera* camera)override;
+	void Update()override;
 
 private:
-
-	std::unique_ptr<ModelResource> modelResource_;
-
-	const float jumpSpeed_ = 1.0f;
-	const float gravity_ = 9.8f;
-
-	const float xSpeed_ = 1.0f;
 
 };
 
