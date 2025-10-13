@@ -6,6 +6,7 @@ Player::Player() {
 Player::~Player() {
 }
 
+
 void Player::Initialize(ModelData* modelData, Camera* camera) {
 	BaseObject::Initialize(modelData,camera);
 

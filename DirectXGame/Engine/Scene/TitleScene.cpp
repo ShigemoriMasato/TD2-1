@@ -19,20 +19,14 @@ void TitleScene::Initialize() {
 		gridMaker_.push_back(std::move(grid));
 	}
 
-	descHandle_ = modelManager_->LoadModel("DefaultDesc");
+	descHandle_ = modelManager_->LoadModel("cube");
 	descModel_ = std::make_unique<ModelResource>();
-	descModel_->Initialize(modelManager_->GetModelData(descHandle_));
-	descModel_->SetCamera(camera_.get());
+	descModel_->Initialize(modelManager_, descHandle_);
+	descModel_->camera_ = camera_.get();
 	descTransform_ = {};
 	descTransform_.scale = { 1.0f, 1.0f, 1.0f };
 	descModel_->psoConfig_.isSwapChain = true;
 	imguiWrapper_->AddItem("Desc", &worldMatrix_, &descTransform_);
-
-	triangle_ = std::make_unique<ParticleResource>();
-	triangle_->Initialize(3, 0, 10);
-	triangle_->localPos_ = { {0.0f,1.0f,0.0f},{1.0f,-1.0f,0.0f},{-1.0f,-1.0f,0.0f} };
-	triangle_->psoConfig_.isSwapChain = true;
-	triangle_->camera_ = camera_.get();
 
 	testEmitter_ = std::make_unique<DefaultEmitter>(1000);
 	testEmitter_->Initialize(camera_.get());
@@ -52,10 +46,6 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 		grid->Update();
 	}
 
-	for (int i = 0; i < 10; ++i) {
-		triangle_->position_[i] = { (float)i - 5.0f, 0.0f, 0.0f };
-	}
-
 	camera_->MakeMatrix();
 	testEmitter_->Update();
 
@@ -72,8 +62,6 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 
 	// ====================- GuIzmoテスト -============================
 	imguiWrapper_->GuizmoUpdate();
-	descModel_->SetMatrixData(descTransform_.scale, descTransform_.rotation, descTransform_.position);
-
 
 	// ====================- Input系のテスト -==========================
 	ImGui::Begin("Input");
@@ -92,6 +80,7 @@ void TitleScene::Draw() {
 	for(auto& grid : gridMaker_) {
 		grid->Draw(render_);
 	}
+
 	render_->Draw(descModel_.get());
 
 	testEmitter_->Draw(render_);

@@ -7,7 +7,7 @@ CommonData::CommonData() {
 	keyManager_->SetKey(Key::Right, DIK_D, KeyState::Hold);
 	keyManager_->SetKey(Key::Right, DIK_RIGHTARROW, KeyState::Hold);
 	keyManager_->SetButton(Key::Right, XBoxController::kRight, KeyState::Hold);
-	keyManager_->SetStick(Key::Right, false, 0.5f);
+	keyManager_->SetStick(Key::Right, true, 0.5f);
 
 	keyManager_->SetKey(Key::Left, DIK_A, KeyState::Hold);
 	keyManager_->SetKey(Key::Left, DIK_LEFTARROW, KeyState::Hold);
