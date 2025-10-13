@@ -45,7 +45,8 @@ void KeyManager::Update() {
 
 	for (const auto& [action, stick] : stickMap_) {
 		//履歴を作成する
-		stickHistory_.back()[stick.first] = Input::GetXBoxStickState(int(stick.first)).x;
+		stickHistory_.back()[stick.first].x = Input::GetXBoxStickState(int(stick.first)).x;
+		stickHistory_.back()[stick.first].y = Input::GetXBoxStickState(int(stick.first)).y;
 	}
 
 	// ================- keyの最終的な状態の更新 -================
@@ -126,10 +127,12 @@ void KeyManager::Update() {
 		//最終的な状態
 		bool state = false;
 
+		///xかyか
+		int isX = static_cast<int>(stick.second.first);
 		//目標のスティックの倒れ具合
-		float toggleValue = stick.second;
+		float toggleValue = stick.second.second;
 		//現在のスティックの倒れ具合
-		float currentValue = stickHistory_.back()[stick.first];
+		float currentValue = (&stickHistory_.back()[stick.first].x)[isX];
 
 		//スティックの倒れ具合がtoggleValueを超えたらtrueにする
 		if (toggleValue > 0) {
@@ -164,6 +167,6 @@ void KeyManager::SetButton(Key action, XBoxController button, KeyState state) {
 	buttonMap_[action].emplace_back(button, state);
 }
 
-void KeyManager::SetStick(Key action, bool isLeft, float toggleValue) {
-	stickMap_[action] = { isLeft ? Direction::Left : Direction::Right, toggleValue };
+void KeyManager::SetStick(Key action, bool isLeft, bool isY, float toggleValue) {
+	stickMap_[action] = { isLeft ? Direction::Left : Direction::Right, {isY, toggleValue} };
 }
