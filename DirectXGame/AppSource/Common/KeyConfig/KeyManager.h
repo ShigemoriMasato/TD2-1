@@ -38,7 +38,7 @@ public:
 
 	void SetKey(Key action, uint8_t DIK, KeyState state = KeyState::Release);
 	void SetButton(Key action, XBoxController button, KeyState state);
-	void SetStick(Key action, bool isLeft, float toggleValue);
+	void SetStick(Key action, bool isLeft, bool isY, float toggleValue);
 
 private:
 
@@ -50,12 +50,12 @@ private:
 	//Keyに割り当てられているDIKと状態
 	std::unordered_map<Key, std::vector<std::pair<uint8_t, KeyState>>> keyMap_;
 	std::unordered_map<Key, std::vector<std::pair<XBoxController, KeyState>>> buttonMap_;
-	std::unordered_map<Key, std::pair<Direction, float>> stickMap_;
+	std::unordered_map<Key, std::pair<Direction, std::pair<bool, float>>> stickMap_;
 
 	//キー入力の履歴を保存する。
 	std::vector<std::unordered_map<uint8_t, bool>> keyHistory_;
 	std::vector<std::unordered_map<XBoxController, bool>> buttonHistory_;
-	std::vector<std::unordered_map<Direction, float>> stickHistory_;
+	std::vector<std::unordered_map<Direction, Vector2>> stickHistory_;
 	//履歴の最大数
 	static const int kMaxHistory_ = 10;
 
