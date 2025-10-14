@@ -126,6 +126,11 @@ std::vector<ModelMaterial> ModelData::LoadMaterialTemplateFile(const std::string
         }
     }
 
+    if (material.size() == 0) {
+        index++;
+        material.push_back(ModelMaterial());
+    }
+
     if (material[index].textureHandle == -1) {
         //テクスチャが読み込めなかった場合は白い1x1のテクスチャを使う
         material[index].textureHandle = 0;
