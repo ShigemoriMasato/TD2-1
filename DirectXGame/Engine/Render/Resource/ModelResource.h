@@ -41,11 +41,11 @@ public:
 
 	uint32_t color_ = 0xffffffff;
 
-	std::vector<Node> node_{};
+	Node node_{};
 
 	Camera* camera_ = nullptr;
 
-	std::vector<Bone> bones_{};
+	Skeleton skeleton_{};
 
 	PSOConfig psoConfig_{};
 

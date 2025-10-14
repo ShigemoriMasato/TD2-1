@@ -7,21 +7,6 @@
 #include <assimp/postprocess.h>
 #include <numbers>
 
-namespace {
-    void FindBoneParents(aiNode* node, std::unordered_map<std::string, int>& boneMap, std::vector<Bone>& bones, int parentIndex = -1) {
-        std::string nodeName = node->mName.C_Str();
-
-        if (boneMap.contains(nodeName)) {
-            int boneIndex = boneMap[nodeName];
-            bones[boneIndex].parentIndex = parentIndex;
-        }
-
-        for (unsigned int i = 0; i < node->mNumChildren; i++) {
-            FindBoneParents(node->mChildren[i], boneMap, bones, boneMap.contains(nodeName) ? boneMap[nodeName] : parentIndex);
-        }
-    }
-}
-
 void ModelData::LoadModel(const std::string& directoryPath, const std::string& filename, TextureManager* textureManager, DXDevice* device) {
     Assimp::Importer importer;
     std::string path = (directoryPath + "/" + filename);
@@ -31,8 +16,8 @@ void ModelData::LoadModel(const std::string& directoryPath, const std::string& f
 	LoadMaterial(scene, directoryPath, textureManager);
 
 	aiNode* node = scene->mRootNode;
-    LoadNode(node, scene);
-	FindBoneParents(scene->mRootNode, boneMap_, bones_);
+    rootNode_ = LoadNode(node, scene);
+	skeleton_ = CreateSkeleton(rootNode_);
 
     //頂点がなかったら要素を削除する
     for(auto& [material, vertex] : vertices_) {
@@ -79,11 +64,17 @@ void ModelData::LoadMaterial(const aiScene* scene, std::string directoryPath, Te
 
 }
 
-void ModelData::LoadNode(aiNode* node, const aiScene* scene, int parentIndex) {
+Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
 
     Node result{};
     result.name = node->mName.C_Str();
-	result.parentIndex = parentIndex;
+	aiVector3D scale, position;
+	aiQuaternion rotation;
+    node->mTransformation.Decompose(scale, rotation, position);
+	result.scale = { scale.x,scale.y,scale.z };
+    result.rotation = { rotation.w,rotation.x,rotation.y,rotation.z };
+    result.translation = { position.x,position.y,position.z };
+
     aiMatrix4x4 mat = node->mTransformation;
 
     for (int i = 0; i < 4; ++i) {
@@ -118,22 +109,8 @@ void ModelData::LoadNode(aiNode* node, const aiScene* scene, int parentIndex) {
             aiBone* aiBone = mesh->mBones[i];
             std::string boneName = aiBone->mName.C_Str();
 
-            int boneIndex = 0;
-            if (boneMap_.contains(boneName)) {
-                boneIndex = boneMap_[boneName];
-            } else {
-                Bone bone{};
-                bone.name = boneName;
-                for (int i = 0; i < 4; ++i) {
-                    for (int j = 0; j < 4; ++j) {
-                        bone.offsetMatrix.m[i][j] = aiBone->mOffsetMatrix[j][i];
-                    }
-                }
-                bone.nodeIndex = nodeCount_;
-                boneMap_[boneName] = static_cast<int>(bones_.size());
-                boneIndex = boneMap_[boneName];
-                bones_.push_back(bone);
-            }
+
+
 
             //ボーンの情報を頂点に登録
             for (unsigned int w = 0; w < aiBone->mNumWeights; w++) {
@@ -143,8 +120,8 @@ void ModelData::LoadNode(aiNode* node, const aiScene* scene, int parentIndex) {
                 // 4ウェイト制限
                 for (int j = 0; j < 4; j++) {
                     if (vertices_[materialName][vId].boneIndex[j] == -1) {
-                        vertices_[materialName][vId].boneIndex[j] = boneIndex;
-                        vertices_[materialName][vId].boneWeight[j] = weight;
+                        vertices_[materialName][vId].boneIndex[j] = -1;
+                        vertices_[materialName][vId].boneWeight[j] = 0.0f;
                         break;
                     }
                 }
@@ -164,12 +141,43 @@ void ModelData::LoadNode(aiNode* node, const aiScene* scene, int parentIndex) {
 
     }//mesh
 
-    nodeMap_[result.name] = nodeCount_;
-    nodes_.push_back(result);
     nodeCount_++;
+
     for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-        LoadNode(node->mChildren[i], scene, nodeMap_[result.name]);
+        result.chileren.push_back(LoadNode(node->mChildren[i], scene));
     }
+
+    return result;
+}
+
+Skeleton ModelData::CreateSkeleton(const Node& rootNode) {
+    Skeleton skeleton{};
+    skeleton.root = CreateJoint(rootNode, {}, skeleton.joints);
+
+    //名前とindexのマッピングを行いアクセスしやすくする
+    for (const Joint& joint : skeleton.joints) {
+        skeleton.jointMap.emplace(joint.name, joint.index);
+    }
+
+	return skeleton;
+}
+
+int32_t ModelData::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints) {
+    Joint joint;
+    joint.name = node.name;
+    joint.localMatrix = node.localMatrix;
+    joint.skeltonSpaceMatrix = MakeIdentity4x4();
+	joint.scale = node.scale;
+	joint.rotation = node.rotation;
+    joint.translation = node.translation;
+    joint.index = static_cast<int32_t>(joints.size());
+    joint.parent = parent;
+	joints.push_back(joint);
+    for (const Node& child : node.chileren) {
+		int32_t childIndex = CreateJoint(child, joint.index, joints);
+		joints[joint.index].children.push_back(childIndex);
+    }
+	return joint.index;
 }
 
 void ModelData::CreateID3D12Resource(ID3D12Device* device) {

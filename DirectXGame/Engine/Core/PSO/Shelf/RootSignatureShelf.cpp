@@ -156,7 +156,7 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
         descriptionRootSignature.Flags =
             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
         //RootParameter作成
-        D3D12_ROOT_PARAMETER rootParameters[4] = {};
+        D3D12_ROOT_PARAMETER rootParameters[3] = {};
         //Material
         rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
         rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     //PixelShaderで使う
@@ -166,15 +166,11 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
         rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;                //VertexShaderで使う
         rootParameters[1].DescriptorTable.pDescriptorRanges = instancingDescriptor;         //テーブルの中身
         rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(instancingDescriptor); //テーブルの数
-		//BoneMatrix
-        rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
-        rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;     //PixelShaderで使う
-        rootParameters[2].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
 		//Texture
-		rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
-		rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
-		rootParameters[3].DescriptorTable.pDescriptorRanges = textureDescriptor;	//テーブルの中身
-		rootParameters[3].DescriptorTable.NumDescriptorRanges = _countof(textureDescriptor);	//テーブルの数
+		rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
+		rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
+		rootParameters[2].DescriptorTable.pDescriptorRanges = textureDescriptor;	//テーブルの中身
+		rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(textureDescriptor);	//テーブルの数
 
         descriptionRootSignature.pParameters = rootParameters;                  //ルートパラメータ配列へのポインタ
         descriptionRootSignature.NumParameters = _countof(rootParameters);      //配列の長さ

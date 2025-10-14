@@ -16,13 +16,14 @@ void ModelResource::Initialize(ModelManager* manager, int modelHandle) {
 		return;
 	}
 
-	node_ = modelData->GetParentNode();
-
 	//データのコピー
 	auto vertex = modelData->GetVertexResource();
 	auto idnex = modelData->GetIndexResource();
 	auto materials = modelData->GetMaterials();
-	bones_ = modelData->GetBones();
+
+	node_ = modelData->GetParentNode();
+	skeleton_ = modelData->GetSkeleton();
+
 
 	for (const auto& material : materials) {
 		ModelDrawData drawData{};
@@ -54,9 +55,6 @@ void ModelResource::Initialize(ModelManager* manager, int modelHandle) {
 		dxDevice_->GetDevice()->CreateShaderResourceView(matrixResource_.Get(), &srvDesc, matrixCPUHandle);
 	}
 
-	boneResource_.Attach(CreateBufferResource(dxDevice_->GetDevice(), sizeof(Bone)));
-	boneResource_->Map(0, nullptr, (void**)&bone_);
-
 	materialResource_.Attach(CreateBufferResource(dxDevice_->GetDevice(), sizeof(Material)));
 	materialResource_->Map(0, nullptr, (void**)&material_);
 
@@ -81,39 +79,18 @@ void ModelResource::DrawReady() {
 void ModelResource::DrawReadyNodeAndBone() {
 	Matrix4x4 worldMat = Matrix::MakeScaleMatrix(scale_) * rotate_.ToMatrix() * Matrix::MakeTranslationMatrix(position_);
 
-	// --- ノードのワールド行列を更新 ---
-	for (uint32_t i = 0; i < node_.size(); ++i) {
-		if (node_[i].parentIndex >= 0) {
-			node_[i].worldMatrix = node_[i].localMatrix * node_[node_[i].parentIndex].worldMatrix;
+	int index = 0;
+	for (Joint& joint : skeleton_.joints) {
+		joint.localMatrix = Matrix::MakeScaleMatrix(joint.scale) *
+			joint.rotation.ToMatrix() *
+			Matrix::MakeTranslationMatrix(joint.translation);
+
+		if (joint.parent) {
+			joint.skeltonSpaceMatrix = joint.localMatrix * skeleton_.joints[*joint.parent].skeltonSpaceMatrix;
 		} else {
-			node_[i].worldMatrix = node_[i].localMatrix;
+			joint.skeltonSpaceMatrix = joint.localMatrix;
 		}
 
-		matrix_[i].local = node_[i].localMatrix;
-		matrix_[i].world = node_[i].worldMatrix * worldMat;
-		matrix_[i].wvp = matrix_[i].world * camera_->GetVPMatrix();
-	}
-
-	// --- ボーンの最終行列を計算 ---
-	for (uint32_t i = 0; i < bones_.size(); ++i) {
-		Bone& bone = bones_[i];
-
-		// 対応するノードのワールド行列を参照
-		if (bone.nodeIndex == -1) continue;
-
-		const Node& node = node_[bone.nodeIndex];
-		Matrix4x4 nodeWorld = node.worldMatrix;
-
-		// 親子関係を持つ場合は、親のボーンワールドを継承
-		if (bone.parentIndex >= 0) {
-			bone.worldMatrix = bone.localMatrix * bones_[bone.parentIndex].worldMatrix;
-		} else {
-			bone.worldMatrix = bone.localMatrix;
-		}
-
-		// ボーン最終行列（スキニング用）
-		// nodeWorld: ノード階層におけるワールド
-		// offsetMatrix: バインドポーズからボーンローカルへの逆変換
-		bone_->boneMatrix[i] = nodeWorld * bone.offsetMatrix;
+		matrix_[index].world = joint.skeltonSpaceMatrix * worldMat;
 	}
 }
