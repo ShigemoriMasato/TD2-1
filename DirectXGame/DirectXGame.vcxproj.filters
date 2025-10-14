@@ -73,6 +73,9 @@
     <Filter Include="MyEngine\Scene\Engine">
       <UniqueIdentifier>{bac00d7f-a14d-4c65-a665-955994fd5de6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="externals\assimp">
+      <UniqueIdentifier>{4ed73c2c-efdc-44e2-bd45-a0fffbfca3d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -262,6 +265,24 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="AppSource\Game\BaseObject.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Scene\EnemyTestScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Enemy\EnemyManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Enemy\BaseEnemy.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy2.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Enemy\FloatingEnemy.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -468,6 +489,24 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="AppSource\Game\BaseObject.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\Scene\EnemyTestScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\Enemy\EnemyManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\Enemy\BaseEnemy.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy2.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\Enemy\FloatingEnemy.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

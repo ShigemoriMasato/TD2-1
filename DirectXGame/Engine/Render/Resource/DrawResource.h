@@ -8,21 +8,33 @@
 #include <Camera/Camera.h>
 #include "Data/BaseResource.h"
 
+enum class ShapeType {
+	Plane,
+	Cube,
+	Sphere,	
+
+	Count
+};
+
 /// <summary>
 /// CG2で作成した基本的(?)な描画情報
 /// </summary>
 class DrawResource : public BaseResource {
 public:
 
-	DrawResource();
+	DrawResource() = default;
 	~DrawResource();
 
 	void Initialize(uint32_t vertexNum, uint32_t indexNum = 0, bool useMatrix = true);
+	void Initialize(ShapeType type);
 
 	/// <summary>
 	/// 描画前準備(Render内で呼ばれるため、プログラム時に呼ぶ必要はない)
 	/// </summary>
 	void DrawReady() override;
+
+	//親の行列をかける。毎フレーム呼ばないといけない。ごめん。
+	void AddParentMatrix(const Matrix4x4& parentMatrix);
 
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() const { return vertexBufferView; }
 	D3D12_INDEX_BUFFER_VIEW GetIndexBufferView() const;
@@ -69,5 +81,7 @@ private:
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 
 	uint32_t indexNum_ = 0;
+
+	std::vector<Matrix4x4> parentMatrices_{};
 
 };

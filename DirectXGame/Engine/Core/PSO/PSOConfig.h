@@ -10,13 +10,13 @@
 struct PSOConfig {
 	std::string vs = "Object3d.VS.hlsl";
 	std::string ps = "Object3d.PS.hlsl";
+	RootSignatureID rootID = RootSignatureID::Default;
+	InputLayoutID inputLayoutID = InputLayoutID::Default;
 	BlendStateID blendID = BlendStateID::Normal;
 	DepthStencilID depthStencilID = DepthStencilID::Default;
 	RasterizerID rasterizerID = RasterizerID::Fill;
-	RootSignatureID rootID = RootSignatureID::Default;
-	InputLayoutID inputLayoutID = InputLayoutID::Default;
 	D3D12_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	bool isSwapChain = false;
+	bool isSwapChain = true;
 
 	bool operator==(const PSOConfig& other) const {
 		return vs == other.vs &&

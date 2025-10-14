@@ -7,22 +7,22 @@ CommonData::CommonData() {
 	keyManager_->SetKey(Key::Right, DIK_D, KeyState::Hold);
 	keyManager_->SetKey(Key::Right, DIK_RIGHTARROW, KeyState::Hold);
 	keyManager_->SetButton(Key::Right, XBoxController::kRight, KeyState::Hold);
-	keyManager_->SetStick(Key::Right, false, 0.5f);
+	keyManager_->SetStick(Key::Right, true, false, 0.5f);
 
 	keyManager_->SetKey(Key::Left, DIK_A, KeyState::Hold);
 	keyManager_->SetKey(Key::Left, DIK_LEFTARROW, KeyState::Hold);
 	keyManager_->SetButton(Key::Left, XBoxController::kLeft, KeyState::Hold);
-	keyManager_->SetStick(Key::Left, true, -0.5f);
+	keyManager_->SetStick(Key::Left, true, false, -0.5f);
 
 	keyManager_->SetKey(Key::Up, DIK_W, KeyState::Hold);
 	keyManager_->SetKey(Key::Up, DIK_UPARROW, KeyState::Hold);
 	keyManager_->SetButton(Key::Up, XBoxController::kUp, KeyState::Hold);
-	keyManager_->SetStick(Key::Up, true, 0.5f);
+	keyManager_->SetStick(Key::Up, true, true, 0.5f);
 
 	keyManager_->SetKey(Key::Down, DIK_S, KeyState::Hold);
 	keyManager_->SetKey(Key::Down, DIK_DOWNARROW, KeyState::Hold);
 	keyManager_->SetButton(Key::Down, XBoxController::kDown, KeyState::Hold);
-	keyManager_->SetStick(Key::Down, true, -0.5f);
+	keyManager_->SetStick(Key::Down, true, true, -0.5f);
 	
 	keyManager_->SetKey(Key::Action, DIK_SPACE, KeyState::Trigger);
 	keyManager_->SetKey(Key::Action, DIK_Z, KeyState::Trigger);

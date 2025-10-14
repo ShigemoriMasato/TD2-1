@@ -4,8 +4,7 @@
 
 #include <memory>
 
-class AudioManager;
-class BaseObject
+class AudioManager; class BaseObject
 {
 public:
 	virtual ~BaseObject() = default;
