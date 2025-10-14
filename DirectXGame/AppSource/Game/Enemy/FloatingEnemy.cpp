@@ -21,9 +21,12 @@ void FloatingEnemy::Initialize(ModelData* modelData, Camera* camera) {
 
 	isActive_ = true;
 
-	// 初期Transform設定をModelResourceに反映
+	// ModelResourceのTransformを更新
 	if (modelResource_) {
-		modelResource_->SetMatrixData(transform_.scale, transform_.rotation, transform_.position);
+		modelResource_->scale_ = transform_.scale;
+		modelResource_->rotate_ = transform_.rotation;
+		modelResource_->position_ = transform_.position;
+
 	}
 }
 
@@ -47,9 +50,12 @@ void FloatingEnemy::Update() {
 	// Y座標を更新
 	transform_.position.y = currentHeight_;
 
-	// 初期Transform設定をModelResourceに反映
+	// ModelResourceのTransformを更新
 	if (modelResource_) {
-		modelResource_->SetMatrixData(transform_.scale, transform_.rotation, transform_.position);
+		modelResource_->scale_ = transform_.scale;
+		modelResource_->rotate_ = transform_.rotation;
+		modelResource_->position_ = transform_.position;
+
 	}
 
 }

@@ -9,7 +9,7 @@ void BunnyEnemy2::Initialize(ModelData* modelData, Camera* camera) {
 	BaseObject::Initialize(modelData, camera);
 
 	// 敵の初期設定（BunnyEnemyの隣に配置）
-	transform_.position = { 3.0f, 0.0f, 5.0f }; // 右隣に配置
+	transform_.position = { 0.0f, 0.0f, 0.0f }; // 右隣に配置
 	transform_.rotation = { 0.0f, 0.0f, 0.0f };
 	transform_.scale = { 1.0f, 1.0f, 1.0f };
 
@@ -24,7 +24,10 @@ void BunnyEnemy2::Update() {
 
 	// ModelResourceのTransformを更新
 	if (modelResource_) {
-		modelResource_->SetMatrixData(transform_.scale, transform_.rotation, transform_.position);
+		modelResource_->scale_ = transform_.scale;
+		modelResource_->rotate_ = transform_.rotation;
+		modelResource_->position_ = transform_.position;
+
 	}
 }
 
