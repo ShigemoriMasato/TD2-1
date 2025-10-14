@@ -11,16 +11,23 @@ public:
 
 	virtual void Initialize(ModelData* modelData, Camera* camera);
 
-	virtual void Update() = 0;
+	virtual void Update(float deltaTime) = 0;
 
 	virtual void Draw(Render* render);
 
+	//配列から消すかどうかのフラグ
 	virtual bool Finalize() { return false; }
 
-protected:
+	virtual void OnCollision(BaseObject* other){}
 
-	std::unique_ptr<ModelResource> modelResource_;
+	std::pair<Transform, float>GetCollider()const { return { transform_,radius_ }; }
+
+protected://オブジェクトプロパティ
 	Transform transform_;
+	float radius_ = 0.0f;
+
+protected://描画に必要なリソース
+	std::unique_ptr<ModelResource> modelResource_;
 
 };
 
