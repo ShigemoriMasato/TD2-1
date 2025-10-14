@@ -29,7 +29,7 @@ void TitleScene::Initialize() {
 	imguiWrapper_->AddItem("Desc", &worldMatrix_, &descTransform_);
 
 	skel_ = std::make_unique<SkeletonDrawer>();
-	skel_->Initialize(modelManager_->GetModelData(descHandle_)->GetSkeleton(), modelManager_->GetAnimation(descHandle_), camera_.get());
+	skel_->Initialize(modelManager_->GetModelData(descHandle_)->skeleton_, modelManager_->GetAnimation(descHandle_), camera_.get());
 
 	testEmitter_ = std::make_unique<DefaultEmitter>(1000);
 	testEmitter_->Initialize(camera_.get());
@@ -88,7 +88,7 @@ void TitleScene::Draw() {
 		grid->Draw(render_);
 	}
 
-	//render_->Draw(descModel_.get());
+	render_->Draw(descModel_.get());
 
 	skel_->Draw(render_);
 

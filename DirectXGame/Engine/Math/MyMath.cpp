@@ -694,6 +694,15 @@ Matrix3x3 Matrix::Inverse(const Matrix3x3& mat) {
 	return mat;
 }
 
+Matrix4x4 Matrix::Transpose(const Matrix4x4& m) {
+	return {
+		m.m[0][0], m.m[1][0], m.m[2][0], m.m[3][0],
+		m.m[0][1], m.m[1][1], m.m[2][1], m.m[3][1],
+		m.m[0][2], m.m[1][2], m.m[2][2], m.m[3][2],
+		m.m[0][3], m.m[1][3], m.m[2][3], m.m[3][3]
+	};
+}
+
 Matrix3x3 Matrix::MakeIdentity3x3() {
 	return { 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 }

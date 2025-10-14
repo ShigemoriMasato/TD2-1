@@ -18,6 +18,7 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
     textureDescriptor[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
 	//ParticleDataのDescriptorRange
+	//VertexShader : register(t0)
 	D3D12_DESCRIPTOR_RANGE instancingDescriptor[1] = {};
     instancingDescriptor[0].BaseShaderRegister = 0;
     instancingDescriptor[0].NumDescriptors = 1;
@@ -149,21 +150,25 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
         descriptionRootSignature.Flags =
             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
         //RootParameter作成
-        D3D12_ROOT_PARAMETER rootParameters[3] = {};
+        D3D12_ROOT_PARAMETER rootParameters[4] = {};
         //Material
         rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
         rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     //PixelShaderで使う
         rootParameters[0].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
         //Matrix
-        rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //CBVを使う
-        rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;                //VertexShaderで使う
-        rootParameters[1].DescriptorTable.pDescriptorRanges = instancingDescriptor;         //テーブルの中身
-        rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(instancingDescriptor); //テーブルの数
+        rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
+        rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;     //VertexShaderで使う
+        rootParameters[1].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
+        //Well
+        rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;       //CBVを使う
+        rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;                //VertexShaderで使う
+        rootParameters[2].DescriptorTable.pDescriptorRanges = instancingDescriptor;         //テーブルの中身
+        rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(instancingDescriptor); //テーブルの数
 		//Texture
-		rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
-		rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
-		rootParameters[2].DescriptorTable.pDescriptorRanges = textureDescriptor;	//テーブルの中身
-		rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(textureDescriptor);	//テーブルの数
+		rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
+		rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
+		rootParameters[3].DescriptorTable.pDescriptorRanges = textureDescriptor;	//テーブルの中身
+		rootParameters[3].DescriptorTable.NumDescriptorRanges = _countof(textureDescriptor);	//テーブルの数
 
         descriptionRootSignature.pParameters = rootParameters;                  //ルートパラメータ配列へのポインタ
         descriptionRootSignature.NumParameters = _countof(rootParameters);      //配列の長さ

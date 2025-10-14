@@ -6,6 +6,7 @@ namespace fs = std::filesystem;
 ModelManager::ModelManager(TextureManager* textureManager, DXDevice* device, SRVManager* srvManager) {
 	textureManager_ = textureManager;
 	device_ = device;
+	srvManager_ = srvManager;
 }
 
 ModelManager::~ModelManager() {
@@ -39,7 +40,7 @@ int ModelManager::LoadModel(const std::string& directoryPath) {
 		}
 
 		models_.push_back(std::make_unique<ModelData>());
-		models_.back()->LoadModel(basePath_ + directoryPath, glbfile[0], textureManager_, device_);
+		models_.back()->LoadModel(basePath_ + directoryPath, glbfile[0], textureManager_, device_, srvManager_);
 		
 		animations_[static_cast<int>(models_.size() - 1)] = Animation();
 		animations_[static_cast<int>(models_.size() - 1)] = LoadAnimationFile(basePath_ + directoryPath, glbfile[0]);
@@ -48,7 +49,7 @@ int ModelManager::LoadModel(const std::string& directoryPath) {
 
 		//モデルの読み込み
 		models_.push_back(std::make_unique<ModelData>());
-		models_.back()->LoadModel(basePath_ + directoryPath, objfile[0], textureManager_, device_);
+		models_.back()->LoadModel(basePath_ + directoryPath, objfile[0], textureManager_, device_, srvManager_);
 
 	}
 

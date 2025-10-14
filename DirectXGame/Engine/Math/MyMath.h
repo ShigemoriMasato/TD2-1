@@ -88,6 +88,8 @@ namespace Matrix {
 	Matrix4x4 Inverse(const Matrix4x4& m);
 	Matrix3x3 Inverse(const Matrix3x3& m);
 
+	Matrix4x4 Transpose(const Matrix4x4& m);
+
 	Matrix4x4 MakeTranslationMatrix(const Vector3& pos);
 	Matrix4x4 MakeRotationMatrix(Vector3 angle);
 	Matrix4x4 MakeScaleMatrix(const Vector3& scale);

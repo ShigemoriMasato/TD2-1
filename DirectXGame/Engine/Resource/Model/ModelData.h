@@ -51,9 +51,11 @@ struct SkinCluster {
 	Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
 	D3D12_VERTEX_BUFFER_VIEW influenceBufferView;
 	std::span<VertexInfluence> mappedInfluence;
-	Microsoft::WRL::ComPtr<ID3D12Resource> palleteResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource;
 	std::span<WellForGPU> mappedPalette;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> palleteSrvHandle;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle;
+
+	void Update(Skeleton& skeleton);
 };
 
 
@@ -75,34 +77,31 @@ public:
 	ModelData() = default;
 	~ModelData() = default;
 
-	void LoadModel(const std::string& directoryPath, const std::string& filename, TextureManager* textureManager, DXDevice* device);
-	
-	Node GetParentNode() { return rootNode_; }
-	Skeleton GetSkeleton() { return skeleton_; };
-	std::unordered_map<std::string, VertexResource> GetVertexResource() const { return vertexBufferViews_; }
-	std::unordered_map<std::string, IndexResource> GetIndexResource() const { return indexBufferViews_; }
-	std::vector<ModelMaterial> GetMaterials() const { return material_; }
+	void LoadModel(const std::string& directoryPath, const std::string& filename, TextureManager* textureManager, DXDevice* device, SRVManager* srvManager);
+
+	std::vector<ModelMaterial> material_{};
+
+	Node rootNode_{};
+	Skeleton skeleton_{};
+	SkinCluster skinCluster_{};
+	std::unordered_map<std::string, JointWeightData> skinClusterData;
+
+	std::unordered_map<std::string, VertexResource> vertexBufferViews_{};
+	std::unordered_map<std::string, IndexResource> indexBufferViews_{};
+
 	int GetNodeCount() const { return nodeCount_; }
 
 protected:
 
 	void LoadMaterial(const aiScene* scene, std::string directoryPath, TextureManager* textureManager);
 	Node LoadNode(aiNode* node, const aiScene* scene);
-	void CreateSkinCruster(const Skeleton& skeleton);
 	void CreateID3D12Resource(ID3D12Device* device);
+	SkinCluster CreateSkinCluster(ID3D12Device* device, const Skeleton& skeleton, SRVManager* srvManager);
 
-	std::vector<ModelMaterial> material_{};
 	std::unordered_map<std::string, std::vector<ModelVertexData>> vertices_{};
 	std::unordered_map<std::string, std::vector<uint32_t>> indices_{};
 
-	std::unordered_map<std::string, VertexResource> vertexBufferViews_{};
-	std::unordered_map<std::string, IndexResource> indexBufferViews_{};
-
 	int nodeCount_ = 0;
 
-	Node rootNode_{};
-	Skeleton skeleton_{};
-	SkinCluster skinCluster_{};
-	std::unordered_map<std::string, JointWeightData> skinClusterData;
 };
 

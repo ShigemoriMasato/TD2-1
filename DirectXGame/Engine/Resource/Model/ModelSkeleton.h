@@ -28,3 +28,4 @@ int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std:
 
 void SkeletonUpdate(Skeleton& skeleton);
 void SkeletonAnimation(Skeleton& skeleton, const Animation& animation, float animationTime);
+

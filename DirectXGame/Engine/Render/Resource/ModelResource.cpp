@@ -22,41 +22,14 @@ void ModelResource::Initialize(ModelManager* manager, int modelHandle) {
 }
 
 void ModelResource::Initialize(ModelData* modelData) {
-	node_ = modelData->GetParentNode();
+	node_ = modelData->rootNode_;
 
-	//データのコピー
-	auto vertex = modelData->GetVertexResource();
-	auto idnex = modelData->GetIndexResource();
-	auto materials = modelData->GetMaterials();
+	modelData_ = modelData;
 
-	for (const auto& material : materials) {
-		ModelDrawData drawData{};
-		drawData.textureHandle = material.textureHandle;
-
-		drawData.vertexBufferView = vertex[material.name].bufferView.get();
-		drawData.indexBufferView = idnex[material.name].bufferView.get();
-		drawData.indexNum = idnex[material.name].indexNum;
-
-		modelDrawDatas_[material.name] = drawData;
-	}
+	skeleton_ = modelData_->skeleton_;
 
 	matrixResource_.Attach(CreateBufferResource(dxDevice_->GetDevice(), sizeof(MatrixData) * modelData->GetNodeCount()));
 	matrixResource_->Map(0, nullptr, (void**)&matrix_);
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-	srvDesc.Buffer.FirstElement = 0;
-	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	srvDesc.Buffer.NumElements = modelData->GetNodeCount();
-	srvDesc.Buffer.StructureByteStride = sizeof(MatrixData);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE matrixCPUHandle = srvManager_->GetCPUHandle();
-	matrixGPUHandle_ = srvManager_->GetGPUHandle();
-
-	dxDevice_->GetDevice()->CreateShaderResourceView(matrixResource_.Get(), &srvDesc, matrixCPUHandle);
-
 
 	materialResource_.Attach(CreateBufferResource(dxDevice_->GetDevice(), sizeof(Material)));
 	materialResource_->Map(0, nullptr, (void**)&material_);
@@ -85,28 +58,16 @@ void ModelResource::DrawReady() {
 		(color_ & 0xff) / 255.0f,
 		((color_ >> 24) & 0xff) / 255.0f
 	};
+	
+	animationTime_ += 1.f / 60;
+	animationTime_ = std::fmod(animationTime_, animation_->duration);
+	//SkeletonAnimation(skeleton_, *animation_, animationTime_);
+	SkeletonUpdate(skeleton_);
+
+	modelData_->skinCluster_.Update(skeleton_);
 
 	animationTime_ += FPSObserver::GetDeltatime();
-	DrawReadyNode(node_, Matrix::MakeIdentity4x4());
-}
 
-void ModelResource::DrawReadyNode(Node node, const Matrix4x4& parentMatrix) {
-
-	Matrix4x4 worldMatrix = Matrix::MakeScaleMatrix(scale_) * Matrix::MakeRotationMatrix(rotate_) * Matrix::MakeTranslationMatrix(position_);
-
-	//if (animation_) {
-	//	animationTime_ = std::fmod(animationTime_, animation_->duration);
-	//	NodeAnimation& rootNodeAnimation = animation_->nodeAnimations[node.name];
-	//	Vector3 translate = CalculateValue(rootNodeAnimation.translate, animationTime_);
-	//	Quaternion rotate = CalculateValue(rootNodeAnimation.rotate, animationTime_);
-	//	Vector3 scale = CalculateValue(rootNodeAnimation.scale, animationTime_);
-	//	localMatrix *= Matrix::MakeScaleMatrix(scale) * rotate.ToMatrix() * Matrix::MakeTranslationMatrix(translate);
-	//}
-
-	matrix_[node.nodeIndex].world = worldMatrix;
-	matrix_[node.nodeIndex].wvp = matrix_[node.nodeIndex].world * camera_->GetVPMatrix();
-
-	for(auto& child : node.children) {
-		DrawReadyNode(child, Matrix::MakeIdentity4x4());
-	}
+	matrix_->world = Matrix::MakeScaleMatrix(scale_) * Matrix::MakeRotationMatrix(rotate_) * Matrix::MakeTranslationMatrix(position_);
+	matrix_->wvp = matrix_->world * camera_->GetVPMatrix();
 }

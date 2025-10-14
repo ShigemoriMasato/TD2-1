@@ -24,5 +24,6 @@ private:
 
 	TextureManager* textureManager_ = nullptr;
 	DXDevice* device_ = nullptr;
+	SRVManager* srvManager_ = nullptr;
 };
 

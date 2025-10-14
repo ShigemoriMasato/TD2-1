@@ -41,7 +41,8 @@ public:
 
 	std::unordered_map<std::string, ModelDrawData> GetModelDrawDatas() const { return modelDrawDatas_; }
 	ID3D12Resource* GetMaterialResource() const { return materialResource_.Get(); }
-	D3D12_GPU_DESCRIPTOR_HANDLE GetMatrixSRVDesc() const { return matrixGPUHandle_; }
+	ID3D12Resource* GetMatrixResource() const { return matrixResource_.Get(); }
+	ModelData* GetModelData() const { return modelData_; }
 
 	/// <summary>
 	/// 描画前準備(Render内で呼ばれるため、プログラム時に呼ぶ必要はない)
@@ -65,13 +66,14 @@ private:
 	std::unique_ptr<Animation> animation_{};
 	float animationTime_ = 0.0f;
 
-	void DrawReadyNode(Node node, const Matrix4x4& parentMatrix);
-
 	std::unordered_map<std::string, ModelDrawData> modelDrawDatas_{};
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> matrixResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_ = nullptr;
-	D3D12_GPU_DESCRIPTOR_HANDLE matrixGPUHandle_ = {};
+
+	ModelData* modelData_ = nullptr;
+
+	Skeleton skeleton_{};
 
 	MatrixData* matrix_ = nullptr;
 	Material* material_ = nullptr;

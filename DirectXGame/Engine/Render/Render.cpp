@@ -220,24 +220,28 @@ void Render::Draw(DrawResource* resource) {
 void Render::Draw(ModelResource* resource) {
     resource->DrawReady();
 
-	psoEditor_->SetPSOConfig(resource->psoConfig_);
-	psoEditor_->Setting(commandList.Get());
-    auto drawData = resource->GetModelDrawDatas();
+    psoEditor_->SetPSOConfig(resource->psoConfig_);
+    psoEditor_->Setting(commandList.Get());
+    auto drawDatas = resource->GetModelDrawDatas();
+    auto data = resource->GetModelData();
 
-    for(const auto& [name, drawData] : drawData) {
-        auto vertexBufferView = drawData.vertexBufferView;
-        commandList->IASetVertexBuffers(0, 1, drawData.vertexBufferView);
-        auto indexBufferView = drawData.indexBufferView;
-        commandList->IASetIndexBuffer(drawData.indexBufferView);
-        //Material
-		commandList->SetGraphicsRootConstantBufferView(0, resource->GetMaterialResource()->GetGPUVirtualAddress());
-        //Matrixのポインタを設定
-        commandList->SetGraphicsRootDescriptorTable(1, resource->GetMatrixSRVDesc());
-        //Texture
-        commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureData(drawData.textureHandle)->GetTextureGPUHandle());
-        //インデックスがある場合は、インデックスを設定して描画
-        commandList->DrawIndexedInstanced(drawData.indexNum, 1, 0, 0, 0);
-	}
+    D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+        *data->vertexBufferViews_["None"].bufferView.get(),
+        data->skinCluster_.influenceBufferView
+    };
+
+    commandList->IASetVertexBuffers(0, 2, vbvs);
+    commandList->IASetIndexBuffer(data->indexBufferViews_["None"].bufferView.get());
+    //Material
+    commandList->SetGraphicsRootConstantBufferView(0, resource->GetMaterialResource()->GetGPUVirtualAddress());
+    //Matrixのポインタを設定
+    commandList->SetGraphicsRootConstantBufferView(1, resource->GetMatrixResource()->GetGPUVirtualAddress());
+    //Well
+    commandList->SetGraphicsRootDescriptorTable(2, data->skinCluster_.paletteSrvHandle.second);
+    //Texture
+    commandList->SetGraphicsRootDescriptorTable(3, textureManager_->GetTextureData(data->material_[0].textureHandle)->GetTextureGPUHandle());
+    //インデックスがある場合は、インデックスを設定して描画
+    commandList->DrawIndexedInstanced(data->indexBufferViews_["None"].indexNum, 1, 0, 0, 0);
 
 }
 
