@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -16,6 +16,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppSource\Game\BaseObject.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\BaseEnemy.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy2.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\EnemyManager.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\FloatingEnemy.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\EnemyTestScene.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
     <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp" />
@@ -81,6 +87,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
+    <ClInclude Include="AppSource\Game\Enemy\BaseEnemy.h" />
+    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy.h" />
+    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy2.h" />
+    <ClInclude Include="AppSource\Game\Enemy\EnemyManager.h" />
+    <ClInclude Include="AppSource\Game\Enemy\FloatingEnemy.h" />
+    <ClInclude Include="AppSource\Game\Scene\EnemyTestScene.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
     <ClInclude Include="Engine\Resource\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Render\Resource\Data\BaseResource.h" />
