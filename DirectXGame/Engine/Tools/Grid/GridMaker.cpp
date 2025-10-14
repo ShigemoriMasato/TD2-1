@@ -198,7 +198,7 @@ void GridMaker::Update() {
 	int vertexIndex[] = { 0, 1, 2, 1, 2, 3 };
 	for (int i = 0; i < 2; ++i) {
 		for (auto& line : lines_[i]) {
-			if (line->GetShapeType() == ShapeType::kLine) {
+			if (line->GetShapeType() == GridLine::ShapeType::kLine) {
 				lineResource_->localPos_[lineCount++] = line->GetStart();
 				lineResource_->localPos_[lineCount++] = line->GetEnd();
 			} else {

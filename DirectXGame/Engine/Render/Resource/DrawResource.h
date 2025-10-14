@@ -8,6 +8,14 @@
 #include <Camera/Camera.h>
 #include "Data/BaseResource.h"
 
+enum class ShapeType {
+	Plane,
+	Cube,
+	Sphere,	
+
+	Count
+};
+
 /// <summary>
 /// CG2で作成した基本的(?)な描画情報
 /// </summary>
@@ -18,6 +26,7 @@ public:
 	~DrawResource();
 
 	void Initialize(uint32_t vertexNum, uint32_t indexNum = 0, bool useMatrix = true);
+	void Initialize(ShapeType type);
 
 	/// <summary>
 	/// 描画前準備(Render内で呼ばれるため、プログラム時に呼ぶ必要はない)
