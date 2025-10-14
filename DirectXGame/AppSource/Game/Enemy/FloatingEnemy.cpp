@@ -30,10 +30,8 @@ void FloatingEnemy::Initialize(ModelData* modelData, Camera* camera) {
 	}
 }
 
-void FloatingEnemy::Update() {
+void FloatingEnemy::Update(float deltaTime) {
 	if (!isActive_) return;
-
-	float deltaTime = FPSObserver::GetDeltatime();
 
 	// プレイヤーが範囲内にいるかチェックして目標高度を設定
 	if (IsPlayerInRange()) {

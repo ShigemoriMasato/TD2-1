@@ -82,20 +82,12 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
     }//node
 
     nodeCount_++;
-
+    
     // --- 子ノードを再帰的に処理する ---
     for (unsigned int i = 0; i < node->mNumChildren; i++) {
         result.children.push_back(LoadNode(node->mChildren[i], scene));
     }
 
-    if (material.size() == 0) {
-        index++;
-        material.push_back(ModelMaterial());
-    }
-
-    if (material[index].textureHandle == -1) {
-        //テクスチャが読み込めなかった場合は白い1x1のテクスチャを使う
-        material[index].textureHandle = 0;
     return result;
 }
 

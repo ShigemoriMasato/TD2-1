@@ -24,11 +24,11 @@ void EnemyManager::Initialize(ModelManager* modelManager, Camera* camera) {
 	AddEnemy(std::move(floatingEnemy), "testEnemy"); // FloatingEnemyにはtestEnemyモデル
 }
 
-void EnemyManager::Update() {
+void EnemyManager::Update(float deltaTime) {
 	// 全ての敵を更新
 	for (auto& enemy : enemies_) {
 		if (enemy && enemy->IsActive()) {
-			enemy->Update();
+			enemy->Update(deltaTime);
 		}
 	}
 }

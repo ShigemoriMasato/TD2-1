@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-class EnemyManager : public BaseObject
+class EnemyManager
 {
 public:
 	EnemyManager();
@@ -15,8 +15,8 @@ public:
 	// 新しい初期化メソッド：ModelManagerとCameraを受け取る
 	void Initialize(class ModelManager* modelManager, Camera* camera);
 
-	void Update() override;
-	void Draw(Render* render) override;
+	void Update(float deltaTime);
+	void Draw(Render* render);
 
 	// 敵を追加（モデル名を指定）
 	void AddEnemy(std::unique_ptr<BaseEnemy> enemy, const std::string& modelName);

@@ -16,7 +16,7 @@ std::unique_ptr<BaseScene> EnemyTestScene::Update()
 	//オブジェクト更新
 	for (auto& object : objects_)
 	{
-		object->Update();
+		object->Update(1 / 60.f);
 	}
 
 	return nullptr;

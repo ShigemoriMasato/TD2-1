@@ -8,7 +8,7 @@ public:
     ~BunnyEnemy2() override = default;
 
     void Initialize(ModelData* modelData, Camera* camera) override;
-    void Update() override;
+    void Update(float deltaTime) override;
     void Draw(Render* render) override;
 
 private:

@@ -16,11 +16,11 @@ void BunnyEnemy::Initialize(ModelData* modelData, Camera* camera) {
 	isActive_ = true;
 }
 
-void BunnyEnemy::Update() {
+void BunnyEnemy::Update(float deltaTime) {
 	if (!isActive_) return;
 
 	// Y軸周りにデルタタイムを使用して回転させる
-	transform_.rotation.y += rotationSpeed_ * FPSObserver::GetDeltatime();
+	transform_.rotation.y += rotationSpeed_ * deltaTime;
 
 	// ModelResourceのTransformを更新
 	if (modelResource_) {

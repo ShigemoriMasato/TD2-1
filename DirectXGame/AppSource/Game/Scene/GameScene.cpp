@@ -1,5 +1,6 @@
 #include "GameScene.h"
-#include "../Enemy/EnemyManager.h"
+#include "../Player/Player.h"
+
 #include <Tools/FPS/FPSObserver.h>
 #include <cmath>
 
@@ -16,10 +17,12 @@ void GameScene::Initialize()
 		player->SetKeyConfig(&keys_);
 		player_ = player.get();
 		objects_.push_back(std::move(player));
+
+	}
+
 	{
-		auto enemyManager = std::make_unique<EnemyManager>();
-		enemyManager->Initialize(modelManager_, camera_.get());
-		objects_.push_back(std::move(enemyManager));
+		enemyManager_ = std::make_unique<EnemyManager>();
+		enemyManager_->Initialize(modelManager_, camera_.get());
 	}
 
 	//ワイヤー初期化
@@ -32,7 +35,7 @@ void GameScene::Initialize()
 
 		auto wire2 = std::make_unique<Wire>();
 		wire2->Initialize(modelManager_->GetModelData(handle), camera_.get());
-		objects_.push_back(std::move(wire2));
+		//objects_.push_back(std::move(wire2));
 	}
 }
 
@@ -47,28 +50,35 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	{
 		object->Update(deltaTime);
 	}
-	
+
+	enemyManager_->Update(deltaTime);
+
 	// テスト用：仮想プレイヤーの位置を左右に移動させる
 	static float testPlayerX = -5.0f;
 	static float direction = 1.0f;
-	
+
 	testPlayerX += direction * 2.0f * deltaTime; // 2.0f units per second
-	
+
 	// 範囲制限（-5.0f から 10.0f まで移動）
-	if (testPlayerX > 10.0f) {
+	if (testPlayerX > 10.0f)
+	{
 		testPlayerX = 10.0f;
 		direction = -1.0f;
-	} else if (testPlayerX < -5.0f) {
+	}
+	else if (testPlayerX < -5.0f)
+	{
 		testPlayerX = -5.0f;
 		direction = 1.0f;
 	}
-	
-	Vector3 testPlayerPos = {testPlayerX, 0.0f, 5.0f};
+
+	Vector3 testPlayerPos = { testPlayerX, 0.0f, 5.0f };
 
 	// EnemyManagerにプレイヤー位置を通知
-	for (auto& object : objects_) {
+	for (auto& object : objects_)
+	{
 		// EnemyManagerの場合のみプレイヤー位置を設定
-		if (auto* enemyManager = dynamic_cast<EnemyManager*>(object.get())) {
+		if (auto* enemyManager = dynamic_cast<EnemyManager*>(object.get()))
+		{
 			enemyManager->SetPlayerPosition(testPlayerPos);
 		}
 	}
@@ -76,14 +86,14 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	//オブジェクト更新
 	for (auto& object : objects_)
 	{
-		object->Update();
+		object->Update(deltaTime);
 	}
 
-  	//ワイヤ出せる範囲をチェック
+	//ワイヤ出せる範囲をチェック
 	CheckPlayerWireField();
 	//オブジェクト間でのコリジョンチェック
 	CheckAllCollision();
-  
+
 	return nullptr;
 }
 
@@ -106,7 +116,7 @@ void GameScene::CheckAllCollision()
 			if (CollisionChecker((*itA).get(), (*itB).get()))
 			{
 				(*itA)->OnCollision((*itB).get());
-                (*itB)->OnCollision((*itA).get());
+				(*itB)->OnCollision((*itA).get());
 			}
 		}
 	}
@@ -130,11 +140,4 @@ void GameScene::CheckPlayerWireField()
 		isInWireField_ = true;
 	}
 	collisionObjects.clear();
-
-
-	// オブジェクトを描画
-	for (auto& object : objects_)
-	{
-		object->Draw(render_);
-	}
 }

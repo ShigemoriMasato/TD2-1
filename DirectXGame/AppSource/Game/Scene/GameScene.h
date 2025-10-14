@@ -4,11 +4,11 @@
 #include <Camera/DebugCamera.h>
 #include <Scene/Data/BaseScene.h>
 #include <unordered_map>
+#include "../Enemy/EnemyManager.h"
 #include "../Player/Wire.h"
 
 class Player;
-class GameScene :
-	public BaseScene
+class GameScene : public BaseScene
 {
 public:
 
@@ -27,6 +27,7 @@ private://パラメータ変数
 	bool isInWireField_ = false;
 
 private://特定なオブジェクト
+	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 	Player* player_ = nullptr;
 	std::unique_ptr<Wire> wire_ = nullptr;
 private://使える関数

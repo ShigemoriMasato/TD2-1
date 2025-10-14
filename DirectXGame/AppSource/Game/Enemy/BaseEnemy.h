@@ -9,7 +9,7 @@ public:
 
 	virtual ~BaseEnemy() = default;
 	virtual void Initialize(ModelData* modelData, Camera* camera) = 0;
-	virtual void Update() = 0;
+	virtual void Update(float deltaTime) = 0;
 	virtual void Draw(Render* render) = 0;
 
 	// プレイヤーの位置を設定（敵がプレイヤーの位置を知るため）
