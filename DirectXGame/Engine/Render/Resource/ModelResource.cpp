@@ -1,4 +1,5 @@
 #include "ModelResource.h"
+#include <Tools/FPS/FPSObserver.h>
 
 DXDevice* ModelResource::dxDevice_ = nullptr;
 SRVManager* ModelResource::srvManager_ = nullptr;
@@ -17,10 +18,11 @@ void ModelResource::Initialize(ModelManager* manager, int modelHandle) {
 	}
 
 	Initialize(modelData);
+	SetAnimation(manager, modelHandle);
 }
 
 void ModelResource::Initialize(ModelData* modelData) {
-	node_ = ConvertNodeToTransform(modelData->GetParentNode());
+	node_ = modelData->GetParentNode();
 
 	//データのコピー
 	auto vertex = modelData->GetVertexResource();
@@ -65,6 +67,16 @@ void ModelResource::Initialize(ModelData* modelData) {
 	psoConfig_.inputLayoutID = InputLayoutID::Model;
 }
 
+void ModelResource::SetAnimation(ModelManager* manager, int modelHandle) {
+	auto animation = manager->GetAnimation(modelHandle);
+	if (animation.nodeAnimations.size() == 0) {
+		return;
+	}
+	animation_ = std::make_unique<Animation>();
+	*animation_ = animation;
+	animationTime_ = 0.0f;
+}
+
 void ModelResource::DrawReady() {
 
 	material_->color = {
@@ -74,30 +86,27 @@ void ModelResource::DrawReady() {
 		((color_ >> 24) & 0xff) / 255.0f
 	};
 
+	animationTime_ += FPSObserver::GetDeltatime();
 	DrawReadyNode(node_, Matrix::MakeIdentity4x4());
 }
 
-ModelResource::NodeTransform ModelResource::ConvertNodeToTransform(const Node& node) {
-	NodeTransform result{};
-	result.localMatrix = node.localMatrix;
-	result.name = node.name;
-	result.nodeIndex = node.nodeIndex;
-	for (const auto& child : node.children) {
-		result.children.push_back(ConvertNodeToTransform(child));
-	}
-
-	return result;
-}
-
-void ModelResource::DrawReadyNode(NodeTransform node, const Matrix4x4& parentMatrix) {
+void ModelResource::DrawReadyNode(Node node, const Matrix4x4& parentMatrix) {
 
 	Matrix4x4 worldMatrix = Matrix::MakeScaleMatrix(scale_) * Matrix::MakeRotationMatrix(rotate_) * Matrix::MakeTranslationMatrix(position_);
-	Matrix4x4 localMatrix = Matrix::MakeScaleMatrix(node.scale) * Matrix::MakeRotationMatrix(node.rotate) * Matrix::MakeTranslationMatrix(node.translate);
 
-	matrix_[node.nodeIndex].world = parentMatrix * node.localMatrix * localMatrix * worldMatrix;
+	//if (animation_) {
+	//	animationTime_ = std::fmod(animationTime_, animation_->duration);
+	//	NodeAnimation& rootNodeAnimation = animation_->nodeAnimations[node.name];
+	//	Vector3 translate = CalculateValue(rootNodeAnimation.translate, animationTime_);
+	//	Quaternion rotate = CalculateValue(rootNodeAnimation.rotate, animationTime_);
+	//	Vector3 scale = CalculateValue(rootNodeAnimation.scale, animationTime_);
+	//	localMatrix *= Matrix::MakeScaleMatrix(scale) * rotate.ToMatrix() * Matrix::MakeTranslationMatrix(translate);
+	//}
+
+	matrix_[node.nodeIndex].world = worldMatrix;
 	matrix_[node.nodeIndex].wvp = matrix_[node.nodeIndex].world * camera_->GetVPMatrix();
 
 	for(auto& child : node.children) {
-		DrawReadyNode(child, matrix_[node.nodeIndex].world);
+		DrawReadyNode(child, Matrix::MakeIdentity4x4());
 	}
 }

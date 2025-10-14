@@ -125,7 +125,7 @@ void ImGuiWrapper::UseGuizmo(ImGuizmo::OPERATION operationType, GuizmoData& data
 	std::memcpy(data.matrix->m, worldMat, sizeof(float) * 16);
 }
 
-int ImGuiWrapper::AddItem(std::string name, Matrix4x4* matrix, Transform* transform) {
+int ImGuiWrapper::AddItem(std::string name, Matrix4x4* matrix, EulerTransform* transform) {
     GuizmoData data;
     data.name = name;
     data.matrix = matrix;

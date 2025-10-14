@@ -82,7 +82,7 @@ GridMaker::GridMaker(Camera* camera) {
 }
 
 void GridMaker::Initialize() {
-	Transform transform{};
+	EulerTransform transform{};
 
 	for (int i = 0; i < 2; ++i) {
 

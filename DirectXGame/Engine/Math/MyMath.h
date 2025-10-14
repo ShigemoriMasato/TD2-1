@@ -92,7 +92,8 @@ namespace Matrix {
 	Matrix4x4 MakeRotationMatrix(Vector3 angle);
 	Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 	Matrix4x4 MakeAffineMatrix(const Vector3& pos, const Vector3& angle, const Vector3& scale);
-	Matrix4x4 MakeAffineMatrix(Transform transform);
+	Matrix4x4 MakeAffineMatrix(EulerTransform transform);
+	Matrix4x4 MakeAffineMatrix(QuaternionTransform transform);
 
 	Matrix3x3 MakeTranslationMatrix(const Vector2& pos);
 	Matrix3x3 MakeRotationMatrix(float angle);
@@ -120,6 +121,8 @@ namespace MyMath {
 	/// <returns></returns>
 	uint32_t lerp(uint32_t a, uint32_t b, float t);
 	Vector3 lerp(const Vector3& a, const Vector3& b, float t);
+	Vector4 lerp(const Vector4& a, const Vector4& b, float t);
+	Quaternion lerp(const Quaternion& a, const Quaternion& b, float t);
 
 	float EaseIn(float a, float b, float t);
 	Vector3 EaseIn(Vector3 a, Vector3 b, float t);

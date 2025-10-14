@@ -36,6 +36,9 @@ public:
 	void Initialize(ModelManager* manager, int modelHandle);
 	void Initialize(ModelData* modelData);
 
+	void SetAnimation(ModelManager* manager, int modelHandle);
+	void SetAnimation(const Animation& animation) { animation_ = std::make_unique<Animation>(); *animation_ = animation; }
+
 	std::unordered_map<std::string, ModelDrawData> GetModelDrawDatas() const { return modelDrawDatas_; }
 	ID3D12Resource* GetMaterialResource() const { return materialResource_.Get(); }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetMatrixSRVDesc() const { return matrixGPUHandle_; }
@@ -51,7 +54,7 @@ public:
 
 	uint32_t color_ = 0xffffffff;
 
-	NodeTransform node_{};
+	Node node_{};
 
 	Camera* camera_ = nullptr;
 
@@ -59,9 +62,10 @@ public:
 
 private:
 
-	NodeTransform ConvertNodeToTransform(const Node& node);
+	std::unique_ptr<Animation> animation_{};
+	float animationTime_ = 0.0f;
 
-	void DrawReadyNode(NodeTransform node, const Matrix4x4& parentMatrix);
+	void DrawReadyNode(Node node, const Matrix4x4& parentMatrix);
 
 	std::unordered_map<std::string, ModelDrawData> modelDrawDatas_{};
 

@@ -19,7 +19,7 @@ void TitleScene::Initialize() {
 		gridMaker_.push_back(std::move(grid));
 	}
 
-	descHandle_ = modelManager_->LoadModel("cube");
+	descHandle_ = modelManager_->LoadModel("walk");
 	descModel_ = std::make_unique<ModelResource>();
 	descModel_->Initialize(modelManager_, descHandle_);
 	descModel_->camera_ = camera_.get();
@@ -27,6 +27,9 @@ void TitleScene::Initialize() {
 	descTransform_.scale = { 1.0f, 1.0f, 1.0f };
 	descModel_->psoConfig_.isSwapChain = true;
 	imguiWrapper_->AddItem("Desc", &worldMatrix_, &descTransform_);
+
+	skel_ = std::make_unique<SkeletonDrawer>();
+	skel_->Initialize(modelManager_->GetModelData(descHandle_)->GetSkeleton(), modelManager_->GetAnimation(descHandle_), camera_.get());
 
 	testEmitter_ = std::make_unique<DefaultEmitter>(1000);
 	testEmitter_->Initialize(camera_.get());
@@ -59,9 +62,13 @@ std::unique_ptr<BaseScene> TitleScene::Update() {
 	}
 	ImGui::End();
 
+	skel_->Update();
 
 	// ====================- GuIzmoテスト -============================
 	imguiWrapper_->GuizmoUpdate();
+	descModel_->position_ = descTransform_.position;
+	descModel_->rotate_ = descTransform_.rotation;
+	descModel_->scale_ = descTransform_.scale;
 
 	// ====================- Input系のテスト -==========================
 	ImGui::Begin("Input");
@@ -81,7 +88,9 @@ void TitleScene::Draw() {
 		grid->Draw(render_);
 	}
 
-	render_->Draw(descModel_.get());
+	//render_->Draw(descModel_.get());
 
-	testEmitter_->Draw(render_);
+	skel_->Draw(render_);
+
+	//testEmitter_->Draw(render_);
 }

@@ -56,8 +56,8 @@ void Camera::DrawImGui() {
 	ImGui::End();
 }
 
-void Camera::SetTransform(Transform* transform) {
-	transform_ = std::shared_ptr<Transform>(transform);
+void Camera::SetTransform(EulerTransform* transform) {
+	transform_ = std::shared_ptr<EulerTransform>(transform);
 	isSetMatrix = false;
 }
 

@@ -16,6 +16,8 @@ void ModelData::LoadModel(const std::string& directoryPath, const std::string& f
 
 	rootNode_ = LoadNode(scene->mRootNode, scene);
 
+    skeleton_ = CreateSkeleton(rootNode_);
+
 	CreateID3D12Resource(device->GetDevice());
 }
 
@@ -40,15 +42,15 @@ void ModelData::LoadMaterial(const aiScene* scene, std::string directoryPath, Te
 Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
     Node result{};
 	result.name = node->mName.C_Str();
-    result.nodeIndex = nodeCount_;
-	aiMatrix4x4 mat = node->mTransformation;
-
-    for(int i = 0; i < 4; ++i) {
-        for(int j = 0; j < 4; ++j) {
-            result.localMatrix.m[i][j] = mat[j][i];
-        }
-	}
-
+	result.nodeIndex = nodeCount_;
+    aiVector3D scale, translate;
+    aiQuaternion rotate;
+    node->mTransformation.Decompose(scale, rotate, translate);
+    result.transform.scale = { scale.x, scale.y, scale.z };
+    result.transform.rotation = { rotate.w, rotate.x, rotate.y, rotate.z };
+    result.transform.position = { translate.x, translate.y, translate.z };
+    result.localMatrix = Matrix::MakeAffineMatrix(result.transform);
+    
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[i];
 
@@ -61,8 +63,6 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
             vertexData.position = { pos.x,pos.y,pos.z,1.0f };
             vertexData.normal = { normal.x,normal.y,normal.z };
             vertexData.texcoord = { tex.x,tex.y };
-
-			vertexData.nodeIndex = result.nodeIndex;
 
             vertices_[scene->mMaterials[mesh->mMaterialIndex]->GetName().C_Str()].push_back(vertexData);
         }
@@ -77,9 +77,30 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
 				indices_[scene->mMaterials[mesh->mMaterialIndex]->GetName().C_Str()].push_back(localIndex);
             }//vertex
 
-        }//mesh
+        }//face
 
-    }//node
+        for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
+            aiBone* bone = mesh->mBones[boneIndex];
+            std::string jointName = bone->mName.C_Str();
+            JointWeightData& jointWeightData = skinClusterData[jointName];
+
+            aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
+            aiVector3D scale, translate;
+            aiQuaternion rotate;
+            bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
+            Matrix4x4 bindPoseMatrix = Matrix::MakeAffineMatrix({
+                {scale.x, scale.y, scale.z},
+                {rotate.w, rotate.x, rotate.y, rotate.z},
+                {translate.x, translate.y, translate.z}
+                });
+            jointWeightData.inverseBindPoseMatrix = Inverse(bindPoseMatrix);
+
+            for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
+                jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId });
+            }
+        }
+
+    }//mesh
 
     nodeCount_++;
 
@@ -89,6 +110,12 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
     }
 
     return result;
+}
+
+void ModelData::CreateSkinCruster(const Skeleton& skeleton) {
+    SkinCluster skinCluster;
+
+    skinCluster.palleteResource.Attach(CreateBufferResource(, sizeof(WellForGPU) * skeleton.joints.size()));
 }
 
 void ModelData::CreateID3D12Resource(ID3D12Device* device) {

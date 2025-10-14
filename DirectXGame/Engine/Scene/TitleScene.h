@@ -5,6 +5,7 @@
 #include <Tools/Grid/GridMaker.h>
 #include <Game/Emitter/DefaultEmitter.h>
 #include <Render/ImGuiWrapper.h>
+#include <Render/Resource/SkeletonDrawer.h>
 
 class TitleScene : public BaseScene {
 public:
@@ -20,7 +21,8 @@ private:
 
 	int descHandle_ = -1;
 	std::unique_ptr<ModelResource> descModel_ = nullptr;
-	Transform descTransform_;
+	EulerTransform descTransform_;
+	std::unique_ptr<SkeletonDrawer> skel_;
 
 	std::unique_ptr<DebugCamera> camera_ = nullptr;
 
@@ -30,7 +32,7 @@ private:
 
 	std::unique_ptr<ImGuiWrapper> imguiWrapper_ = nullptr;
 	Matrix4x4 worldMatrix_ = Matrix::MakeIdentity4x4();
-	Transform gizmoTransform_;
+	EulerTransform gizmoTransform_;
 
 	int mp3Handle;
 	int wavHandle;

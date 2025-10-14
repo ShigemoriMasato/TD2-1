@@ -572,6 +572,24 @@ Vector3 MyMath::lerp(const Vector3& a, const Vector3& b, float t) {
 	);
 }
 
+Vector4 MyMath::lerp(const Vector4& a, const Vector4& b, float t) {
+	return Vector4(
+		lerp(a.x, b.x, t),
+		lerp(a.y, b.y, t),
+		lerp(a.z, b.z, t),
+		lerp(a.w, b.w, t)
+	);
+}
+
+Quaternion MyMath::lerp(const Quaternion& a, const Quaternion& b, float t) {
+	return Quaternion(
+		lerp(a.w, b.w, t),
+		lerp(a.x, b.x, t),
+		lerp(a.y, b.y, t),
+		lerp(a.z, b.z, t)
+	).Normalize();
+}
+
 float MyMath::EaseIn(float a, float b, float t) {
 	return a + (b - a) * t * t * t; // Cubic ease-in
 }
@@ -862,8 +880,14 @@ Matrix4x4 Matrix::MakeAffineMatrix(const Vector3& translation, const Vector3& ro
 		MakeTranslationMatrix(translation);
 }
 
-Matrix4x4 Matrix::MakeAffineMatrix(Transform transform) {
+Matrix4x4 Matrix::MakeAffineMatrix(EulerTransform transform) {
 	return MakeAffineMatrix(transform.position, transform.rotation, transform.scale);
+}
+
+Matrix4x4 Matrix::MakeAffineMatrix(QuaternionTransform transform) {
+	return MakeScaleMatrix(transform.scale) *
+		transform.rotation.ToMatrix() *
+		MakeTranslationMatrix(transform.position);
 }
 
 bool CollisionChecker(AABB a, AABB b) {

@@ -21,7 +21,7 @@ public:
 protected:
 	
 	std::unique_ptr<ModelResource> modelResource_;
-	Transform transform_;
+	EulerTransform transform_;
 
 };
 

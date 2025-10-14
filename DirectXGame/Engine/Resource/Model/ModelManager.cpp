@@ -3,7 +3,7 @@
 
 namespace fs = std::filesystem;
 
-ModelManager::ModelManager(TextureManager* textureManager, DXDevice* device) {
+ModelManager::ModelManager(TextureManager* textureManager, DXDevice* device, SRVManager* srvManager) {
 	textureManager_ = textureManager;
 	device_ = device;
 }
@@ -38,14 +38,19 @@ int ModelManager::LoadModel(const std::string& directoryPath) {
 			glbfile = gltffile;
 		}
 
-		//glbが見つかったら
-		objfile = glbfile;
+		models_.push_back(std::make_unique<ModelData>());
+		models_.back()->LoadModel(basePath_ + directoryPath, glbfile[0], textureManager_, device_);
+		
+		animations_[static_cast<int>(models_.size() - 1)] = Animation();
+		animations_[static_cast<int>(models_.size() - 1)] = LoadAnimationFile(basePath_ + directoryPath, glbfile[0]);
 
-	} 
+	} else {
 
-	//モデルの読み込み
-	models_.push_back(std::make_unique<ModelData>());
-	models_.back()->LoadModel(basePath_ + directoryPath, objfile[0], textureManager_, device_);
+		//モデルの読み込み
+		models_.push_back(std::make_unique<ModelData>());
+		models_.back()->LoadModel(basePath_ + directoryPath, objfile[0], textureManager_, device_);
+
+	}
 
 	this->modelHandleMap_[directoryPath] = int(models_.size() - 1);
 
@@ -57,4 +62,11 @@ ModelData* ModelManager::GetModelData(int modelHandle) {
 		return nullptr;
 	}
 	return models_[modelHandle].get();
+}
+
+Animation ModelManager::GetAnimation(int modelHandle) {
+	if(animations_.find(modelHandle) == animations_.end()) {
+		return Animation();
+	}
+	return animations_[modelHandle];
 }

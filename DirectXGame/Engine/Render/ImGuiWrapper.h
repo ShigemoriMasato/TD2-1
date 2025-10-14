@@ -30,14 +30,14 @@ public:
 
 	void GuizmoUpdate();
 
-	int AddItem(std::string name, Matrix4x4* matrix, Transform* transform);
+	int AddItem(std::string name, Matrix4x4* matrix, EulerTransform* transform);
 
 private:
 
 	struct GuizmoData {
 		std::string name;
 		Matrix4x4* matrix;
-		Transform* transform;
+		EulerTransform* transform;
 	};
 
 	void UseGuizmo(ImGuizmo::OPERATION operationType, GuizmoData& data);

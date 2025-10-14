@@ -78,6 +78,9 @@
     <ClCompile Include="AppSource\Game\Player\MoveNumManager.cpp" />
     <ClCompile Include="AppSource\Game\Player\Player.cpp" />
     <ClCompile Include="AppSource\Game\Player\Wire.cpp" />
+    <ClCompile Include="Engine\Resource\Model\ModelAnimation.cpp" />
+    <ClCompile Include="Engine\Resource\Model\ModelSkeleton.cpp" />
+    <ClCompile Include="Engine\Render\Resource\SkeletonDrawer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -148,6 +151,9 @@
     <ClInclude Include="AppSource\Game\Player\Wire.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Game\Scene\GameScene.h" />
+    <ClInclude Include="Engine\Resource\Model\ModelAnimation.h" />
+    <ClInclude Include="Engine\Resource\Model\ModelSkeleton.h" />
+    <ClInclude Include="Engine\Render\Resource\SkeletonDrawer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

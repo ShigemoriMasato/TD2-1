@@ -3,7 +3,7 @@
 #include <memory>
 
 using namespace Matrix;
-struct Transform;
+struct EulerTransform;
 
 //初期値を画面サイズ1280*720と仮定して設定
 
@@ -26,7 +26,7 @@ struct OrthographicDesc {
 class Camera {
 public:
 
-	Camera() : transform_(std::make_shared<Transform>()) {};
+	Camera() : transform_(std::make_shared<EulerTransform>()) {};
 	~Camera() = default;
 	
 	void SetProjectionMatrix(PerspectiveFovDesc desc);
@@ -35,7 +35,7 @@ public:
 	void MakeMatrix();
 	void DrawImGui();
 
-	void SetTransform(Transform* transform);
+	void SetTransform(EulerTransform* transform);
 	void SetTransform(Matrix4x4 mat);
 
 	Matrix4x4 GetVPMatrix() const;
@@ -43,7 +43,7 @@ public:
 	virtual Vector3 GetPosition() const {
 		return transform_->position;
 	}
-	Transform GetTransform() const { return *transform_; }
+	EulerTransform GetTransform() const { return *transform_; }
 	Matrix4x4 GetTranformMatrix() const { return transformMatrix_; }
 	Matrix4x4 GetProjectionMatrix() const { return projectionMatrix; }
 
@@ -52,7 +52,7 @@ protected:
 	Matrix4x4 projectionMatrix = Matrix::MakeIdentity4x4();		//ワールド行列にこれをかけると正射影になる
 	Matrix4x4 vpMatrix = Matrix::MakeIdentity4x4();			//w抜きviewport変換行列
 
-	std::shared_ptr<Transform> transform_ = {};							//カメラ座標
+	std::shared_ptr<EulerTransform> transform_ = {};							//カメラ座標
 	Matrix4x4 transformMatrix_ = Matrix::MakeIdentity4x4();	//カメラ座標変換行列
 
 	bool isSetMatrix = false;
