@@ -98,6 +98,6 @@ void ModelResource::DrawReadyNode(NodeTransform node, const Matrix4x4& parentMat
 	matrix_[node.nodeIndex].wvp = matrix_[node.nodeIndex].world * camera_->GetVPMatrix();
 
 	for(auto& child : node.children) {
-		DrawReadyNode(child, matrix_[node.nodeIndex].world);
+		DrawReadyNode(child, parentMatrix * node.localMatrix * localMatrix);
 	}
 }
