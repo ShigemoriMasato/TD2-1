@@ -599,7 +599,7 @@ Vector3 deCasteljau(const std::vector<Vector3>& controlPoints, float t)
 
 bool CollisionChecker(BaseObject* a, BaseObject* b)
 {
-	auto aCollider = a->GetCollider();
+	/*auto aCollider = a->GetCollider();
 	auto bCollider = b->GetCollider();
 
 	auto distance = aCollider.first.position - bCollider.first.position;
@@ -608,7 +608,7 @@ bool CollisionChecker(BaseObject* a, BaseObject* b)
 	if (length <= aCollider.second + bCollider.second)
 	{
 		return true;
-	}
+	}*/
 
 	return false;
 }
@@ -809,6 +809,11 @@ Vector3 MyMath::cross(const Vector3& a, const Vector3& b)
 float MyMath::dot(const Vector3& a, const Vector3& b)
 {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+float MyMath::Length(const Vector3& vec)
+{
+	return std::sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
 }
 
 Matrix3x3 Matrix::Inverse(const Matrix3x3& mat)
