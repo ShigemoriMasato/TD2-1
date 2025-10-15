@@ -140,6 +140,7 @@ namespace MyMath {
 
 	Vector3 cross(const Vector3& a, const Vector3& b);
 	float dot(const Vector3& a, const Vector3& b);
+	float Length(const Vector3& vec);
 }
 
 class BaseObject;
