@@ -4,6 +4,7 @@
 #include <assimp/anim.h>
 #include <cassert>
 #include <Math/MyMath.h>
+#include <assimp/postprocess.h>
 
 using namespace MyMath;
 
@@ -11,7 +12,7 @@ Animation LoadAnimationFile(const std::string& directoryPath, const std::string&
 	Animation animation;
 	Assimp::Importer importer;
 	std::string path = (directoryPath + "/" + filename);
-	const aiScene* scene = importer.ReadFile(path.c_str(), 0);
+	const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
 	if (scene->mNumAnimations == 0) return animation;
 	aiAnimation* animationAssimp = scene->mAnimations[0];
 	animation.duration = static_cast<float>(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
@@ -25,7 +26,9 @@ Animation LoadAnimationFile(const std::string& directoryPath, const std::string&
 			aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
 			KeyframeVector3 keyframe;
 			keyframe.time = static_cast<float>(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
-			keyframe.value = { -keyAssimp.mValue.x, keyAssimp.mValue.y, keyAssimp.mValue.z };
+			keyframe.value.x = keyAssimp.mValue.x;
+			keyframe.value.y = keyAssimp.mValue.y;
+			keyframe.value.z = keyAssimp.mValue.z;
 			nodeAnimation.translate.push_back(keyframe);
 		}
 
@@ -33,7 +36,10 @@ Animation LoadAnimationFile(const std::string& directoryPath, const std::string&
 			aiQuatKey& keyAssimp = nodeAnimationAssimp->mRotationKeys[keyIndex];
 			KeyframeQuaternion keyframe;
 			keyframe.time = static_cast<float>(keyAssimp.mTime / animationAssimp->mTicksPerSecond);
-			keyframe.value = { keyAssimp.mValue.w, keyAssimp.mValue.x, -keyAssimp.mValue.y, -keyAssimp.mValue.z };
+			keyframe.value.x = keyAssimp.mValue.x;
+			keyframe.value.y = keyAssimp.mValue.y;
+			keyframe.value.z = keyAssimp.mValue.z;
+			keyframe.value.w = keyAssimp.mValue.w;
 			nodeAnimation.rotate.push_back(keyframe);
 		}
 
@@ -81,7 +87,7 @@ Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, floa
 
 		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time) {
 
-			float t = (time - keyframes[index].time) / keyframes[nextIndex].time - keyframes[index].time;
+			float t = (time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time);
 			return lerp(keyframes[index].value, keyframes[nextIndex].value, t);
 		}
 	}

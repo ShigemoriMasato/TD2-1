@@ -4,6 +4,17 @@ void SkeletonDrawer::Initialize(Skeleton skeleton, Animation anim, Camera* camer
 	SkeletonUpdate(skeleton);
 
 	for (const auto& joint : skeleton.joints) {
+
+		auto res = std::make_unique<DrawResource>();
+		res->Initialize(ShapeType::Sphere);
+		res->SetWorldMatrix(joint.skeletonSpaceMatrix);
+		res->color_ = 0xffffffff;
+		res->camera_ = camera;
+		res->psoConfig_.rasterizerID = RasterizerID::Wireframe;
+		res->psoConfig_.isSwapChain = true;
+		resource_.push_back(std::move(res));
+		resMap_.push_back({ joint.index, joint.index });
+
 		if (joint.parent.has_value()) {
 
 			auto res = std::make_unique<DrawResource>();
@@ -11,15 +22,11 @@ void SkeletonDrawer::Initialize(Skeleton skeleton, Animation anim, Camera* camer
 
 			res->localPos_ = {
 				{
-					joint.skeletonSpaceMatrix.m[3][0],
-					joint.skeletonSpaceMatrix.m[3][1],
-					joint.skeletonSpaceMatrix.m[3][2],
+					0,0,0
 				},
 
 				{
-					skeleton.joints[joint.parent.value()].skeletonSpaceMatrix.m[3][0],
-					skeleton.joints[joint.parent.value()].skeletonSpaceMatrix.m[3][1],
-					skeleton.joints[joint.parent.value()].skeletonSpaceMatrix.m[3][2],
+					0,0,0
 				}
 			};
 
@@ -49,18 +56,22 @@ void SkeletonDrawer::Update() {
 
 		auto& res = resource_[i];
 
-		res->localPos_ = {
-			{
-				skeleton_.joints[f].skeletonSpaceMatrix.m[3][0],
-				skeleton_.joints[f].skeletonSpaceMatrix.m[3][1],
-				skeleton_.joints[f].skeletonSpaceMatrix.m[3][2]
-			},
-			{
-				skeleton_.joints[s].skeletonSpaceMatrix.m[3][0],
-				skeleton_.joints[s].skeletonSpaceMatrix.m[3][1],
-				skeleton_.joints[s].skeletonSpaceMatrix.m[3][2]
-			}
-		};
+		if (f != s) {
+			res->localPos_ = {
+				{
+					skeleton_.joints[f].skeletonSpaceMatrix.m[3][0],
+					skeleton_.joints[f].skeletonSpaceMatrix.m[3][1],
+					skeleton_.joints[f].skeletonSpaceMatrix.m[3][2]
+				},
+				{
+					skeleton_.joints[s].skeletonSpaceMatrix.m[3][0],
+					skeleton_.joints[s].skeletonSpaceMatrix.m[3][1],
+					skeleton_.joints[s].skeletonSpaceMatrix.m[3][2]
+				}
+			};
+		} else {
+			res->SetWorldMatrix(skeleton_.joints[f].skeletonSpaceMatrix);
+		}
 	}
 }
 

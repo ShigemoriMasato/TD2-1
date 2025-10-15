@@ -33,7 +33,7 @@ int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std:
 void SkeletonUpdate(Skeleton& skeleton) {
 	for (auto& joint : skeleton.joints) {
 		joint.localMatrix = MakeAffineMatrix(joint.transform);
-		if (joint.parent) {
+		if (joint.parent.has_value()) {
 			joint.skeletonSpaceMatrix = joint.localMatrix * skeleton.joints[*joint.parent].skeletonSpaceMatrix;
 		} else {
 			joint.skeletonSpaceMatrix = joint.localMatrix;

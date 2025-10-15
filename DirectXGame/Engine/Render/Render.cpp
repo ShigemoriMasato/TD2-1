@@ -225,13 +225,15 @@ void Render::Draw(ModelResource* resource) {
     auto drawDatas = resource->GetModelDrawDatas();
     auto data = resource->GetModelData();
 
+    std::string name = "None";
+
     D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
-        *data->vertexBufferViews_["None"].bufferView.get(),
+        *data->vertexBufferViews_[name].bufferView.get(),
         data->skinCluster_.influenceBufferView
     };
 
     commandList->IASetVertexBuffers(0, 2, vbvs);
-    commandList->IASetIndexBuffer(data->indexBufferViews_["None"].bufferView.get());
+    commandList->IASetIndexBuffer(data->indexBufferViews_[name].bufferView.get());
     //Material
     commandList->SetGraphicsRootConstantBufferView(0, resource->GetMaterialResource()->GetGPUVirtualAddress());
     //Matrixのポインタを設定
@@ -241,7 +243,7 @@ void Render::Draw(ModelResource* resource) {
     //Texture
     commandList->SetGraphicsRootDescriptorTable(3, textureManager_->GetTextureData(data->material_[0].textureHandle)->GetTextureGPUHandle());
     //インデックスがある場合は、インデックスを設定して描画
-    commandList->DrawIndexedInstanced(data->indexBufferViews_["None"].indexNum, 1, 0, 0, 0);
+    commandList->DrawIndexedInstanced(data->indexBufferViews_[name].indexNum, 1, 0, 0, 0);
 
 }
 

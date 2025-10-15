@@ -71,49 +71,51 @@ void PSOManager::Initialize() {
 
 				for (int ds = 0; ds < int(DepthStencilID::Count); ++ds) {
 
-					for (int shader = 0; shader < shaderData_.size(); ++shader) {
+					for (int rast = 0; rast < int(RasterizerID::Count); ++rast) {
 
-						PSOConfig config;
-						config.vs = shaderData_[shader].vs;
-						config.ps = shaderData_[shader].ps;
-						config.inputLayoutID = shaderData_[shader].inputLayoutID;
-						config.rootID = shaderData_[shader].rootSignatureID;
-						config.depthStencilID = static_cast<DepthStencilID>(ds);
-						config.blendID = static_cast<BlendStateID>(blend);
-						config.topology = commandT;
-						config.isSwapChain = bool(isSwapChain);
+						for (int shader = 0; shader < shaderData_.size(); ++shader) {
 
-						//以下defaultとして上で設定したものを使う
-						config.rasterizerID = RasterizerID::Fill;
+							PSOConfig config;
+							config.vs = shaderData_[shader].vs;
+							config.ps = shaderData_[shader].ps;
+							config.inputLayoutID = shaderData_[shader].inputLayoutID;
+							config.rootID = shaderData_[shader].rootSignatureID;
+							config.depthStencilID = static_cast<DepthStencilID>(ds);
+							config.blendID = static_cast<BlendStateID>(blend);
+							config.topology = commandT;
+							config.isSwapChain = bool(isSwapChain);
+							config.rasterizerID = static_cast<RasterizerID>(rast);
 
-						config.Validate(*shaderShelf_.get(), *inputLayoutShelf_.get(), *rootSignatureShelf_.get(), logger_);
+							config.Validate(*shaderShelf_.get(), *inputLayoutShelf_.get(), *rootSignatureShelf_.get(), logger_);
 
-						//defaultとして設定したPSOを持ってくる
-						D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = basicDesc;
+							//defaultとして設定したPSOを持ってくる
+							D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = basicDesc;
 
-						psoDesc.pRootSignature = rootSignatureShelf_->GetRootSignature(config.rootID);
-						psoDesc.VS = shaderShelf_->GetShaderBytecode(ShaderType::VERTEX_SHADER, config.vs);
-						psoDesc.PS = shaderShelf_->GetShaderBytecode(ShaderType::PIXEL_SHADER, config.ps);
-						psoDesc.DepthStencilState = depthStencilShelf_->GetDepthStencilDesc(config.depthStencilID);
-						psoDesc.BlendState = blendStateShelf_->GetBlendState(config.blendID);
-						psoDesc.RasterizerState = rasterizerShelf_->GetRasterizerDesc(config.rasterizerID);
-						psoDesc.InputLayout = inputLayoutShelf_->GetInputLayoutDesc(config.inputLayoutID);
+							psoDesc.pRootSignature = rootSignatureShelf_->GetRootSignature(config.rootID);
+							psoDesc.VS = shaderShelf_->GetShaderBytecode(ShaderType::VERTEX_SHADER, config.vs);
+							psoDesc.PS = shaderShelf_->GetShaderBytecode(ShaderType::PIXEL_SHADER, config.ps);
+							psoDesc.DepthStencilState = depthStencilShelf_->GetDepthStencilDesc(config.depthStencilID);
+							psoDesc.BlendState = blendStateShelf_->GetBlendState(config.blendID);
+							psoDesc.RasterizerState = rasterizerShelf_->GetRasterizerDesc(config.rasterizerID);
+							psoDesc.InputLayout = inputLayoutShelf_->GetInputLayoutDesc(config.inputLayoutID);
 
-						psoDesc.RTVFormats[0] = config.isSwapChain ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
-						psoDesc.PrimitiveTopologyType = topologyMap_[config.topology];
+							psoDesc.RTVFormats[0] = config.isSwapChain ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
+							psoDesc.PrimitiveTopologyType = topologyMap_[config.topology];
 
-						ID3D12PipelineState* pso = nullptr;
+							ID3D12PipelineState* pso = nullptr;
 
-						HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso));
+							HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso));
 
-						if (FAILED(hr)) {
-							logger_->Log(std::format("Failed to Create PSO : DepthStencilID {}, BlendStateID {}", ds, blend));
-							assert(false && "Failed to create PSO");
-						}
+							if (FAILED(hr)) {
+								logger_->Log(std::format("Failed to Create PSO : DepthStencilID {}, BlendStateID {}", ds, blend));
+								assert(false && "Failed to create PSO");
+							}
 
-						psoMap_[config] = pso;
+							psoMap_[config] = pso;
 
-					}//shader
+						}//shader
+
+					}//rasterizer
 
 				}//topology
 

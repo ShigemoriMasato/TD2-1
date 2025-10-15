@@ -61,13 +61,13 @@ void ModelResource::DrawReady() {
 	
 	animationTime_ += 1.f / 60;
 	animationTime_ = std::fmod(animationTime_, animation_->duration);
-	//SkeletonAnimation(skeleton_, *animation_, animationTime_);
+	SkeletonAnimation(skeleton_, *animation_, animationTime_);
 	SkeletonUpdate(skeleton_);
 
 	modelData_->skinCluster_.Update(skeleton_);
 
-	animationTime_ += FPSObserver::GetDeltatime();
+	//todo 変えろ！！！！
 
-	matrix_->world = Matrix::MakeScaleMatrix(scale_) * Matrix::MakeRotationMatrix(rotate_) * Matrix::MakeTranslationMatrix(position_);
-	matrix_->wvp = matrix_->world * camera_->GetVPMatrix();
+	matrix_->world = Matrix::MakeIdentity4x4();
+	matrix_->wvp = Matrix::MakeIdentity4x4() * camera_->GetVPMatrix();
 }

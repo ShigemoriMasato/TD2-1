@@ -62,11 +62,11 @@ struct Sphere {
 
 //即興クオータニオン。仕組みはよくわかってない。AI制なので、いい感じに変えて
 struct Quaternion {
-	float w = 1.0f, x = 0.0f, y = 0.0f, z = 0.0f;
+	float x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f;
 
 	// 単位クオータニオン生成（回転なし）
 	static Quaternion Identity() {
-		return { 1, 0, 0, 0 };
+		return { 0, 0, 0, 1 };
 	}
 
 	// 軸と角度から生成
@@ -74,41 +74,36 @@ struct Quaternion {
 		float half = angle * 0.5f;
 		float s = sin(half);
 		return {
-			cos(half),
 			axis.x * s,
 			axis.y * s,
-			axis.z * s
+			axis.z * s,
+			cos(half)
 		};
 	}
 
 	// 正規化
 	Quaternion Normalize() const {
-		float len = sqrt(w * w + x * x + y * y + z * z);
+		float len = sqrt(x * x + y * y + z * z + w * w);
 		if (len == 0.0f) {
-			return { 1, 0, 0, 0 };
+			return { 0, 0, 0, 1 };
 		}
-		return { w / len, x / len, y / len, z / len };
-	}
-
-	// 掛け算（回転合成）
-	Quaternion operator*(const Quaternion& q) const {
-		return {
-			w * q.w - x * q.x - y * q.y - z * q.z,
-			w * q.x + x * q.w + y * q.z - z * q.y,
-			w * q.y - x * q.z + y * q.w + z * q.x,
-			w * q.z + x * q.y - y * q.x + z * q.w
-		};
+		return { x / len, y / len, z / len, w / len };
 	}
 
 	Matrix4x4 ToMatrix() const {
 		// 正規化
 		Quaternion a = Normalize();
 
+		float x2 = a.x * a.x;
+		float y2 = a.y * a.y;
+		float z2 = a.z * a.z;
+		float w2 = a.w * a.w;
+
 		return {
-			1 - 2 * (a.y * a.y + a.z * a.z),  2 * (a.x * a.y + a.z * a.w),    2 * (a.x * a.z - a.y * a.w),    0,
-			2 * (a.x * a.y - a.z * a.w),      1 - 2 * (a.x * a.x + a.z * a.z),2 * (a.y * a.z + a.x * a.w),    0,
-			2 * (a.x * a.z + a.y * a.w),      2 * (a.y * a.z - a.x * a.w),    1 - 2 * (a.x * a.x + a.y * a.y),0,
-			0,                             0,                          0,                          1
+			w2 + x2 - y2 - z2, 2 * (a.x * a.y + a.w * a.z), 2 * (a.x * a.z - a.w * a.y), 0,
+			2 * (a.x * a.y - a.w * a.z), w2 - x2 + y2 - z2, 2 * (a.y * a.z + a.w * a.x), 0,
+			2 * (a.x * a.z + a.w * a.y), 2 * (a.y * a.z - a.w * a.x), w2 - x2 - y2 + z2, 0,
+			0, 0, 0, 1
 		};
 	}
 };

@@ -48,7 +48,7 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
     aiQuaternion rotate;
     node->mTransformation.Decompose(scale, rotate, translate);
     result.transform.scale = { scale.x, scale.y, scale.z };
-    result.transform.rotation = { rotate.w, rotate.x, rotate.y, rotate.z };
+    result.transform.rotation = { rotate.x, rotate.y, rotate.z, rotate.w };
     result.transform.position = { translate.x, translate.y, translate.z };
     result.localMatrix = Matrix::MakeAffineMatrix(result.transform);
     
@@ -91,7 +91,7 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
             bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
             Matrix4x4 bindPoseMatrix = Matrix::MakeAffineMatrix({
                 {scale.x, scale.y, scale.z},
-                {rotate.w, rotate.x, rotate.y, rotate.z},
+                {rotate.x, rotate.y, rotate.z, rotate.w},
                 {translate.x, translate.y, translate.z}
                 });
             jointWeightData.inverseBindPoseMatrix = Inverse(bindPoseMatrix);
@@ -99,7 +99,7 @@ Node ModelData::LoadNode(aiNode* node, const aiScene* scene) {
             for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
                 jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId });
             }
-        }
+        }//bone
 
     }//mesh
 

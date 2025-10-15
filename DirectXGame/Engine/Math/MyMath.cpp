@@ -583,10 +583,10 @@ Vector4 MyMath::lerp(const Vector4& a, const Vector4& b, float t) {
 
 Quaternion MyMath::lerp(const Quaternion& a, const Quaternion& b, float t) {
 	return Quaternion(
-		lerp(a.w, b.w, t),
 		lerp(a.x, b.x, t),
 		lerp(a.y, b.y, t),
-		lerp(a.z, b.z, t)
+		lerp(a.z, b.z, t),
+		lerp(a.w, b.w, t)
 	).Normalize();
 }
 
