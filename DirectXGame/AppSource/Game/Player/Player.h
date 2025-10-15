@@ -21,6 +21,7 @@ public:
 	void SetTargets(const std::list<BaseObject*>* targets) { targets_ = targets; }
 	void SetKeyConfig(std::unordered_map<Key, bool>* keyConfig) { key_ = keyConfig; }
 private:
+
 	enum class Behavior
 	{
 		Extend,			//伸ばす
@@ -32,7 +33,8 @@ private:
 
 private://状態変数
 	//プレイヤー状態
-	Behavior* behavior_ = nullptr;
+	Behavior behavior_ = Behavior::Idel;
+	Behavior behaviorPrev_ = Behavior::Idel;
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
 
 private://パラメータ
@@ -43,6 +45,28 @@ private:
 	const std::list<BaseObject*>* targets_ = nullptr;
 	std::unordered_map<Key, bool>* key_ = nullptr;
 private://メンバ関数
+	//ビヘイビアリクエスト
+	void RequestBehavior();
+    void UpdateBehavior(float deltaTime);
 
+	//ワイヤーを伸ばす
+	void OnExtend();
+	void UpdateExtend(float deltaTime);
+
+	//ワイヤーを縮める
+    void OnShrink();
+    void UpdateShrink(float deltaTime);
+
+	//プレイヤー待機
+	void OnIdel();
+	void UpdateIdel(float deltaTime);
+
+    //プレイヤー吊り下げ
+    void OnHanging();
+    void UpdateHanging(float deltaTime);
+
+    //プレイヤーダッシュ
+    void OnDash();
+    void UpdateDash(float deltaTime);
 };
 
