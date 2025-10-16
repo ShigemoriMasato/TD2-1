@@ -273,21 +273,6 @@
     <ClCompile Include="AppSource\Game\Enemy\BaseEnemy.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy2.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Enemy\FloatingEnemy.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Player\Movement\PlayerMovement.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\FPS\TimeSlower.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="AppSource\Game\Collision\Collision.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -298,6 +283,25 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="AppSource\Game\Physics\PhysicsActor.cpp">
+    <ClCompile Include="AppSource\Game\Player\Movement\PlayerMovement.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\FPS\TimeSlower.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Collision\Collision.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Enemy\Division\DivisionEnemy.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Enemy\Division\SplitEnemy.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Enemy\EnemyFactory.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -512,16 +516,6 @@
     <ClInclude Include="AppSource\Game\Enemy\BaseEnemy.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy2.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Enemy\FloatingEnemy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\FPS\TimeSlower.h">
     <ClInclude Include="AppSource\Game\Collision\Collision.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -535,6 +529,23 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="AppSource\Game\Physics\PhysicsActor.h">
+    <ClInclude Include="AppSource\Game\FPS\TimeSlower.h">
+    <ClInclude Include="AppSource\Game\Collision\Collision.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\Enemy\Division\DivisionEnemy.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\Enemy\Division\SplitEnemy.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\Enemy\EnemyFactory.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\Enemy\EnemySpawnParams.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
