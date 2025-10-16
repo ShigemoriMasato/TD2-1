@@ -53,8 +53,6 @@ std::unique_ptr<BaseScene> GameScene::Update()
 
 	float deltaTime = timeSlower_->GetDeltaTime();
 
-	auto deltaTime = FPSObserver::GetDeltatime() * slowmotionFactor_;
-	
 	// EnemyManagerにキー入力を渡す
 	if (enemyManager_) {
 		enemyManager_->SetKeys(keys_);
