@@ -56,7 +56,7 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	timeSlower_->Update();
 
 	float deltaTime = timeSlower_->GetDeltaTime();
-	
+
 	// EnemyManagerにキー入力を渡す
 	if (enemyManager_) {
 		enemyManager_->SetKeys(keys_);
