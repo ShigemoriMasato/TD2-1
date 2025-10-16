@@ -47,8 +47,8 @@ private:
 
 	float maxSpeed_ = 20.0f;
 
-	static const inline float gravity_ = -9.8f;
-
+	static const inline float gravity_ = -9.8f;		// 重力
+	static const inline float friction_ = 0.9f;	// 摩擦係数
 private:
 	//全ての判定を行う
 	void CheckAllCollisions();
