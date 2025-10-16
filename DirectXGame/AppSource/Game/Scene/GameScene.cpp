@@ -1,8 +1,10 @@
 #include "GameScene.h"
 #include "../Player/Player.h"
+#include "../Enemy/EnemyManager.h"
 
 #include <Tools/FPS/FPSObserver.h>
 #include <cmath>
+#include <algorithm>
 
 void GameScene::Initialize()
 {
@@ -45,6 +47,12 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	camera_->Update();
 
 	auto deltaTime = FPSObserver::GetDeltatime() * slowmotionFactor_;
+	
+	// EnemyManagerにキー入力を渡す
+	if (enemyManager_) {
+		enemyManager_->SetKeys(keys_);
+	}
+
 	//オブジェクト更新
 	for (auto& object : objects_)
 	{
@@ -52,42 +60,6 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	}
 
 	enemyManager_->Update(deltaTime);
-
-	// テスト用：仮想プレイヤーの位置を左右に移動させる
-	static float testPlayerX = -5.0f;
-	static float direction = 1.0f;
-
-	testPlayerX += direction * 2.0f * deltaTime; // 2.0f units per second
-
-	// 範囲制限（-5.0f から 10.0f まで移動）
-	if (testPlayerX > 10.0f)
-	{
-		testPlayerX = 10.0f;
-		direction = -1.0f;
-	}
-	else if (testPlayerX < -5.0f)
-	{
-		testPlayerX = -5.0f;
-		direction = 1.0f;
-	}
-
-	Vector3 testPlayerPos = { testPlayerX, 0.0f, 5.0f };
-
-	// EnemyManagerにプレイヤー位置を通知
-	for (auto& object : objects_)
-	{
-		// EnemyManagerの場合のみプレイヤー位置を設定
-		if (auto* enemyManager = dynamic_cast<EnemyManager*>(object.get()))
-		{
-			enemyManager->SetPlayerPosition(testPlayerPos);
-		}
-	}
-
-	//オブジェクト更新
-	for (auto& object : objects_)
-	{
-		object->Update(deltaTime);
-	}
 
 	//ワイヤ出せる範囲をチェック
 	CheckPlayerWireField();
@@ -105,6 +77,8 @@ void GameScene::Draw()
 	{
 		object->Draw(render_);
 	}
+
+	enemyManager_->Draw(render_);
 }
 
 void GameScene::CheckAllCollision()
