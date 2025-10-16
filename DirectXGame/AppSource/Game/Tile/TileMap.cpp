@@ -20,6 +20,7 @@ void TileMap::LoadMap(TileInfo&& tiles)
 	tiles_ = std::move(tiles);
 	mapSize_.x = static_cast<float>(tiles_.width);
 	mapSize_.y = static_cast<float>(tiles_.height);
+	physicsEngine_->SetWorldBounds(AABB({0,0,0},Vector3(WorldSize())));
 }
 
 TileType TileMap::GetTileInfoAt(int x, int y) const
@@ -61,6 +62,7 @@ Vector2 TileMap::WorldSize() const
 void TileMap::SetModelData(ModelData* modelData, Camera* camera)
 {
 	int index = 0;
+	srand(1);
 	for (int y = 0; y < tiles_.height; ++y)
 	{
 		for (int x = 0; x < tiles_.width; ++x)
@@ -72,6 +74,7 @@ void TileMap::SetModelData(ModelData* modelData, Camera* camera)
 				resource->camera_ = camera;
 				resource->psoConfig_.isSwapChain = true;
 				resource->position_ = Vector3(x * size_.x, (mapSize_.y - 1 - y) * size_.y, 0.0f);
+				resource->color_ = 0x808080ff | (rand() % (x + 1) + 101);
 				models_.push_back(std::move(resource));
 				index++;
 			}

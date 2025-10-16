@@ -47,7 +47,7 @@ private:
 
 	float maxSpeed_ = 20.0f;
 
-	static const inline float gravity_ = 9.8f;
+	static const inline float gravity_ = -9.8f;
 
 private:
 	//全ての判定を行う

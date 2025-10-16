@@ -18,3 +18,8 @@ void BaseObject::Draw(Render* render)
 
 
 }
+
+void BaseObject::SetActor(PhysicsEngine* physicsEngine)
+{
+	actor_ = std::make_unique<PhysicsActor>(physicsEngine,this);
+}
