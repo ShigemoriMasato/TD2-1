@@ -33,6 +33,10 @@ public:
 	/// @param speed 追跡速度
 	void SetTrackingSpeed(float speed) { trackingSpeed_ = speed; }
 
+	/// @brief 敵固有の設定を行う
+	/// @param params スポーンパラメータ
+	void Configure(const EnemySpawnParams& params) override;
+
 private:
 	// 追跡速度
 	float trackingSpeed_ = 1.0f;

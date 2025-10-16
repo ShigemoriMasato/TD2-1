@@ -1,4 +1,5 @@
 #include "TrackerEnemy.h"
+#include "../EnemySpawnParams.h"
 #include <Tools/FPS/FPSObserver.h>
 #include <Common/KeyConfig/KeyManager.h>
 
@@ -76,5 +77,26 @@ void TrackerEnemy::SetPosition(const Vector3& position) {
 	transform_.position = position;
 	if (modelResource_) {
 		modelResource_->position_ = transform_.position;
+	}
+}
+
+void TrackerEnemy::Configure(const EnemySpawnParams& params) {
+	// 基本的な Transform 設定
+	transform_.position = params.position;
+	transform_.rotation = params.rotation;
+	transform_.scale = params.scale;
+
+	// TrackerEnemy 固有のパラメータ設定
+	float speed = params.GetFloat("trackingSpeed", 1.0f);
+	int hp = params.GetInt("hp", 3);
+	
+	SetTrackingSpeed(speed);
+	hp_ = hp;
+
+	// ModelResource に反映
+	if (modelResource_) {
+		modelResource_->position_ = transform_.position;
+		modelResource_->rotate_ = transform_.rotation;
+		modelResource_->scale_ = transform_.scale;
 	}
 }

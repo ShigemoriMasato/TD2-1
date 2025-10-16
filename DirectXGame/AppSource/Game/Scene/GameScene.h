@@ -33,7 +33,9 @@ private://特定なオブジェクト
 	std::unique_ptr<Wire> wire_ = nullptr;
 private://使える関数
 
-	void CheckAllCollision();
-	void CheckPlayerWireField();
+void CheckAllCollision();
+void CheckPlayerWireField();
+///// @brief 敵の配置を設定する
+//void SetupEnemies();
 };
 

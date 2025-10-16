@@ -6,8 +6,17 @@
 
 /// @brief 敵のスポーンパラメータ
 struct EnemySpawnParams {
+	// 基本的な空間配置パラメータ
 	Vector3 position = { 0.0f, 0.0f, 0.0f };
+	Vector3 rotation = { 0.0f, 0.0f, 0.0f };
+	Vector3 scale = { 1.0f, 1.0f, 1.0f };
+	
+	// モデル設定
 	std::string modelName = "testEnemy";
+	
+	// ゲーム設定
+	std::string teamTag = "enemy";  // チーム識別子
+	int priority = 0;               // 優先度（描画順等）
 	
 	// 敵固有のパラメータ（柔軟に拡張可能）
 	std::unordered_map<std::string, std::variant<float, int, bool, std::string>> customParams;

@@ -39,9 +39,4 @@ private:
 	ModelManager* modelManager_ = nullptr;
 	Camera* camera_ = nullptr;
 	std::unordered_map<std::string, EnemyCreator> enemyRegistry_;
-	
-	/// @brief 敵の基本設定を行う
-	/// @param enemy 敵オブジェクト
-	/// @param params スポーンパラメータ
-	void ConfigureEnemyBase(BaseEnemy* enemy, const EnemySpawnParams& params);
 };

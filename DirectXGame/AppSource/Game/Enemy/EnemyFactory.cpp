@@ -45,8 +45,8 @@ std::unique_ptr<BaseEnemy> EnemyFactory::CreateEnemy(const std::string& enemyTyp
 
 	enemy->Initialize(modelData, camera_);
 
-	// 基本設定を適用
-	ConfigureEnemyBase(enemy.get(), params);
+	// 敵固有の設定を適用（dynamic_cast不要！）
+	enemy->Configure(params);
 
 	return enemy;
 }
@@ -57,33 +57,4 @@ std::vector<std::string> EnemyFactory::GetRegisteredEnemyTypes() const {
 		types.push_back(pair.first);
 	}
 	return types;
-}
-
-void EnemyFactory::ConfigureEnemyBase(BaseEnemy* enemy, const EnemySpawnParams& params) {
-	// 位置設定（敵タイプによって個別処理）
-	if (auto* divisionEnemy = dynamic_cast<DivisionEnemy*>(enemy)) {
-		divisionEnemy->SetPosition(params.position);
-
-		// DivisionEnemy固有のパラメータ設定
-		bool canDivide = params.GetBool("canDivide", true);
-		divisionEnemy->SetCanDivide(canDivide);
-
-	} else if (auto* splitEnemy = dynamic_cast<SplitEnemy*>(enemy)) {
-		bool isLeft = params.GetBool("isLeft", false);
-		splitEnemy->SetPosition(params.position, isLeft);
-
-	} else if (auto* trackerEnemy = dynamic_cast<TrackerEnemy*>(enemy)) {
-		trackerEnemy->SetPosition(params.position);
-
-		// TrackerEnemy固有のパラメータ設定
-		float trackingSpeed = params.GetFloat("trackingSpeed", 1.0f);
-		trackerEnemy->SetTrackingSpeed(trackingSpeed);
-
-	} else {
-		// その他の敵はTransformを直接設定
-		enemy->GetTransform()->position = params.position;
-	}
-
-	// 共通パラメータの設定があれば追加
-	// 例：HP、速度など
 }

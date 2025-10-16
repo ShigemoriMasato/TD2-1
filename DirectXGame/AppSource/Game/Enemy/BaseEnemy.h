@@ -4,6 +4,9 @@
 #include <unordered_map>
 #include <Common/KeyConfig/KeyManager.h>
 
+// 前方宣言
+struct EnemySpawnParams;
+
 
 class BaseEnemy : public BaseObject
 {
@@ -30,6 +33,9 @@ public:
 
 	// 共通インターフェース：死亡状態を取得
 	virtual bool IsDead() const { return !isAlive_; }
+
+	// 敵固有の設定を行う（Factory パターンで使用）
+	virtual void Configure(const EnemySpawnParams& params) {}
 
 protected:
 	Vector3 playerPosition_ = { 0.0f, 0.0f, 0.0f };
