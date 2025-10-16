@@ -7,32 +7,14 @@
 EnemyManager::EnemyManager() {
 }
 
-
 void EnemyManager::Initialize(ModelManager* modelManager, Camera* camera) {
 	modelManager_ = modelManager;
 	camera_ = camera;
 	
 	// Enemy Factory を初期化
 	enemyFactory_.Initialize(modelManager, camera);
-
-	// 分裂可能な敵を1体スポーン（新しいAPI使用）
-	EnemySpawnParams params;
-	params.position = { 2.0f, 0.0f, 0.0f };
-	params.modelName = "testEnemy";
-	params.customParams["canDivide"] = true;
 	
-	if (SpawnEnemy("DivisionEnemy", params)) {
-		// 追加待ちリストの最後に追加された敵（DivisionEnemy）にコールバックを設定
-		if (!enemiesToAdd_.empty()) {
-			if (auto* divisionEnemy = dynamic_cast<DivisionEnemy*>(enemiesToAdd_.back().get())) {
-				divisionEnemy->SetDivisionCallback(
-					[this](const Vector3& position, bool isLeft) {
-						this->AddSplitEnemy(position, isLeft);
-					}
-				);
-			}
-		}
-	}
+	// 初期敵配置はシーン側で行う（EnemyManagerは管理のみに専念）
 }
 
 void EnemyManager::Update(float deltaTime) {
@@ -80,7 +62,6 @@ void EnemyManager::Draw(Render* render) {
 	}
 }
 
-
 void EnemyManager::SetPlayerPosition(const Vector3& playerPos) {
 	// 全ての敵にプレイヤーの位置を通知
 	for (auto& enemy : enemies_) {
@@ -89,7 +70,6 @@ void EnemyManager::SetPlayerPosition(const Vector3& playerPos) {
 		}
 	}
 }
-
 
 void EnemyManager::ClearEnemies() {
 	enemies_.clear();
@@ -121,4 +101,22 @@ void EnemyManager::AddSplitEnemy(const Vector3& position, bool isLeft) {
 	params.customParams["isLeft"] = isLeft;
 	
 	SpawnEnemy("SplitEnemy", params);
+}
+
+// DivisionEnemyの分裂コールバック設定用ヘルパー関数
+bool EnemyManager::SetupDivisionEnemy(const std::string& enemyType, const EnemySpawnParams& params) {
+	if (SpawnEnemy(enemyType, params)) {
+		// 追加待ちリストの最後に追加された敵（DivisionEnemy）にコールバックを設定
+		if (!enemiesToAdd_.empty()) {
+			if (auto* divisionEnemy = dynamic_cast<DivisionEnemy*>(enemiesToAdd_.back().get())) {
+				divisionEnemy->SetDivisionCallback(
+					[this](const Vector3& position, bool isLeft) {
+						this->AddSplitEnemy(position, isLeft);
+					}
+				);
+				return true;
+			}
+		}
+	}
+	return false;
 }

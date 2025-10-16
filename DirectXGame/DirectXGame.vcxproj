@@ -21,7 +21,6 @@
     <ClCompile Include="AppSource\Game\Enemy\EnemyFactory.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\EnemyManager.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.cpp" />
-    <ClCompile Include="AppSource\Game\Scene\EnemyTestScene.cpp" />
     <ClCompile Include="AppSource\Game\Collision\Collision.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\Division\DivisionEnemy.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
@@ -100,7 +99,6 @@
     <ClInclude Include="AppSource\Game\Enemy\Division\SplitEnemy.h" />
     <ClInclude Include="AppSource\Game\Enemy\EnemySpawnParams.h" />
     <ClInclude Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.h" />
-    <ClInclude Include="AppSource\Game\Scene\EnemyTestScene.h" />
     <ClInclude Include="AppSource\Game\Collision\Collision.h" />
     <ClInclude Include="AppSource\Game\Enemy\Division\DivisionEnemy.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />

@@ -56,22 +56,28 @@ public:
 	/// @return EnemyFactory参照
 	EnemyFactory& GetFactory() { return enemyFactory_; }
 
+	/// @brief DivisionEnemyをスポーンして分裂コールバックを自動設定
+	/// @param enemyType 敵の種類名（通常は"DivisionEnemy"）
+	/// @param params スポーンパラメータ
+	/// @return 生成に成功したかどうか
+	bool SetupDivisionEnemy(const std::string& enemyType, const EnemySpawnParams& params);
+
 private:
-std::vector<std::unique_ptr<BaseEnemy>> enemies_;
-std::vector<std::unique_ptr<BaseEnemy>> enemiesToAdd_; // 追加待ちの敵
-ModelManager* modelManager_ = nullptr;
-Camera* camera_ = nullptr;
-std::unordered_map<Key, bool> keys_;
+	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
+	std::vector<std::unique_ptr<BaseEnemy>> enemiesToAdd_; // 追加待ちの敵
+	ModelManager* modelManager_ = nullptr;
+	Camera* camera_ = nullptr;
+	std::unordered_map<Key, bool> keys_;
 
-// Enemy Factory
-EnemyFactory enemyFactory_;
+	// Enemy Factory
+	EnemyFactory enemyFactory_;
 
-// 分裂用のモデル名（デフォルト）
-std::string divisionModelName_ = "testEnemy";
+	// 分裂用のモデル名（デフォルト）
+	std::string divisionModelName_ = "testEnemy";
 
-/// @brief 分裂後の敵を追加（コールバック用）
-/// @param position 生成位置
-/// @param isLeft 左の敵かどうか
-void AddSplitEnemy(const Vector3& position, bool isLeft);
+	/// @brief 分裂後の敵を追加（コールバック用）
+	/// @param position 生成位置
+	/// @param isLeft 左の敵かどうか
+	void AddSplitEnemy(const Vector3& position, bool isLeft);
 };
 

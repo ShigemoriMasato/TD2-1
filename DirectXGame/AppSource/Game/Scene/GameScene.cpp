@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "../Player/Player.h"
 #include "../Enemy/EnemyManager.h"
+#include "../Enemy/EnemySpawnParams.h"
 
 #include <Tools/FPS/FPSObserver.h>
 #include <cmath>
@@ -27,6 +28,9 @@ void GameScene::Initialize()
 	{
 		enemyManager_ = std::make_unique<EnemyManager>();
 		enemyManager_->Initialize(modelManager_, camera_.get());
+		
+		//// 敵の配置を行う
+		//SetupEnemies();
 	}
 
 	//ワイヤー初期化
@@ -56,17 +60,19 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	// EnemyManagerにキー入力を渡す
 	if (enemyManager_) {
 		enemyManager_->SetKeys(keys_);
+		
+		// プレイヤーの位置を敵に通知
+		if (player_) {
+			enemyManager_->SetPlayerPosition(player_->GetTransform()->position);
+		}
 
-	enemyManager_->Update(deltaTime);
-
+		enemyManager_->Update(deltaTime);
 	}
 
 	//オブジェクト更新
 	for (auto& object : objects_){
 		object->Update(deltaTime);
 	}
-
-	enemyManager_->Update(deltaTime);
 
 	//ワイヤ出せる範囲をチェック
 	CheckPlayerWireField();
@@ -122,3 +128,72 @@ void GameScene::CheckPlayerWireField()
 	}
 	collisionObjects.clear();
 }
+
+//void GameScene::SetupEnemies() {
+//	// 分裂可能な敵を配置（ボス敵）
+//	{
+//		EnemySpawnParams params;
+//		params.position = { 5.0f, 0.0f, 0.0f };
+//		params.rotation = { 0.0f, 0.0f, 0.0f };
+//		params.scale = { 1.5f, 1.5f, 1.5f };  // 少し大きめに
+//		params.modelName = "testEnemy";
+//		params.teamTag = "boss";
+//		params.customParams["canDivide"] = true;
+//		
+//		enemyManager_->SetupDivisionEnemy("DivisionEnemy", params);
+//	}
+//
+//	// 追跡敵を複数配置
+//	{
+//		// 追跡敵1
+//		EnemySpawnParams params1;
+//		params1.position = { -3.0f, 0.0f, 2.0f };
+//		params1.scale = { 0.8f, 0.8f, 0.8f };
+//		params1.modelName = "testEnemy";
+//		params1.teamTag = "normal";
+//		params1.customParams["trackingSpeed"] = 1.2f;
+//		params1.customParams["hp"] = 3;
+//		
+//		enemyManager_->SpawnEnemy("TrackerEnemy", params1);
+//
+//		// 追跡敵2
+//		EnemySpawnParams params2;
+//		params2.position = { -3.0f, 0.0f, -2.0f };
+//		params2.scale = { 0.8f, 0.8f, 0.8f };
+//		params2.modelName = "testEnemy";
+//		params2.teamTag = "normal";
+//		params2.customParams["trackingSpeed"] = 0.8f;
+//		params2.customParams["hp"] = 5;
+//		
+//		enemyManager_->SpawnEnemy("TrackerEnemy", params2);
+//
+//		// 追跡敵3（少し遠くに配置）
+//		EnemySpawnParams params3;
+//		params3.position = { 8.0f, 0.0f, -5.0f };
+//		params3.rotation = { 0.0f, 45.0f, 0.0f };  // 45度回転
+//		params3.scale = { 1.0f, 1.0f, 1.0f };
+//		params3.modelName = "testEnemy";
+//		params3.teamTag = "elite";
+//		params3.customParams["trackingSpeed"] = 2.0f;  // 高速
+//		params3.customParams["hp"] = 8;
+//		
+//		enemyManager_->SpawnEnemy("TrackerEnemy", params3);
+//	}
+//
+//	// 通常の敵をランダムな位置に配置
+//	for (int i = 0; i < 3; ++i) {
+//		EnemySpawnParams params;
+//		params.position = { 
+//			static_cast<float>(-5 + i * 3), 
+//			0.0f, 
+//			static_cast<float>(-8 + i * 2)
+//		};
+//		params.rotation = { 0.0f, static_cast<float>(i * 30), 0.0f };
+//		params.modelName = "testEnemy";
+//		params.teamTag = "normal";
+//		params.customParams["trackingSpeed"] = 1.0f + i * 0.2f;
+//		params.customParams["hp"] = 2 + i;
+//		
+//		enemyManager_->SpawnEnemy("TrackerEnemy", params);
+//	}
+//}

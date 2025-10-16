@@ -36,6 +36,10 @@ public:
 	/// @return 死亡フラグ
 	bool IsDead() const override { return isDead_; }
 
+	/// @brief 敵固有の設定を行う
+	/// @param params スポーンパラメータ
+	void Configure(const EnemySpawnParams& params) override;
+
 private:
 	// 移動速度
 	float moveSpeed_ = 2.0f;

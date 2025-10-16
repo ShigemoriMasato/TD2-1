@@ -1,4 +1,5 @@
 #include "DivisionEnemy.h"
+#include "../EnemySpawnParams.h"
 #include <Tools/FPS/FPSObserver.h>
 
 void DivisionEnemy::Initialize(ModelData* modelData, Camera* camera)
@@ -80,4 +81,25 @@ void DivisionEnemy::SetPosition(const Vector3& position)
 		modelResource_->position_ = transform_.position;
 	}
 }
+
+void DivisionEnemy::Configure(const EnemySpawnParams& params)
+{
+	// 基本的な Transform 設定
+	transform_.position = params.position;
+	transform_.rotation = params.rotation;
+	transform_.scale = params.scale;
+
+	// DivisionEnemy 固有のパラメータ設定
+	bool canDivide = params.GetBool("canDivide", true);
+	SetCanDivide(canDivide);
+
+	// ModelResource に反映
+	if (modelResource_) {
+		modelResource_->position_ = transform_.position;
+		modelResource_->rotate_ = transform_.rotation;
+		modelResource_->scale_ = transform_.scale;
+	}
+}
+
+
 

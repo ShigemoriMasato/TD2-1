@@ -47,6 +47,10 @@ public:
 	/// @param position 位置
 	void SetPosition(const Vector3& position);
 
+	/// @brief 敵固有の設定を行う
+	/// @param params スポーンパラメータ
+	void Configure(const EnemySpawnParams& params) override;
+
 private:
 	// 分裂可能フラグ（trueなら死亡時に分裂、falseなら分裂しない）
 	bool canDivide_ = true;
