@@ -49,6 +49,15 @@ struct ParticleData final
 	Vector4 color;
 };
 
+struct ModelParticleData final
+{
+	Matrix4x4 wvp;
+	Matrix4x4 world;
+	Vector4 color;
+	int textureIndex;
+	Vector3 padding;
+};
+
 struct MatrixData final
 {
 	Matrix4x4 wvp;

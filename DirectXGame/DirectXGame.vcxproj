@@ -90,6 +90,7 @@
     <ClCompile Include="AppSource\Game\Tile\TileMap.cpp" />
     <ClCompile Include="AppSource\Game\Physics\PhysicsEngine.cpp" />
     <ClCompile Include="AppSource\Game\Physics\PhysicsActor.cpp" />
+    <ClCompile Include="Engine\Render\Resource\MPResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -172,6 +173,7 @@
     <ClInclude Include="AppSource\Game\Tile\TileMap.h" />
     <ClInclude Include="AppSource\Game\Physics\PhysicsEngine.h" />
     <ClInclude Include="AppSource\Game\Physics\PhysicsActor.h" />
+    <ClInclude Include="Engine\Render\Resource\MPResource.h" />
     <ClInclude Include="AppSource\Game\LevelLoader.h" />
   </ItemGroup>
   <ItemGroup>

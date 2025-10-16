@@ -7,6 +7,9 @@
 #include <cmath>
 #include <algorithm>
 
+namespace {
+}
+
 void GameScene::Initialize()
 {
 	camera_ = std::make_unique<DebugCamera>();
@@ -22,7 +25,6 @@ void GameScene::Initialize()
 		player->SetKeyConfig(&keys_);
 		player_ = player.get();
 		objects_.push_back(std::move(player));
-
 	}
 
 	{
@@ -98,6 +100,7 @@ void GameScene::Draw()
 	{
 		object->Draw(render_);
 	}
+
 	tileMap_->Draw(render_);
 	enemyManager_->Draw(render_);
 }
