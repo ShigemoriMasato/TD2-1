@@ -4,6 +4,7 @@
 #include <Render/Resource/DrawResource.h>
 #include <Render/Resource/ModelResource.h>
 #include <Render/Resource/ParticleResource.h>
+#include <Render/Resource/MPResource.h>
 #include <Resource/Texture/TextureManager.h>
 #include <Resource/OffScreen/OffScreenManager.h>
 #include <Render/ImGuiWrapper.h>
@@ -21,6 +22,7 @@ public:
 	void Draw(DrawResource* resource);
 	void Draw(ModelResource* resource);
 	void Draw(ParticleResource* resource);
+	void Draw(MPResource* resource);
 	void PostDraw(ImGuiWrapper* imguiRap);
 
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
