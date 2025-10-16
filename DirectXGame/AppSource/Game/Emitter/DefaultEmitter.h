@@ -40,7 +40,7 @@ public:
 	//初期化
 	void Initialize(Camera* camera);
 	//更新
-	void Update();
+	void Update(float deltaTime);
 	//描画
 	void Draw(Render* render);
 

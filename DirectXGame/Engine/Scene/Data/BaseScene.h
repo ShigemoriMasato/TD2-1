@@ -21,6 +21,7 @@ protected:
 	Render* render_ = nullptr;
 	Input* input_ = nullptr;
 	AudioManager* audio_ = nullptr;
+	FPSObserver* fpsObserver_ = nullptr;
 
 };
 

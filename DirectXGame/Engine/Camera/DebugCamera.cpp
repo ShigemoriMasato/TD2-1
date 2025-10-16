@@ -3,6 +3,10 @@
 #include "Camera.h"
 #include <numbers>
 
+#ifdef max
+#undef max
+#endif
+
 using namespace Matrix;
 
 void DebugCamera::Initialize() {
@@ -39,7 +43,7 @@ void DebugCamera::Update() {
 		spherical_ += Vector3(mouseWheel * 0.05f, mouseMove.y * speed_, -mouseMove.x * speed_);
 	}
 
-	spherical_.x = max(0.01f, spherical_.x); // マイナスにならないようにする
+	spherical_.x = std::max(0.01f, spherical_.x); // マイナスにならないようにする
 
 	transform_->position.x = std::sinf(spherical_.y) * std::cosf(spherical_.z);
 	transform_->position.y = std::cosf(spherical_.y);

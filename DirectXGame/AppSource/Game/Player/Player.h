@@ -2,13 +2,15 @@
 #include"../BaseObject.h"
 #include <optional>
 #include <Common/KeyConfig/KeyManager.h>
+#include <Game/FPS/TimeSlower.h>
 
+; /* このセミコロンを消したらエラーが出る。 */
 class Wire;
 class Player : public BaseObject
 {
 public:
 
-	Player();
+	Player(TimeSlower* slower);
 	~Player();
 
 	void Initialize(ModelData* modelData, Camera* camera)override;
@@ -24,46 +26,65 @@ private:
 
 	enum class Behavior
 	{
+		Idle,			//待機(着地)
+		Forcus,			//狙いを定める
 		Extend,			//伸ばす
-		Shrink,			//縮める
-		Idel,			//待機(着地)
-		Hanging,		//吊り下げ
 		Dash,			//ダッシュ
 	};
 
 private://状態変数
 	//プレイヤー状態
-	Behavior behavior_ = Behavior::Idel;
-	Behavior behaviorPrev_ = Behavior::Idel;
+	Behavior behavior_ = Behavior::Idle;
+	Behavior behaviorPrev_ = Behavior::Idle;
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
 
 private://パラメータ
-	float moveSpeed_ = 10.0f;
+	Vector3 velocity_ = {};
+
+	//移動速度
+	const float moveSpeed_ = 10.0f;
+	//ダッシュ中のキーによる移動速度
+	const float dashMoveSpeed_ = 5.0f;
+
+	//重力
+	const float gravity_ = -9.8f;
+	//ワイヤーを伸ばしてる時の重力適用率
+	const float extendGravityRate_ = 0.1f;
+	//ワイヤーで引っ張った時の最初の速度
+	const float dashPower_ = 20.0f;
+	//dashの速度軽減率
+	const float dashRegistRate_ = 0.99f;
+
+	//wireを再び伸ばせるまでのクールタイム
+	float wireCoolTime_ = 0.0f;
+	const float maxWireCoolTime_ = 0.5f;
 
 private:
+
 	Wire* wire_ = nullptr;
 	const std::list<BaseObject*>* targets_ = nullptr;
 	std::unordered_map<Key, bool>* key_ = nullptr;
+
+	TimeSlower* timeSlower_ = nullptr;
+
 private://メンバ関数
 	//ビヘイビアリクエスト
 	void RequestBehavior();
-    void UpdateBehavior(float deltaTime);
 
-	//ワイヤーを伸ばす
-	void OnExtend();
-	void UpdateExtend(float deltaTime);
-
-	//ワイヤーを縮める
-    void OnShrink();
-    void UpdateShrink(float deltaTime);
+	static void (Player::*behaviorUpdate[])(float);
+	static void (Player::*behaviorOn[])();
 
 	//プレイヤー待機
 	void OnIdel();
 	void UpdateIdel(float deltaTime);
 
-    //プレイヤー吊り下げ
-    void OnHanging();
-    void UpdateHanging(float deltaTime);
+	//ワイヤーの狙いを定める
+	void OnForcus();
+	void UpdateForcus(float deltaTime);
+
+	//ワイヤーを伸ばす
+	void OnExtend();
+	void UpdateExtend(float deltaTime);
 
     //プレイヤーダッシュ
     void OnDash();

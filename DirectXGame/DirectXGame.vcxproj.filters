@@ -165,9 +165,6 @@
     <ClCompile Include="Engine\Scene\SceneManager.cpp">
       <Filter>MyEngine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Scene\TitleScene.cpp">
-      <Filter>MyEngine\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\DXCommonFunction.cpp">
       <Filter>MyEngine\Core</Filter>
     </ClCompile>
@@ -285,6 +282,12 @@
     <ClCompile Include="AppSource\Game\Enemy\FloatingEnemy.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="AppSource\Game\Player\Movement\PlayerMovement.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\FPS\TimeSlower.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -381,9 +384,6 @@
       <Filter>MyEngine\Render\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\SceneManager.h">
-      <Filter>MyEngine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Scene\TitleScene.h">
       <Filter>MyEngine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\DXCommonFunction.h">
@@ -507,6 +507,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="AppSource\Game\Enemy\FloatingEnemy.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSource\Game\FPS\TimeSlower.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
