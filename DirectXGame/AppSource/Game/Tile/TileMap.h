@@ -55,7 +55,7 @@ public:
     void SetDraw(bool isDraw){isDraw_ = isDraw;}
     void SetPhysicsEngine(PhysicsEngine* physicsEngine){physicsEngine_ = physicsEngine;}
 
-    void SetModelData(ModelData* modelData,Camera* camera);
+    void SetModelData(TextureManager* textureManager, ModelData* modelData, Camera* camera);
 
     void Draw(Render* render);
 private:
@@ -63,7 +63,7 @@ private:
     Vector2 mapSize_;
     
     TileInfo tiles_;
-    std::vector<std::unique_ptr<ModelResource>> models_;
+	std::unique_ptr<MPResource> mpResource_ = nullptr;
 
     bool isDraw_ = false;
 

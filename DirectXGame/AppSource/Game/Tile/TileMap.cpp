@@ -7,6 +7,7 @@ using Json = nlohmann::json;
 TileMap::TileMap(PhysicsEngine* physicsEngine)
 	: physicsEngine_(physicsEngine)
 {
+	mpResource_ = std::make_unique<MPResource>();
 	physicsEngine_->RegisterTileMap(this);
 }
 
@@ -21,6 +22,7 @@ void TileMap::LoadMap(TileInfo&& tiles)
 	mapSize_.x = static_cast<float>(tiles_.width);
 	mapSize_.y = static_cast<float>(tiles_.height);
 	physicsEngine_->SetWorldBounds(AABB({0,0,0},Vector3(WorldSize())));
+
 }
 
 TileType TileMap::GetTileInfoAt(int x, int y) const
@@ -59,27 +61,38 @@ Vector2 TileMap::WorldSize() const
 	return worldSize;
 }
 
-void TileMap::SetModelData(ModelData* modelData, Camera* camera)
+void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData, Camera* camera)
 {
 	int index = 0;
 	srand(1);
+	mpResource_->Initialize(modelData, tiles_.width * tiles_.height);
+	MPResource* resource = mpResource_.get();
 	for (int y = 0; y < tiles_.height; ++y)
 	{
 		for (int x = 0; x < tiles_.width; ++x)
 		{
 			if (GetTileInfoAt(x, y) != TileType::Empty)
 			{
-				std::unique_ptr<ModelResource> resource = std::make_unique<ModelResource>();
-				resource->Initialize(modelData);
 				resource->camera_ = camera;
 				resource->psoConfig_.isSwapChain = true;
-				resource->position_ = Vector3(x * size_.x, (mapSize_.y - 1 - y) * size_.y, 0.0f);
-				resource->color_ = 0x808080ff | (rand() % (x + 1) + 101);
-				models_.push_back(std::move(resource));
+				resource->position_[index] = Vector3(x * size_.x, (mapSize_.y - 1 - y) * size_.y, 0.0f);
+				resource->color_[index] = 0x808080ff | (rand() % (x + 1) + 101);
 				index++;
 			}
 		}
 	}
+
+	//画像のリソースの先頭をセット
+	//int handle = textureManager->LoadTexture("Assets/Texture/Mapchip/Block01.png");
+	//textureManager->LoadTexture("Assets/Texture/Mapchip/Block02.png");
+	//textureManager->LoadTexture("Assets/Texture/Mapchip/Block03.png");
+	//textureManager->LoadTexture("Assets/Texture/Mapchip/Block04.png");
+	//その他読み込み
+	//
+	//mpResource_->textureStartIndex_ = handle;
+
+	//今はとりあえずwhite1x1とかを入れとく
+	mpResource_->textureStartIndex_ = 0;
 }
 
 void TileMap::Draw(Render* render)
@@ -104,8 +117,5 @@ void TileMap::Draw(Render* render)
 
 		 }
 	 }*/
-	for (auto& model : models_)
-	{
-		render->Draw(model.get());
-	}
+	render->Draw(mpResource_.get());
 }

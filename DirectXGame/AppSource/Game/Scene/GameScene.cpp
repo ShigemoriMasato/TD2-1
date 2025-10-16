@@ -54,7 +54,7 @@ void GameScene::Initialize()
 		auto handle = modelManager_->LoadModel("testBlock");
 		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
 		levelLoader_.LoadLevel("Assets/Map/test.json", *tileMap_);
-		tileMap_->SetModelData(modelManager_->GetModelData(handle), camera_.get());
+		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_.get());
 
 		auto testPlayer = std::make_unique<TestPlayer>();
 		testPlayer->Initialize(modelManager_->GetModelData(handle), camera_.get());

@@ -45,6 +45,7 @@ public:		//以下描画設定項目 ---==================
 	int textureStartIndex_ = 0;
 
 	Camera* camera_ = nullptr;
+	bool billboard_ = false;
 
 	//いじる必要なし
 	D3D12_GPU_DESCRIPTOR_HANDLE* textureHandles_ = nullptr;
@@ -67,6 +68,5 @@ private:
 	//これを変える際は、RootSignatureとShaderも変える
 	const uint32_t maxTextureNum_ = 8;
 
-	bool billboard_ = true;
 };
 

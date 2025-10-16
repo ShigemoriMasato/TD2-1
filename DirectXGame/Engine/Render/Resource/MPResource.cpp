@@ -40,7 +40,7 @@ void MPResource::Initialize(ModelData* modelData, int instanceNum) {
 		srvDesc.Buffer.FirstElement = 0;
 		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 		srvDesc.Buffer.NumElements = instanceNum;
-		srvDesc.Buffer.StructureByteStride = sizeof(ParticleData);
+		srvDesc.Buffer.StructureByteStride = sizeof(ModelParticleData);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE matrixCPUHandle = srvManager_->GetCPUHandle();
 		particleDataGPUHandle_ = srvManager_->GetGPUHandle();

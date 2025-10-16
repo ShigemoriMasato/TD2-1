@@ -14,6 +14,8 @@ void PhysicsEngine::RegisterActor(PhysicsActor* actor)
 
 void PhysicsEngine::UnregisterActor(PhysicsActor* actor)
 {
+	if (actors_.empty()) return;
+
 	auto it = std::remove(actors_.begin(), actors_.end(), actor);
 	actors_.erase(it, actors_.end());
 }
