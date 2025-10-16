@@ -259,7 +259,7 @@ void Render::Draw(ParticleResource* resource) {
     psoEditor_->Setting(commandList.Get());
 
 	//ParticleDataのポインタを設定
-	commandList->SetGraphicsRootDescriptorTable(0, resource->GetParticleDataSRVDesc());
+	commandList->SetGraphicsRootDescriptorTable(0, resource->GetParticleDataGPUHandle());
 	//Texture
 	commandList->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
 
@@ -271,6 +271,28 @@ void Render::Draw(ParticleResource* resource) {
         commandList->DrawInstanced(resource->GetVertexNum(), resource->GetInstanceNum(), 0, 0);
     }
 
+}
+
+void Render::Draw(MPResource* resource) {
+
+    resource->DrawReady();
+
+    auto vertexBufferView = resource->GetVertexBufferView();
+    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+    uint32_t indexNum = resource->GetIndexNum();
+    auto indexBufferView = resource->GetIndexBufferView();
+    commandList->IASetIndexBuffer(&indexBufferView);
+
+    psoEditor_->SetPSOConfig(resource->psoConfig_);
+    psoEditor_->Setting(commandList.Get());
+
+    //ParticleDataのポインタを設定
+    commandList->SetGraphicsRootDescriptorTable(0, resource->GetParticleDataGPUHandle());
+	//Texture
+	commandList->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureData(resource->textureStartIndex_)->GetTextureGPUHandle());
+
+    commandList->DrawIndexedInstanced(indexNum, resource->GetInstanceNum(), 0, 0, 0);
 }
 
 void Render::PostDraw(ImGuiWrapper* imguiRap) {
