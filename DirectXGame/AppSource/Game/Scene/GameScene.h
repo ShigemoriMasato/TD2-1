@@ -6,6 +6,9 @@
 #include <unordered_map>
 #include "../Enemy/EnemyManager.h"
 #include "../Player/Wire.h"
+#include "../Physics/PhysicsEngine.h"
+#include "../LevelLoader.h"
+#include "../Tile/TileMap.h"
 
 class Player;
 class GameScene : public BaseScene
@@ -21,6 +24,10 @@ private://管理用メンバ変数
 	std::vector<std::unique_ptr<BaseObject>> objects_;
 	std::unique_ptr<DebugCamera> camera_ = nullptr;
 	std::unordered_map<Key, bool> keys_{};
+
+	PhysicsEngine physicsEngine_;
+	LevelLoader levelLoader_;
+	std::unique_ptr<TileMap> tileMap_ = nullptr;
 private://パラメータ変数
 
 	float slowmotionFactor_ = 1.0f;

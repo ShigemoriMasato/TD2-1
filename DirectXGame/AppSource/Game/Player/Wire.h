@@ -13,7 +13,7 @@ public:
 
 	void Update(float deltaTime)override;
 
-	std::pair<Transform, float>GetCollider()const { return { transform_,radius_ }; }
+
 private:
 
 

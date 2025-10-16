@@ -61,7 +61,7 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	dxDevice_->Initialize();
 
 	render_ = std::make_unique<Render>(dxDevice_.get());
-	srvManager_ = std::make_unique<SRVManager>(dxDevice_.get(), 256);
+	srvManager_ = std::make_unique<SRVManager>(dxDevice_.get(), 4096);
 
 	BaseResource::StaticInitialize(dxDevice_.get(), srvManager_.get());
 	ParticleResource::StaticInitialize(dxDevice_.get(), srvManager_.get());
