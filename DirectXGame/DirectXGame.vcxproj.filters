@@ -165,9 +165,6 @@
     <ClCompile Include="Engine\Scene\SceneManager.cpp">
       <Filter>MyEngine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Scene\TitleScene.cpp">
-      <Filter>MyEngine\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\DXCommonFunction.cpp">
       <Filter>MyEngine\Core</Filter>
     </ClCompile>
@@ -286,6 +283,13 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="AppSource\Game\Physics\PhysicsActor.cpp">
+    <ClCompile Include="AppSource\Game\Player\Movement\PlayerMovement.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\FPS\TimeSlower.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSource\Game\Collision\Collision.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="AppSource\Game\Enemy\Division\DivisionEnemy.cpp">
@@ -396,9 +400,6 @@
       <Filter>MyEngine\Render\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\SceneManager.h">
-      <Filter>MyEngine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Scene\TitleScene.h">
       <Filter>MyEngine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\DXCommonFunction.h">
@@ -528,6 +529,8 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="AppSource\Game\Physics\PhysicsActor.h">
+    <ClInclude Include="AppSource\Game\FPS\TimeSlower.h">
+    <ClInclude Include="AppSource\Game\Collision\Collision.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="AppSource\Game\Enemy\Division\DivisionEnemy.h">

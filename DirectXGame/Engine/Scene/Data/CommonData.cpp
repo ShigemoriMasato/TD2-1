@@ -24,8 +24,9 @@ CommonData::CommonData() {
 	keyManager_->SetButton(Key::Down, XBoxController::kDown, KeyState::Hold);
 	keyManager_->SetStick(Key::Down, true, true, -0.5f);
 	
-	keyManager_->SetKey(Key::Action, DIK_SPACE, KeyState::Trigger);
-	keyManager_->SetKey(Key::Action, DIK_Z, KeyState::Trigger);
+	keyManager_->SetKey(Key::Action, DIK_SPACE, KeyState::Hold);
+	keyManager_->SetKey(Key::Action, DIK_J, KeyState::Hold);
+	keyManager_->SetKey(Key::Action, DIK_Z, KeyState::Hold);
 	
 	keyManager_->SetKey(Key::Correct, DIK_RETURN, KeyState::Trigger);
 	keyManager_->SetKey(Key::Correct, DIK_SPACE, KeyState::Trigger);

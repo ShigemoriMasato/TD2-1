@@ -11,10 +11,12 @@ void GameScene::Initialize()
 	camera_ = std::make_unique<DebugCamera>();
 	camera_->Initialize();
 
+	timeSlower_ = std::make_unique<TimeSlower>(fpsObserver_);
+
 	//プレイヤー初期化
 	{
-		auto player = std::make_unique<Player>();
-		auto handle = modelManager_->LoadModel("Bunny");
+		auto player = std::make_unique<Player>(timeSlower_.get());
+		auto handle = modelManager_->LoadModel("Cube");
 		player->Initialize(modelManager_->GetModelData(handle), camera_.get());
 		player->SetKeyConfig(&keys_);
 		player_ = player.get();
@@ -45,17 +47,24 @@ std::unique_ptr<BaseScene> GameScene::Update()
 {
 	keys_ = commonData->keyManager_->GetKeyStates();
 	camera_->Update();
+	camera_->DrawImGui();
+
+	timeSlower_->Update();
+
+	float deltaTime = timeSlower_->GetDeltaTime();
 
 	auto deltaTime = FPSObserver::GetDeltatime() * slowmotionFactor_;
 	
 	// EnemyManagerにキー入力を渡す
 	if (enemyManager_) {
 		enemyManager_->SetKeys(keys_);
+
+	enemyManager_->Update(deltaTime);
+
 	}
 
 	//オブジェクト更新
-	for (auto& object : objects_)
-	{
+	for (auto& object : objects_){
 		object->Update(deltaTime);
 	}
 

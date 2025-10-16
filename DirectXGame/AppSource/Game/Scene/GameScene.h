@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include "../Enemy/EnemyManager.h"
 #include "../Player/Wire.h"
+#include <Game/FPS/TimeSlower.h>
 
 class Player;
 class GameScene : public BaseScene
@@ -23,7 +24,7 @@ private://管理用メンバ変数
 	std::unordered_map<Key, bool> keys_{};
 private://パラメータ変数
 
-	float slowmotionFactor_ = 1.0f;
+	std::unique_ptr<TimeSlower> timeSlower_ = nullptr;
 	bool isInWireField_ = false;
 
 private://特定なオブジェクト
