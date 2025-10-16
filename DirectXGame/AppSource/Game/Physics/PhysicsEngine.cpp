@@ -3,6 +3,9 @@
 #include "../Collision/Collider.h"
 #include "../BaseObject.h"
 #include "../Tile/TileMap.h"
+#include <set>
+#undef max
+#undef min
 
 void PhysicsEngine::RegisterActor(PhysicsActor* actor)
 {
@@ -55,7 +58,7 @@ void PhysicsEngine::Update(float deltaTime)
 	//対象のオブジェクトと当たり判定
 	CheckAllCollisions();
 	//当たる結果を処理
-	HandleTileCollision();
+	CheckTileTriggers();
 }
 
 void PhysicsEngine::CheckAllCollisions()
@@ -78,7 +81,7 @@ void PhysicsEngine::CheckAllCollisions()
 			auto* b_collider = b_owner->GetCollider();
 			if (!b_collider || !b_collider->IsActive())continue;
 
-
+			
 			if (Collision::CheckCollision(*a_collider, *b_collider))
 			{
 				if (a_collider->GetTag() != ColliderTag::Static && b_collider->GetTag() == ColliderTag::Static)
@@ -123,7 +126,7 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 	{
 		transform->position = dis;
 		actor->velocity_.x = std::clamp(actor->velocity_.x, -maxSpeed_, maxSpeed_);
-        actor->velocity_.y = std::clamp(actor->velocity_.y, -maxSpeed_, maxSpeed_);
+		actor->velocity_.y = std::clamp(actor->velocity_.y, -maxSpeed_, maxSpeed_);
 		return;
 	}
 
@@ -137,16 +140,16 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 		if (dis.x > 0.0f)
 		{
 			auto rightTopX = newPos.x + objHalfSize.x;
-			auto tileX = TileXIndex(rightTopX,tileSize.x);
+			auto tileX = TileXIndex(rightTopX, tileSize.x);
 			auto tileY = TileYIndex(objPos.y, tileSize.y, worldSize.y);
-			auto tileTypeTop = tile->GetTileTypeAt( tileX, tileY );
+			auto tileTypeTop = tile->GetTileTypeAt(tileX, tileY);
 			auto tileYBottom = TileYIndex(objPos.y - objHalfSize.y + epsilon, tileSize.y, worldSize.y);
-			auto tileTypeBottom = tile->GetTileTypeAt( tileX, tileYBottom );
+			auto tileTypeBottom = tile->GetTileTypeAt(tileX, tileYBottom);
 
 			if (tileTypeTop == TileType::Solid || tileTypeBottom == TileType::Solid)
 			{
 				newPos.x = tileX * tileSize.x - objHalfSize.x;
-                actor->velocity_.x = 0.0f;
+				actor->velocity_.x = 0.0f;
 				actor->collidedRight_ = true;
 			}
 			else
@@ -157,7 +160,7 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 				{
 					if (newPos.y < (tileYBottom + 1) * tileSize.y + objHalfSize.y + heightRight)
 					{
-                        newPos.y = (tileYBottom + 1) * tileSize.y + objHalfSize.y + heightRight;
+						newPos.y = (tileYBottom + 1) * tileSize.y + objHalfSize.y + heightRight;
 						actor->collidedBottom_ = true;
 					}
 				}
@@ -169,59 +172,270 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 			auto leftTopX = newPos.x - objHalfSize.x;
 			auto tileX = TileXIndex(leftTopX, tileSize.x);
 			auto tileY = TileYIndex(objPos.y, tileSize.y, worldSize.y);
-			auto tileTypeTop = tile->GetTileTypeAt( tileX, tileY );
+			auto tileTypeTop = tile->GetTileTypeAt(tileX, tileY);
 
 			auto tileYBottom = TileYIndex(objPos.y - objHalfSize.y + epsilon, tileSize.y, worldSize.y);
-			auto tileTypeBottom = tile->GetTileTypeAt( tileX, tileYBottom );
+			auto tileTypeBottom = tile->GetTileTypeAt(tileX, tileYBottom);
 
 			if (tileTypeTop == TileType::Solid || tileTypeBottom == TileType::Solid)
 			{
 				newPos.x = (tileX + 1) * tileSize.x + objHalfSize.x;
-                actor->velocity_.x = 0.0f;
-                actor->collidedLeft_ = true;
+				actor->velocity_.x = 0.0f;
+				actor->collidedLeft_ = true;
 			}
 			else
 			{
 				auto widthLeft = newPos.x - tileX * tileSize.x - objHalfSize.x;
-                auto heightLeft = GetTileHeightAtWidth(widthLeft, tileTypeBottom, tileSize);
+				auto heightLeft = GetTileHeightAtWidth(widthLeft, tileTypeBottom, tileSize);
 				if (heightLeft > 0.0f)
 				{
 					if (newPos.y < (tileYBottom + 1) * tileSize.y + objHalfSize.y + heightLeft)
 					{
-                        newPos.y = (tileYBottom + 1) * tileSize.y + objHalfSize.y + heightLeft;
-                        actor->collidedBottom_ = true;
+						newPos.y = (tileYBottom + 1) * tileSize.y + objHalfSize.y + heightLeft;
+						actor->collidedBottom_ = true;
 					}
 				}
 			}
 
 		}
-		
+
 		//下方向
 		if (dis.y < 0.0f)
 		{
-			//TODO:
+			auto leftBottomY = newPos.y - objHalfSize.y;
+			auto tileY = TileYIndex(leftBottomY, tileSize.y, worldSize.y);
+			auto tileX = TileXIndex(objPos.x, tileSize.x);
+
+			auto tileTypeLeft = tile->GetTileTypeAt(tileX, tileY);
+			auto tileXRight = TileXIndex(objPos.x + objHalfSize.x - epsilon, tileSize.x);
+			auto tileTypeRight = tile->GetTileTypeAt(tileXRight, tileY);
+
+			if (tileTypeLeft == TileType::Solid || tileTypeRight == TileType::Solid)
+			{
+				newPos.y = (tileY + 1) * tileSize.y + objHalfSize.y;
+				actor->velocity_.y = 0.0f;
+				actor->collidedBottom_ = true;
+			}
+			else
+			{
+				auto widthLeft = newPos.x - tileX * tileSize.x - objHalfSize.x;
+				auto widthRight = newPos.x + objHalfSize.x - (tileXRight + 1) * tileSize.x;
+				auto heightLeft = GetTileHeightAtWidth(widthLeft, tileTypeLeft, tileSize);
+				auto heightRight = GetTileHeightAtWidth(widthRight, tileTypeRight, tileSize);
+				auto height = std::max(heightLeft, heightRight);
+
+				if (height > 0.0f)
+				{
+					if (newPos.y < (tileY + 1) * tileSize.y + objHalfSize.y + height)
+					{
+						newPos.y = (tileY + 1) * tileSize.y + objHalfSize.y + height;
+						actor->velocity_.y = 0.0f;
+						actor->collidedBottom_ = true;
+					}
+				}
+			}
+		}
+		else if (dis.y > 0.0f)
+		{
+			auto topLeftY = newPos.y - objHalfSize.y;
+			auto tileY = TileYIndex(topLeftY, tileSize.y, worldSize.y);
+
+			auto tileX = TileXIndex(objPos.x, tileSize.x);
+			auto tileTypeLeft = tile->GetTileTypeAt(tileX, tileY);
+
+			auto tileXRight = TileXIndex(objPos.x + objHalfSize.x - epsilon, tileSize.x);
+			auto tileTypeRight = tile->GetTileTypeAt(tileXRight, tileY);
+
+			if (tileTypeLeft == TileType::Solid || tileTypeRight == TileType::Solid)
+			{
+				newPos.y = tileY * tileSize.y - objHalfSize.y;
+				actor->velocity_.y = 0.0f;
+				actor->collidedTop_ = true;
+			}
+
 		}
 
 	}
-
+	//速度処理完了してから位置を更新
+	transform->position = Vector3(newPos) - objPos;
+	actor->velocity_.x = std::clamp(actor->velocity_.x, -maxSpeed_, maxSpeed_);
 }
 
 void PhysicsEngine::ResolveObjectCollisions(BaseObject* moveObject, BaseObject* other)
 {
+	auto* moveTransform = moveObject->GetTransform();
+	auto* moveCollider = moveObject->GetCollider();
+	auto* moveActor = moveObject->GetActor();
+
+	auto* otherCollider = other->GetCollider();
+
+	auto movePos = moveCollider->GetWorldAABB().Position();
+	auto otherPos = otherCollider->GetWorldAABB().Position();
+
+	auto moveHalfSize = moveCollider->GetWorldAABB().Size() * 0.5f;
+	auto otherHalfSize = otherCollider->GetWorldAABB().Size() * 0.5f;
+
+	Vector2 dis;
+	dis.x = std::abs(movePos.x - otherPos.x);
+	dis.y = std::abs(movePos.y - otherPos.y);
+
+	auto overlap = Vector2(moveHalfSize + otherHalfSize) - dis;
+	if (overlap.x < 0.0f && overlap.y < 0.0f)return;
+
+	if (overlap.x < overlap.y)
+	{
+		if (movePos.y > otherPos.y)
+		{
+			moveTransform->position.x -= overlap.x;
+			if (moveActor->velocity_.x > 0.0f)
+			{
+				moveActor->velocity_.x = 0.0f;
+				moveActor->collidedRight_ = true;
+			}
+		}
+		else
+		{
+			moveTransform->position.x += overlap.x;
+			if (moveActor->velocity_.x < 0.0f)
+			{
+				moveActor->velocity_.x = 0.0f;
+				moveActor->collidedLeft_ = true;
+			}
+		}
+	}
+	else
+	{
+		if (movePos.x > otherPos.x)
+		{
+			moveTransform->position.y += overlap.y;
+			if (moveActor->velocity_.y < 0.0f)
+			{
+				moveActor->velocity_.y = 0.0f;
+				moveActor->collidedBottom_ = true;
+			}
+		}
+		else
+		{
+			moveTransform->position.y -= overlap.y;
+			if (moveActor->velocity_.y > 0.0f)
+			{
+				moveActor->velocity_.y = 0.0f;
+				moveActor->collidedTop_ = true;
+			}
+		}
+	}
+
 }
 
 void PhysicsEngine::ApplyWorldBounds(PhysicsActor* actor, float deltaTime)
 {
+	if (!actor || !worldBounds_)return;
 
+	auto* obj = actor->owner_;
+	auto* collider = obj->GetCollider();
+	auto* transform = obj->GetTransform();
+	auto objectWorldAABB = collider->GetWorldAABB();
+	auto objPos = objectWorldAABB.Position();
+	auto objHalfSize = objectWorldAABB.Size() * 0.5f;
+
+	//左方向
+	if (objPos.x < worldBounds_->min.x + objHalfSize.x)
+	{
+		actor->velocity_.x = 0.0f;
+		objPos.x = worldBounds_->min.x + objHalfSize.x;
+		actor->collidedLeft_ = true;
+	}
+	//右方向
+	if (objPos.x > worldBounds_->max.x - objHalfSize.x)
+	{
+		actor->velocity_.x = 0.0f;
+		objPos.x = worldBounds_->max.x - objHalfSize.x;
+		actor->collidedRight_ = true;
+	}
+	//上方向
+	if (objPos.y > worldBounds_->max.y + objHalfSize.y)
+	{
+		actor->velocity_.y = 0.0f;
+		objPos.y = worldBounds_->max.y + objHalfSize.y;
+		actor->collidedTop_ = true;
+	}
+	//新しい位置 - 現在位置
+	transform->position += objPos - objectWorldAABB.Position();
 }
 
 float PhysicsEngine::GetTileHeightAtWidth(float width, TileType type, const Vector2& tileSize)
 {
+	auto relX = std::clamp(width / tileSize.x, 0.0f, 1.0f);
+
+	switch (type)
+	{
+	case TileType::Slope_0_1:
+		return relX * tileSize.y;
+	case TileType::Slope_0_0_5:
+		return relX * tileSize.y * 0.5f;
+	case TileType::Slope_0_5_1:
+		return (1.0f - relX) * tileSize.y;
+	case TileType::Slope_0_5_0:
+		return (1.0f - relX) * tileSize.y * 0.5f;
+	case TileType::Slope_1_0:
+		return (1.0f - relX) * tileSize.y;
+	case TileType::Slope_1_0_5:
+		return (1.0f - relX) * tileSize.y * 0.5f;
+	}
+
 	return 0.0f;
 }
 
-void PhysicsEngine::HandleTileCollision()
+void PhysicsEngine::CheckTileTriggers()
 {
+	for (auto* actor : actors_)
+	{
+		if (!actor || !actor->isActive_)continue;
+		auto* obj = actor->owner_;
+		if(!obj)continue;
+		auto* collider = obj->GetCollider();
+        if (!collider)continue;
+
+		//ワールド座標を取得
+		auto worldAABB = collider->GetWorldAABB();
+
+		std::set<TileType>triggersSet;
+
+		for (auto* tile : collisionTiles_)
+		{
+			if (!tile)continue;
+			const auto& tileSize = tile->Size();
+			const auto& tileWorldSize = tile->WorldSize();
+			constexpr float epsilon = 1e-6f;
+
+			auto startX = static_cast<int>(std::floor(worldAABB.min.x / tileSize.x));
+			auto endX = static_cast<int>(std::ceil((worldAABB.max.x - epsilon) / tileSize.x));
+			auto startY =static_cast<int>(std::floor(worldAABB.max.y / tileSize.y));
+			auto endY = static_cast<int>(std::ceil((worldAABB.min.y + epsilon) / tileSize.y));
+
+			for (int x = startX; x < endX; x++)
+			{
+				for (int y = startY; y < endY; y++)
+                {
+					auto tileType = tile->GetTileTypeAt(x, y);
+
+					switch (tileType)
+					{
+					case TileType::Trap:
+						triggersSet.insert(tileType);
+						break;
+					default:
+						break;
+					}
+
+                }
+			}
+		}
+		for (const auto& type : triggersSet)
+		{
+			tileCollisionInfo_.emplace_back(obj, type);
+		}
+	}
 }
 
 int PhysicsEngine::TileXIndex(float x, float size)

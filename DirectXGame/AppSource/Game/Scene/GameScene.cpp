@@ -45,6 +45,14 @@ void GameScene::Initialize()
 		wire2->Initialize(modelManager_->GetModelData(handle), camera_.get());
 		//objects_.push_back(std::move(wire2));
 	}
+
+
+	{
+		auto handle = modelManager_->LoadModel("testBlock");
+		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
+		levelLoader_.LoadLevel("Assets/Map/test.json", *tileMap_);
+		tileMap_->SetModelData(modelManager_->GetModelData(handle), camera_.get());
+	}
 }
 
 std::unique_ptr<BaseScene> GameScene::Update()
@@ -90,22 +98,26 @@ void GameScene::Draw()
 	{
 		object->Draw(render_);
 	}
-
+	tileMap_->Draw(render_);
 	enemyManager_->Draw(render_);
 }
 
 void GameScene::CheckAllCollision()
 {
-	for (auto itA = objects_.begin(); itA != objects_.end(); itA++)
+	const auto& collisionPairs = physicsEngine_.GetCollisionInfo();
+	for (const auto& pair : collisionPairs)
 	{
-		for (auto itB = std::next(itA); itB != objects_.end(); itB++)
-		{
-			if (CollisionChecker((*itA).get(), (*itB).get()))
-			{
-				(*itA)->OnCollision((*itB).get());
-				(*itB)->OnCollision((*itA).get());
-			}
-		}
+		auto* objAColider = pair.first->GetCollider();
+        auto* objBColider = pair.second->GetCollider();
+
+		auto selfA = objAColider->GetSelf();
+		auto maskA = objBColider->GetMask();
+        auto selfB = objBColider->GetSelf();
+        auto maskB = objAColider->GetMask();
+		
+		if(!(selfA & maskB) || !(selfB & maskA))continue;
+		pair.first->OnCollision(pair.second);
+        pair.second->OnCollision(pair.first);
 	}
 }
 

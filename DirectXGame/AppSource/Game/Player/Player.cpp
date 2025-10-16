@@ -33,8 +33,6 @@ Player::~Player()
 void Player::Initialize(ModelData* modelData, Camera* camera) {
 	BaseObject::Initialize(modelData,camera);
 
-	radius_ = 1.0f;
-
 	//debug
 	transform_.scale = { 0.3f, 0.3f, 0.3f };
 }
