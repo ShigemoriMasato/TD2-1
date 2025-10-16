@@ -4,6 +4,9 @@
 #include <Tools/FPS/FPSObserver.h>
 #include <cmath>
 
+namespace {
+}
+
 void GameScene::Initialize()
 {
 	camera_ = std::make_unique<DebugCamera>();
@@ -19,7 +22,6 @@ void GameScene::Initialize()
 		player->SetKeyConfig(&keys_);
 		player_ = player.get();
 		objects_.push_back(std::move(player));
-
 	}
 
 	{
@@ -111,6 +113,7 @@ void GameScene::Draw()
 	{
 		object->Draw(render_);
 	}
+
 }
 
 void GameScene::CheckAllCollision()

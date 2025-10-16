@@ -1,6 +1,7 @@
 #include "ParticleResource.h"
 #include <Core/DXCommonFunction.h>
 #include <Math/MyMath.h>
+#include "MPResource.h"
 
 using namespace Matrix;
 

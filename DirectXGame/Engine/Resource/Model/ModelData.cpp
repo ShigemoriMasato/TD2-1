@@ -16,6 +16,20 @@ void ModelData::LoadModel(const std::string& directoryPath, const std::string& f
 
 	rootNode_ = LoadNode(scene->mRootNode, scene);
 
+    //頂点が0だったらデータを削除する
+    for(const auto& [material, vertex] : vertices_) {
+        if (vertex.size() == 0) {
+			vertices_.erase(material);
+			indices_.erase(material);
+            for(auto it = material_.begin(); it != material_.end(); ++it) {
+                if (it->name == material) {
+                    material_.erase(it);
+                    break;
+                }
+			}
+        }
+	}
+
 	CreateID3D12Resource(device->GetDevice());
 }
 

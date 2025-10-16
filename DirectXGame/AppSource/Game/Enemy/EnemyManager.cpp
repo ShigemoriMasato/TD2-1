@@ -16,10 +16,10 @@ void EnemyManager::Initialize(ModelManager* modelManager, Camera* camera) {
 	// 各敵に異なるモデルを設定
 	auto bunnyEnemy = std::make_unique<BunnyEnemy>();
 	AddEnemy(std::move(bunnyEnemy), "testEnemy"); // BunnyEnemyにはtestEnemyモデル
-	
-	auto bunnyEnemy2 = std::make_unique<BunnyEnemy2>();
-	AddEnemy(std::move(bunnyEnemy2), "Bunny"); // BunnyEnemy2にはBunnyモデル
-	
+	//
+	//auto bunnyEnemy2 = std::make_unique<BunnyEnemy2>();
+	//AddEnemy(std::move(bunnyEnemy2), "Bunny"); // BunnyEnemy2にはBunnyモデル
+	//
 	auto floatingEnemy = std::make_unique<FloatingEnemy>();
 	AddEnemy(std::move(floatingEnemy), "testEnemy"); // FloatingEnemyにはtestEnemyモデル
 }
