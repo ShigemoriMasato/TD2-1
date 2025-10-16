@@ -1,5 +1,6 @@
 #pragma once
 #include "Collision/Collider.h"
+#include "Physics/PhysicsActor.h"
 #include <Render/Resource/ModelResource.h>
 #include <Render/Render.h>
 
@@ -23,11 +24,11 @@ public:
 	virtual void OnCollision(BaseObject* other){}
 
 	Collider* GetCollider()const { return collider_.get(); }
-
+	PhysicsActor* GetActor() { return actor_.get(); }
 	Transform* GetTransform() { return &transform_; }
 protected://オブジェクトプロパティ
 	Transform transform_;
-	float radius_ = 0.0f;
+	std::unique_ptr<PhysicsActor> actor_ = nullptr;
 
 protected://描画に必要なリソース
 	std::unique_ptr<ModelResource> modelResource_;

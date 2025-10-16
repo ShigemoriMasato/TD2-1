@@ -17,12 +17,12 @@
   <ItemGroup>
     <ClCompile Include="AppSource\Game\BaseObject.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\BaseEnemy.cpp" />
-    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy.cpp" />
-    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy2.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\Division\SplitEnemy.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\EnemyFactory.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\EnemyManager.cpp" />
-    <ClCompile Include="AppSource\Game\Enemy\FloatingEnemy.cpp" />
-    <ClCompile Include="AppSource\Game\Scene\EnemyTestScene.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.cpp" />
     <ClCompile Include="AppSource\Game\Collision\Collision.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\Division\DivisionEnemy.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
     <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp" />
@@ -59,6 +59,7 @@
     <ClCompile Include="AppSource\Game\Field\Field.cpp" />
     <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp" />
     <ClCompile Include="AppSource\Game\Scene\GameScene.cpp" />
+    <ClCompile Include="AppSource\Game\LevelLoader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp" />
@@ -95,12 +96,13 @@
     <ClInclude Include="AppSource\Game\BaseObject.h" />
     <ClInclude Include="AppSource\Game\Collision\Collider.h" />
     <ClInclude Include="AppSource\Game\Enemy\BaseEnemy.h" />
-    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy.h" />
-    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy2.h" />
+    <ClInclude Include="AppSource\Game\Enemy\EnemyFactory.h" />
     <ClInclude Include="AppSource\Game\Enemy\EnemyManager.h" />
-    <ClInclude Include="AppSource\Game\Enemy\FloatingEnemy.h" />
-    <ClInclude Include="AppSource\Game\Scene\EnemyTestScene.h" />
+    <ClInclude Include="AppSource\Game\Enemy\Division\SplitEnemy.h" />
+    <ClInclude Include="AppSource\Game\Enemy\EnemySpawnParams.h" />
+    <ClInclude Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.h" />
     <ClInclude Include="AppSource\Game\Collision\Collision.h" />
+    <ClInclude Include="AppSource\Game\Enemy\Division\DivisionEnemy.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
     <ClInclude Include="Engine\Resource\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Render\Resource\Data\BaseResource.h" />
@@ -172,6 +174,7 @@
     <ClInclude Include="AppSource\Game\Physics\PhysicsEngine.h" />
     <ClInclude Include="AppSource\Game\Physics\PhysicsActor.h" />
     <ClInclude Include="Engine\Render\Resource\MPResource.h" />
+    <ClInclude Include="AppSource\Game\LevelLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
@@ -246,7 +249,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Engine;$(ProjectDir)AppSource;$(ProjectDir)externals/assimp/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Engine;$(ProjectDir)AppSource;$(ProjectDir)externals/assimp/include/;$(ProjectDir)externals/nlohmannjson</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -275,7 +278,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Engine;$(ProjectDir)AppSource;$(ProjectDir)externals/assimp/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Engine;$(ProjectDir)AppSource;$(ProjectDir)externals/assimp/include/;$(ProjectDir)externals/nlohmannjson</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -304,7 +307,7 @@ xcopy /E /I /Y "$(ProjectDir)Assets\*" "$(TargetDir)Assets\"</Command>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Engine;$(ProjectDir)AppSource;$(ProjectDir)externals/assimp/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals;$(ProjectDir)Engine;$(ProjectDir)AppSource;$(ProjectDir)externals/assimp/include/;$(ProjectDir)externals/nlohmannjson</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

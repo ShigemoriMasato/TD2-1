@@ -14,9 +14,27 @@ enum class ColliderTag
 	Static			//静的なオブジェクト
 };
 
+enum ColliderMask : uint32_t
+{
+	MASK_NONE	= 0,		//無効
+	PLAYER		= 1 << 0,	//プレイヤー
+	ENEMY		= 1 << 1,	//敵
+	ITEM		= 1 << 2,	//アイテム
+};
+
 class Collider
 {
 public:
+	/// <summary>
+	/// コライダーのコンストラクタ
+	/// </summary>
+	/// <param name="tag">タグ(動的か静的か)</param>
+	/// <param name="type">このコライダーを所有者タイプ</param>
+	/// <param name="mask">当たるマスク(ビット演算で取る)</param>
+	Collider(ColliderTag tag, ColliderMask type, ColliderMask mask)
+		: tag_(tag), self_(type), mask_(mask)
+	{
+	}
 	virtual ~Collider() = default;
 	virtual ColliderType GetType() const = 0;
 
@@ -31,7 +49,10 @@ public:
 	void SetTransform(Transform* transform) { transform_ = transform; }
 
 	ColliderTag GetTag() const { return tag_; }
-	void SetTag(ColliderTag tag) { tag_ = tag; }
+
+
+	uint32_t GetMask() const{ return mask_;}
+	uint32_t GetSelf() const { return self_;}
 
 	bool IsActive() const { return isActive_; }
 	bool IsTrigger() const { return isTrigger_; }
@@ -44,6 +65,9 @@ protected:
 	Transform* transform_ = nullptr;		// 所属のオブジェクト
 	ColliderTag tag_;						// タグ
 
+	uint32_t self_ = 0xffffffff;			// 自身のID
+	uint32_t mask_ = 0xffffffff;			// 当たり判定対象
+
 	bool isTrigger_ = false;				// トリガーであるか
 	bool isActive_ = true;					// 有効性
 };
@@ -51,7 +75,8 @@ protected:
 class AABBCollider : public Collider
 {
 public:
-	explicit AABBCollider(const Vector3& size)
+	explicit AABBCollider(const Vector3& size, ColliderTag tag, ColliderMask type, ColliderMask mask)
+		: Collider(tag, type, mask)
 	{
 		SetSize(size);
 		aabb_.max = size_ * 0.5f;
@@ -72,7 +97,11 @@ private:
 class SphereCollider : public Collider
 {
 public:
-	explicit SphereCollider(float radius) :radius_(radius) { SetSize(Vector3(radius, radius, radius)); }
+	explicit SphereCollider(float radius, ColliderTag tag, ColliderMask type, ColliderMask mask)
+		:Collider(tag, type, mask), radius_(radius)
+	{
+		SetSize(Vector3(radius, radius, radius));
+	}
 
 	ColliderType GetType() const override
 	{
