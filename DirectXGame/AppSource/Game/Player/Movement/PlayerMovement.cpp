@@ -8,6 +8,8 @@ namespace {
 }
 
 void Player::OnIdel() {
+	wire_->SetStartPositionPtr(&transform_.position);
+	wire_->Shrinked();
 }
 
 void Player::UpdateIdel(float deltaTime) {
@@ -30,6 +32,13 @@ void Player::OnForcus() {
 }
 
 void Player::UpdateForcus(float deltaTime) {
+	//重力適用
+	velocity_.y += gravity_ * deltaTime;
+	//地面に着地していたら慣性を消す
+	if(transform_.position.y <= 0.0f) {
+		velocity_ = {};
+	}
+
 	//todo 狙い先の当たり判定をとる。
 	//todo 当たり判定の具体的な値の送信方法は後日相談
 
@@ -79,6 +88,7 @@ void Player::OnExtend() {
 	velocity_ = {};
 	wireTimer = wireTime;
 	timeSlower_->EndSlow(false);
+	wire_->SetEndPosition(transform_.position + Vector3(5.0f, 5.0f, 0.0f));
 }
 
 void Player::UpdateExtend(float deltaTime) {
@@ -89,7 +99,7 @@ void Player::UpdateExtend(float deltaTime) {
 	wireTimer -= deltaTime;
 
 	//Wireが届いたらDashへ
-	if (wireTimer <= 0.0f) {
+	if (wire_->Extended()) {
 		behaviorRequest_ = Behavior::Dash;
 	}
 }

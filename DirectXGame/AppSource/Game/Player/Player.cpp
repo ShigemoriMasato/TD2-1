@@ -37,6 +37,8 @@ void Player::Initialize(ModelData* modelData, Camera* camera) {
 
 	//debug
 	transform_.scale = { 0.3f, 0.3f, 0.3f };
+
+	behaviorRequest_ = Behavior::Idle;
 }
 
 void Player::Update(float deltaTime)
@@ -50,6 +52,8 @@ void Player::Update(float deltaTime)
 
 	transform_.position += velocity_ * deltaTime;
 	transform_.position.y = std::max(transform_.position.y, 0.0f);
+
+	wire_->Update(deltaTime);
 }
 
 void Player::Draw(Render* render)

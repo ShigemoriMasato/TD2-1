@@ -1,5 +1,6 @@
 #include "TimeSlower.h"
 #include <Math/MyMath.h>
+#include <imgui/imgui.h>
 
 using namespace MyMath;
 
@@ -27,6 +28,12 @@ void TimeSlower::Update() {
 	if (timer_ < calculateTime_) {
 		CalculateDeltaTime();
 	}
+
+	ImGui::Begin("DeltaTime");
+	ImGui::Text("TrueDelta: %.6f", trueDelta);
+	ImGui::Text("DeltaTime: %.6f", deltaTime_);
+	ImGui::Text("TimeRate: %.6f", timeRate_);
+	ImGui::End();
 }
 
 void TimeSlower::StartSlow(float time) {
@@ -35,7 +42,7 @@ void TimeSlower::StartSlow(float time) {
 }
 
 void TimeSlower::EndSlow(bool calculate) {
-	calculate ? timer_ = 0.0f : timer_ = calculateTime_;
+	calculate ? timer_ = calculateTime_ : timer_ = 0.0f;
 }
 
 void TimeSlower::CalculateDeltaTime() {
