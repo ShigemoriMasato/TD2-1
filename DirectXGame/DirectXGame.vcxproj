@@ -73,7 +73,6 @@
     <ClCompile Include="Engine\Render\Resource\ModelResource.cpp" />
     <ClCompile Include="Engine\Resource\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
-    <ClCompile Include="Engine\Scene\TitleScene.cpp" />
     <ClCompile Include="Engine\Resource\SRVManager.cpp" />
     <ClCompile Include="Engine\Scene\Engine\ShaderEditScene.cpp" />
     <ClCompile Include="Engine\Math\MyString.cpp" />
@@ -85,6 +84,8 @@
     <ClCompile Include="AppSource\Game\Player\MoveNumManager.cpp" />
     <ClCompile Include="AppSource\Game\Player\Player.cpp" />
     <ClCompile Include="AppSource\Game\Player\Wire.cpp" />
+    <ClCompile Include="AppSource\Game\Player\Movement\PlayerMovement.cpp" />
+    <ClCompile Include="AppSource\Game\FPS\TimeSlower.cpp" />
     <ClCompile Include="AppSource\Game\Tile\TileMap.cpp" />
     <ClCompile Include="AppSource\Game\Physics\PhysicsEngine.cpp" />
     <ClCompile Include="AppSource\Game\Physics\PhysicsActor.cpp" />
@@ -150,7 +151,6 @@
     <ClInclude Include="Engine\Render\Resource\ModelResource.h" />
     <ClInclude Include="Engine\Resource\Model\ModelManager.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
-    <ClInclude Include="Engine\Scene\TitleScene.h" />
     <ClInclude Include="Engine\Resource\SRVManager.h" />
     <ClInclude Include="Engine\Scene\Engine\ShaderEditScene.h" />
     <ClInclude Include="Engine\Math\MyString.h" />
@@ -166,6 +166,7 @@
     <ClInclude Include="AppSource\Game\Player\Wire.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Game\Scene\GameScene.h" />
+    <ClInclude Include="AppSource\Game\FPS\TimeSlower.h" />
     <ClInclude Include="AppSource\Game\Tile\TileMap.h" />
     <ClInclude Include="AppSource\Game\Physics\PhysicsEngine.h" />
     <ClInclude Include="AppSource\Game\Physics\PhysicsActor.h" />
