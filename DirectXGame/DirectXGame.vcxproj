@@ -17,12 +17,12 @@
   <ItemGroup>
     <ClCompile Include="AppSource\Game\BaseObject.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\BaseEnemy.cpp" />
-    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy.cpp" />
-    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy2.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\Division\SplitEnemy.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\EnemyFactory.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\EnemyManager.cpp" />
-    <ClCompile Include="AppSource\Game\Enemy\FloatingEnemy.cpp" />
-    <ClCompile Include="AppSource\Game\Scene\EnemyTestScene.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.cpp" />
     <ClCompile Include="AppSource\Game\Collision\Collision.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\Division\DivisionEnemy.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
     <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp" />
@@ -74,7 +74,6 @@
     <ClCompile Include="Engine\Render\Resource\ModelResource.cpp" />
     <ClCompile Include="Engine\Resource\Model\ModelManager.cpp" />
     <ClCompile Include="Engine\Scene\SceneManager.cpp" />
-    <ClCompile Include="Engine\Scene\TitleScene.cpp" />
     <ClCompile Include="Engine\Resource\SRVManager.cpp" />
     <ClCompile Include="Engine\Scene\Engine\ShaderEditScene.cpp" />
     <ClCompile Include="Engine\Math\MyString.cpp" />
@@ -86,6 +85,8 @@
     <ClCompile Include="AppSource\Game\Player\MoveNumManager.cpp" />
     <ClCompile Include="AppSource\Game\Player\Player.cpp" />
     <ClCompile Include="AppSource\Game\Player\Wire.cpp" />
+    <ClCompile Include="AppSource\Game\Player\Movement\PlayerMovement.cpp" />
+    <ClCompile Include="AppSource\Game\FPS\TimeSlower.cpp" />
     <ClCompile Include="AppSource\Game\Tile\TileMap.cpp" />
     <ClCompile Include="AppSource\Game\Physics\PhysicsEngine.cpp" />
     <ClCompile Include="AppSource\Game\Physics\PhysicsActor.cpp" />
@@ -94,12 +95,13 @@
     <ClInclude Include="AppSource\Game\BaseObject.h" />
     <ClInclude Include="AppSource\Game\Collision\Collider.h" />
     <ClInclude Include="AppSource\Game\Enemy\BaseEnemy.h" />
-    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy.h" />
-    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy2.h" />
+    <ClInclude Include="AppSource\Game\Enemy\EnemyFactory.h" />
     <ClInclude Include="AppSource\Game\Enemy\EnemyManager.h" />
-    <ClInclude Include="AppSource\Game\Enemy\FloatingEnemy.h" />
-    <ClInclude Include="AppSource\Game\Scene\EnemyTestScene.h" />
+    <ClInclude Include="AppSource\Game\Enemy\Division\SplitEnemy.h" />
+    <ClInclude Include="AppSource\Game\Enemy\EnemySpawnParams.h" />
+    <ClInclude Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.h" />
     <ClInclude Include="AppSource\Game\Collision\Collision.h" />
+    <ClInclude Include="AppSource\Game\Enemy\Division\DivisionEnemy.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
     <ClInclude Include="Engine\Resource\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Render\Resource\Data\BaseResource.h" />
@@ -151,7 +153,6 @@
     <ClInclude Include="Engine\Render\Resource\ModelResource.h" />
     <ClInclude Include="Engine\Resource\Model\ModelManager.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
-    <ClInclude Include="Engine\Scene\TitleScene.h" />
     <ClInclude Include="Engine\Resource\SRVManager.h" />
     <ClInclude Include="Engine\Scene\Engine\ShaderEditScene.h" />
     <ClInclude Include="Engine\Math\MyString.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="AppSource\Game\Player\Wire.h" />
     <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
     <ClInclude Include="AppSource\Game\Scene\GameScene.h" />
+    <ClInclude Include="AppSource\Game\FPS\TimeSlower.h" />
     <ClInclude Include="AppSource\Game\Tile\TileMap.h" />
     <ClInclude Include="AppSource\Game\Physics\PhysicsEngine.h" />
     <ClInclude Include="AppSource\Game\Physics\PhysicsActor.h" />

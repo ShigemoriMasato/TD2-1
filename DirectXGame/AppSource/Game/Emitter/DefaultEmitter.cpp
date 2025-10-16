@@ -60,10 +60,10 @@ void DefaultEmitter::Initialize(Camera* camera) {
 	info_->camera_ = camera;
 }
 
-void DefaultEmitter::Update() {
+void DefaultEmitter::Update(float deltaTime) {
 
 	if (isActive_) {
-		timer_ += FPSObserver::GetDeltatime();
+		timer_ += deltaTime;
 	}
 
 	//==================- パーティクル発生処理 -==================
@@ -138,7 +138,7 @@ void DefaultEmitter::Update() {
 		}
 
 		//生きた時間の更新
-		life_[i] += FPSObserver::GetDeltatime();
+		life_[i] += deltaTime;
 
 		//だんだん透明に
 		if (particleJobs_[i] & ParticleJob::ToTransparent) {
@@ -146,13 +146,13 @@ void DefaultEmitter::Update() {
 		}
 
 		//加速度を加算
-		velocity_[i] += acceleration_[i] * FPSObserver::GetDeltatime();
+		velocity_[i] += acceleration_[i] * deltaTime;
 		
 		//移動量を加算
-		info_->position_[i] += velocity_[i] * FPSObserver::GetDeltatime();
+		info_->position_[i] += velocity_[i] * deltaTime;
 		
 		//回転量を加算
-		info_->rotate_[i] += rotation_[i] * FPSObserver::GetDeltatime();
+		info_->rotate_[i] += rotation_[i] * deltaTime;
 
 		if (life_[i] > lifeSpan_[i]) {
 			info_->color_[i] = 0;
@@ -186,13 +186,11 @@ void DefaultEmitter::SetConfig(ParticleJob jobs, Vector3 value, Vector3 value2) 
 	switch (jobs) {
 	case ParticleJob::Gravity:
 		//重力
-		velocity_[particleIndex_].y -= value.y * FPSObserver::GetDeltatime();
+		gravity_ = value;
 		return;
 	case ParticleJob::ToRotate:
 		//回転
-		velocity_[particleIndex_].x += value.x * FPSObserver::GetDeltatime();
-		velocity_[particleIndex_].y += value.y * FPSObserver::GetDeltatime();
-		velocity_[particleIndex_].z += value.z * FPSObserver::GetDeltatime();
+		rotateSpeed_ = value;
 
 		if (value2.Length() > 0.0f) {
 			isRotateInverse_ = true;
