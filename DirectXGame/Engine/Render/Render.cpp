@@ -290,7 +290,7 @@ void Render::Draw(MPResource* resource) {
     //ParticleDataのポインタを設定
     commandList->SetGraphicsRootDescriptorTable(0, resource->GetParticleDataGPUHandle());
 	//Texture
-	commandList->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureData(resource->textureMap_[0])->GetTextureGPUHandle());
+	commandList->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureData(resource->textureStartIndex_)->GetTextureGPUHandle());
 
     commandList->DrawIndexedInstanced(indexNum, resource->GetInstanceNum(), 0, 0, 0);
 }
