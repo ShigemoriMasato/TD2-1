@@ -4,7 +4,6 @@
 class PhysicsEngine;
 class PhysicsActor
 {
-	friend class BaseObject;
 	friend class PhysicsEngine;
 public:
 	PhysicsActor(PhysicsEngine* physicsEngine, BaseObject* owner);
@@ -15,6 +14,7 @@ private:
 
 	void ResetFlags();
 
+public:
 	Vector2 velocity_;
 
 	PhysicsEngine* physicsEngine_ = nullptr;

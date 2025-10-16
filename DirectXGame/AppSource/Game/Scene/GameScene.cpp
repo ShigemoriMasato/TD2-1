@@ -6,6 +6,7 @@
 #include <Tools/FPS/FPSObserver.h>
 #include <cmath>
 #include <algorithm>
+#include "../Player/TestPlayer.h"
 
 void GameScene::Initialize()
 {
@@ -52,6 +53,12 @@ void GameScene::Initialize()
 		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
 		levelLoader_.LoadLevel("Assets/Map/test.json", *tileMap_);
 		tileMap_->SetModelData(modelManager_->GetModelData(handle), camera_.get());
+
+		auto testPlayer = std::make_unique<TestPlayer>();
+		testPlayer->Initialize(modelManager_->GetModelData(handle), camera_.get());
+		testPlayer->SetKeyConfig(&keys_);
+		testPlayer->SetActor(&physicsEngine_);
+		objects_.push_back(std::move(testPlayer));
 	}
 }
 
@@ -64,6 +71,15 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	timeSlower_->Update();
 
 	float deltaTime = timeSlower_->GetDeltaTime();
+	ImGui::Checkbox("use phy", &isPhysics_);
+	if (isPhysics_)
+	{
+		//オブジェクト間でのコリジョンチェック
+		CheckAllCollision();
+		//ワイヤ出せる範囲をチェック
+		CheckPlayerWireField();
+	}
+	
 
 	// EnemyManagerにキー入力を渡す
 	if (enemyManager_) {
@@ -82,10 +98,8 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		object->Update(deltaTime);
 	}
 
-	//ワイヤ出せる範囲をチェック
-	CheckPlayerWireField();
-	//オブジェクト間でのコリジョンチェック
-	CheckAllCollision();
+	if(isPhysics_)
+		physicsEngine_.Update(deltaTime);
 
 	return nullptr;
 }

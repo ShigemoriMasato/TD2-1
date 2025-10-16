@@ -26,13 +26,14 @@ public:
 	Collider* GetCollider()const { return collider_.get(); }
 	PhysicsActor* GetActor() { return actor_.get(); }
 	Transform* GetTransform() { return &transform_; }
+	void SetActor(PhysicsEngine* physicsEngine);
 protected://オブジェクトプロパティ
 	Transform transform_;
 	std::unique_ptr<PhysicsActor> actor_ = nullptr;
-
+	std::unique_ptr<Collider> collider_;
 protected://描画に必要なリソース
 	std::unique_ptr<ModelResource> modelResource_;
-	std::unique_ptr<Collider> collider_;
+
 
 };
 

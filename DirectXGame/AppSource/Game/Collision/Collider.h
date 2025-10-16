@@ -31,7 +31,7 @@ public:
 	/// <param name="tag">タグ(動的か静的か)</param>
 	/// <param name="type">このコライダーを所有者タイプ</param>
 	/// <param name="mask">当たるマスク(ビット演算で取る)</param>
-	Collider(ColliderTag tag, ColliderMask type, ColliderMask mask)
+	Collider(ColliderTag tag, uint32_t type, uint32_t mask)
 		: tag_(tag), self_(type), mask_(mask)
 	{
 	}
@@ -75,7 +75,7 @@ protected:
 class AABBCollider : public Collider
 {
 public:
-	explicit AABBCollider(const Vector3& size, ColliderTag tag, ColliderMask type, ColliderMask mask)
+	explicit AABBCollider(ColliderTag tag, uint32_t type, uint32_t mask, const Vector3& size = { 1,1,1 })
 		: Collider(tag, type, mask)
 	{
 		SetSize(size);
@@ -97,7 +97,7 @@ private:
 class SphereCollider : public Collider
 {
 public:
-	explicit SphereCollider(float radius, ColliderTag tag, ColliderMask type, ColliderMask mask)
+	explicit SphereCollider( ColliderTag tag, uint32_t type, uint32_t mask,float radius = 1.0f)
 		:Collider(tag, type, mask), radius_(radius)
 	{
 		SetSize(Vector3(radius, radius, radius));

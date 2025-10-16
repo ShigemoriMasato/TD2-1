@@ -257,7 +257,7 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 
 	}
 	//速度処理完了してから位置を更新
-	transform->position = Vector3(newPos) - objPos;
+	transform->position += Vector3(newPos) - objPos;
 	actor->velocity_.x = std::clamp(actor->velocity_.x, -maxSpeed_, maxSpeed_);
 }
 
