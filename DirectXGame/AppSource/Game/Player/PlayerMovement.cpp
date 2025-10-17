@@ -1,5 +1,5 @@
-#include "../Player.h"
-#include "../Wire.h"
+#include "Player.h"
+#include "Wire.h"
 
 namespace {
 	//debug用
@@ -12,12 +12,11 @@ void Player::OnIdel() {
 
 void Player::UpdateIdel(float deltaTime) {
 	//初期化
-	velocity_ = {};
 	auto key = (*key_);
 
 	//移動
-	if (key[Key::Right]) velocity_.x += moveSpeed_;
-	if (key[Key::Left]) velocity_.x -= moveSpeed_;
+	if (key[Key::Right]) actor_->velocity_.x += moveSpeed_;
+	if (key[Key::Left]) actor_->velocity_.x -= moveSpeed_;
 
 	//Behaviorリクエスト
 	if (key[Key::Action]) {
@@ -76,19 +75,21 @@ void Player::UpdateForcus(float deltaTime) {
 }
 
 void Player::OnExtend() {
-	velocity_ = {};
-	wireTimer = wireTime;
+	actor_->velocity_ = {};
+	//スロウモーション終了
 	timeSlower_->EndSlow(false);
+	//重力無効化
+	actor_->useGravity_ = false;
+
+	//debug
+	wireTimer = wireTime;
 }
 
 void Player::UpdateExtend(float deltaTime) {
-	//やんわり落下させる(/ 10.0fはやんわりのために雑に決めただけ)
-	velocity_.y += gravity_ * deltaTime * extendGravityRate_;
-
-	//Wireを伸ばすアップデート
+	//? Wireを伸ばすアップデート	debug
 	wireTimer -= deltaTime;
 
-	//Wireが届いたらDashへ
+	//? Wireが届いたらDashへ		debug
 	if (wireTimer <= 0.0f) {
 		behaviorRequest_ = Behavior::Dash;
 	}
@@ -100,18 +101,19 @@ void Player::OnDash() {
 	//	return;
 	//}
 
-	//velocity_ = wire_->GetDirection() * dashPower_;
+	//actor_->velocity_ = wire_->GetDirection() * dashPower_;
 	
 	//↓仮置き(斜め45度くらいで吹っ飛ばす)
-	velocity_ = Vector3(0.71f, 0.71f, 0.0f) * dashPower_;
+	actor_->velocity_ = Vector3(0.71f, 0.71f, 0.0f) * dashPower_;
 	if (transform_.position.y == 0.0f) {
 		transform_.position.y = 0.01f;
 	}
+
+	actor_->useGravity_ = true;
 }
 
 void Player::UpdateDash(float deltaTime) {
-	velocity_ *= dashRegistRate_;
-	velocity_.y += gravity_ * deltaTime;
+	actor_->velocity_ *= dashRegistRate_;
 
 	//if(着地したら){
 	//	behaviorRequest_ = Behavior::Idel;
@@ -125,8 +127,8 @@ void Player::UpdateDash(float deltaTime) {
 	}
 
 	//velocityの微調整をできるようにする
-	if (key[Key::Right]) velocity_.x += dashMoveSpeed_ * deltaTime;
-	if (key[Key::Left]) velocity_.x -= dashMoveSpeed_ * deltaTime;
+	if (key[Key::Right]) actor_->velocity_.x += dashMoveSpeed_ * deltaTime;
+	if (key[Key::Left]) actor_->velocity_.x -= dashMoveSpeed_ * deltaTime;
 
 	if (transform_.position.y <= 0.0f) {
 		transform_.position.y = 0.0f;

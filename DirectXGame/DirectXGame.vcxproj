@@ -85,7 +85,7 @@
     <ClCompile Include="AppSource\Game\Player\MoveNumManager.cpp" />
     <ClCompile Include="AppSource\Game\Player\Player.cpp" />
     <ClCompile Include="AppSource\Game\Player\Wire.cpp" />
-    <ClCompile Include="AppSource\Game\Player\Movement\PlayerMovement.cpp" />
+    <ClCompile Include="AppSource\Game\Player\PlayerMovement.cpp" />
     <ClCompile Include="AppSource\Game\FPS\TimeSlower.cpp" />
     <ClCompile Include="AppSource\Game\Tile\TileMap.cpp" />
     <ClCompile Include="AppSource\Game\Physics\PhysicsEngine.cpp" />

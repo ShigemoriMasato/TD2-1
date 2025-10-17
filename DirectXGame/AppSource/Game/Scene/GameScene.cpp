@@ -8,9 +8,6 @@
 #include <algorithm>
 #include "../Player/TestPlayer.h"
 
-namespace {
-}
-
 void GameScene::Initialize()
 {
 	camera_ = std::make_unique<DebugCamera>();
@@ -20,8 +17,9 @@ void GameScene::Initialize()
 
 	//プレイヤー初期化
 	{
-		auto player = std::make_unique<Player>(timeSlower_.get());
-		auto handle = modelManager_->LoadModel("Cube");
+		auto player = std::make_unique<Player>(timeSlower_.get(), &physicsEngine_);
+		auto handle = modelManager_->LoadModel("testBlock");
+		physicsEngine_;
 		player->Initialize(modelManager_->GetModelData(handle), camera_.get());
 		player->SetKeyConfig(&keys_);
 		player_ = player.get();
@@ -36,9 +34,9 @@ void GameScene::Initialize()
 		//SetupEnemies();
 	}
 
-	//ワイヤー初期化
-	//ワイヤーの描画をプレイヤーに任せているので、オブジェクトリストに追加されない
 	{
+		//ワイヤー初期化
+		//ワイヤーの描画をプレイヤーに任せているので、オブジェクトリストに追加されない
 		wire_ = std::make_unique<Wire>();
 		auto handle = modelManager_->LoadModel("testWire");
 		wire_->Initialize(modelManager_->GetModelData(handle), camera_.get());
@@ -48,7 +46,6 @@ void GameScene::Initialize()
 		wire2->Initialize(modelManager_->GetModelData(handle), camera_.get());
 		//objects_.push_back(std::move(wire2));
 	}
-
 
 	{
 		auto handle = modelManager_->LoadModel("testBlock");

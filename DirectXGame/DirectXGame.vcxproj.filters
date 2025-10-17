@@ -69,7 +69,7 @@
     <ClCompile Include="AppSource\Game\Player\MoveNumManager.cpp" />
     <ClCompile Include="AppSource\Game\Player\Player.cpp" />
     <ClCompile Include="AppSource\Game\Player\Wire.cpp" />
-    <ClCompile Include="AppSource\Game\Player\Movement\PlayerMovement.cpp" />
+    <ClCompile Include="AppSource\Game\Player\PlayerMovement.cpp" />
     <ClCompile Include="AppSource\Game\FPS\TimeSlower.cpp" />
     <ClCompile Include="AppSource\Game\Tile\TileMap.cpp" />
     <ClCompile Include="AppSource\Game\Physics\PhysicsEngine.cpp" />
@@ -77,6 +77,7 @@
     <ClCompile Include="AppSource\Game\Enemy\EnemyManager.cpp" />
     <ClCompile Include="AppSource\Game\LevelLoader.cpp" />
     <ClCompile Include="AppSource\Game\Player\TestPlayer.cpp" />
+    <ClCompile Include="Engine\Render\Resource\MPResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -361,6 +362,7 @@
     <ClInclude Include="AppSource\Game\Physics\PhysicsActor.h" />
     <ClInclude Include="AppSource\Game\LevelLoader.h" />
     <ClInclude Include="AppSource\Game\Player\TestPlayer.h" />
+    <ClInclude Include="Engine\Render\Resource\MPResource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />

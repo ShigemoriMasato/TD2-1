@@ -2,6 +2,7 @@
 #include "Wire.h"
 #include <Core/EngineTerminal.h>
 #include <algorithm>
+#include <Game/Physics/PhysicsEngine.h>
 
 #ifdef max
 #undef max
@@ -21,8 +22,15 @@ void (Player::* Player::behaviorOn[])() = {
 	&Player::OnDash,
 };
 
-Player::Player(TimeSlower* slower) {
+Player::Player(TimeSlower* slower, PhysicsEngine* phEngine) {
 	timeSlower_ = slower;
+	actor_ = std::make_unique<PhysicsActor>(phEngine, this);
+	collider_ = std::make_unique<SphereCollider>(
+		ColliderTag::Dynamic,
+		ColliderMask::PLAYER,
+		ColliderMask::ENEMY | ColliderMask::ITEM);
+	collider_->SetTransform(&transform_);
+	collider_->SetSize(Vector3(1.0f, 1.0f, 1.0f));
 }
 
 Player::~Player()
@@ -32,9 +40,6 @@ Player::~Player()
 
 void Player::Initialize(ModelData* modelData, Camera* camera) {
 	BaseObject::Initialize(modelData,camera);
-
-	//debug
-	transform_.scale = { 0.3f, 0.3f, 0.3f };
 }
 
 void Player::Update(float deltaTime)
@@ -45,9 +50,6 @@ void Player::Update(float deltaTime)
 
 	RequestBehavior();
 	(this->*behaviorUpdate[static_cast<int>(behavior_)])(deltaTime);
-
-	transform_.position += velocity_ * deltaTime;
-	transform_.position.y = std::max(transform_.position.y, 0.0f);
 }
 
 void Player::Draw(Render* render)
