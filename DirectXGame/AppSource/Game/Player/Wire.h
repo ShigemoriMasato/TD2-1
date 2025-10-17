@@ -12,6 +12,9 @@ public:
 	void Initialize(ModelData* modelData, Camera* camera)override;
 
 	void Update(float deltaTime) override;
+
+	void Draw(Render* render) override;
+
 	std::pair<Transform, float>GetCollider()const { return { transform_,radius_ }; }
 
 	void SetStartPositionPtr(Vector3* startPos) { startPos_ = startPos; }
@@ -47,5 +50,6 @@ private://Wire情報
 	bool isVisible_ = true;
 
 private:
+	std::unique_ptr<DrawResource> drawResource_ = nullptr;
 };
 

@@ -76,7 +76,7 @@ LRESULT MyWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
     auto it = wndProcMap_.find(hwnd);
     if (it != wndProcMap_.end()) {
         //登録されているウィンドウプロシージャを呼ぶ
-        return (hwnd, msg, wparam, lparam);
+		it->second(hwnd, msg, wparam, lparam);
     }
 
     //標準のメッセージ

@@ -1,5 +1,5 @@
-#include "../Player.h"
-#include "../Wire.h"
+#include "Player.h"
+#include "Wire.h"
 
 namespace {
 	//debug用

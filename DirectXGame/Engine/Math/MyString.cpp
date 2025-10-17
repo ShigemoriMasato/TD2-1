@@ -1,11 +1,5 @@
 #include "MyString.h"
-#define NOMINMAX
 #include <Windows.h>
-
-#if max || min
-#undef max
-#undef min
-#endif
 
 namespace fs = std::filesystem;
 

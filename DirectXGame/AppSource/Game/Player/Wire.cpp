@@ -2,6 +2,10 @@
 
 void Wire::Initialize(ModelData* modelData, Camera* camera) {
 	BaseObject::Initialize(modelData, camera);
+	drawResource_ = std::make_unique<DrawResource>();
+	drawResource_->Initialize(2);
+	drawResource_->camera_ = camera;
+	drawResource_->psoConfig_.topology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
 }
 
 void Wire::Update(float deltaTime) {
@@ -10,7 +14,7 @@ void Wire::Update(float deltaTime) {
 		Vector3 direction = (targetPos_ - endPos_).Normalize();
 		float distance = (targetPos_ - endPos_).Length();
 		//現在距離から進ませる
-		distance -= extendSpeed_ * deltaTime;
+		distance += extendSpeed_ * deltaTime;
 
 		//距離が0以下になったら終端にする
 		if (distance <= 0.0f) {
@@ -26,6 +30,11 @@ void Wire::Update(float deltaTime) {
 	}
 
 	transform_.position = (*startPos_ + endPos_) / 2.0f;
+}
+
+void Wire::Draw(Render* render) {
+	drawResource_->localPos_ = { *startPos_, endPos_ };
+	render->Draw(drawResource_.get());
 }
 
 void Wire::SetEndPosition(const Vector3& endPos) {

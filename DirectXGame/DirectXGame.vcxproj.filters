@@ -1,546 +1,161 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="リソース ファイル">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="MyEngine">
-      <UniqueIdentifier>{d932f52b-6fa5-4668-96d5-9180925a90b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Core">
-      <UniqueIdentifier>{1054987d-12e7-4b36-8f56-1d5700d87d7d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Input">
-      <UniqueIdentifier>{7c82c2a9-7c1e-405e-954b-06379ea13519}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Math">
-      <UniqueIdentifier>{12df5a62-84c3-482b-90cd-801a45144471}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Camera">
-      <UniqueIdentifier>{8f0fd59d-354e-4c59-af20-97efb1d8af19}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Logger">
-      <UniqueIdentifier>{87707572-8692-443e-a2ec-223c7eb23df9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="externals">
-      <UniqueIdentifier>{4bac4297-4a49-4638-9cc3-0ff09d407e6a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="externals\imgui">
-      <UniqueIdentifier>{231f3a29-1e23-4adb-8343-c8f6d9396245}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Transform">
-      <UniqueIdentifier>{6ea883f2-3b2f-41d5-886f-1d1c1522f7db}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Resource">
-      <UniqueIdentifier>{3422b680-7894-4d9a-925b-228193d70de2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Render">
-      <UniqueIdentifier>{40b7b9ae-02fa-49ac-b24a-bd2072af964d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Tools">
-      <UniqueIdentifier>{530994ec-3057-45ae-b041-55a04b3a84cc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Tools\Binary">
-      <UniqueIdentifier>{7a4a4c88-e89b-4197-af81-4b270be58238}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Render\Resource">
-      <UniqueIdentifier>{ae145bdc-a0da-45ec-a56b-8ae914189960}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Scene">
-      <UniqueIdentifier>{bd525153-3159-4b42-8994-2d0d7ca9a812}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Core\PSO">
-      <UniqueIdentifier>{957d13e2-7349-4487-b013-569a1f62f278}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Core\PSO\Shlef">
-      <UniqueIdentifier>{5701567d-c667-482c-b1c1-80892a14dd78}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Tools\Grid">
-      <UniqueIdentifier>{350f5375-b871-4579-af08-049c52803ef7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Scene\Data">
-      <UniqueIdentifier>{87574364-67d6-43f6-a02b-1bac21ee20d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyEngine\Scene\Engine">
-      <UniqueIdentifier>{bac00d7f-a14d-4c65-a665-955994fd5de6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="externals\assimp">
-      <UniqueIdentifier>{4ed73c2c-efdc-44e2-bd45-a0fffbfca3d8}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="AppSource\Game\BaseObject.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\BaseEnemy.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy2.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\EnemyManager.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\FloatingEnemy.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\EnemyTestScene.cpp" />
+    <ClCompile Include="AppSource\Game\Collision\Collision.cpp" />
+    <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
+    <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp" />
+    <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp" />
+    <ClCompile Include="Engine\Core\EngineTerminal.cpp" />
+    <ClCompile Include="Engine\Tools\Binary\BinaryManager.cpp" />
+    <ClCompile Include="Engine\Tools\Binary\Data\BinaryInput.cpp" />
+    <ClCompile Include="Engine\Tools\Binary\Data\BinaryOutput.cpp" />
+    <ClCompile Include="Engine\Scene\Data\BaseScene.cpp" />
+    <ClCompile Include="Engine\Scene\Data\CommonData.cpp" />
+    <ClCompile Include="Engine\Core\DXCommonFunction.cpp" />
+    <ClCompile Include="Engine\Render\Resource\DrawResource.cpp" />
+    <ClCompile Include="Engine\Core\DXDevice.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\DepthStencilShelf.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\BlendStateShelf.cpp" />
+    <ClCompile Include="Engine\Camera\Camera.cpp" />
+    <ClCompile Include="Engine\Camera\DebugCamera.cpp" />
+    <ClCompile Include="Engine\Core\PSO\PSOManager.cpp" />
+    <ClCompile Include="Engine\Core\MyWindow.cpp" />
+    <ClCompile Include="Engine\Tools\Grid\GridMaker.cpp" />
+    <ClCompile Include="Engine\Input\Input.cpp" />
+    <ClCompile Include="Engine\Logger\Logger.cpp" />
+    <ClCompile Include="Engine\Math\MyMath.cpp" />
+    <ClCompile Include="externals\imgui\imgui.cpp" />
+    <ClCompile Include="externals\imgui\ImGuizmo.cpp" />
+    <ClCompile Include="externals\imgui\imgui_demo.cpp" />
+    <ClCompile Include="externals\imgui\imgui_draw.cpp" />
+    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="externals\imgui\imgui_tables.cpp" />
+    <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\InputLayoutShelf.cpp" />
+    <ClCompile Include="Engine\Render\ImGuiWrapper.cpp" />
+    <ClCompile Include="Engine\Tools\FPS\FPSObserver.cpp" />
+    <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\GameScene.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp" />
+    <ClCompile Include="Engine\Core\PSO\PSOEditor.cpp" />
+    <ClCompile Include="Engine\Core\PSO\Shelf\ShaderShelf.cpp" />
+    <ClCompile Include="Engine\Render\Render.cpp" />
+    <ClCompile Include="Engine\Resource\OffScreen\OffScreenManager.cpp" />
+    <ClCompile Include="Engine\Resource\Texture\TextureManager.cpp" />
+    <ClCompile Include="Engine\Resource\Texture\TextureData.cpp" />
+    <ClCompile Include="Engine\Resource\OffScreen\OffScreenData.cpp" />
+    <ClCompile Include="Engine\Resource\Model\ModelData.cpp" />
+    <ClCompile Include="Engine\Render\Resource\ModelResource.cpp" />
+    <ClCompile Include="Engine\Resource\Model\ModelManager.cpp" />
+    <ClCompile Include="Engine\Scene\SceneManager.cpp" />
+    <ClCompile Include="Engine\Resource\SRVManager.cpp" />
+    <ClCompile Include="Engine\Scene\Engine\ShaderEditScene.cpp" />
+    <ClCompile Include="Engine\Math\MyString.cpp" />
+    <ClCompile Include="Engine\Render\Resource\ParticleResource.cpp" />
+    <ClCompile Include="AppSource\Game\Emitter\DefaultEmitter.cpp" />
+    <ClCompile Include="Engine\Render\Resource\PostEffectResource.cpp" />
+    <ClCompile Include="Engine\Resource\Audio\Data\MP3Data.cpp" />
+    <ClCompile Include="Engine\Resource\Audio\Data\WAVData.cpp" />
+    <ClCompile Include="AppSource\Game\Player\MoveNumManager.cpp" />
+    <ClCompile Include="AppSource\Game\Player\Player.cpp" />
+    <ClCompile Include="AppSource\Game\Player\Wire.cpp" />
+    <ClCompile Include="AppSource\Game\Player\PlayerMovement.cpp" />
+    <ClCompile Include="AppSource\Game\FPS\TimeSlower.cpp" />
+    <ClCompile Include="AppSource\Game\Tile\TileMap.cpp" />
+    <ClCompile Include="AppSource\Game\Physics\PhysicsEngine.cpp" />
+    <ClCompile Include="AppSource\Game\Physics\PhysicsActor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="externals\imgui\imgui.cpp">
-      <Filter>externals\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_demo.cpp">
-      <Filter>externals\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_draw.cpp">
-      <Filter>externals\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
-      <Filter>externals\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
-      <Filter>externals\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_tables.cpp">
-      <Filter>externals\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
-      <Filter>externals\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\MyWindow.cpp">
-      <Filter>MyEngine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Camera\Camera.cpp">
-      <Filter>MyEngine\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Camera\DebugCamera.cpp">
-      <Filter>MyEngine\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Input\Input.cpp">
-      <Filter>MyEngine\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Math\MyMath.cpp">
-      <Filter>MyEngine\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Logger\Logger.cpp">
-      <Filter>MyEngine\Logger</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Resource\Texture\TextureManager.cpp">
-      <Filter>MyEngine\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Resource\Texture\TextureData.cpp">
-      <Filter>MyEngine\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Resource\OffScreen\OffScreenManager.cpp">
-      <Filter>MyEngine\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Resource\OffScreen\OffScreenData.cpp">
-      <Filter>MyEngine\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\Resource\ModelResource.cpp">
-      <Filter>MyEngine\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Resource\Model\ModelManager.cpp">
-      <Filter>MyEngine\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Resource\Model\ModelData.cpp">
-      <Filter>MyEngine\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Resource\SRVManager.cpp">
-      <Filter>MyEngine\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\DXDevice.cpp">
-      <Filter>MyEngine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Tools\Binary\Data\BinaryInput.cpp">
-      <Filter>MyEngine\Tools\Binary</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Tools\Binary\BinaryManager.cpp">
-      <Filter>MyEngine\Tools\Binary</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Tools\Binary\Data\BinaryOutput.cpp">
-      <Filter>MyEngine\Tools\Binary</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\Resource\DrawResource.cpp">
-      <Filter>MyEngine\Render\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\Resource\ParticleResource.cpp">
-      <Filter>MyEngine\Render\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Scene\SceneManager.cpp">
-      <Filter>MyEngine\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\DXCommonFunction.cpp">
-      <Filter>MyEngine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\PSO\Shelf\ShaderShelf.cpp">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\PSO\Shelf\InputLayoutShelf.cpp">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\PSO\Shelf\DepthStencilShelf.cpp">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\PSO\Shelf\BlendStateShelf.cpp">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\PSO\PSOEditor.cpp">
-      <Filter>MyEngine\Core\PSO</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\PSO\PSOManager.cpp">
-      <Filter>MyEngine\Core\PSO</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Tools\Grid\GridMaker.cpp">
-      <Filter>MyEngine\Tools\Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\ImGuiWrapper.cpp">
-      <Filter>MyEngine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\Render.cpp">
-      <Filter>MyEngine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Scene\Data\BaseScene.cpp">
-      <Filter>MyEngine\Scene\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Scene\Data\CommonData.cpp">
-      <Filter>MyEngine\Scene\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\EngineTerminal.cpp">
-      <Filter>MyEngine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Scene\Engine\ShaderEditScene.cpp">
-      <Filter>MyEngine\Scene\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Math\MyString.cpp">
-      <Filter>MyEngine\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Tools\FPS\FPSObserver.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Emitter\DefaultEmitter.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\Resource\PostEffectResource.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\ImGuizmo.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Resource\Audio\Data\WAVData.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Resource\Audio\Data\MP3Data.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Player\Player.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Field\Field.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Player\Wire.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Player\MoveNumManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Common\KeyConfig\KeyManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Scene\GameScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\BaseObject.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Scene\EnemyTestScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Enemy\EnemyManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Enemy\BaseEnemy.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Enemy\BunnyEnemy2.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Enemy\FloatingEnemy.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Player\Movement\PlayerMovement.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\FPS\TimeSlower.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Collision\Collision.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Tile\TileMap.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Physics\PhysicsEngine.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="AppSource\Game\Physics\PhysicsActor.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
+    <ClInclude Include="AppSource\Game\BaseObject.h" />
+    <ClInclude Include="AppSource\Game\Collision\Collider.h" />
+    <ClInclude Include="AppSource\Game\Enemy\BaseEnemy.h" />
+    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy.h" />
+    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy2.h" />
+    <ClInclude Include="AppSource\Game\Enemy\EnemyManager.h" />
+    <ClInclude Include="AppSource\Game\Enemy\FloatingEnemy.h" />
+    <ClInclude Include="AppSource\Game\Scene\EnemyTestScene.h" />
+    <ClInclude Include="AppSource\Game\Collision\Collision.h" />
+    <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
+    <ClInclude Include="Engine\Resource\Audio\AudioManager.h" />
+    <ClInclude Include="Engine\Render\Resource\Data\BaseResource.h" />
+    <ClInclude Include="Engine\Core\EngineTerminal.h" />
+    <ClInclude Include="Engine\Tools\Binary\BinaryManager.h" />
+    <ClInclude Include="Engine\Tools\Binary\Data\BinaryInput.h" />
+    <ClInclude Include="Engine\Tools\Binary\Data\BinaryOutput.h" />
+    <ClInclude Include="Engine\Scene\Data\BaseScene.h" />
+    <ClInclude Include="Engine\Scene\Data\CommonData.h" />
+    <ClInclude Include="Engine\Core\DXCommonFunction.h" />
+    <ClInclude Include="Engine\Render\Resource\DrawResource.h" />
+    <ClInclude Include="Engine\Core\DXDevice.h" />
+    <ClInclude Include="Engine\Core\PSO\PSOConfig.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\DepthStencilShelf.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\BlendStateShelf.h" />
+    <ClInclude Include="Engine\Camera\Camera.h" />
+    <ClInclude Include="Engine\Camera\DebugCamera.h" />
+    <ClInclude Include="Engine\Core\PSO\PSOManager.h" />
+    <ClInclude Include="Engine\Core\MyWindow.h" />
+    <ClInclude Include="Engine\Tools\Grid\GridMaker.h" />
+    <ClInclude Include="Engine\Transform\Matrix.h" />
+    <ClInclude Include="Engine\Transform\Transform.h" />
+    <ClInclude Include="Engine\Tools\Binary\Data\Value.h" />
+    <ClInclude Include="Engine\Transform\Vector.h" />
+    <ClInclude Include="Engine\Input\Input.h" />
+    <ClInclude Include="Engine\Logger\Logger.h" />
+    <ClInclude Include="Engine\Math\MyMath.h" />
+    <ClInclude Include="externals\imgui\imconfig.h" />
+    <ClInclude Include="externals\imgui\imgui.h" />
+    <ClInclude Include="externals\imgui\ImGuizmo.h" />
+    <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
+    <ClInclude Include="externals\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="externals\imgui\imgui_internal.h" />
+    <ClInclude Include="externals\imgui\imstb_rectpack.h" />
+    <ClInclude Include="externals\imgui\imstb_textedit.h" />
+    <ClInclude Include="externals\imgui\imstb_truetype.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\InputLayoutShelf.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\RasterizerShelf.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\RootSignatureShelf.h" />
+    <ClInclude Include="Engine\Core\PSO\PSOEditor.h" />
+    <ClInclude Include="Engine\Core\PSO\Shelf\ShaderShelf.h" />
+    <ClInclude Include="Engine\Render\ImGuiWrapper.h" />
+    <ClInclude Include="Engine\Render\Render.h" />
+    <ClInclude Include="Engine\Resource\OffScreen\OffScreenManager.h" />
+    <ClInclude Include="Engine\Resource\Texture\TextureManager.h" />
+    <ClInclude Include="Engine\Resource\Texture\TextureData.h" />
+    <ClInclude Include="Engine\Resource\OffScreen\OffScreenData.h" />
+    <ClInclude Include="Engine\Resource\Model\ModelData.h" />
+    <ClInclude Include="Engine\Render\Resource\ModelResource.h" />
+    <ClInclude Include="Engine\Resource\Model\ModelManager.h" />
+    <ClInclude Include="Engine\Scene\SceneManager.h" />
+    <ClInclude Include="Engine\Resource\SRVManager.h" />
+    <ClInclude Include="Engine\Scene\Engine\ShaderEditScene.h" />
+    <ClInclude Include="Engine\Math\MyString.h" />
+    <ClInclude Include="Engine\Render\Resource\ParticleResource.h" />
+    <ClInclude Include="Engine\Tools\FPS\FPSObserver.h" />
+    <ClInclude Include="AppSource\Game\Emitter\DefaultEmitter.h" />
+    <ClInclude Include="Engine\Render\Resource\PostEffectResource.h" />
+    <ClInclude Include="Engine\Resource\Audio\Data\MP3Data.h" />
+    <ClInclude Include="Engine\Resource\Audio\Data\WAVData.h" />
+    <ClInclude Include="AppSource\Game\Player\MoveNumManager.h" />
+    <ClInclude Include="AppSource\Game\Player\Player.h" />
+    <ClInclude Include="AppSource\Game\Player\Wire.h" />
+    <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h" />
+    <ClInclude Include="AppSource\Game\Scene\GameScene.h" />
+    <ClInclude Include="AppSource\Game\FPS\TimeSlower.h" />
+    <ClInclude Include="AppSource\Game\Tile\TileMap.h" />
+    <ClInclude Include="AppSource\Game\Physics\PhysicsEngine.h" />
+    <ClInclude Include="AppSource\Game\Physics\PhysicsActor.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="externals\imgui\imconfig.h">
-      <Filter>externals\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui.h">
-      <Filter>externals\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_dx12.h">
-      <Filter>externals\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_impl_win32.h">
-      <Filter>externals\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imgui_internal.h">
-      <Filter>externals\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_rectpack.h">
-      <Filter>externals\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_textedit.h">
-      <Filter>externals\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\imstb_truetype.h">
-      <Filter>externals\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Camera\Camera.h">
-      <Filter>MyEngine\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Camera\DebugCamera.h">
-      <Filter>MyEngine\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Transform\Matrix.h">
-      <Filter>MyEngine\Transform</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Transform\Transform.h">
-      <Filter>MyEngine\Transform</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Input\Input.h">
-      <Filter>MyEngine\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\MyMath.h">
-      <Filter>MyEngine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Logger\Logger.h">
-      <Filter>MyEngine\Logger</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Transform\Vector.h">
-      <Filter>MyEngine\Transform</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Tools\Binary\Data\Value.h">
-      <Filter>MyEngine\Transform</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Resource\Texture\TextureManager.h">
-      <Filter>MyEngine\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Resource\Model\ModelData.h">
-      <Filter>MyEngine\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Resource\Model\ModelManager.h">
-      <Filter>MyEngine\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Render\Resource\ModelResource.h">
-      <Filter>MyEngine\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Resource\OffScreen\OffScreenData.h">
-      <Filter>MyEngine\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Resource\OffScreen\OffScreenManager.h">
-      <Filter>MyEngine\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Resource\SRVManager.h">
-      <Filter>MyEngine\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Resource\Texture\TextureData.h">
-      <Filter>MyEngine\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\DXDevice.h">
-      <Filter>MyEngine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Tools\Binary\Data\BinaryOutput.h">
-      <Filter>MyEngine\Tools\Binary</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Tools\Binary\Data\BinaryInput.h">
-      <Filter>MyEngine\Tools\Binary</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Tools\Binary\BinaryManager.h">
-      <Filter>MyEngine\Tools\Binary</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Render\Resource\ParticleResource.h">
-      <Filter>MyEngine\Render\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Render\Resource\DrawResource.h">
-      <Filter>MyEngine\Render\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Scene\SceneManager.h">
-      <Filter>MyEngine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\DXCommonFunction.h">
-      <Filter>MyEngine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\MyWindow.h">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\PSO\Shelf\ShaderShelf.h">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\PSO\Shelf\RootSignatureShelf.h">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\PSO\Shelf\RasterizerShelf.h">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\PSO\Shelf\InputLayoutShelf.h">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\PSO\Shelf\DepthStencilShelf.h">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\PSO\Shelf\BlendStateShelf.h">
-      <Filter>MyEngine\Core\PSO\Shlef</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\PSO\PSOConfig.h">
-      <Filter>MyEngine\Core\PSO</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\PSO\PSOEditor.h">
-      <Filter>MyEngine\Core\PSO</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\PSO\PSOManager.h">
-      <Filter>MyEngine\Core\PSO</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Tools\Grid\GridMaker.h">
-      <Filter>MyEngine\Tools\Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Render\ImGuiWrapper.h">
-      <Filter>MyEngine\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Render\Render.h">
-      <Filter>MyEngine\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Scene\Data\BaseScene.h">
-      <Filter>MyEngine\Scene\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Scene\Data\CommonData.h">
-      <Filter>MyEngine\Scene\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\EngineTerminal.h">
-      <Filter>MyEngine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Scene\Engine\ShaderEditScene.h">
-      <Filter>MyEngine\Scene\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\MyString.h">
-      <Filter>MyEngine\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Tools\FPS\FPSObserver.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Emitter\DefaultEmitter.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Render\Resource\PostEffectResource.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Render\Resource\Data\BaseResource.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="externals\imgui\ImGuizmo.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Resource\Audio\AudioManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Resource\Audio\Data\WAVData.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Resource\Audio\Data\MP3Data.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Player\Player.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Field\Field.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Player\Wire.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Player\MoveNumManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Common\KeyConfig\KeyManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Scene\GameScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\BaseObject.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Scene\EnemyTestScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Enemy\EnemyManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Enemy\BaseEnemy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Enemy\BunnyEnemy2.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Enemy\FloatingEnemy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\FPS\TimeSlower.h">
-    <ClInclude Include="AppSource\Game\Collision\Collision.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Collision\Collider.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Tile\TileMap.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Physics\PhysicsEngine.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="AppSource\Game\Physics\PhysicsActor.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="externals\imgui\LICENSE.txt">
-      <Filter>externals\imgui</Filter>
-    </Text>
+    <Text Include="externals\imgui\LICENSE.txt" />
   </ItemGroup>
 </Project>

@@ -1,12 +1,4 @@
 #pragma once
-#define NOMINMAX
-
-#if max || min
-#undef max
-#undef min
-#endif
-
-
 #include <Windows.h>
 #include <imgui/imgui_impl_win32.h>
 #include <cstdint>

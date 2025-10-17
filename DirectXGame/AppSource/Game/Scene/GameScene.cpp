@@ -19,7 +19,6 @@ void GameScene::Initialize()
 		player->SetKeyConfig(&keys_);
 		player_ = player.get();
 		objects_.push_back(std::move(player));
-
 	}
 
 	{

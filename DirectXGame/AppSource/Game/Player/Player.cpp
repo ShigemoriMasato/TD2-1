@@ -3,10 +3,6 @@
 #include <Core/EngineTerminal.h>
 #include <algorithm>
 
-#ifdef max
-#undef max
-#endif
-
 void (Player::* Player::behaviorUpdate[])(float) = {
 	&Player::UpdateIdel,
 	&Player::UpdateForcus,
