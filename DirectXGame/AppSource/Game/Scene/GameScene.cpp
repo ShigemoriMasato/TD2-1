@@ -100,6 +100,10 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	if(isPhysics_)
 		physicsEngine_.Update(deltaTime);
 
+	if (keys_[Key::Reverse]) {
+		return std::make_unique<GameScene>();
+	}
+
 	return nullptr;
 }
 

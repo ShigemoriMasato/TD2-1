@@ -49,9 +49,9 @@ private://パラメータ
 	Vector3 targetDir_ = {};
 
 	//移動速度
-	const float moveSpeed_ = 10.0f;
+	const float moveSpeed_ = 20.0f;
 	//ダッシュ中のキーによる移動速度
-	const float dashMoveSpeed_ = 5.0f;
+	const float dashMoveSpeed_ = 2.0f;
 
 	//重力
 	const float gravity_ = -9.8f;

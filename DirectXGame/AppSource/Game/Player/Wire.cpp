@@ -9,6 +9,7 @@ void Wire::Initialize(ModelData* modelData, Camera* camera) {
 }
 
 void Wire::Update(float deltaTime) {
+	preEndPos_ = endPos_;
 	if (isExtending_) {
 
 		Vector3 direction = (targetPos_ - endPos_).Normalize();
@@ -16,13 +17,19 @@ void Wire::Update(float deltaTime) {
 		//現在距離から進ませる
 		leftDistance -= extendSpeed_ * deltaTime;
 
-		//距離が0.1以下になったら伸ばし切ったこととする6
-		if (leftDistance <= 0.1f) {
+		//距離が0.2以下になったら伸ばし切ったこととする
+		if (leftDistance <= 0.2f) {
 			endPos_ = targetPos_;
 			isExtending_ = false;
 		}
 
 		endPos_ = *startPos_ + direction * (initDistance_ - leftDistance);
+
+		//伸びすぎて戻って来た時対策
+		if (isExtending_ && (targetPos_ - endPos_).Length() > (targetPos_ - preEndPos_).Length()) {
+			endPos_ = targetPos_;
+			isExtending_ = false;
+		}
 	}
 
 	if (!isVisible_) {

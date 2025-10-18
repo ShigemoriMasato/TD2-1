@@ -15,9 +15,7 @@ public:
 
 	void Draw(Render* render) override;
 
-	std::pair<Transform, float>GetCollider()const { return { transform_,radius_ }; }
-
-private:
+	std::pair<Transform, float>GetCollider()const { return { transform_, 0.2f }; }
 
 	void SetStartPositionPtr(Vector3* startPos) { startPos_ = startPos; }
 	void SetEndPosition(const Vector3& endPos);
@@ -39,6 +37,7 @@ private://Wire情報
 	Vector3* startPos_ = {};
 	//終点(当たった座標)
 	Vector3 endPos_ = {};
+	Vector3 preEndPos_ = {};
 	//伸ばすときの目標座標
 	Vector3 targetPos_ = {};
 

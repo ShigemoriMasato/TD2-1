@@ -16,7 +16,7 @@ void Player::OnIdel() {
 void Player::UpdateIdel(float deltaTime) {
 	//初期化
 
-	velocity_ = {};
+	actor_->velocity_ = {};
 	auto key = (*key_);
 
 	//移動
@@ -36,7 +36,7 @@ void Player::OnForcus() {
 void Player::UpdateForcus(float deltaTime) {
 	//地面に着地していたら慣性を消す
 	if(transform_.position.y <= 0.0f) {
-		velocity_ = {};
+		actor_->velocity_ = {};
 	}
 
 	//todo 狙い先の当たり判定をとる。
@@ -93,14 +93,15 @@ void Player::UpdateForcus(float deltaTime) {
 }
 
 void Player::OnExtend() {
-	velocity_ = {};
+	actor_->velocity_ = {};
+	actor_->useGravity_ = false;
 	wireTimer = wireTime;
 	timeSlower_->EndSlow(false);
 }
 
 void Player::UpdateExtend(float deltaTime) {
 	//やんわり落下させる(/ 10.0fはやんわりのために雑に決めただけ)
-	velocity_.y += gravity_ * deltaTime * extendGravityRate_;
+	actor_->velocity_.y += gravity_ * deltaTime * extendGravityRate_;
 
 	//Wireが届いたらDashへ
 	if (wire_->Extended()) {
@@ -110,10 +111,13 @@ void Player::UpdateExtend(float deltaTime) {
 
 void Player::OnShrink() {
 	targetDir_ = (targetPos_ - transform_.position).Normalize();
-	velocity_ = targetDir_ * dashPower_;
+	actor_->velocity_ = targetDir_ * dashPower_;
 }
 
 void Player::UpdateShrink(float deltaTime) {
+	//velocityの固定
+	actor_->velocity_ = targetDir_ * dashPower_;
+
 	float tarlen = targetPos_.Length();
 	float plalen = transform_.position.Length();
 	//playerがtarlenに一定以上近くなったらダッシュに切り替え
@@ -124,17 +128,16 @@ void Player::UpdateShrink(float deltaTime) {
 }
 
 void Player::OnDash() {
-
 	//↓仮置き(斜め45度くらいで吹っ飛ばす)
-	velocity_ = targetDir_ * dashPower_;
+	actor_->velocity_ = targetDir_ * dashPower_;
 	if (transform_.position.y == 0.0f) {
 		transform_.position.y = 0.01f;
 	}
+	actor_->useGravity_ = true;
 }
 
 void Player::UpdateDash(float deltaTime) {
-	velocity_ *= dashRegistRate_;
-	velocity_.y += gravity_ * deltaTime;
+	actor_->velocity_ *= dashRegistRate_;
 
 	//if(着地したら){
 	//	behaviorRequest_ = Behavior::Idel;

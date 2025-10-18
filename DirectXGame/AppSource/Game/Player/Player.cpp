@@ -29,12 +29,13 @@ Player::Player(TimeSlower* slower, PhysicsEngine* phEngine) {
 		ColliderMask::ENEMY | ColliderMask::ITEM);
 	collider_->SetTransform(&transform_);
 	collider_->SetSize(Vector3(1.0f, 1.0f, 1.0f));
+
+	transform_.position = { 1.0f,1.0f,0.0f };
 }
 
 Player::~Player()
 {
 }
-
 
 void Player::Initialize(ModelData* modelData, Camera* camera) {
 	BaseObject::Initialize(modelData,camera);
@@ -50,6 +51,12 @@ void Player::Update(float deltaTime)
 
 	RequestBehavior();
 	(this->*behaviorUpdate[static_cast<int>(behavior_)])(deltaTime);
+
+	wire_->Update(deltaTime);
+
+	ImGui::Begin("Player Debug");
+	ImGui::Text("Behavior: %d", static_cast<int>(behavior_));
+	ImGui::End();
 }
 
 void Player::Draw(Render* render)
