@@ -3,10 +3,6 @@
 #include "Camera.h"
 #include <numbers>
 
-#ifdef max
-#undef max
-#endif
-
 using namespace Matrix;
 
 void DebugCamera::Initialize() {

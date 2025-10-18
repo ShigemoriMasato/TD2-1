@@ -53,7 +53,7 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 		}
 
 		return DefWindowProc(hwnd, msg, wparam, lparam);
-		};
+	};
 
 	dxDevice_->SetWindowProc(windowProc);
 

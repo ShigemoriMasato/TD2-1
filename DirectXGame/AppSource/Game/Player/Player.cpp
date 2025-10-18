@@ -4,14 +4,11 @@
 #include <algorithm>
 #include <Game/Physics/PhysicsEngine.h>
 
-#ifdef max
-#undef max
-#endif
-
 void (Player::* Player::behaviorUpdate[])(float) = {
 	&Player::UpdateIdel,
 	&Player::UpdateForcus,
 	&Player::UpdateExtend,
+	&Player::UpdateShrink,
 	&Player::UpdateDash,
 };
 
@@ -19,6 +16,7 @@ void (Player::* Player::behaviorOn[])() = {
 	&Player::OnIdel,
 	&Player::OnForcus,
 	&Player::OnExtend,
+	&Player::OnShrink,
 	&Player::OnDash,
 };
 
@@ -40,6 +38,8 @@ Player::~Player()
 
 void Player::Initialize(ModelData* modelData, Camera* camera) {
 	BaseObject::Initialize(modelData,camera);
+
+	behaviorRequest_ = Behavior::Idle;
 }
 
 void Player::Update(float deltaTime)
