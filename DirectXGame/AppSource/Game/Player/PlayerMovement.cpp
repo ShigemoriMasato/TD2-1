@@ -42,10 +42,8 @@ void Player::UpdateForcus(float deltaTime) {
 	//todo 狙い先の当たり判定をとる。
 	//todo 当たり判定の具体的な値の送信方法は後日相談
 
+
 	auto key = (*key_);
-	if (!key[Key::Action]) behaviorRequest_ = Behavior::Extend;
-
-
 	//以下仮置き
 	int directionID = -1;
 	
@@ -82,38 +80,51 @@ void Player::UpdateForcus(float deltaTime) {
 		}
 	}
 
+	if (!key[Key::Action]) { 
+		// 8分割なので、一つの方向は2π/8 = π/4ラジアン
+		float theta = static_cast<float>(directionID) * (2.0f * 3.1415926535f / 8.0f);
+		static const float wireLength = 10.0f;
+		targetPos_ = Vector3(wireLength * std::cos(theta), wireLength * std::sin(theta), 0.0f) + transform_.position;
+		wire_->SetEndPosition(targetPos_);
+		behaviorRequest_ = Behavior::Extend;
+	}
+
 }
 
 void Player::OnExtend() {
 	velocity_ = {};
 	wireTimer = wireTime;
 	timeSlower_->EndSlow(false);
-	wire_->SetEndPosition(transform_.position + Vector3(5.0f, 5.0f, 0.0f));
 }
 
 void Player::UpdateExtend(float deltaTime) {
 	//やんわり落下させる(/ 10.0fはやんわりのために雑に決めただけ)
 	velocity_.y += gravity_ * deltaTime * extendGravityRate_;
 
-	//Wireを伸ばすアップデート
-	wireTimer -= deltaTime;
-
 	//Wireが届いたらDashへ
 	if (wire_->Extended()) {
+		behaviorRequest_ = Behavior::Shrink;
+	}
+}
+
+void Player::OnShrink() {
+	targetDir_ = (targetPos_ - transform_.position).Normalize();
+	velocity_ = targetDir_ * dashPower_;
+}
+
+void Player::UpdateShrink(float deltaTime) {
+	float tarlen = targetPos_.Length();
+	float plalen = transform_.position.Length();
+	//playerがtarlenに一定以上近くなったらダッシュに切り替え
+	if (plalen > tarlen - 0.5f && plalen < tarlen + 0.5f) {
+		wire_->Shrinked();
 		behaviorRequest_ = Behavior::Dash;
 	}
 }
 
 void Player::OnDash() {
-
-	//if (!wire_->IsHited()) {
-	//	return;
-	//}
-
-	//velocity_ = wire_->GetDirection() * dashPower_;
-	
 	//↓仮置き(斜め45度くらいで吹っ飛ばす)
-	velocity_ = Vector3(0.71f, 0.71f, 0.0f) * dashPower_;
+	velocity_ = targetDir_ * dashPower_;
 	if (transform_.position.y == 0.0f) {
 		transform_.position.y = 0.01f;
 	}

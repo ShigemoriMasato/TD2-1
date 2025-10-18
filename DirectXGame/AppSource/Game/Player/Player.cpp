@@ -7,6 +7,7 @@ void (Player::* Player::behaviorUpdate[])(float) = {
 	&Player::UpdateIdel,
 	&Player::UpdateForcus,
 	&Player::UpdateExtend,
+	&Player::UpdateShrink,
 	&Player::UpdateDash,
 };
 
@@ -14,6 +15,7 @@ void (Player::* Player::behaviorOn[])() = {
 	&Player::OnIdel,
 	&Player::OnForcus,
 	&Player::OnExtend,
+	&Player::OnShrink,
 	&Player::OnDash,
 };
 
@@ -50,6 +52,11 @@ void Player::Update(float deltaTime)
 	transform_.position.y = std::max(transform_.position.y, 0.0f);
 
 	wire_->Update(deltaTime);
+
+	ImGui::Begin("Player");
+	ImGui::Text("behavior : %s", behMap[behavior_].c_str());
+	ImGui::Text("TargetPos : %.2f, %.2f, %.2f", targetPos_.x, targetPos_.y, targetPos_.z);
+	ImGui::End();
 }
 
 void Player::Draw(Render* render)

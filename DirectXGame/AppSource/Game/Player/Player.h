@@ -30,6 +30,7 @@ private:
 		Idle,			//待機(着地)
 		Forcus,			//狙いを定める
 		Extend,			//伸ばす
+		Shrink,		//縮める
 		Dash,			//ダッシュ
 	};
 
@@ -42,6 +43,10 @@ private://状態変数
 
 private://パラメータ
 	Vector3 velocity_ = {};
+
+	//wireを投げた場所
+	Vector3 targetPos_ = {};
+	Vector3 targetDir_ = {};
 
 	//移動速度
 	const float moveSpeed_ = 10.0f;
@@ -60,6 +65,15 @@ private://パラメータ
 	//wireを再び伸ばせるまでのクールタイム
 	float wireCoolTime_ = 0.0f;
 	const float maxWireCoolTime_ = 0.5f;
+
+	//? ImGui用 debug
+	std::unordered_map<Behavior, std::string> behMap = {
+		{Behavior::Idle, "Idle"},
+		{Behavior::Forcus, "Forcus"},
+		{Behavior::Extend, "Extend"},
+		{Behavior::Shrink, "Shrink"},
+		{Behavior::Dash, "Dash"}
+	};
 
 private:
 
@@ -87,6 +101,10 @@ private://メンバ関数
 	//ワイヤーを伸ばす
 	void OnExtend();
 	void UpdateExtend(float deltaTime);
+
+	//ワイヤーを縮める
+	void OnShrink();
+	void UpdateShrink(float deltaTime);
 
     //プレイヤーダッシュ
     void OnDash();
