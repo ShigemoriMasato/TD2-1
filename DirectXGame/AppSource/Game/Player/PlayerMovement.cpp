@@ -8,18 +8,20 @@ namespace {
 }
 
 void Player::OnIdel() {
+
 	wire_->SetStartPositionPtr(&transform_.position);
 	wire_->Shrinked();
 }
 
 void Player::UpdateIdel(float deltaTime) {
 	//初期化
+
 	velocity_ = {};
 	auto key = (*key_);
 
 	//移動
-	if (key[Key::Right]) velocity_.x += moveSpeed_;
-	if (key[Key::Left]) velocity_.x -= moveSpeed_;
+	if (key[Key::Right]) actor_->velocity_.x += moveSpeed_;
+	if (key[Key::Left]) actor_->velocity_.x -= moveSpeed_;
 
 	//Behaviorリクエスト
 	if (key[Key::Action]) {
@@ -32,8 +34,6 @@ void Player::OnForcus() {
 }
 
 void Player::UpdateForcus(float deltaTime) {
-	//重力適用
-	velocity_.y += gravity_ * deltaTime;
 	//地面に着地していたら慣性を消す
 	if(transform_.position.y <= 0.0f) {
 		velocity_ = {};
@@ -42,8 +42,8 @@ void Player::UpdateForcus(float deltaTime) {
 	//todo 狙い先の当たり判定をとる。
 	//todo 当たり判定の具体的な値の送信方法は後日相談
 
-
 	auto key = (*key_);
+
 	//以下仮置き
 	int directionID = -1;
 	
@@ -79,6 +79,7 @@ void Player::UpdateForcus(float deltaTime) {
 			directionID = 6;
 		}
 	}
+
 
 	if (!key[Key::Action]) { 
 		// 8分割なので、一つの方向は2π/8 = π/4ラジアン
@@ -123,6 +124,7 @@ void Player::UpdateShrink(float deltaTime) {
 }
 
 void Player::OnDash() {
+
 	//↓仮置き(斜め45度くらいで吹っ飛ばす)
 	velocity_ = targetDir_ * dashPower_;
 	if (transform_.position.y == 0.0f) {
@@ -146,8 +148,8 @@ void Player::UpdateDash(float deltaTime) {
 	}
 
 	//velocityの微調整をできるようにする
-	if (key[Key::Right]) velocity_.x += dashMoveSpeed_ * deltaTime;
-	if (key[Key::Left]) velocity_.x -= dashMoveSpeed_ * deltaTime;
+	if (key[Key::Right]) actor_->velocity_.x += dashMoveSpeed_ * deltaTime;
+	if (key[Key::Left]) actor_->velocity_.x -= dashMoveSpeed_ * deltaTime;
 
 	if (transform_.position.y <= 0.0f) {
 		transform_.position.y = 0.0f;

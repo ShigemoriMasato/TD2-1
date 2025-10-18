@@ -17,6 +17,8 @@ public:
 
 	std::pair<Transform, float>GetCollider()const { return { transform_,radius_ }; }
 
+private:
+
 	void SetStartPositionPtr(Vector3* startPos) { startPos_ = startPos; }
 	void SetEndPosition(const Vector3& endPos);
 

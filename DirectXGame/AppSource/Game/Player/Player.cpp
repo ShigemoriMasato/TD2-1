@@ -2,6 +2,7 @@
 #include "Wire.h"
 #include <Core/EngineTerminal.h>
 #include <algorithm>
+#include <Game/Physics/PhysicsEngine.h>
 
 void (Player::* Player::behaviorUpdate[])(float) = {
 	&Player::UpdateIdel,
@@ -19,8 +20,15 @@ void (Player::* Player::behaviorOn[])() = {
 	&Player::OnDash,
 };
 
-Player::Player(TimeSlower* slower) {
+Player::Player(TimeSlower* slower, PhysicsEngine* phEngine) {
 	timeSlower_ = slower;
+	actor_ = std::make_unique<PhysicsActor>(phEngine, this);
+	collider_ = std::make_unique<SphereCollider>(
+		ColliderTag::Dynamic,
+		ColliderMask::PLAYER,
+		ColliderMask::ENEMY | ColliderMask::ITEM);
+	collider_->SetTransform(&transform_);
+	collider_->SetSize(Vector3(1.0f, 1.0f, 1.0f));
 }
 
 Player::~Player()
@@ -30,11 +38,6 @@ Player::~Player()
 
 void Player::Initialize(ModelData* modelData, Camera* camera) {
 	BaseObject::Initialize(modelData,camera);
-
-	radius_ = 1.0f;
-
-	//debug
-	transform_.scale = { 0.3f, 0.3f, 0.3f };
 
 	behaviorRequest_ = Behavior::Idle;
 }
@@ -47,16 +50,6 @@ void Player::Update(float deltaTime)
 
 	RequestBehavior();
 	(this->*behaviorUpdate[static_cast<int>(behavior_)])(deltaTime);
-
-	transform_.position += velocity_ * deltaTime;
-	transform_.position.y = std::max(transform_.position.y, 0.0f);
-
-	wire_->Update(deltaTime);
-
-	ImGui::Begin("Player");
-	ImGui::Text("behavior : %s", behMap[behavior_].c_str());
-	ImGui::Text("TargetPos : %.2f, %.2f, %.2f", targetPos_.x, targetPos_.y, targetPos_.z);
-	ImGui::End();
 }
 
 void Player::Draw(Render* render)

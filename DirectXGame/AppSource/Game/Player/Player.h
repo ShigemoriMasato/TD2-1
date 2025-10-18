@@ -10,7 +10,7 @@ class Player : public BaseObject
 {
 public:
 
-	Player(TimeSlower* slower);
+	Player(TimeSlower* slower, PhysicsEngine* phEngine);
 	~Player();
 
 	void Initialize(ModelData* modelData, Camera* camera)override;
@@ -42,7 +42,7 @@ private://状態変数
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
 
 private://パラメータ
-	Vector3 velocity_ = {};
+	std::unique_ptr<PhysicsActor> actor_ = nullptr;
 
 	//wireを投げた場所
 	Vector3 targetPos_ = {};

@@ -11,7 +11,7 @@ class PhysicsEngine
 public:
 
 	using ObjectCollision = std::pair<BaseObject*, BaseObject*>;
-	using TileCollision = std::pair<BaseObject*, TileMap*>;
+	using TileCollision = std::pair<BaseObject*, TileType>;
 
 	// アクターを登録
 	void RegisterActor(PhysicsActor* actor);
@@ -30,20 +30,25 @@ public:
 	void SetWorldBounds(const AABB& bounds) { worldBounds_ = bounds; }
 	const std::optional<AABB>& GetWorldBounds() const { return worldBounds_; }
 
+	
+	//現在のフレイムで発生したオブジェクト間の判定情報を取得
+	const std::vector<ObjectCollision>& GetCollisionInfo()const { return objectCollisionInfo_; }
+    //現在のフレイムで発生したタイルマップの判定情報を取得
+	const std::vector<TileCollision>& GetTileCollisionInfo()const { return tileCollisionInfo_; }
+
 private:
 
 	std::vector<PhysicsActor*> actors_;			// 物理演算を行うアクター
 	std::vector<TileMap*> collisionTiles_;		// コリジョン判定を行うタイル
 	std::optional<AABB> worldBounds_;			// ワールドの範囲
 
-
 	std::vector<ObjectCollision> objectCollisionInfo_; // 記録された判定を行うオブジェクト
 	std::vector<TileCollision> tileCollisionInfo_;		// 記録された判定を行うタイル
 
 	float maxSpeed_ = 20.0f;
 
-	static const inline float gravity_ = 9.8f;
-
+	static const inline float gravity_ = -9.8f;		// 重力
+	static const inline float friction_ = 0.9f;	// 摩擦係数
 private:
 	//全ての判定を行う
 	void CheckAllCollisions();
@@ -56,7 +61,7 @@ private:
 	//タイルマップの高さを取得する(斜め移動)
 	float GetTileHeightAtWidth(float width, TileType type, const Vector2& tileSize);
 	//タイルマップの当たり判定押し戻し
-	void HandleTileCollision();
+	void CheckTileTriggers();
 
 	int TileXIndex(float x, float size);
 	int TileYIndex(float y, float size,float worldY);

@@ -1,24 +1,15 @@
 #pragma once
-#include <cstdint>
-#include <wrl.h>
-#include <d3d12.h>
-#include <Core/DXDevice.h>
-#include <Transform/Transform.h>
-#include <Core/PSO/PSOConfig.h>
-#include <Resource/SRVManager.h>
-#include <Camera/Camera.h>
 #include "Data/BaseResource.h"
+#include <Resource/Model/ModelManager.h>
 
-/// <summary>
-/// CG2で作成した基本的(?)な描画情報
-/// </summary>
-class ParticleResource : public BaseResource {
+class MPResource : public BaseResource {
 public:
 
-	ParticleResource();
-	~ParticleResource();
+	MPResource();
+	~MPResource();
 
-	void Initialize(uint32_t vertexNum, uint32_t indexNum = 0, uint32_t instanceNum = 1);
+	void Initialize(ModelData* modelData, int instanceNum);
+	void Initialize(ModelManager* manager, int modelHandle, int instanceNum);
 
 	void IsBillboard(bool isBillboard) {
 		billboard_ = isBillboard;
@@ -30,18 +21,16 @@ public:
 	void DrawReady() override;
 
 	D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() const { return vertexBufferView; }
-	D3D12_INDEX_BUFFER_VIEW GetIndexBufferView() const;
+	D3D12_INDEX_BUFFER_VIEW GetIndexBufferView() const { return indexBufferView; };
 
-	D3D12_GPU_DESCRIPTOR_HANDLE GetMatrixSRVDesc() const { return matrixGPUHandle_; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetParticleDataGPUHandle() const { return particleDataGPUHandle_; }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureGPUHandle() const { return textureGPUHandle_; }
 
 	uint32_t GetVertexNum() const { return vertexNum_; }
 	uint32_t GetIndexNum() const { return indexNum_; }
 	uint32_t GetInstanceNum() const { return instanceNum_; }
 
 public:		//以下描画設定項目 ---==================
-
-	int textureHandle_ = 0;
 
 	std::vector<uint32_t> index_{};
 
@@ -50,18 +39,25 @@ public:		//以下描画設定項目 ---==================
 	std::vector<Vector3> scale_ = {};
 
 	std::vector<uint32_t> color_{};
+	//テクスチャインデックス(0~7)
+	std::vector<int> textureIndex_{};
+	//読み込む八枚のテクスチャの一番最初のハンドル
+	int textureStartIndex_ = 0;
 
 	Camera* camera_ = nullptr;
+	bool billboard_ = false;
+
+	//いじる必要なし
+	D3D12_GPU_DESCRIPTOR_HANDLE* textureHandles_ = nullptr;
 
 private:
 
-	uint32_t* indices_ = nullptr;
-	ParticleData* particleData_ = nullptr;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = nullptr;
+	ModelParticleData* particleData_ = nullptr;
+	
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleDataResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = nullptr;
 
-	D3D12_GPU_DESCRIPTOR_HANDLE matrixGPUHandle_{};
+	D3D12_GPU_DESCRIPTOR_HANDLE textureGPUHandle_{};
 	D3D12_GPU_DESCRIPTOR_HANDLE particleDataGPUHandle_{};
 
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
@@ -69,6 +65,8 @@ private:
 	uint32_t indexNum_ = 0;
 	uint32_t instanceNum_ = 0;
 
+	//これを変える際は、RootSignatureとShaderも変える
+	const uint32_t maxTextureNum_ = 8;
 
-	bool billboard_ = true;
 };
+

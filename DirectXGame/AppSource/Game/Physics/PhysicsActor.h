@@ -4,18 +4,17 @@
 class PhysicsEngine;
 class PhysicsActor
 {
-	friend class BaseObject;
 	friend class PhysicsEngine;
-
-private:
-
+public:
 	PhysicsActor(PhysicsEngine* physicsEngine, BaseObject* owner);
 	~PhysicsActor();
+private:
 
 	void ClearForce() { force_ = { 0.0f,0.0f }; }
 
 	void ResetFlags();
 
+public:
 	Vector2 velocity_;
 
 	PhysicsEngine* physicsEngine_ = nullptr;
