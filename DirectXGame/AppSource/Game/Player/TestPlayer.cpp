@@ -5,8 +5,8 @@ void TestPlayer::Initialize(ModelData* modelData, Camera* camera)
 	BaseObject::Initialize(modelData, camera);
 	collider_ = std::make_unique<SphereCollider>(
 		ColliderTag::Dynamic,
-		ColliderMask::PLAYER,
-		ColliderMask::ENEMY | ColliderMask::ITEM);
+		ColliderMask::ENEMY,
+		ColliderMask::PLAYER | ColliderMask::ITEM);
 	collider_->SetTransform(&transform_);
 	transform_.position = { 5,5,0 };
 }

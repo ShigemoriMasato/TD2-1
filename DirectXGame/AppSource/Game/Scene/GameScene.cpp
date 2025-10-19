@@ -29,7 +29,7 @@ void GameScene::Initialize()
 	{
 		enemyManager_ = std::make_unique<EnemyManager>();
 		enemyManager_->Initialize(modelManager_, camera_.get());
-		
+
 		//// 敵の配置を行う
 		//SetupEnemies();
 	}
@@ -78,14 +78,16 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		//ワイヤ出せる範囲をチェック
 		CheckPlayerWireField();
 	}
-	
+
 
 	// EnemyManagerにキー入力を渡す
-	if (enemyManager_) {
+	if (enemyManager_)
+	{
 		enemyManager_->SetKeys(keys_);
-		
+
 		// プレイヤーの位置を敵に通知
-		if (player_) {
+		if (player_)
+		{
 			enemyManager_->SetPlayerPosition(player_->GetTransform()->position);
 		}
 
@@ -93,14 +95,16 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	}
 
 	//オブジェクト更新
-	for (auto& object : objects_){
+	for (auto& object : objects_)
+	{
 		object->Update(deltaTime);
 	}
 
-	if(isPhysics_)
+	if (isPhysics_)
 		physicsEngine_.Update(deltaTime);
 
-	if (keys_[Key::Reverse]) {
+	if (keys_[Key::Reverse])
+	{
 		return std::make_unique<GameScene>();
 	}
 
@@ -126,16 +130,16 @@ void GameScene::CheckAllCollision()
 	for (const auto& pair : collisionPairs)
 	{
 		auto* objAColider = pair.first->GetCollider();
-        auto* objBColider = pair.second->GetCollider();
+		auto* objBColider = pair.second->GetCollider();
 
 		auto selfA = objAColider->GetSelf();
 		auto maskA = objBColider->GetMask();
-        auto selfB = objBColider->GetSelf();
-        auto maskB = objAColider->GetMask();
-		
-		if(!(selfA & maskB) || !(selfB & maskA))continue;
+		auto selfB = objBColider->GetSelf();
+		auto maskB = objAColider->GetMask();
+
+		if (!(selfA & maskB) || !(selfB & maskA))continue;
 		pair.first->OnCollision(pair.second);
-        pair.second->OnCollision(pair.first);
+		pair.second->OnCollision(pair.first);
 	}
 }
 
@@ -145,7 +149,7 @@ void GameScene::CheckPlayerWireField()
 
 	for (auto& object : objects_)
 	{
-		if (object.get() == player_)continue;
+		if (object.get() == player_ || object.get() == wire_.get())continue;
 		if (CollisionChecker(wire_.get(), object.get()))
 		{
 			collisionObjects.push_back(object.get());
@@ -155,7 +159,14 @@ void GameScene::CheckPlayerWireField()
 	{
 		player_->SetTargets(&collisionObjects);
 		isInWireField_ = true;
+
+		ImGui::Text("InWireField %d targets", (int)collisionObjects.size());
+		for (auto* t : collisionObjects)
+		{
+			ImGui::Text("Target: %u", t->GetCollider()->GetSelf());
+		}
 	}
+
 	collisionObjects.clear();
 }
 

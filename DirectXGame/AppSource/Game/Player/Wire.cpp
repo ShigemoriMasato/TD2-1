@@ -6,10 +6,18 @@ void Wire::Initialize(ModelData* modelData, Camera* camera) {
 	drawResource_->Initialize(2);
 	drawResource_->camera_ = camera;
 	drawResource_->psoConfig_.topology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+
+	collider_ = std::make_unique<SphereCollider>(
+		ColliderTag::Dynamic, 
+		ColliderMask::WIRE,
+		ColliderMask::ENEMY | ColliderMask::ITEM, 
+		5.0f);
+	collider_->SetTransform(&transform_);
 }
 
 void Wire::Update(float deltaTime) {
 	preEndPos_ = endPos_;
+	transform_.position = *startPos_;
 	if (isExtending_) {
 
 		Vector3 direction = (targetPos_ - endPos_).Normalize();
