@@ -56,7 +56,7 @@ public:
     void SetPhysicsEngine(PhysicsEngine* physicsEngine){physicsEngine_ = physicsEngine;}
 
     void SetModelData(TextureManager* textureManager, ModelData* modelData, Camera* camera);
-
+    bool HasTile(const Vector3& startPos, const Vector3& endPos, TileType type,Vector3* outEndPos = nullptr)const;
     void Draw(Render* render);
 private:
     Vector2 size_ = {1.0f,1.0f};

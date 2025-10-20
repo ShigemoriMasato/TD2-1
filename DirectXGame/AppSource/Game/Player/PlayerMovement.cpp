@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Wire.h"
+#include "../Tile/TileMap.h"
 
 namespace {
 	//debug用
@@ -17,7 +18,7 @@ void Player::UpdateIdel(float deltaTime) {
 	//初期化
 
 	actor_->velocity_ = {};
-	auto key = (*key_);
+	auto& key = (*key_);
 
 	//移動
 	if (key[Key::Right]) actor_->velocity_.x += moveSpeed_;
@@ -35,14 +36,14 @@ void Player::OnForcus() {
 
 void Player::UpdateForcus(float deltaTime) {
 	//地面に着地していたら慣性を消す
-	if(transform_.position.y <= 0.0f) {
+	if(actor_->collidedBottom_) {
 		actor_->velocity_ = {};
 	}
 
 	//todo 狙い先の当たり判定をとる。
 	//todo 当たり判定の具体的な値の送信方法は後日相談
 
-	auto key = (*key_);
+	auto& key = (*key_);
 
 	//以下仮置き
 	int directionID = -1;
@@ -82,14 +83,24 @@ void Player::UpdateForcus(float deltaTime) {
 
 
 	if (!key[Key::Action]) { 
-		// 8分割なので、一つの方向は2π/8 = π/4ラジアン
-		float theta = static_cast<float>(directionID) * (2.0f * 3.1415926535f / 8.0f);
-		static const float wireLength = 10.0f;
-		targetPos_ = Vector3(wireLength * std::cos(theta), wireLength * std::sin(theta), 0.0f) + transform_.position;
-		wire_->SetEndPosition(targetPos_);
-		behaviorRequest_ = Behavior::Extend;
-	}
+		//ワイヤーの範囲に入ったオブジェクトチェック
+		Vector3 inputDirection = GetInputDirection();
+		if (inputDirection.Length() > 0.1f)
+		{
+			BaseObject* selectedTarget = SelectTargetByDirection(inputDirection);
 
+			if (selectedTarget)
+			{
+				targetPos_ = selectedTarget->GetTransform()->position;
+				if (!tileMap_->HasTile(this->transform_.position, targetPos_, TileType::Solid))
+				{
+					wire_->SetEndPosition(targetPos_);
+					behaviorRequest_ = Behavior::Extend;
+					//todo:スローでオブジェクト選択できるようになる
+				}
+			}
+		}
+	}
 }
 
 void Player::OnExtend() {
@@ -143,7 +154,7 @@ void Player::UpdateDash(float deltaTime) {
 	//	behaviorRequest_ = Behavior::Idel;
 	//}
 
-	auto key = (*key_);
+	auto& key = (*key_);
 
 	//空中でワイヤーを伸ばせるようにする
 	if (key[Key::Action]) {

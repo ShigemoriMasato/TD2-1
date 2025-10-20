@@ -15,6 +15,15 @@ void GameScene::Initialize()
 
 	timeSlower_ = std::make_unique<TimeSlower>(fpsObserver_);
 
+	//タイルマップ初期化
+	{
+		auto handle = modelManager_->LoadModel("testBlock");
+		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
+		levelLoader_.LoadLevel("Assets/Map/test.json", *tileMap_);
+		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_.get());
+	}
+
+
 	//プレイヤー初期化
 	{
 		auto player = std::make_unique<Player>(timeSlower_.get(), &physicsEngine_);
@@ -22,6 +31,7 @@ void GameScene::Initialize()
 		physicsEngine_;
 		player->Initialize(modelManager_->GetModelData(handle), camera_.get());
 		player->SetKeyConfig(&keys_);
+		player->SetTileMap(tileMap_.get());
 		player_ = player.get();
 		objects_.push_back(std::move(player));
 	}
@@ -42,17 +52,10 @@ void GameScene::Initialize()
 		wire_->Initialize(modelManager_->GetModelData(handle), camera_.get());
 		player_->SetWire(wire_.get());
 
-		auto wire2 = std::make_unique<Wire>();
-		wire2->Initialize(modelManager_->GetModelData(handle), camera_.get());
-		//objects_.push_back(std::move(wire2));
 	}
 
 	{
 		auto handle = modelManager_->LoadModel("testBlock");
-		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
-		levelLoader_.LoadLevel("Assets/Map/test.json", *tileMap_);
-		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_.get());
-
 		auto testPlayer = std::make_unique<TestPlayer>();
 		testPlayer->Initialize(modelManager_->GetModelData(handle), camera_.get());
 		testPlayer->SetKeyConfig(&keys_);
@@ -145,29 +148,15 @@ void GameScene::CheckAllCollision()
 
 void GameScene::CheckPlayerWireField()
 {
-	std::list<BaseObject*> collisionObjects;
-
 	for (auto& object : objects_)
 	{
 		if (object.get() == player_ || object.get() == wire_.get())continue;
 		if (CollisionChecker(wire_.get(), object.get()))
 		{
-			collisionObjects.push_back(object.get());
+			player_->AddTargets(object.get());
+			isInWireField_ = true;
 		}
 	}
-	if (collisionObjects.size() > 0)
-	{
-		player_->SetTargets(&collisionObjects);
-		isInWireField_ = true;
-
-		ImGui::Text("InWireField %d targets", (int)collisionObjects.size());
-		for (auto* t : collisionObjects)
-		{
-			ImGui::Text("Target: %u", t->GetCollider()->GetSelf());
-		}
-	}
-
-	collisionObjects.clear();
 }
 
 //void GameScene::SetupEnemies() {
