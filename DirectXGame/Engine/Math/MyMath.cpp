@@ -599,16 +599,22 @@ Vector3 deCasteljau(const std::vector<Vector3>& controlPoints, float t)
 
 bool CollisionChecker(BaseObject* a, BaseObject* b)
 {
-	/*auto aCollider = a->GetCollider();
-	auto bCollider = b->GetCollider();
+	const auto& aCollider = a->GetCollider();
+	const auto& bCollider = b->GetCollider();
 
-	auto distance = aCollider.first.position - bCollider.first.position;
+	const auto& aTransform = a->GetTransform();
+    const auto& bTransform = b->GetTransform();
+
+	auto distance = aTransform->position - bTransform->position;
 	float length = distance.Length();
 
-	if (length <= aCollider.second + bCollider.second)
+	const auto& aSize = aCollider->GetSize();
+	const auto& bSize = bCollider->GetSize();
+
+	if (length <= aSize.Length() + bSize.Length())
 	{
 		return true;
-	}*/
+	}
 
 	return false;
 }

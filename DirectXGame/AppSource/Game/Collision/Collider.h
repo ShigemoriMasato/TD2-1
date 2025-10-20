@@ -18,8 +18,9 @@ enum ColliderMask : uint32_t
 {
 	MASK_NONE	= 0,		//無効
 	PLAYER		= 1 << 0,	//プレイヤー
-	ENEMY		= 1 << 1,	//敵
-	ITEM		= 1 << 2,	//アイテム
+	WIRE		= 1 << 1,	//ワイヤー
+	ENEMY		= 1 << 2,	//敵
+	ITEM		= 1 << 3,	//アイテム
 };
 
 class Collider
