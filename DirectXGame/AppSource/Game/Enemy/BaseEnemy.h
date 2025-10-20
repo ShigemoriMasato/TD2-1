@@ -37,6 +37,9 @@ public:
 	// 敵固有の設定を行う（Factory パターンで使用）
 	virtual void Configure(const EnemySpawnParams& params) {}
 
+	// 当たり判定時の処理（BaseObjectからオーバーライド）
+	void OnCollision(BaseObject* other) override;
+
 protected:
 	Vector3 playerPosition_ = { 0.0f, 0.0f, 0.0f };
 	bool isActive_ = true;  // 処理対象フラグ（更新・描画するかどうか）
