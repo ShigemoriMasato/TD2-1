@@ -4,6 +4,7 @@
 #include <string>
 #include <array>
 #include <cmath>
+#include <numbers>
 #include "../Transform/Vector.h"
 #include "../Transform/Matrix.h"
 #include "../Transform/Transform.h"
@@ -149,3 +150,4 @@ bool CollisionChecker(BaseObject* a, BaseObject* b);
 std::vector<Vector3> GetSplinePoints(const std::vector<Vector3>& controlPoints, int segment);
 std::vector<Vector3> GetCatmullPoints(const std::vector<Vector3>& points, int segmentsPerCurve);
 Vector3 GetCatmullPoint(const std::vector<Vector3>& points, float t);
+float CalculateAngle(const Vector3& a, const Vector3& b);

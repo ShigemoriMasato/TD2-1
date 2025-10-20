@@ -6,6 +6,7 @@
 
 ; /* このセミコロンを消したらエラーが出る。 */
 class Wire;
+class TileMap;
 class Player : public BaseObject
 {
 public:
@@ -20,9 +21,9 @@ public:
 	void SetWire(Wire* wire) { wire_ = wire; }
 	void OnCollision(BaseObject* other)override;
 
-	void SetTargets(const std::list<BaseObject*>* targets) { targets_ = targets; }
+	void AddTargets(BaseObject* target) { targets_.push_back(target); }
 	void SetKeyConfig(std::unordered_map<Key, bool>* keyConfig) { key_ = keyConfig; }
-
+	void SetTileMap(const TileMap* tileMap) { tileMap_ = tileMap; }
 private:
 
 	enum class Behavior
@@ -30,7 +31,7 @@ private:
 		Idle,			//待機(着地)
 		Forcus,			//狙いを定める
 		Extend,			//伸ばす
-		Shrink,		//縮める
+		Shrink,			//縮める
 		Dash,			//ダッシュ
 	};
 
@@ -78,11 +79,11 @@ private://パラメータ
 private:
 
 	Wire* wire_ = nullptr;
-	const std::list<BaseObject*>* targets_ = nullptr;
+	std::list<BaseObject*> targets_;
 	std::unordered_map<Key, bool>* key_ = nullptr;
 
 	TimeSlower* timeSlower_ = nullptr;
-
+	const TileMap* tileMap_ = nullptr;
 private://メンバ関数
 	//ビヘイビアリクエスト
 	void RequestBehavior();
@@ -109,5 +110,9 @@ private://メンバ関数
     //プレイヤーダッシュ
     void OnDash();
     void UpdateDash(float deltaTime);
+
+private://ワイヤー関連
+	Vector3 GetInputDirection();
+	BaseObject* SelectTargetByDirection(const Vector3& direction);
 };
 

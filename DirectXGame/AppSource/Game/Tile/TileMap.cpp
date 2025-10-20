@@ -76,7 +76,7 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 				resource->camera_ = camera;
 				resource->psoConfig_.isSwapChain = true;
 				resource->position_[index] = Vector3(x * size_.x, (mapSize_.y - 1 - y) * size_.y, 0.0f);
-				resource->color_[index] = 0x808080ff | (rand() % (x + 1) + 101);
+				resource->color_[index] = 0x80808080;
 				index++;
 			}
 		}
@@ -93,6 +93,80 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 
 	//今はとりあえずwhite1x1とかを入れとく
 	mpResource_->textureStartIndex_ = 0;
+}
+
+//DDA（Digital Differential Analyzer）
+bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType type,Vector3* outEndPos = nullptr)const
+{
+	Vector2 dir = endPos - startPos;
+	float length = dir.Length();
+	if (length <= 0.0001f) return false;
+
+	dir /= length;
+
+	const float tileWidth = size_.x;
+	const float tileHeight = size_.y;
+
+	int x = static_cast<int>(std::floor(startPos.x / tileWidth));
+	int y = static_cast<int>(std::floor(WorldSize().y - 1 - startPos.y / tileHeight));
+
+	int endX = static_cast<int>(std::floor(endPos.x / tileWidth));
+	int endY = static_cast<int>(std::floor(WorldSize().y - 1 - endPos.y / tileHeight));
+
+	int stepX = (dir.x > 0.0f) ? 1 : (dir.x < 0.0f ? -1 : 0);
+	int stepY = (dir.y > 0.0f) ? 1 : (dir.y < 0.0f ? -1 : 0);
+
+	float tMaxX = 0.0f, tMaxY = 0.0f;
+	float tDeltaX = (stepX != 0) ? tileWidth / std::abs(dir.x) : std::numeric_limits<float>::infinity();
+	float tDeltaY = (stepY != 0) ? tileHeight / std::abs(dir.y) : std::numeric_limits<float>::infinity();
+
+	if (stepX > 0)
+		tMaxX = ((x + 1) * tileWidth - startPos.x) / dir.x;
+	else if (stepX < 0)
+		tMaxX = (x * tileWidth - startPos.x) / dir.x;
+	else
+		tMaxX = std::numeric_limits<float>::infinity();
+
+	if (stepY > 0)
+		tMaxY = ((y + 1) * tileHeight - startPos.y) / dir.y;
+	else if (stepY < 0)
+		tMaxY = (y * tileHeight - startPos.y) / dir.y;
+	else
+		tMaxY = std::numeric_limits<float>::infinity();
+
+	const float maxDist = length;
+	float traveled = 0.0f;
+
+	while (true)
+	{
+		TileType tile = GetTileTypeAt(x, y);
+		if (tile == type)
+		{
+			if (outEndPos)*outEndPos = { (float)x,(float)y,0.0f };
+			return true;
+		}
+
+		if (std::abs(x - endX) < 1 && std::abs(y - endY) < 1)
+			break;
+
+		if (tMaxX < tMaxY)
+		{
+			traveled = tMaxX;
+			tMaxX += tDeltaX;
+			x += stepX;
+		}
+		else
+		{
+			traveled = tMaxY;
+			tMaxY += tDeltaY;
+			y += stepY;
+		}
+
+		if (traveled > maxDist)
+			break;
+	}
+
+	return false;
 }
 
 void TileMap::Draw(Render* render)

@@ -676,6 +676,20 @@ Vector3 GetCatmullPoint(const std::vector<Vector3>& points, float t)
 	return catmullRom(points[segmentIndex], points[segmentIndex + 1], points[segmentIndex + 2], points[segmentIndex + 3], localT);
 }
 
+float CalculateAngle(const Vector3& a, const Vector3& b)
+{
+	float dotProduct = dot(a,b);
+	float magnitudeA = std::sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+	float magnitudeB = std::sqrt(b.x * b.x + b.y * b.y + b.z * b.z);
+
+	if (magnitudeA == 0 || magnitudeB == 0) return (float)std::numbers::pi;
+
+	float cosAngle = dotProduct / (magnitudeA * magnitudeB);
+	cosAngle = std::clamp(cosAngle, -1.0f, 1.0f);
+
+	return std::cos(cosAngle);
+}
+
 float MyMath::lerp(float a, float b, float t)
 {
 	return a + (b - a) * t;

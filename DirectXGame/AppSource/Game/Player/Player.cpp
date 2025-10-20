@@ -49,6 +49,7 @@ void Player::Update(float deltaTime)
 
 	modelResource_->position_ = transform_.position;
 
+
 	RequestBehavior();
 	(this->*behaviorUpdate[static_cast<int>(behavior_)])(deltaTime);
 
@@ -56,7 +57,14 @@ void Player::Update(float deltaTime)
 
 	ImGui::Begin("Player Debug");
 	ImGui::Text("Behavior: %d", static_cast<int>(behavior_));
+
+	ImGui::Text("InWireField %d targets", (int)targets_.size());
+	for (auto* t : targets_)
+	{
+		ImGui::Text("Target: %u", t->GetCollider()->GetSelf());
+	}
 	ImGui::End();
+	targets_.clear();
 }
 
 void Player::Draw(Render* render)
@@ -70,6 +78,61 @@ void Player::Draw(Render* render)
 void Player::OnCollision(BaseObject* other)
 {
 	modelResource_->color_ = 0xff0000ff;
+}
+
+Vector3 Player::GetInputDirection()
+{
+	Vector3 direction = { 0.0f, 0.0f, 0.0f };
+
+	if (!key_) return direction;
+
+	if ((*key_)[Key::Up]) direction.z += 1.0f;
+	if ((*key_)[Key::Down]) direction.z -= 1.0f;
+	if ((*key_)[Key::Left]) direction.x -= 1.0f;
+	if ((*key_)[Key::Right]) direction.x += 1.0f;
+
+	if (direction.Length() > 0.1f)
+	{
+		direction = direction.Normalize();
+	}
+
+	return direction;
+}
+
+BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
+{
+	if (targets_.empty()) return nullptr;
+
+	BaseObject* selectTarget = nullptr;
+	float bestScore = -1.0f;
+	const float maxAngle = 60.0f * ((float)std::numbers::pi / 180.0f);//60度の扇状の範囲
+
+	for (auto it = targets_.begin(); it != targets_.end(); ++it)
+	{
+		auto target = (*it);
+		if (!target) continue;
+
+		Vector3 toTarget = (target->GetTransform()->position - transform_.position).Normalize();
+
+		float angle = CalculateAngle(direction, toTarget);
+
+		if (angle <= maxAngle)
+		{
+			float distance = (target->GetTransform()->position - transform_.position).Length();
+			float distanceScore = 1.0f / (distance + 0.1f);
+			float angleScore = 1.0f - (angle / maxAngle);
+
+			float totalScore = distanceScore * 0.4f + angleScore * 0.6f;
+
+			if (totalScore > bestScore)
+			{
+				bestScore = totalScore;
+				selectTarget = target;
+			}
+		}
+	}
+
+	return selectTarget;
 }
 
 void Player::RequestBehavior()
