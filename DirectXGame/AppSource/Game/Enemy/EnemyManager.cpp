@@ -103,6 +103,19 @@ void EnemyManager::AddSplitEnemy(const Vector3& position, bool isLeft) {
 	SpawnEnemy("SplitEnemy", params);
 }
 
+std::vector<BaseObject*> EnemyManager::GetAllEnemyObjects() {
+	std::vector<BaseObject*> result;
+	result.reserve(enemies_.size());
+	
+	for (auto& enemy : enemies_) {
+		if (enemy && enemy->IsActive()) {
+			result.push_back(enemy.get());
+		}
+	}
+	
+	return result;
+}
+
 // DivisionEnemyの分裂コールバック設定用ヘルパー関数
 bool EnemyManager::SetupDivisionEnemy(const std::string& enemyType, const EnemySpawnParams& params) {
 	if (SpawnEnemy(enemyType, params)) {

@@ -42,7 +42,5 @@ private://使える関数
 
 void CheckAllCollision();
 void CheckPlayerWireField();
-///// @brief 敵の配置を設定する
-//void SetupEnemies();
 };
 

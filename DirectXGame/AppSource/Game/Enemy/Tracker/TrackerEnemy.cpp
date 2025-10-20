@@ -2,6 +2,7 @@
 #include "../EnemySpawnParams.h"
 #include <Tools/FPS/FPSObserver.h>
 #include <Common/KeyConfig/KeyManager.h>
+#include <Game/Collision/Collider.h>
 
 TrackerEnemy::TrackerEnemy() {
 }
@@ -9,6 +10,14 @@ TrackerEnemy::TrackerEnemy() {
 void TrackerEnemy::Initialize(ModelData* modelData, Camera* camera) {
 	// BaseObjectのInitializeを呼び出してモデルリソースを初期化
 	BaseObject::Initialize(modelData, camera);
+
+	// コライダーを設定（敵用のAABBCollider）
+	collider_ = std::make_unique<AABBCollider>(
+		ColliderTag::Dynamic,
+		ColliderMask::ENEMY,
+		ColliderMask::PLAYER,
+		Vector3(1.0f, 1.0f, 1.0f));
+	collider_->SetTransform(&transform_);
 
 	transform_.position = {0.0f, 0.0f, 0.0f};
 	transform_.rotation = {0.0f, 0.0f, 0.0f};
