@@ -31,6 +31,24 @@ void GameScene::Initialize()
 		enemyManager_ = std::make_unique<EnemyManager>();
 		enemyManager_->Initialize(modelManager_, camera_.get());
 
+		// プレイヤーの初期位置
+		Vector3 playerPos = { 4.0f, 7.0f, 0.0f };
+
+		// TrackerEnemy（プレイヤーについてくる敵）を5体配置
+		// 敵1: プレイヤーの右側
+		enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x + 5.0f, playerPos.y, 0.0f));
+
+		// 敵2: プレイヤーの左側
+		enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x - 5.0f, playerPos.y, 0.0f));
+
+		// 敵3: プレイヤーの前方
+		enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x, playerPos.y, 0.0f));
+
+		// 敵4: プレイヤーの後方
+		enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x, playerPos.y, 0.0f));
+
+		// 敵5: プレイヤーの右前方（斜め）
+		enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x + 4.0f, playerPos.y, 0.0f));
 	}
 
 	{
