@@ -353,10 +353,10 @@ void PhysicsEngine::ApplyWorldBounds(PhysicsActor* actor, float deltaTime)
 	auto objHalfSize = objectWorldAABB.Size() * 0.5f;
 
 	//左方向
-	if (objPos.x < worldBounds_->min.x + objHalfSize.x)
+	if (objPos.x < worldBounds_->min.x)
 	{
 		actor->velocity_.x = 0.0f;
-		objPos.x = worldBounds_->min.x + objHalfSize.x;
+		objPos.x = worldBounds_->min.x;
 		actor->collidedLeft_ = true;
 	}
 	//右方向
@@ -367,10 +367,10 @@ void PhysicsEngine::ApplyWorldBounds(PhysicsActor* actor, float deltaTime)
 		actor->collidedRight_ = true;
 	}
 	//上方向
-	if (objPos.y > worldBounds_->max.y + objHalfSize.y)
+	if (objPos.y > worldBounds_->max.y)
 	{
 		actor->velocity_.y = 0.0f;
-		objPos.y = worldBounds_->max.y + objHalfSize.y;
+		objPos.y = worldBounds_->max.y;
 		actor->collidedTop_ = true;
 	}
 	//新しい位置 - 現在位置
