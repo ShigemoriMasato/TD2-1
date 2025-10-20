@@ -38,14 +38,14 @@ void TrackerEnemy::Initialize(ModelData* modelData, Camera* camera) {
 void TrackerEnemy::Update(float deltaTime) {
 if (!isActive_ || !isAlive_) return;
 
-	// テスト用：スペースキーでHP減少
-	if (keys_[Key::Action]) {
-		hp_--;
-		if (hp_ <= 0) {
-			Die();
-			return;
-		}
-	}
+	//// テスト用：スペースキーでHP減少
+	//if (keys_[Key::Action]) {
+	//	hp_--;
+	//	if (hp_ <= 0) {
+	//		Die();
+	//		return;
+	//	}
+	//}
 
 	// プレイヤーに向かって移動
 	Vector3 direction = playerPosition_ - transform_.position;
