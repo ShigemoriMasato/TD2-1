@@ -56,6 +56,10 @@ public:
 	/// @return EnemyFactory参照
 	EnemyFactory& GetFactory() { return enemyFactory_; }
 
+	/// @brief 全ての敵オブジェクトのリストを取得（物理エンジン登録用）
+	/// @return 敵オブジェクトのリスト
+	std::vector<BaseObject*> GetAllEnemyObjects();
+
 	/// @brief DivisionEnemyをスポーンして分裂コールバックを自動設定
 	/// @param enemyType 敵の種類名（通常は"DivisionEnemy"）
 	/// @param params スポーンパラメータ
