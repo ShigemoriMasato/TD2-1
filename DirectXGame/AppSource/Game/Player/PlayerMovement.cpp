@@ -17,7 +17,7 @@ void Player::OnIdel() {
 void Player::UpdateIdel(float deltaTime) {
 	//初期化
 
-	actor_->velocity_ = {};
+	actor_->velocity_.x = {};
 	auto& key = (*key_);
 
 	//移動

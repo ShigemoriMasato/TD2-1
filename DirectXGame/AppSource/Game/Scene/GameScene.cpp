@@ -44,21 +44,24 @@ void GameScene::Initialize()
 		// プレイヤーの初期位置
 		Vector3 playerPos = { 4.0f, 7.0f, 0.0f };
 
-		// TrackerEnemy（プレイヤーについてくる敵）を5体配置
-		// 敵1: プレイヤーの右側
-		enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x + 5.0f, playerPos.y, 0.0f));
+		//// TrackerEnemy（プレイヤーについてくる敵）を5体配置
+		//// 敵1: プレイヤーの右側
+		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x + 5.0f, playerPos.y, 0.0f));
 
-		// 敵2: プレイヤーの左側
-		enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x - 5.0f, playerPos.y, 0.0f));
+		//// 敵2: プレイヤーの左側
+		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x - 5.0f, playerPos.y, 0.0f));
 
-		// 敵3: プレイヤーの前方
-		enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x, playerPos.y, 0.0f));
+		//// 敵3: プレイヤーの前方
+		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x, playerPos.y, 0.0f));
 
-		// 敵4: プレイヤーの後方
-		enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x, playerPos.y, 0.0f));
+		//// 敵4: プレイヤーの後方
+		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x, playerPos.y, 0.0f));
 
-		// 敵5: プレイヤーの右前方（斜め）
-		enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x + 4.0f, playerPos.y, 0.0f));
+		//// 敵5: プレイヤーの右前方（斜め）
+		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x + 4.0f, playerPos.y, 0.0f));
+
+		enemyManager_->SpawnEnemy("FloatEnemy", Vector3(4.0f, 1.0f, 0.0f));
+
 	}
 
 	{
@@ -72,13 +75,13 @@ void GameScene::Initialize()
 	}
 
 	{
-	  auto handle = modelManager_->LoadModel("testBlock");
-	  auto testPlayer = std::make_unique<TestPlayer>();
-	  testPlayer->Initialize(modelManager_->GetModelData(handle), camera_.get());
-	  testPlayer->SetKeyConfig(&keys_);
-	  testPlayer->SetActor(&physicsEngine_);
-	  objects_.push_back(std::move(testPlayer));
-  }
+		auto handle = modelManager_->LoadModel("testBlock");
+		auto testPlayer = std::make_unique<TestPlayer>();
+		testPlayer->Initialize(modelManager_->GetModelData(handle), camera_.get());
+		testPlayer->SetKeyConfig(&keys_);
+		testPlayer->SetActor(&physicsEngine_);
+		objects_.push_back(std::move(testPlayer));
+	}
 }
 
 std::unique_ptr<BaseScene> GameScene::Update()
@@ -93,8 +96,6 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	ImGui::Checkbox("use phy", &isPhysics_);
 	if (isPhysics_)
 	{
-		//オブジェクト間でのコリジョンチェック
-		CheckAllCollision();
 		//ワイヤ出せる範囲をチェック
 		CheckPlayerWireField();
 	}
@@ -121,7 +122,9 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	}
 
 	if (isPhysics_)
-		physicsEngine_.Update(deltaTime);
+		//オブジェクト間でのコリジョンチェック
+		CheckAllCollision();
+	physicsEngine_.Update(deltaTime);
 
 	if (keys_[Key::Reverse])
 	{

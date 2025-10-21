@@ -24,6 +24,16 @@ public:
 	void AddTargets(BaseObject* target) { targets_.push_back(target); }
 	void SetKeyConfig(std::unordered_map<Key, bool>* keyConfig) { key_ = keyConfig; }
 	void SetTileMap(const TileMap* tileMap) { tileMap_ = tileMap; }
+
+	// 速度操作用のアクセッサ
+	void AddVelocity(const Vector2& velocity) { 
+		if (actor_) {
+			actor_->velocity_ += velocity;
+		}
+	}
+	Vector2 GetVelocity() const { 
+		return actor_ ? actor_->velocity_ : Vector2{0.0f, 0.0f};
+	}
 private:
 
 	enum class Behavior
