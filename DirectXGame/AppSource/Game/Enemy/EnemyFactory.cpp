@@ -3,6 +3,7 @@
 #include "Division/SplitEnemy.h"
 #include "Tracker/TrackerEnemy.h"
 #include "Float/FloatEnemy.h"
+#include "Dash/DashEnemy.h"
 #include <Resource/Model/ModelManager.h>
 
 void EnemyFactory::Initialize(ModelManager* modelManager, Camera* camera) {
@@ -24,6 +25,10 @@ void EnemyFactory::Initialize(ModelManager* modelManager, Camera* camera) {
 
 	RegisterEnemy("FloatEnemy", []() {
 		return std::make_unique<FloatEnemy>();
+		});
+
+	RegisterEnemy("DashEnemy", []() {
+		return std::make_unique<DashEnemy>();
 		});
 }
 
