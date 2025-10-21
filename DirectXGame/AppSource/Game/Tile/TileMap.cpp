@@ -96,7 +96,7 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 }
 
 //DDA（Digital Differential Analyzer）
-bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType type,Vector3* outEndPos = nullptr)const
+bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType type,Vector3* outEndPos)const
 {
 	Vector2 dir = endPos - startPos;
 	float length = dir.Length();
