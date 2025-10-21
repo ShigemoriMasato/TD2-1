@@ -94,11 +94,11 @@ std::unique_ptr<BaseScene> GameScene::Update()
 
 	float deltaTime = timeSlower_->GetDeltaTime();
 	ImGui::Checkbox("use phy", &isPhysics_);
-	if (isPhysics_)
-	{
+  
 		//ワイヤ出せる範囲をチェック
 		CheckPlayerWireField();
-	}
+	
+
 
 
 	// EnemyManagerにキー入力を渡す
@@ -121,9 +121,9 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		object->Update(deltaTime);
 	}
 
-	if (isPhysics_)
+
 		//オブジェクト間でのコリジョンチェック
-		CheckAllCollision();
+	CheckAllCollision();
 	physicsEngine_.Update(deltaTime);
 
 	if (keys_[Key::Reverse])
@@ -200,8 +200,14 @@ void GameScene::CheckPlayerWireField()
 		if (CollisionChecker(wire_.get(), object.get()))
 		{
 			player_->AddTargets(object.get());
-			isInWireField_ = true;
 		}
+	}
+	for (auto& enemy : enemyManager_->GetAllEnemyObjects())
+	{
+        if (CollisionChecker(wire_.get(), enemy))
+        {
+            player_->AddTargets(enemy);
+        }
 	}
 }
 

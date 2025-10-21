@@ -32,8 +32,7 @@ private://管理用メンバ変数
 private://パラメータ変数
 
 	std::unique_ptr<TimeSlower> timeSlower_ = nullptr;
-	bool isInWireField_ = false;
-	bool isPhysics_ = false;
+
 private://特定なオブジェクト
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 	Player* player_ = nullptr;
