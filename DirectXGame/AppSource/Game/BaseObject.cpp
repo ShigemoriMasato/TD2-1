@@ -9,7 +9,6 @@ void BaseObject::Initialize(ModelData* modelData, Camera* camera)
 	modelResource_ = std::make_unique<ModelResource>();
 	modelResource_->Initialize(modelData);
 	modelResource_->camera_ = camera;
-	modelResource_->psoConfig_.isSwapChain = true;
 }
 
 void BaseObject::Draw(Render* render)

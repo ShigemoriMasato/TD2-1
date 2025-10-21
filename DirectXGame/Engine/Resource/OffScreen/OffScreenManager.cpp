@@ -20,8 +20,20 @@ void OffScreenManager::Initialize(DXDevice* device, ID3D12GraphicsCommandList* c
 	ID3D12DescriptorHeap* rawHeap = CreateDescriptorHeap(device_->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, maxOffScreenCount_, false);
 	rtvDescriptorHeap_.Attach(rawHeap);
 
-	for(int i = 0; i < maxOffScreenCount_; ++i) {
-		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	CreateOffScreen(1280, 720, clearColor); // ImGuiDocking
+
+	clearColor[0] = 1.0f; clearColor[1] = 0.0f; clearColor[2] = 0.0f; clearColor[3] = 1.0f;
+	CreateOffScreen(1280, 720, clearColor); // PostPing
+
+	clearColor[0] = 0.0f; clearColor[1] = 0.0f; clearColor[2] = 1.0f; clearColor[3] = 1.0f;
+	CreateOffScreen(1280, 720, clearColor); // PostPong
+
+	clearColor[0] = 0.0f; clearColor[1] = 1.0f; clearColor[2] = 0.0f; clearColor[3] = 1.0f;
+	CreateOffScreen(1280, 720, clearColor); // GameWindow
+
+	for(int i = 4; i < maxOffScreenCount_; ++i) {
+		float clearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		CreateOffScreen(1280, 720, clearColor);
 	}
 }
@@ -31,9 +43,6 @@ int OffScreenManager::CreateOffScreen(int width, int height, float* clearColor) 
 	return static_cast<int>(offScreens_.size() - 1);
 }
 
-OffScreenData* OffScreenManager::GetOffScreenData(int handle) {
-	if (handle < 0 || handle >= static_cast<int>(offScreens_.size())) {
-		return nullptr;
-	}
-	return offScreens_[handle].get();
+OffScreenData* OffScreenManager::GetOffScreenData(OffScreenIndex index) {
+	return offScreens_[int(index)].get();
 }

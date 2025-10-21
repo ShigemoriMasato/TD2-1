@@ -150,29 +150,30 @@ void Render::Initialize(TextureManager* textureManager, OffScreenManager* offScr
     commandList->Reset(commandAllocator.Get(), nullptr);
 }
 
-void Render::PreDraw(int offscreenHandle) {
+void Render::PreDraw(OffScreenIndex index, bool isClear) {
     //PSOとRootSignatureを初期化する
     if (isFrameFirst_) {
         psoEditor_->FrameInitialize(commandList.Get());
         ID3D12DescriptorHeap* ppHeaps[] = { srvManager_->GetHeap() };
 		commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 		isFrameFirst_ = false;
-    } else {
-        
+    }
+	//もともと描画していたRTVのリソースバリアをリセットする
+    else {
+        ResetResourceBarrier();
     }
 
-    offScreenHandle_ = offscreenHandle;
+    offScreenHandle_ = index;
 
     //描画する画面が指定されている場合はそちらにする
-    if (offscreenHandle != -1) {
-		auto offscreen = offScreenManager_->GetOffScreenData(offscreenHandle);
-		PreDrawOffScreen(offscreen);
+    if (offScreenHandle_ != OffScreenIndex::SwapChain) {
+		auto offscreen = offScreenManager_->GetOffScreenData(offScreenHandle_);
+		PreDrawOffScreen(offscreen, isClear);
         return;
     }
 
 	//そうでない場合はスワップチェーンのバッファに描画する
-    PreDrawSwapChain();
-
+    PreDrawSwapChain(isClear);
 }
 
 void Render::Draw(DrawResource* resource) {
@@ -295,10 +296,58 @@ void Render::Draw(MPResource* resource) {
     commandList->DrawIndexedInstanced(indexNum, resource->GetInstanceNum(), 0, 0, 0);
 }
 
+void Render::Draw(PostEffectResource* resource) {
+
+    OffScreenIndex nextWindow = OffScreenIndex::PostPing;
+    OffScreenIndex preOffScreenIndex = offScreenHandle_;
+    OffScreenIndex inputIndex = resource->input_;
+    resource->psoConfig_.isSwapChain = false;
+
+    //描画関数
+    auto draw = [&, this](OffScreenIndex to, OffScreenIndex in) {
+        PreDraw(to);
+
+        auto vertexBufferView = resource->GetVertexBufferView();
+        commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+        psoEditor_->SetPSOConfig(resource->psoConfig_);
+        psoEditor_->Setting(commandList.Get());
+
+        commandList->SetGraphicsRootConstantBufferView(0, resource->GetInfoResource()->GetGPUVirtualAddress());
+        commandList->SetGraphicsRootDescriptorTable(1, offScreenManager_->GetOffScreenData(in)->GetTextureGPUHandle());
+
+        commandList->DrawInstanced(3, 1, 0, 0);
+        };
+
+    //Pingに移す
+    resource->SimpleDrawReady();
+    draw(nextWindow, inputIndex);
+
+    //PingPong描画する
+    while (resource->IsContinue()) {
+        inputIndex = nextWindow;
+        nextWindow == OffScreenIndex::PostPing ?
+            nextWindow = OffScreenIndex::PostPong :
+            nextWindow = OffScreenIndex::PostPing;
+        resource->DrawReady();
+        draw(nextWindow, inputIndex);
+    }
+
+    //outputに持ってくる
+    inputIndex = nextWindow;
+    nextWindow = resource->output_;
+    resource->psoConfig_.isSwapChain = nextWindow == OffScreenIndex::SwapChain;
+    resource->SimpleDrawReady();
+    draw(nextWindow, inputIndex);
+
+    //描画先を元のRTVに戻す
+    PreDraw(preOffScreenIndex);
+}
+
 void Render::PostDraw(ImGuiWrapper* imguiRap) {
-    if (offScreenHandle_ != -1) {
+    if (offScreenHandle_ != OffScreenIndex::SwapChain) {
         ResetResourceBarrier();
-        PreDraw();
+        PreDraw(OffScreenIndex::SwapChain, false);
     }
 
     if (isFrameFirst_) {
@@ -361,7 +410,7 @@ ImGui_ImplDX12_InitInfo Render::GetImGuiInitInfo(SRVManager* srv) {
 	return info;
 }
 
-void Render::PreDrawSwapChain() {
+void Render::PreDrawSwapChain(bool isClear) {
     //描画する画面を取得
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
     UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
@@ -372,40 +421,42 @@ void Render::PreDrawSwapChain() {
     //RenderTargetの切り替え
     commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
 
-    //指定した色で画面全体をクリアする
-    commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor_, 0, nullptr);
+    if (isClear) {
+        //指定した色で画面全体をクリアする
+        commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor_, 0, nullptr);
 
-    //深度バッファをクリアする
-    commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+        //深度バッファをクリアする
+        commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-    //ビューポート
-    D3D12_VIEWPORT viewport{};
-    //クライアント領域のサイズと一緒にして画面全体に表示
-    viewport.Width = static_cast<float>(device_->GetWindowSize().first);
-    viewport.Height = static_cast<float>(device_->GetWindowSize().second);
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
+        //ビューポート
+        D3D12_VIEWPORT viewport{};
+        //クライアント領域のサイズと一緒にして画面全体に表示
+        viewport.Width = static_cast<float>(device_->GetWindowSize().first);
+        viewport.Height = static_cast<float>(device_->GetWindowSize().second);
+        viewport.TopLeftX = 0;
+        viewport.TopLeftY = 0;
+        viewport.MinDepth = 0.0f;
+        viewport.MaxDepth = 1.0f;
 
-    //シザー矩形
-    D3D12_RECT scissorRect{};
-    //基本的にビューポートと同じく刑が構成されるようにする
-    scissorRect.left = 0;
-    scissorRect.right = device_->GetWindowSize().first;
-    scissorRect.top = 0;
-    scissorRect.bottom = device_->GetWindowSize().second;
+        //シザー矩形
+        D3D12_RECT scissorRect{};
+        //基本的にビューポートと同じく刑が構成されるようにする
+        scissorRect.left = 0;
+        scissorRect.right = device_->GetWindowSize().first;
+        scissorRect.top = 0;
+        scissorRect.bottom = device_->GetWindowSize().second;
 
-    commandList->RSSetViewports(1, &viewport);
-    commandList->RSSetScissorRects(1, &scissorRect);
+        commandList->RSSetViewports(1, &viewport);
+        commandList->RSSetScissorRects(1, &scissorRect);
+    }
 }
 
-void Render::PreDrawOffScreen(OffScreenData* offScreen) {
-	offScreenManager_->GetOffScreenData(offScreenHandle_)->DrawReady(commandList.Get());
+void Render::PreDrawOffScreen(OffScreenData* offScreen, bool isClear) {
+	offScreenManager_->GetOffScreenData(offScreenHandle_)->DrawReady(commandList.Get(), isClear);
 }
 
 void Render::ResetResourceBarrier() {
-    if (offScreenHandle_ != -1) {
+    if (offScreenHandle_ != OffScreenIndex::SwapChain) {
         offScreenManager_->GetOffScreenData(offScreenHandle_)->EditBarrier(commandList.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     } else {
 		int backBufferIndex = swapChain->GetCurrentBackBufferIndex();

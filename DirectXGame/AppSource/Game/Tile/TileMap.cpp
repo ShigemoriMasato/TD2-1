@@ -74,7 +74,6 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 			if (GetTileInfoAt(x, y) != TileType::Empty)
 			{
 				resource->camera_ = camera;
-				resource->psoConfig_.isSwapChain = true;
 				resource->position_[index] = Vector3(x * size_.x, (mapSize_.y - 1 - y) * size_.y, 0.0f);
 				resource->color_[index] = 0x80808080;
 				index++;

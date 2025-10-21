@@ -78,7 +78,16 @@ void GameScene::Initialize()
 	  testPlayer->SetKeyConfig(&keys_);
 	  testPlayer->SetActor(&physicsEngine_);
 	  objects_.push_back(std::move(testPlayer));
-  }
+	}
+
+	{
+		//PostEffect初期化
+		postEffect_ = std::make_unique<PostEffectResource>();
+		postEffect_->Initialize();
+		postEffect_->SetJobs(PostEffectJob::Blur);
+		postEffect_->input_ = OffScreenIndex::GameWindow;
+		postEffect_->output_ = OffScreenIndex::SwapChain;
+	}
 }
 
 std::unique_ptr<BaseScene> GameScene::Update()
@@ -128,12 +137,16 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		return std::make_unique<GameScene>();
 	}
 
+	ImGui::Begin("PostEffectDebug");
+	auto& blur = postEffect_->data_.blur;
+	ImGui::DragFloat("i", *blur.intensity);
+
 	return nullptr;
 }
 
 void GameScene::Draw()
 {
-	render_->PreDraw();
+	render_->PreDraw(OffScreenIndex::GameWindow);
 
 	for (auto& object : objects_)
 	{
@@ -142,6 +155,8 @@ void GameScene::Draw()
 
 	tileMap_->Draw(render_);
 	enemyManager_->Draw(render_);
+
+	render_->Draw(postEffect_.get());
 }
 
 void GameScene::CheckAllCollision()

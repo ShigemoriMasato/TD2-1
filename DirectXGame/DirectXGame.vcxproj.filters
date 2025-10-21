@@ -161,6 +161,7 @@
     <ClInclude Include="Engine\Render\Resource\MPResource.h" />
     <ClInclude Include="AppSource\Game\LevelLoader.h" />
     <ClInclude Include="AppSource\Game\Player\TestPlayer.h" />
+    <ClInclude Include="Engine\Render\Resource\Data\PostEffectData.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
