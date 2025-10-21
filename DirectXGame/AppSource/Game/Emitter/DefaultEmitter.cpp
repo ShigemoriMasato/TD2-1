@@ -55,7 +55,6 @@ DefaultEmitter::~DefaultEmitter() {
 void DefaultEmitter::Initialize(Camera* camera) {
 	info_->psoConfig_.blendID = BlendStateID::Add;
 	info_->psoConfig_.depthStencilID = DepthStencilID::Transparent;
-	info_->psoConfig_.isSwapChain = true;
 
 	info_->camera_ = camera;
 }

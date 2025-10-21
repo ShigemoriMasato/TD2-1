@@ -65,3 +65,21 @@ std::string ConvertString(const std::wstring& str) {
     WideCharToMultiByte(CP_UTF8, 0, str.data(), static_cast<int>(str.size()), result.data(), sizeNeeded, NULL, NULL);
     return result;
 }
+
+std::string printString(std::string format, ...) {
+    va_list args;
+    va_start(args, format);
+
+    // 一度サイズを取得
+    va_list args_copy;
+    va_copy(args_copy, args);
+    int size = std::vsnprintf(nullptr, 0, format.c_str(), args_copy);
+    va_end(args_copy);
+
+    // バッファを確保して文字列を生成
+    std::vector<char> buffer(size + 1);
+    std::vsnprintf(buffer.data(), buffer.size(), format.c_str(), args);
+    va_end(args);
+
+    return std::string(buffer.data());
+}

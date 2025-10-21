@@ -3,15 +3,6 @@
 BlendStateShelf::BlendStateShelf() {
 	blendStates_.resize(int(BlendStateID::Count));
 
-	//NoBlend
-	D3D12_BLEND_DESC noBlend{};
-	noBlend.AlphaToCoverageEnable = false;
-	noBlend.IndependentBlendEnable = false;
-	noBlend.RenderTarget[0].BlendEnable = false;
-	noBlend.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-	noBlend.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
-	blendStates_[int(BlendStateID::NonBlend)] = noBlend;
-
 	//NormalBlend
 	D3D12_BLEND_DESC alphaBlend{};
 	alphaBlend.AlphaToCoverageEnable = false;

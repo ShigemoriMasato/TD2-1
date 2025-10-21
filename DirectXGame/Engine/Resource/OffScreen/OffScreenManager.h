@@ -6,9 +6,11 @@
 #include <Resource/SRVManager.h>
 
 enum class OffScreenIndex {
-	None = -1,
+	SwapChain = -1,
 	ImGuiDocking,
-	PostEffect,
+	PostPing,
+	PostPong,
+	GameWindow,
 
 	MaxCount
 };
@@ -27,7 +29,7 @@ public:
 	/// </summary>
 	void Initialize(DXDevice* device, ID3D12GraphicsCommandList* commandList, SRVManager* srvManager);
 
-	OffScreenData* GetOffScreenData(int handle);
+	OffScreenData* GetOffScreenData(OffScreenIndex index);
 
 private:
 

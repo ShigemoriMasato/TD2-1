@@ -69,14 +69,12 @@ GridMaker::GridMaker(Camera* camera) {
 	Initialize();
 	lineResource_ = std::make_unique<DrawResource>();
 	lineResource_->Initialize(724, 0, true);
-	lineResource_->psoConfig_.isSwapChain = true;
 	lineResource_->psoConfig_.topology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
 	lineResource_->color_ = 0x808080ff;
 	lineResource_->camera_ = camera_;
 
 	thickLineResource_ = std::make_unique<DrawResource>();
 	thickLineResource_->Initialize(252, 0, true);
-	thickLineResource_->psoConfig_.isSwapChain = true;
 	thickLineResource_->color_ = 0xff8000ff;
 	thickLineResource_->camera_ = camera_;
 }

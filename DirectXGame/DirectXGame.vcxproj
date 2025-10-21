@@ -107,6 +107,7 @@
     <ClInclude Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.h" />
     <ClInclude Include="AppSource\Game\Collision\Collision.h" />
     <ClInclude Include="AppSource\Game\Enemy\Division\DivisionEnemy.h" />
+    <ClInclude Include="Engine\Render\Resource\Data\PostEffectData.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
     <ClInclude Include="Engine\Resource\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Render\Resource\Data\BaseResource.h" />

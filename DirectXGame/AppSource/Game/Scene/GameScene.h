@@ -37,6 +37,10 @@ private://特定なオブジェクト
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 	Player* player_ = nullptr;
 	std::unique_ptr<Wire> wire_ = nullptr;
+
+private://postEffect
+	std::unique_ptr<PostEffectResource> postEffect_ = nullptr;
+
 private://使える関数
 
 void CheckAllCollision();

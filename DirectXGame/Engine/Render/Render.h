@@ -5,6 +5,7 @@
 #include <Render/Resource/ModelResource.h>
 #include <Render/Resource/ParticleResource.h>
 #include <Render/Resource/MPResource.h>
+#include <Render/Resource/PostEffectResource.h>
 #include <Resource/Texture/TextureManager.h>
 #include <Resource/OffScreen/OffScreenManager.h>
 #include <Render/ImGuiWrapper.h>
@@ -18,11 +19,12 @@ public:
 
 	void Initialize(TextureManager* textureManager, OffScreenManager* offScreenManager, SRVManager* srvManager);
 
-	void PreDraw(int offscreenHandle = -1);
+	void PreDraw(OffScreenIndex index = OffScreenIndex::SwapChain, bool isClear = true);
 	void Draw(DrawResource* resource);
 	void Draw(ModelResource* resource);
 	void Draw(ParticleResource* resource);
 	void Draw(MPResource* resource);
+	void Draw(PostEffectResource* resource);
 	void PostDraw(ImGuiWrapper* imguiRap);
 
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
@@ -37,8 +39,8 @@ public:
 
 private:
 
-	void PreDrawSwapChain();
-	void PreDrawOffScreen(OffScreenData* offScreen);
+	void PreDrawSwapChain(bool isClear);
+	void PreDrawOffScreen(OffScreenData* offScreen, bool isClear);
 
 	void ResetResourceBarrier();
 
@@ -62,7 +64,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[2] = { nullptr, nullptr };
 	D3D12_RESOURCE_STATES resourcestates_[2] = { D3D12_RESOURCE_STATE_PRESENT,D3D12_RESOURCE_STATE_PRESENT };
 	float clearColor_[4] = { 0.1f,0.1f,0.1f,1.0f };
-	int offScreenHandle_ = -1;			//現在描画対象にしてるOffScreenのハンドル。swapchainは-1
+	OffScreenIndex offScreenHandle_ = OffScreenIndex::SwapChain;
 
 	bool isFrameFirst_ = true;	//PreDrawが初回かどうか
 

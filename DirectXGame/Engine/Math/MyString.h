@@ -12,3 +12,5 @@ std::vector<std::string> SerchFilePathsAddChild(const std::filesystem::path& dir
 std::wstring ConvertString(const std::string& str);
 
 std::string ConvertString(const std::wstring& str);
+
+std::string printString(std::string format, ...);

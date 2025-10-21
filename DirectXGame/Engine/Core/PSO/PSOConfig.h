@@ -16,7 +16,7 @@ struct PSOConfig {
 	DepthStencilID depthStencilID = DepthStencilID::Default;
 	RasterizerID rasterizerID = RasterizerID::Fill;
 	D3D12_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	bool isSwapChain = true;
+	bool isSwapChain = false;
 
 	bool operator==(const PSOConfig& other) const {
 		return vs == other.vs &&

@@ -23,11 +23,6 @@ public:
 
 private:
 
-	/// <summary>
-	/// ShaderDataが破損した時用
-	/// </summary>
-	void CreateAllPSO();
-
 	void CreatePSO(PSOConfig config);
 
 	ID3D12Device* device_ = nullptr;

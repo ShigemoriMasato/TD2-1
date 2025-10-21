@@ -75,12 +75,22 @@ void GameScene::Initialize()
 	}
 
 	{
-		auto handle = modelManager_->LoadModel("testBlock");
-		auto testPlayer = std::make_unique<TestPlayer>();
-		testPlayer->Initialize(modelManager_->GetModelData(handle), camera_.get());
-		testPlayer->SetKeyConfig(&keys_);
-		testPlayer->SetActor(&physicsEngine_);
-		objects_.push_back(std::move(testPlayer));
+
+	  auto handle = modelManager_->LoadModel("testBlock");
+	  auto testPlayer = std::make_unique<TestPlayer>();
+	  testPlayer->Initialize(modelManager_->GetModelData(handle), camera_.get());
+	  testPlayer->SetKeyConfig(&keys_);
+	  testPlayer->SetActor(&physicsEngine_);
+	  objects_.push_back(std::move(testPlayer));
+	}
+
+	{
+		//PostEffect初期化
+		postEffect_ = std::make_unique<PostEffectResource>();
+		postEffect_->Initialize();
+		postEffect_->SetJobs(PostEffectJob::None);
+		postEffect_->input_ = OffScreenIndex::GameWindow;
+		postEffect_->output_ = OffScreenIndex::SwapChain;
 	}
 }
 
@@ -133,7 +143,7 @@ std::unique_ptr<BaseScene> GameScene::Update()
 
 void GameScene::Draw()
 {
-	render_->PreDraw();
+	render_->PreDraw(OffScreenIndex::GameWindow);
 
 	for (auto& object : objects_)
 	{
@@ -142,6 +152,8 @@ void GameScene::Draw()
 
 	tileMap_->Draw(render_);
 	enemyManager_->Draw(render_);
+
+	render_->Draw(postEffect_.get());
 }
 
 void GameScene::CheckAllCollision()
