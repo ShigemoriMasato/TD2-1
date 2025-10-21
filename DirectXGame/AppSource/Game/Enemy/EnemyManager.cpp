@@ -94,7 +94,7 @@ bool EnemyManager::SpawnEnemy(const std::string& enemyType, const Vector3& posit
 }
 
 void EnemyManager::AddSplitEnemy(const Vector3& position, bool isLeft) {
-	// Factory APIを使用して分裂敵を生成
+	//分裂敵を生成
 	EnemySpawnParams params;
 	params.position = position;
 	params.modelName = divisionModelName_;
