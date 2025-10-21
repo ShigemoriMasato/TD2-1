@@ -104,29 +104,21 @@ BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
 	if (targets_.empty()) return nullptr;
 
 	BaseObject* selectTarget = nullptr;
-	float bestScore = -1.0f;
-	const float maxAngle = 60.0f * ((float)std::numbers::pi / 180.0f);//60度の扇状の範囲
+	float minDistance = FLT_MAX;
 
-	for (auto it = targets_.begin(); it != targets_.end(); ++it)
+	for (auto target : targets_)
 	{
-		auto target = (*it);
 		if (!target) continue;
 
-		Vector3 toTarget = (target->GetTransform()->position - transform_.position).Normalize();
+		Vector3 toTarget = (target->GetTransform()->position - transform_.position);
+		float dot = MyMath::dot(direction, toTarget.Normalize());
 
-		float angle = CalculateAngle(direction, toTarget);
-
-		if (angle <= maxAngle)
+		if (dot > 0.0f)
 		{
-			float distance = (target->GetTransform()->position - transform_.position).Length();
-			float distanceScore = 1.0f / (distance + 0.1f);
-			float angleScore = 1.0f - (angle / maxAngle);
-
-			float totalScore = distanceScore * 0.4f + angleScore * 0.6f;
-
-			if (totalScore > bestScore)
+			float distance = toTarget.Length();
+			if (distance < minDistance)
 			{
-				bestScore = totalScore;
+				minDistance = distance;
 				selectTarget = target;
 			}
 		}
