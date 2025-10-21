@@ -24,6 +24,16 @@ public:
 	void AddTargets(BaseObject* target) { targets_.push_back(target); }
 	void SetKeyConfig(std::unordered_map<Key, bool>* keyConfig) { key_ = keyConfig; }
 	void SetTileMap(const TileMap* tileMap) { tileMap_ = tileMap; }
+
+	// 速度操作用のアクセッサ
+	void AddVelocity(const Vector2& velocity) { 
+		if (actor_) {
+			actor_->velocity_ += velocity;
+		}
+	}
+	Vector2 GetVelocity() const { 
+		return actor_ ? actor_->velocity_ : Vector2{0.0f, 0.0f};
+	}
 private:
 
 	enum class Behavior
@@ -57,7 +67,7 @@ private://パラメータ
 	//重力
 	const float gravity_ = -9.8f;
 	//ワイヤーを伸ばしてる時の重力適用率
-	const float extendGravityRate_ = 0.1f;
+	const float extendGravityRate_ = 5.0f;
 	//ワイヤーで引っ張った時の最初の速度
 	const float dashPower_ = 20.0f;
 	//dashの速度軽減率

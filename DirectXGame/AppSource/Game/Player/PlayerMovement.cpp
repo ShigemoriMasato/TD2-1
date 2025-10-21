@@ -10,6 +10,7 @@ namespace {
 
 void Player::OnIdel() {
 
+	actor_->useGravity_ = true;
 	wire_->SetStartPositionPtr(&transform_.position);
 	wire_->Shrinked();
 }
@@ -17,12 +18,14 @@ void Player::OnIdel() {
 void Player::UpdateIdel(float deltaTime) {
 	//初期化
 
-	actor_->velocity_ = {};
 	auto& key = (*key_);
 
 	//移動
-	if (key[Key::Right]) actor_->velocity_.x += moveSpeed_;
-	if (key[Key::Left]) actor_->velocity_.x -= moveSpeed_;
+	if (actor_->collidedBottom_)
+	{
+		if (key[Key::Right]) actor_->force_.x = moveSpeed_;
+		if (key[Key::Left]) actor_->force_.x = -moveSpeed_;
+	}
 
 	//Behaviorリクエスト
 	if (key[Key::Action]) {
@@ -44,7 +47,11 @@ void Player::UpdateForcus(float deltaTime) {
 	//todo 当たり判定の具体的な値の送信方法は後日相談
 
 	auto& key = (*key_);
-
+	if ((targets_.empty() || actor_->collidedBottom_) && !key[Key::Action])
+	{
+		timeSlower_->EndSlow(true);
+		behavior_ = Behavior::Idle;
+	}
 	//以下仮置き
 	int directionID = -1;
 	
@@ -101,6 +108,7 @@ void Player::UpdateForcus(float deltaTime) {
 			}
 		}
 	}
+
 }
 
 void Player::OnExtend() {
@@ -112,7 +120,7 @@ void Player::OnExtend() {
 
 void Player::UpdateExtend(float deltaTime) {
 	//やんわり落下させる(/ 10.0fはやんわりのために雑に決めただけ)
-	actor_->velocity_.y += gravity_ * deltaTime * extendGravityRate_;
+	actor_->force_.y = extendGravityRate_;
 
 	//Wireが届いたらDashへ
 	if (wire_->Extended()) {
@@ -140,19 +148,17 @@ void Player::UpdateShrink(float deltaTime) {
 
 void Player::OnDash() {
 	//↓仮置き(斜め45度くらいで吹っ飛ばす)
-	actor_->velocity_ = targetDir_ * dashPower_;
-	if (transform_.position.y == 0.0f) {
-		transform_.position.y = 0.01f;
-	}
+	actor_->force_ = targetDir_ * dashPower_;
+
 	actor_->useGravity_ = true;
 }
 
 void Player::UpdateDash(float deltaTime) {
 	actor_->velocity_ *= dashRegistRate_;
 
-	//if(着地したら){
-	//	behaviorRequest_ = Behavior::Idel;
-	//}
+	if(actor_->collidedBottom_){
+		behaviorRequest_ = Behavior::Idle;
+	}
 
 	auto& key = (*key_);
 
@@ -165,8 +171,7 @@ void Player::UpdateDash(float deltaTime) {
 	if (key[Key::Right]) actor_->velocity_.x += dashMoveSpeed_ * deltaTime;
 	if (key[Key::Left]) actor_->velocity_.x -= dashMoveSpeed_ * deltaTime;
 
-	if (transform_.position.y <= 0.0f) {
-		transform_.position.y = 0.0f;
+	if (actor_->collidedBottom_) {
 		behaviorRequest_ = Behavior::Idle;
 	}
 }
