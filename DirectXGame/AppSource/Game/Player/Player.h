@@ -57,7 +57,7 @@ private://パラメータ
 	//重力
 	const float gravity_ = -9.8f;
 	//ワイヤーを伸ばしてる時の重力適用率
-	const float extendGravityRate_ = 0.1f;
+	const float extendGravityRate_ = 5.0f;
 	//ワイヤーで引っ張った時の最初の速度
 	const float dashPower_ = 20.0f;
 	//dashの速度軽減率
