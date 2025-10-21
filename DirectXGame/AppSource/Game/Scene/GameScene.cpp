@@ -60,7 +60,7 @@ void GameScene::Initialize()
 		//// 敵5: プレイヤーの右前方（斜め）
 		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x + 4.0f, playerPos.y, 0.0f));
 
-		enemyManager_->SpawnEnemy("FloatEnemy", Vector3(4.0f, 1.0f, 0.0f));
+		enemyManager_->SpawnEnemy("DashEnemy", Vector3(4.0f, 1.0f, 0.0f));
 
 	}
 
@@ -93,12 +93,9 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	timeSlower_->Update();
 
 	float deltaTime = timeSlower_->GetDeltaTime();
-	ImGui::Checkbox("use phy", &isPhysics_);
-  
-		//ワイヤ出せる範囲をチェック
-		CheckPlayerWireField();
-	
 
+	//ワイヤ出せる範囲をチェック
+	CheckPlayerWireField();
 
 
 	// EnemyManagerにキー入力を渡す
@@ -122,7 +119,7 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	}
 
 
-		//オブジェクト間でのコリジョンチェック
+	//オブジェクト間でのコリジョンチェック
 	CheckAllCollision();
 	physicsEngine_.Update(deltaTime);
 
@@ -204,10 +201,10 @@ void GameScene::CheckPlayerWireField()
 	}
 	for (auto& enemy : enemyManager_->GetAllEnemyObjects())
 	{
-        if (CollisionChecker(wire_.get(), enemy))
-        {
-            player_->AddTargets(enemy);
-        }
+		if (CollisionChecker(wire_.get(), enemy))
+		{
+			player_->AddTargets(enemy);
+		}
 	}
 }
 

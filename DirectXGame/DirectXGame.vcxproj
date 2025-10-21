@@ -17,6 +17,7 @@
   <ItemGroup>
     <ClCompile Include="AppSource\Game\BaseObject.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\BaseEnemy.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\Dash\DashEnemy.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\Division\SplitEnemy.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\EnemyFactory.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\EnemyManager.cpp" />
@@ -97,6 +98,7 @@
     <ClInclude Include="AppSource\Game\BaseObject.h" />
     <ClInclude Include="AppSource\Game\Collision\Collider.h" />
     <ClInclude Include="AppSource\Game\Enemy\BaseEnemy.h" />
+    <ClInclude Include="AppSource\Game\Enemy\Dash\DashEnemy.h" />
     <ClInclude Include="AppSource\Game\Enemy\EnemyFactory.h" />
     <ClInclude Include="AppSource\Game\Enemy\EnemyManager.h" />
     <ClInclude Include="AppSource\Game\Enemy\Division\SplitEnemy.h" />
