@@ -15,14 +15,15 @@
 
 enum class PostEffectJob : uint32_t {
 	None = 0,
-	Blur = 1 < 0,
-
+	Blur = 1 << 0,
+	Grayscale = 1 << 1,
 
 };
 
 uint32_t operator|(PostEffectJob a, PostEffectJob b);
 uint32_t operator|(uint32_t a, PostEffectJob b);
 uint32_t operator&(uint32_t a, PostEffectJob b);
+uint32_t operator~(PostEffectJob a);
 
 class PostEffectResource : public BaseResource {
 public:

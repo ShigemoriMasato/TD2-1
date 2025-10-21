@@ -25,7 +25,7 @@ namespace {
         IDxcBlobEncoding* shaderSource = nullptr;
         HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
         //読めなかったら止める
-        assert(SUCCEEDED(hr));
+        assert(SUCCEEDED(hr) && "Failed to Open Shader File");
         //読み込んだファイルの内容を設定する
         DxcBuffer shaderSourceBuffer;
         shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
@@ -50,7 +50,7 @@ namespace {
             IID_PPV_ARGS(&shaderResult)		//コンパイル結果
         );
         //コンパイルエラーではなくdxcが起動できないなどの致命的な状況
-        assert(SUCCEEDED(hr));
+        assert(SUCCEEDED(hr) && "Shader Compile Error");
 
         //警告・エラーが出てたらログに出して止める
         IDxcBlobUtf8* shaderError = nullptr;

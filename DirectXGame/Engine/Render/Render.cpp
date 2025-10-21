@@ -333,15 +333,14 @@ void Render::Draw(PostEffectResource* resource) {
         draw(nextWindow, inputIndex);
     }
 
+	resource->DrawFinish();
+
     //outputに持ってくる
     inputIndex = nextWindow;
     nextWindow = resource->output_;
     resource->psoConfig_.isSwapChain = nextWindow == OffScreenIndex::SwapChain;
     resource->SimpleDrawReady();
     draw(nextWindow, inputIndex);
-
-    //描画先を元のRTVに戻す
-    PreDraw(preOffScreenIndex);
 }
 
 void Render::PostDraw(ImGuiWrapper* imguiRap) {

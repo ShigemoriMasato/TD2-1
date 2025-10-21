@@ -40,6 +40,7 @@ void PostEffectResource::SetJobs(PostEffectJob jobs) {
 
 void PostEffectResource::SetJobs(uint32_t jobs) {
 	this->jobs_ = jobs;
+	task_ = jobs;
 }
 
 void PostEffectResource::DrawReady() {
@@ -48,9 +49,20 @@ void PostEffectResource::DrawReady() {
 	}
 
 	if (task_ & PostEffectJob::Blur) {
-		Blur blur = data_.blur;
-		infoForGPU_->slot1 = { blur.intensity, blur.kernelSize };
-		psoConfig_.ps = blur.shaderFile;
+
+		infoForGPU_->slot1.x = data_.blur.intensity;
+		infoForGPU_->slot1.y = data_.blur.kernelSize;
+
+		psoConfig_.ps = data_.blur.shaderFile;
+		task_ &= ~PostEffectJob::Blur;
+
+	} else if (task_ & PostEffectJob::Grayscale) {
+
+		infoForGPU_->slot1.z = data_.grayscale.intensity;
+
+		psoConfig_.ps = data_.grayscale.shaderFile;
+		task_ &= ~PostEffectJob::Grayscale;
+
 	}
 
 	psoConfig_.ps = shaderBasePath_ + psoConfig_.ps;
@@ -80,4 +92,8 @@ uint32_t operator|(uint32_t a, PostEffectJob b) {
 
 uint32_t operator&(uint32_t a, PostEffectJob b) {
 	return a & static_cast<uint32_t>(b);
+}
+
+uint32_t operator~(PostEffectJob a) {
+	return ~static_cast<uint32_t>(a);
 }

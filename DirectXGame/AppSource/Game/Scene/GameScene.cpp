@@ -84,7 +84,7 @@ void GameScene::Initialize()
 		//PostEffect初期化
 		postEffect_ = std::make_unique<PostEffectResource>();
 		postEffect_->Initialize();
-		postEffect_->SetJobs(PostEffectJob::Blur);
+		postEffect_->SetJobs(PostEffectJob::None);
 		postEffect_->input_ = OffScreenIndex::GameWindow;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
 	}
@@ -136,10 +136,6 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	{
 		return std::make_unique<GameScene>();
 	}
-
-	ImGui::Begin("PostEffectDebug");
-	auto& blur = postEffect_->data_.blur;
-	ImGui::DragFloat("i", *blur.intensity);
 
 	return nullptr;
 }
