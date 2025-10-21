@@ -20,6 +20,7 @@
     <ClCompile Include="AppSource\Game\Enemy\Division\SplitEnemy.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\EnemyFactory.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\EnemyManager.cpp" />
+    <ClCompile Include="AppSource\Game\Enemy\Float\FloatEnemy.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.cpp" />
     <ClCompile Include="AppSource\Game\Collision\Collision.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\Division\DivisionEnemy.cpp" />
@@ -100,6 +101,7 @@
     <ClInclude Include="AppSource\Game\Enemy\EnemyManager.h" />
     <ClInclude Include="AppSource\Game\Enemy\Division\SplitEnemy.h" />
     <ClInclude Include="AppSource\Game\Enemy\EnemySpawnParams.h" />
+    <ClInclude Include="AppSource\Game\Enemy\Float\FloatEnemy.h" />
     <ClInclude Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.h" />
     <ClInclude Include="AppSource\Game\Collision\Collision.h" />
     <ClInclude Include="AppSource\Game\Enemy\Division\DivisionEnemy.h" />
