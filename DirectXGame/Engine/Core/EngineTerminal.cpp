@@ -86,6 +86,7 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	}
 
 	fpsObserver_ = std::make_unique<FPSObserver>(true, 60.0);
+
 }
 
 // =========================- MainLoop -===============================
@@ -97,6 +98,7 @@ void EngineTerminal::Run() {
 		sceneManager_->Update();
 
 		sceneManager_->Draw();
+
 		PostDraw();
 	}
 }
@@ -109,6 +111,7 @@ void EngineTerminal::Update() {
 	ImGuiOperator::StartFrame(static_cast<float>(windowSize.first), static_cast<float>(windowSize.second));
 
 	fpsObserver_->TimeAdjustment();
+	Logger().Log("Deltatime: " + std::to_string(fpsObserver_->GetDeltatime()));
 }
 
 void EngineTerminal::PreDraw() {

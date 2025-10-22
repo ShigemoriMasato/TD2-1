@@ -86,6 +86,13 @@ void GameScene::Initialize()
 	}
 
 	{
+		//ゴールテープの作成
+		goalTape_ = std::make_unique<GoalTape>();
+		goalTape_->Initialize(textureManager_, 5.0f, &physicsEngine_, camera_->GetCamera());
+		objects_.push_back(std::move(goalTape_));
+	}
+
+	{
 		//PostEffect初期化
 		postEffect_ = std::make_unique<PostEffectResource>();
 		postEffect_->Initialize();
@@ -93,6 +100,8 @@ void GameScene::Initialize()
 		postEffect_->input_ = OffScreenIndex::GameWindow;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
 	}
+
+	render_->EndFrame(false);
 }
 
 std::unique_ptr<BaseScene> GameScene::Update()

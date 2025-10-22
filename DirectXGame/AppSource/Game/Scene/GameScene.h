@@ -9,6 +9,7 @@
 #include "../Physics/PhysicsEngine.h"
 #include "../LevelLoader.h"
 #include "../Tile/TileMap.h"
+#include "../Goal/GoalTape.h"
 #include <Game/FPS/TimeSlower.h>
 
 class Player;
@@ -37,6 +38,7 @@ private://特定なオブジェクト
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 	Player* player_ = nullptr;
 	std::unique_ptr<Wire> wire_ = nullptr;
+	std::unique_ptr<GoalTape> goalTape_ = nullptr;
 
 private://postEffect
 	std::unique_ptr<PostEffectResource> postEffect_ = nullptr;
