@@ -3,27 +3,27 @@
 GoalTape::GoalTape() {
 	drawResource_ = std::make_unique<DrawResource>();
 	drawResource_->Initialize(ShapeType::Plane);
-	drawResource_->texcoord_ = {
-		{0.0f, 0.0f},
-		{1.0f, 0.0f},
-		{0.0f, 2.0f},
-		{1.0f, 2.0f},
-	};
 }
 
 GoalTape::~GoalTape() {
 }
 
-void GoalTape::Initialize(TextureManager* textureManager, float positionX, PhysicsEngine* engine, Camera* camera) {
+void GoalTape::Initialize(TextureManager* textureManager, float positionX, float scaleY, PhysicsEngine* engine, Camera* camera) {
 	int textureHandle = textureManager->LoadTexture("Assets/Texture/goal.png");
 	drawResource_->textureHandle_ = textureHandle;
 
-	transform_.scale = { 1.0f, 20.0f, 1.0f };
+	transform_.scale = { 1.0f, 40.0f, 1.0f };
 	transform_.position = { positionX, 10.0f, 0.0f };
 	drawResource_->position_ = transform_.position;
 	drawResource_->scale_ = transform_.scale;
 	drawResource_->camera_ = camera;
-	drawResource_->color_ = 0xffffff80;
+	drawResource_->color_ = 0xffffffff;
+	drawResource_->texcoord_ = {
+		{0.0f, 0.0f},
+		{1.0f, 0.0f},
+		{0.0f, transform_.scale.y / 10.0f},
+		{1.0f, transform_.scale.y / 10.0f},
+	};
 
 	actor_ = std::make_unique<PhysicsActor>(engine, this);
 	actor_->useGravity_ = false;
@@ -38,4 +38,10 @@ void GoalTape::Update(float deltaTime) {
 
 void GoalTape::Draw(Render* render) {
 	render->Draw(drawResource_.get());
+}
+
+void GoalTape::OnCollision(BaseObject* other) {
+	if (other->GetCollider()->GetSelf() == ColliderMask::PLAYER) {
+		isClear_ = true;
+	}
 }

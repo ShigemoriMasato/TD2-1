@@ -81,6 +81,8 @@
     <ClCompile Include="Engine\Render\Resource\MPResource.cpp" />
     <ClCompile Include="AppSource\Game\Camera\CameraManager.cpp" />
     <ClCompile Include="AppSource\Game\Goal\GoalTape.cpp" />
+    <ClCompile Include="AppSource\Game\Goal\GoalEvent.cpp" />
+    <ClCompile Include="AppSource\Common\SceneChange\SceneChange.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -170,6 +172,8 @@
     <ClInclude Include="AppSource\Game\Player\TestPlayer.h" />
     <ClInclude Include="AppSource\Game\Camera\CameraManager.h" />
     <ClInclude Include="AppSource\Game\Goal\GoalTape.h" />
+    <ClInclude Include="AppSource\Game\Goal\GoalEvent.h" />
+    <ClInclude Include="AppSource\Common\SceneChange\SceneChange.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

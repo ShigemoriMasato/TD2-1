@@ -52,8 +52,6 @@ private://状態変数
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
 
 private://パラメータ
-	std::unique_ptr<PhysicsActor> actor_ = nullptr;
-
 	//wireを投げた場所
 	Vector3 targetPos_ = {};
 	Vector3 targetDir_ = {};

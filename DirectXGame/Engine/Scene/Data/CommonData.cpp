@@ -37,6 +37,11 @@ CommonData::CommonData() {
 	keyManager_->SetKey(Key::Reverse, DIK_X, KeyState::Trigger);
 	keyManager_->SetButton(Key::Reverse, XBoxController::kB, KeyState::Trigger);
 
+	keyManager_->SetKey(Key::Debug, DIK_F1, KeyState::Trigger);
+	keyManager_->SetKey(Key::Debug, DIK_ESCAPE, KeyState::Trigger);
+
+	keyManager_->SetKey(Key::DebugClear, DIK_F2, KeyState::Trigger);
+
 }
 
 CommonData::~CommonData() {

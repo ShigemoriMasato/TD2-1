@@ -45,7 +45,5 @@ protected:
 	bool isActive_ = true;  // 処理対象フラグ（更新・描画するかどうか）
 	bool isAlive_ = true;   // 生存フラグ（ゲーム的な生死状態）
 	std::unordered_map<Key, bool> keys_;
-
-
 };
 

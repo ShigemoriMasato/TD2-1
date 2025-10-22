@@ -9,12 +9,18 @@ public:
 	GoalTape();
 	~GoalTape();
 
-	void Initialize(TextureManager* textureManager, float positionX, PhysicsEngine* engine, Camera* camera);
+	void Initialize(TextureManager* textureManager, float positionX, float scaleY, PhysicsEngine* engine, Camera* camera);
 	void Update(float deltaTime) override;
 	void Draw(Render* render) override;
+
+	bool GetClear() const { return isClear_; }
+
+	void OnCollision(BaseObject* other) override;
 
 private:
 
 	std::unique_ptr<DrawResource> drawResource_ = nullptr;
+
+	bool isClear_ = false;
 
 };
