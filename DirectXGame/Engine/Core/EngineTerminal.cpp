@@ -2,6 +2,8 @@
 #include <Scene/Engine/ShaderEditScene.h>
 #include <Game/Scene/GameScene.h>
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 EngineTerminal::EngineTerminal(BootMode mode) {
 	mode_ = mode;
 }
@@ -11,8 +13,11 @@ EngineTerminal::~EngineTerminal() {
 }
 
 bool EngineTerminal::IsLoop() {
-	while (msg.message != WM_QUIT) {
+	if (sceneManager_->commonData_->isPushClose_) {
+		return false;
+	}
 
+	while (true) {
 		//メッセージがあれば処理する
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&msg);
@@ -21,43 +26,32 @@ bool EngineTerminal::IsLoop() {
 			//メッセージがなければ処理を始める
 			return true;
 		}
-
 	}
-	//ウィンドウのxボタンが押されたらfalseを返す
-	return false;
 }
 
 void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	dxDevice_ = std::make_unique<DXDevice>(windowWidth, windowHeight);
+	dxDevice_->Initialize();
 
-	//WindowProc
-	std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> windowProc =
-		[this](HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) -> LRESULT {
+	dxDevice_->SetWindowProc([this](HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) -> LRESULT {
+
+		//imguiのウィンドウプロシージャを呼ぶ
+		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
+			return true;
+		}
 
 		switch (msg) {
-		case WM_DESTROY:
-
-			PostQuitMessage(0);
-
+		case WM_CLOSE:
+			sceneManager_->commonData_->isPushClose_ = true;
 			return 0;
-
-		case WM_KEYDOWN:
-
-			//ESCで終了
-			if (wparam == VK_ESCAPE) {
-				PostQuitMessage(0);
-				return 0;
-			}
-
-			break;
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			return 0;
 		}
 
 		return DefWindowProc(hwnd, msg, wparam, lparam);
-	};
 
-	dxDevice_->SetWindowProc(windowProc);
-
-	dxDevice_->Initialize();
+	});
 
 	render_ = std::make_unique<Render>(dxDevice_.get());
 	srvManager_ = std::make_unique<SRVManager>(dxDevice_.get(), 4096);
@@ -90,7 +84,6 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 		sceneManager_ = std::make_unique<SceneManager>(std::make_unique<ShaderEditScene>(), this);
 		break;
 	}
-
 
 	fpsObserver_ = std::make_unique<FPSObserver>(true, 60.0);
 }

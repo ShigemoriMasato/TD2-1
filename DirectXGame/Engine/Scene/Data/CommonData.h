@@ -9,6 +9,8 @@ public:
 
 	std::unique_ptr<KeyManager> keyManager_ = nullptr;
 
+	bool isPushClose_ = false;
+
 private:
 
 };

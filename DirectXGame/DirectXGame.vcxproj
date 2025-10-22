@@ -25,6 +25,7 @@
     <ClCompile Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.cpp" />
     <ClCompile Include="AppSource\Game\Collision\Collision.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\Division\DivisionEnemy.cpp" />
+    <ClCompile Include="CameraManager.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
     <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp" />
@@ -107,6 +108,7 @@
     <ClInclude Include="AppSource\Game\Enemy\Tracker\TrackerEnemy.h" />
     <ClInclude Include="AppSource\Game\Collision\Collision.h" />
     <ClInclude Include="AppSource\Game\Enemy\Division\DivisionEnemy.h" />
+    <ClInclude Include="CameraManager.h" />
     <ClInclude Include="Engine\Render\Resource\Data\PostEffectData.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
     <ClInclude Include="Engine\Resource\Audio\AudioManager.h" />
