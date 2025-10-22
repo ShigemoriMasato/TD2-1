@@ -43,70 +43,43 @@ void Player::UpdateForcus(float deltaTime) {
 		actor_->velocity_ = {};
 	}
 
-	//todo 狙い先の当たり判定をとる。
-	//todo 当たり判定の具体的な値の送信方法は後日相談
-
 	auto& key = (*key_);
-	if ((targets_.empty() || actor_->collidedBottom_) && !key[Key::Action])
-	{
-		timeSlower_->EndSlow(true);
-		behavior_ = Behavior::Idle;
-	}
-	//以下仮置き
-	int directionID = -1;
-	
-	//右側
-	if (key[Key::Right]) {
 
-		if (key[Key::Up]) {
-			directionID = 1;
-		} else if(key[Key::Down]){
-			directionID = 7;
-		} else {
-			directionID = 0;
+	//狙い先の当たり判定をとる。
+	//ワイヤーの範囲に入ったオブジェクトチェック
+	Vector3 inputDirection = GetInputDirection();
+	BaseObject* selectedTarget = nullptr;
+
+	if (inputDirection.Length() > 0.1f) {
+		selectedTarget = SelectTargetByDirection(inputDirection);
+
+		if (selectedTarget) {
+			targetPos_ = selectedTarget->GetTransform()->position;
 		}
 
-	} 
-	//左側
-	else if(key[Key::Left]) {
-
-		if (key[Key::Up]) {
-			directionID = 3;
-		}else if(key[Key::Down]) {
-			directionID = 5;
-		} else {
-			directionID = 4;
-		}
-
-	} 
-	//上下
-	else {
-		if (key[Key::Up]) {
-			directionID = 2;
-		} else if (key[Key::Down]) {
-			directionID = 6;
-		}
 	}
 
+	if (!key[Key::Action]) {
 
-	if (!key[Key::Action]) { 
-		//ワイヤーの範囲に入ったオブジェクトチェック
-		Vector3 inputDirection = GetInputDirection();
-		if (inputDirection.Length() > 0.1f)
-		{
-			BaseObject* selectedTarget = SelectTargetByDirection(inputDirection);
+		//ターゲットが選ばれていたらワイヤーを伸ばす
+		if (selectedTarget) {
 
-			if (selectedTarget)
-			{
-				targetPos_ = selectedTarget->GetTransform()->position;
-				if (!tileMap_->HasTile(this->transform_.position, targetPos_, TileType::Solid))
-				{
-					wire_->SetEndPosition(targetPos_);
-					behaviorRequest_ = Behavior::Extend;
-					//todo:スローでオブジェクト選択できるようになる
-				}
-			}
+			//ワイヤーの終端をセット
+			wire_->SetEndPosition(targetPos_);
+			//スロウモーション終了(補完なし)
+			timeSlower_->EndSlow(false);
+			//ワイヤーを投げる
+			behaviorRequest_ = Behavior::Extend;
+
+		} else {
+
+			//スロウモーション終了(補完あり)
+			timeSlower_->EndSlow(true);
+			//着地したらIdleに行くはずなのでとりあえずDashに投げる
+			behaviorRequest_ = Behavior::Dash;
+
 		}
+
 	}
 
 }
@@ -115,7 +88,6 @@ void Player::OnExtend() {
 	actor_->velocity_ = {};
 	actor_->useGravity_ = false;
 	wireTimer = wireTime;
-	timeSlower_->EndSlow(false);
 }
 
 void Player::UpdateExtend(float deltaTime) {
@@ -130,10 +102,12 @@ void Player::UpdateExtend(float deltaTime) {
 
 void Player::OnShrink() {
 	targetDir_ = (targetPos_ - transform_.position).Normalize();
-	actor_->velocity_ = targetDir_ * dashPower_;
 }
 
 void Player::UpdateShrink(float deltaTime) {
+	//加速
+	dashPower_ += dashAcceleration_ * deltaTime;
+	dashPower_ = std::min(dashPower_, maxDashSpeed_);
 	//velocityの固定
 	actor_->velocity_ = targetDir_ * dashPower_;
 
@@ -156,9 +130,9 @@ void Player::OnDash() {
 void Player::UpdateDash(float deltaTime) {
 	actor_->velocity_ *= dashRegistRate_;
 
-	if(actor_->collidedBottom_){
-		behaviorRequest_ = Behavior::Idle;
-	}
+	//if(着地したら){
+	//	behaviorRequest_ = Behavior::Idel;
+	//}
 
 	auto& key = (*key_);
 
@@ -171,6 +145,7 @@ void Player::UpdateDash(float deltaTime) {
 	if (key[Key::Right]) actor_->velocity_.x += dashMoveSpeed_ * deltaTime;
 	if (key[Key::Left]) actor_->velocity_.x -= dashMoveSpeed_ * deltaTime;
 
+	//地面についたら
 	if (actor_->collidedBottom_) {
 		behaviorRequest_ = Behavior::Idle;
 	}

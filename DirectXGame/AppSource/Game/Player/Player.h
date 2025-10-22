@@ -4,7 +4,6 @@
 #include <Common/KeyConfig/KeyManager.h>
 #include <Game/FPS/TimeSlower.h>
 
-; /* このセミコロンを消したらエラーが出る。 */
 class Wire;
 class TileMap;
 class Player : public BaseObject
@@ -67,6 +66,14 @@ private://パラメータ
 	//重力
 	const float gravity_ = -9.8f;
 	//ワイヤーを伸ばしてる時の重力適用率
+	const float extendGravityRate_ = 0.1f;
+	//ワイヤーで引っ張った時の速度
+	float dashPower_ = 0.0f;
+	//ワイヤーで引っ張った時の加速度
+	float dashAcceleration_ = 50.0f;
+	//ワイヤーで引っ張った時の最大速度
+	float maxDashSpeed_ = 30.0f;
+
 	const float extendGravityRate_ = 5.0f;
 	//ワイヤーで引っ張った時の最初の速度
 	const float dashPower_ = 20.0f;

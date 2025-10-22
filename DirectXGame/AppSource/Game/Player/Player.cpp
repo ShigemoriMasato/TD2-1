@@ -46,9 +46,7 @@ void Player::Initialize(ModelData* modelData, Camera* camera) {
 void Player::Update(float deltaTime)
 {
 	//更新
-
 	modelResource_->position_ = transform_.position;
-
 
 	RequestBehavior();
 	(this->*behaviorUpdate[static_cast<int>(behavior_)])(deltaTime);
@@ -86,8 +84,8 @@ Vector3 Player::GetInputDirection()
 
 	if (!key_) return direction;
 
-	if ((*key_)[Key::Up]) direction.z += 1.0f;
-	if ((*key_)[Key::Down]) direction.z -= 1.0f;
+	if ((*key_)[Key::Up]) direction.y += 1.0f;
+	if ((*key_)[Key::Down]) direction.y -= 1.0f;
 	if ((*key_)[Key::Left]) direction.x -= 1.0f;
 	if ((*key_)[Key::Right]) direction.x += 1.0f;
 
@@ -104,6 +102,8 @@ BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
 	if (targets_.empty()) return nullptr;
 
 	BaseObject* selectTarget = nullptr;
+	float bestScore = -1.0f;
+	const float allowAngle = -std::cos(0.125f * std::numbers::pi_v<float>);	//判定をとりうる範囲(これより値が小さければターゲットとして選定する)
 	float minDistance = FLT_MAX;
 
 	for (auto target : targets_)
@@ -113,13 +113,25 @@ BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
 		Vector3 toTarget = (target->GetTransform()->position - transform_.position);
 		float dot = MyMath::dot(direction, toTarget.Normalize());
 
-		if (dot > 0.0f)
+		float angle = MyMath::dot(direction, targetToPlayer);
+
+		//許容角度内にいるか
+		if (angle < allowAngle)
 		{
-			float distance = toTarget.Length();
-			if (distance < minDistance)
-			{
-				minDistance = distance;
-				selectTarget = target;
+			//ターゲットとプレイヤーの間に障害物がないか
+			if (!tileMap_->HasTile(this->transform_.position, target->GetTransform()->position, TileType::Solid)) {
+
+				//一番ターゲットが狙いやすいと思われるオブジェクトを選ぶ
+				float distance = (target->GetTransform()->position - transform_.position).Length();
+				float distanceScore = 1.0f / (distance + 0.1f);
+				float angleScore = -angle;
+
+				float totalScore = distanceScore * 0.4f + angleScore * 0.6f;
+
+				if (totalScore > bestScore) {
+					bestScore = totalScore;
+					selectTarget = target;
+				}
 			}
 		}
 	}
