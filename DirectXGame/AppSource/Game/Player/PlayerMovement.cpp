@@ -21,11 +21,10 @@ void Player::UpdateIdel(float deltaTime) {
 	auto& key = (*key_);
 
 	//移動
-	if (actor_->collidedBottom_)
-	{
-		if (key[Key::Right]) actor_->force_.x = moveSpeed_;
-		if (key[Key::Left]) actor_->force_.x = -moveSpeed_;
-	}
+
+	if (key[Key::Right]) actor_->force_.x = moveSpeed_;
+	if (key[Key::Left]) actor_->force_.x = -moveSpeed_;
+
 
 	//Behaviorリクエスト
 	if (key[Key::Action]) {
@@ -56,7 +55,6 @@ void Player::UpdateForcus(float deltaTime) {
 		if (selectedTarget) {
 			targetPos_ = selectedTarget->GetTransform()->position;
 		}
-
 	}
 
 	if (!key[Key::Action]) {

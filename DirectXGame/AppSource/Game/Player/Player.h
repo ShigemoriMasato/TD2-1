@@ -74,9 +74,6 @@ private://パラメータ
 	//ワイヤーで引っ張った時の最大速度
 	float maxDashSpeed_ = 30.0f;
 
-	const float extendGravityRate_ = 5.0f;
-	//ワイヤーで引っ張った時の最初の速度
-	const float dashPower_ = 20.0f;
 	//dashの速度軽減率
 	const float dashRegistRate_ = 0.99f;
 

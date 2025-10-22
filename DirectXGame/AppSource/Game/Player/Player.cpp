@@ -103,21 +103,17 @@ BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
 
 	BaseObject* selectTarget = nullptr;
 	float bestScore = -1.0f;
-	const float allowAngle = -std::cos(0.125f * std::numbers::pi_v<float>);	//判定をとりうる範囲(これより値が小さければターゲットとして選定する)
-	float minDistance = FLT_MAX;
-
+	const float allowAngle = std::cos(0.125f * std::numbers::pi_v<float>);	//判定をとりうる範囲(これより値が小さければターゲットとして選定する)
+	
 	for (auto target : targets_)
 	{
 		if (!target) continue;
 
-		Vector3 toTarget = (target->GetTransform()->position - transform_.position);
-		float dot = MyMath::dot(direction, toTarget.Normalize());
-
-		float angle = MyMath::dot(direction, targetToPlayer);
+		Vector3 targetToPlayer = (target->GetTransform()->position - transform_.position);
+		float angle = MyMath::dot(direction, targetToPlayer.Normalize());
 
 		//許容角度内にいるか
-		if (angle < allowAngle)
-		{
+		if (angle > allowAngle) {
 			//ターゲットとプレイヤーの間に障害物がないか
 			if (!tileMap_->HasTile(this->transform_.position, target->GetTransform()->position, TileType::Solid)) {
 
