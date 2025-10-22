@@ -57,15 +57,15 @@ void PSOManager::Initialize() {
 
 		if (version == 1.0f) {
 			PSOConfig config;
-			config.ps = static_cast<Value<std::string>*>(data[i++].get())->value;
-			config.vs = static_cast<Value<std::string>*>(data[i++].get())->value;
-			config.rootID = (RootSignatureID)static_cast<Value<int>*>(data[i++].get())->value;
-			config.inputLayoutID = (InputLayoutID)static_cast<Value<int>*>(data[i++].get())->value;
-			config.blendID = (BlendStateID)static_cast<Value<int>*>(data[i++].get())->value;
-			config.depthStencilID = (DepthStencilID)static_cast<Value<int>*>(data[i++].get())->value;
-			config.isSwapChain = static_cast<Value<bool>*>(data[i++].get())->value;
-			config.rasterizerID = (RasterizerID)static_cast<Value<int>*>(data[i++].get())->value;
-			config.topology = (D3D12_PRIMITIVE_TOPOLOGY)static_cast<Value<int>*>(data[i++].get())->value;
+			config.ps = binaryManager_->Reverse<std::string>(data[i++]);
+			config.vs = binaryManager_->Reverse<std::string>(data[i++]);
+			config.rootID = (RootSignatureID)binaryManager_->Reverse<int>(data[i++]);
+			config.inputLayoutID = (InputLayoutID)binaryManager_->Reverse<int>(data[i++]);
+			config.blendID = (BlendStateID)binaryManager_->Reverse<int>(data[i++]);
+			config.depthStencilID = (DepthStencilID)binaryManager_->Reverse<int>(data[i++]);
+			config.isSwapChain = binaryManager_->Reverse<bool>(data[i++]);
+			config.rasterizerID = (RasterizerID)binaryManager_->Reverse<int>(data[i++]);
+			config.topology = (D3D12_PRIMITIVE_TOPOLOGY)binaryManager_->Reverse<int>(data[i++]);
 
 			CreatePSO(config);
 		}
