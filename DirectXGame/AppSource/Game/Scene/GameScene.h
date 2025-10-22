@@ -1,7 +1,7 @@
 #pragma once
 #include "../BaseObject.h"
 
-#include <Camera/DebugCamera.h>
+#include <Game/Camera/CameraManager.h>
 #include <Scene/Data/BaseScene.h>
 #include <unordered_map>
 #include "../Enemy/EnemyManager.h"
@@ -23,7 +23,7 @@ public:
 private://管理用メンバ変数
 	//シーン内全てのオブジェクトリスト
 	std::vector<std::unique_ptr<BaseObject>> objects_;
-	std::unique_ptr<DebugCamera> camera_ = nullptr;
+	std::unique_ptr<CameraManager> camera_ = nullptr;
 	std::unordered_map<Key, bool> keys_{};
 
 	PhysicsEngine physicsEngine_;

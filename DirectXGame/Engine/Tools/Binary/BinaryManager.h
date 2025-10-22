@@ -22,7 +22,7 @@ public:
 	};
 
 	template<typename T>
-	T Reverse(std::shared_ptr<ValueBase> value) {
+	static T Reverse(std::shared_ptr<ValueBase> value) {
 		return static_cast<Value<T>*>(value.get())->value;
 	}
 

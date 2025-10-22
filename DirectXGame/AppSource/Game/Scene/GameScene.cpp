@@ -11,8 +11,7 @@
 
 void GameScene::Initialize()
 {
-	camera_ = std::make_unique<DebugCamera>();
-	camera_->Initialize();
+	camera_ = std::make_unique<CameraManager>();
 
 	timeSlower_ = std::make_unique<TimeSlower>(fpsObserver_);
 
@@ -21,25 +20,27 @@ void GameScene::Initialize()
 		auto handle = modelManager_->LoadModel("testBlock");
 		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
 		levelLoader_.LoadLevel("Assets/Map/test.json", *tileMap_);
-		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_.get());
+		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_->GetCamera());
 	}
-
 
 	//プレイヤー初期化
 	{
 		auto player = std::make_unique<Player>(timeSlower_.get(), &physicsEngine_);
 		auto handle = modelManager_->LoadModel("testBlock");
 		physicsEngine_;
-		player->Initialize(modelManager_->GetModelData(handle), camera_.get());
+		player->Initialize(modelManager_->GetModelData(handle), camera_->GetCamera());
 		player->SetKeyConfig(&keys_);
 		player->SetTileMap(tileMap_.get());
 		player_ = player.get();
 		objects_.push_back(std::move(player));
 	}
 
+	//Cameraの初期化
+	camera_->Initialize(&player_->GetTransform()->position);
+
 	{
 		enemyManager_ = std::make_unique<EnemyManager>();
-		enemyManager_->Initialize(modelManager_, camera_.get());
+		enemyManager_->Initialize(modelManager_, camera_->GetCamera());
 
 		// プレイヤーの初期位置
 		Vector3 playerPos = { 4.0f, 7.0f, 0.0f };
@@ -69,7 +70,7 @@ void GameScene::Initialize()
 		//ワイヤーの描画をプレイヤーに任せているので、オブジェクトリストに追加されない
 		wire_ = std::make_unique<Wire>();
 		auto handle = modelManager_->LoadModel("testWire");
-		wire_->Initialize(modelManager_->GetModelData(handle), camera_.get());
+		wire_->Initialize(modelManager_->GetModelData(handle), camera_->GetCamera());
 		player_->SetWire(wire_.get());
 
 	}
@@ -78,7 +79,7 @@ void GameScene::Initialize()
 
 	  auto handle = modelManager_->LoadModel("testBlock");
 	  auto testPlayer = std::make_unique<TestPlayer>();
-	  testPlayer->Initialize(modelManager_->GetModelData(handle), camera_.get());
+	  testPlayer->Initialize(modelManager_->GetModelData(handle), camera_->GetCamera());
 	  testPlayer->SetKeyConfig(&keys_);
 	  testPlayer->SetActor(&physicsEngine_);
 	  objects_.push_back(std::move(testPlayer));
@@ -97,12 +98,13 @@ void GameScene::Initialize()
 std::unique_ptr<BaseScene> GameScene::Update()
 {
 	keys_ = commonData->keyManager_->GetKeyStates();
-	camera_->Update();
-	camera_->DrawImGui();
 
 	timeSlower_->Update();
 
 	float deltaTime = timeSlower_->GetDeltaTime();
+
+	camera_->Update(deltaTime);
+	camera_->DrawImGui();
 
 	//ワイヤ出せる範囲をチェック
 	CheckPlayerWireField();
