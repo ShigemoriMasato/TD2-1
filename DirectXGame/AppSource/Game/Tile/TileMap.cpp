@@ -21,7 +21,7 @@ void TileMap::LoadMap(TileInfo&& tiles)
 	tiles_ = std::move(tiles);
 	mapSize_.x = static_cast<float>(tiles_.width);
 	mapSize_.y = static_cast<float>(tiles_.height);
-	physicsEngine_->SetWorldBounds(AABB({0,0,0},Vector3(WorldSize())));
+	physicsEngine_->SetWorldBounds(AABB({ 0,0,0 }, Vector3(WorldSize())));
 
 }
 
@@ -61,20 +61,25 @@ Vector2 TileMap::WorldSize() const
 	return worldSize;
 }
 
+Vector3 TileMap::GetWorldPos(int x, int y) const
+{
+	return Vector3(x * size_.x, mapSize_.y - 1 - y, 0.0f);
+}
+
 void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData, Camera* camera)
 {
 	int index = 0;
-	srand(1);
+
 	mpResource_->Initialize(modelData, tiles_.width * tiles_.height);
 	MPResource* resource = mpResource_.get();
 	for (int y = 0; y < tiles_.height; ++y)
 	{
 		for (int x = 0; x < tiles_.width; ++x)
 		{
-			if (GetTileInfoAt(x, y) != TileType::Empty)
+			if (GetTileInfoAt(x, y) == TileType::Solid)
 			{
 				resource->camera_ = camera;
-				resource->position_[index] = Vector3(x * size_.x, (mapSize_.y - 1 - y) * size_.y, 0.0f);
+				resource->position_[index] = GetWorldPos(x,y);
 				resource->color_[index] = 0x80808080;
 				index++;
 			}
@@ -95,7 +100,7 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 }
 
 //DDA（Digital Differential Analyzer）
-bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType type,Vector3* outEndPos)const
+bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType type, Vector3* outEndPos)const
 {
 	Vector2 dir = endPos - startPos;
 	float length = dir.Length();

@@ -24,6 +24,8 @@ struct TileInfo
     std::vector<TileType>type;
     int width;
     int height;
+    int tileWidth;
+    int tileHeight;
 };
 
 class PhysicsEngine;
@@ -50,6 +52,8 @@ public:
     Vector2 WorldSize()const;
     //　マップチップ配列
     const TileInfo& Tiles()const{return tiles_;}
+    // 配列座標からワールド空間上の位置を取得する
+    Vector3 GetWorldPos(int x,int y)const;
 
     bool IsDraw()const{return isDraw_;}
     void SetDraw(bool isDraw){isDraw_ = isDraw;}

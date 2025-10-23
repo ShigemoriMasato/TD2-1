@@ -1,5 +1,6 @@
 #pragma once
 #include "Tile/TileMap.h"
+#include "Enemy/EnemyManager.h"
 #include <json.hpp>
 #include <map>
 #include <optional>
@@ -8,15 +9,29 @@ using Json = nlohmann::json;
 class LevelLoader
 {
 public:
-	
+	LevelLoader();
+
     void LoadLevel(const std::string& filePath,TileMap& tileMap);
 
-private:
+    template<class T>
+    void AddGameObject(std::vector<std::unique_ptr<BaseObject>>& gameObjects,
+        ModelManager* modelManager,
+        int modelHandle,
+        Camera* camera);
 
+    void AddEnemy(EnemyManager& enemyManager);
+private:
+    Json levelData;
 	std::string filePath_;
 	
 	int worldWidth_;
 	int worldHeight_;
+    int tileWidth_;
+    int tileHeight_;
+
+private:
+    std::unique_ptr<Logger> logger_;
+
 private:
 	
     template<typename T>
@@ -39,4 +54,40 @@ inline std::optional<T> LevelLoader::GetTileProperty(const Json& tile_json, std:
         }
     }
     return std::nullopt;
+}
+template<typename T>
+inline void LevelLoader::AddGameObject(
+    std::vector<std::unique_ptr<BaseObject>>& gameObjects,
+    ModelManager* modelManager,
+    int modelHandle,
+    Camera* camera)
+{
+    const std::string targetType = T::TypeName();
+
+    logger_->Log("Adding " + targetType);
+
+    for (const auto& layer : levelData["layers"])
+    {
+        if (layer["type"] == "objectgroup")
+        {
+            std::string className = layer.value("class", "");
+            for (auto& obj : layer["objects"])
+            {
+                if (className == targetType)
+                {
+                    float x = std::ceil(obj["x"].get<float>());
+                    float y = std::ceil(obj["y"].get<float>());
+
+                    float worldX = x / tileWidth_;
+                    float worldY = (worldHeight_ - 1 - y / tileHeight_);
+
+                    auto gameObject = std::make_unique<T>();
+                    gameObject->Initialize(modelManager->GetModelData(modelHandle), camera);
+                    gameObject->SetPosition({ worldX, worldY ,0.0f });
+
+                    gameObjects.push_back(std::move(gameObject));
+                }
+            }
+        }
+    }
 }

@@ -26,7 +26,7 @@ Player::Player(TimeSlower* slower, PhysicsEngine* phEngine) {
 	collider_ = std::make_unique<SphereCollider>(
 		ColliderTag::Dynamic,
 		ColliderMask::PLAYER,
-		ColliderMask::ENEMY | ColliderMask::ITEM);
+		ColliderMask::ENEMY | ColliderMask::ITEM | ColliderMask::HOOK);
 	collider_->SetTransform(&transform_);
 	collider_->SetSize(Vector3(1.0f, 1.0f, 1.0f));
 

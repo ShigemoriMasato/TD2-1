@@ -21,6 +21,7 @@ enum ColliderMask : uint32_t
 	WIRE		= 1 << 1,	//ワイヤー
 	ENEMY		= 1 << 2,	//敵
 	ITEM		= 1 << 3,	//アイテム
+	HOOK		= 1 << 4,	//フック
 };
 
 class Collider
