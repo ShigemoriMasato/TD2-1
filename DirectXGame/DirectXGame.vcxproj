@@ -63,6 +63,8 @@
     <ClCompile Include="AppSource\Game\Scene\GameScene.cpp" />
     <ClCompile Include="AppSource\Game\LevelLoader.cpp" />
     <ClCompile Include="AppSource\Game\Hook\Hook.cpp" />
+    <ClCompile Include="AppSource\Game\Goal\GoalTape.cpp" />
+    <ClCompile Include="AppSource\Game\Goal\GoalEvent.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp" />
@@ -94,6 +96,8 @@
     <ClCompile Include="AppSource\Game\Physics\PhysicsEngine.cpp" />
     <ClCompile Include="AppSource\Game\Physics\PhysicsActor.cpp" />
     <ClCompile Include="Engine\Render\Resource\MPResource.cpp" />
+    <ClCompile Include="AppSource\Common\SceneChange\SceneChange.cpp" />
+    <ClCompile Include="AppSource\Game\Player\TargetScope.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -182,6 +186,11 @@
     <ClInclude Include="Engine\Render\Resource\MPResource.h" />
     <ClInclude Include="AppSource\Game\LevelLoader.h" />
     <ClInclude Include="AppSource\Game\Hook\Hook.h" />
+    <ClInclude Include="AppSource\Game\Player\TestPlayer.h" />
+    <ClInclude Include="AppSource\Game\Goal\GoalTape.h" />
+    <ClInclude Include="AppSource\Game\Goal\GoalEvent.h" />
+    <ClInclude Include="AppSource\Common\SceneChange\SceneChange.h" />
+    <ClInclude Include="AppSource\Game\Player\TargetScope.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

@@ -9,6 +9,9 @@
 #include "../Physics/PhysicsEngine.h"
 #include "../LevelLoader.h"
 #include "../Tile/TileMap.h"
+#include "../Goal/GoalTape.h"
+#include "../Goal/GoalEvent.h"
+#include "../Player/TargetScope.h"
 #include <Game/FPS/TimeSlower.h>
 
 class Player;
@@ -37,9 +40,15 @@ private://特定なオブジェクト
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 	Player* player_ = nullptr;
 	std::unique_ptr<Wire> wire_ = nullptr;
+	GoalTape* goalTape_ = nullptr;
+	std::unique_ptr<TargetScope> targetScope_ = nullptr;
+
+private://イベント
+	std::unique_ptr<GoalEvent> goalEvent_ = nullptr;
 
 private://postEffect
 	std::unique_ptr<PostEffectResource> postEffect_ = nullptr;
+	float goalX_ = 20.0f;		//どこからがゴールか
 
 private://使える関数
 

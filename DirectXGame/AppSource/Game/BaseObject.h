@@ -10,7 +10,9 @@ class AudioManager;
 class BaseObject
 {
 public:
-	virtual ~BaseObject() = default;
+	BaseObject();
+	virtual ~BaseObject();
+
 	virtual void Initialize(ModelData* modelData, Camera* camera);
 
 	virtual void Update(float deltaTime) = 0;
@@ -34,6 +36,8 @@ protected://オブジェクトプロパティ
 protected://描画に必要なリソース
 	std::unique_ptr<ModelResource> modelResource_;
 
-
+public://debug用
+	static std::unique_ptr<Logger> logger_;
+	std::string myClassName_;
 };
 

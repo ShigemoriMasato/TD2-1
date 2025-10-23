@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/MyMath.h"
+#include <Logger/Logger.h>
 
 class PhysicsEngine;
 class PhysicsActor
@@ -31,6 +32,9 @@ public:
 	bool collidedLeft_ = false;
 	bool collidedRight_ = false;
 
+public://debug用
 
+	static std::unique_ptr<Logger> logger_;
+	std::string myClassName_;
 };
 

@@ -357,19 +357,27 @@ void Render::PostDraw(ImGuiWrapper* imguiRap) {
 
     ResetResourceBarrier();
 
-	//コマンドリストのクローズ
+	EndFrame(true);
+}
+
+void Render::EndFrame(bool swapchainPresent) {
+
+    //コマンドリストのクローズ
     HRESULT hr = commandList->Close();
     assert(SUCCEEDED(hr));
 
     // GPUにコマンドリストの実行を行わせる
     ID3D12CommandList* commandLists[] = { commandList.Get() };
     commandQueue->ExecuteCommandLists(1, commandLists);
-    //GPUとOSに画面の交換を行うよう通知する
-    hr = swapChain->Present(1, 0);
-    
-    if (true) {
-        // ログに hr を出す (8桁16進などで)
-		logger_->Log(std::format("Failed to Present. hr = 0x{}\n", hr));
+
+    if (swapchainPresent) {
+        //GPUとOSに画面の交換を行うよう通知する
+        hr = swapChain->Present(1, 0);
+
+        if (true) {
+            // ログに hr を出す (8桁16進などで)
+            logger_->Log(std::format("Failed to Present. hr = 0x{}\n", hr));
+        }
     }
 
     //presentするとBarrierが自動でCommonになる。
