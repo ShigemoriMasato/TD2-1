@@ -11,6 +11,8 @@ enum class Key {
 	Action,			//アクションキー。Jumpとかワイヤー確定とか。スペース
 	Correct,		//確定キー。UI用。Enter,昔の人用にZとか入ってるといいかも
 	Reverse,		//キャンセルキー。UI用。Esc,昔の人用にXとか入ってるといいかも
+	Debug,			//デバッグ用キー。
+	DebugClear,		//デバッグ用クリアキー。
 
 	Count
 };

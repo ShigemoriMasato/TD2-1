@@ -27,6 +27,8 @@ public:
 	void Draw(PostEffectResource* resource);
 	void PostDraw(ImGuiWrapper* imguiRap);
 
+	void EndFrame(bool swapchainPresent);
+
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
 	ImGui_ImplDX12_InitInfo GetImGuiInitInfo(SRVManager* srv);
 

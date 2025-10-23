@@ -28,6 +28,10 @@ public:
 	void SetScale(float ratio);
 	void SetDebug(bool debug);
 
+private://関数
+
+
+
 private:// 座行計算用変数
 
 	Vector3* targetPos_ = nullptr;
@@ -36,7 +40,7 @@ private:// 座行計算用変数
 
 	Vector3 targetOffset_{};
 	Vector3 previousOffset_{};
-	Vector3 offset_;
+	Vector3 offset_{0.0f, 0.0f, -40.0f};
 	float ocalculate = 1.0f;
 
 	Vector3 targetScale_{1.0f, 1.0f, 1.0f};

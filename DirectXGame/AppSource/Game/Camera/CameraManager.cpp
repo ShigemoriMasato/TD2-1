@@ -2,7 +2,7 @@
 
 namespace {
 	Vector3 lerp(Vector3 a, Vector3 b, float t) {
-		return MyMath::lerp(a, b, t * t * t * t * t);
+		return MyMath::lerp(a, b, t);
 	}
 }
 

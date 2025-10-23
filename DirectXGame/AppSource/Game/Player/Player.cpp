@@ -80,8 +80,6 @@ void Player::OnCollision(BaseObject* other)
 
 Vector3 Player::GetInputDirection()
 {
-	Vector3 direction = { 0.0f, 0.0f, 0.0f };
-
 	if (!key_) return direction;
 
 	if ((*key_)[Key::Up]) direction.y += 1.0f;

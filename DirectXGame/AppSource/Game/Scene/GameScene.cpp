@@ -37,6 +37,7 @@ void GameScene::Initialize()
 
 	//Cameraの初期化
 	camera_->Initialize(&player_->GetTransform()->position);
+	camera_->SetOffset({ 0.0f, 5.0f, -40.0f });
 
 	{
 		enemyManager_ = std::make_unique<EnemyManager>();
@@ -76,13 +77,21 @@ void GameScene::Initialize()
 	}
 
 	{
+		auto handle = modelManager_->LoadModel("testBlock");
+		auto testPlayer = std::make_unique<TestPlayer>();
+		testPlayer->Initialize(modelManager_->GetModelData(handle), camera_->GetCamera());
+		testPlayer->SetKeyConfig(&keys_);
+		testPlayer->SetActor(&physicsEngine_);
+		objects_.push_back(std::move(testPlayer));
+	}
 
-	  auto handle = modelManager_->LoadModel("testBlock");
-	  auto testPlayer = std::make_unique<TestPlayer>();
-	  testPlayer->Initialize(modelManager_->GetModelData(handle), camera_->GetCamera());
-	  testPlayer->SetKeyConfig(&keys_);
-	  testPlayer->SetActor(&physicsEngine_);
-	  objects_.push_back(std::move(testPlayer));
+	{
+		//ゴールテープの作成
+		auto goalTape = std::make_unique<GoalTape>();
+		int textureHandle = textureManager_->LoadTexture("Assets/Texture/goal.png");
+		goalTape->Initialize(textureHandle, 20.0f, 20.0f, &physicsEngine_, camera_->GetCamera());
+		goalTape_ = goalTape.get();
+		objects_.push_back(std::move(goalTape));
 	}
 
 	{
@@ -93,6 +102,18 @@ void GameScene::Initialize()
 		postEffect_->input_ = OffScreenIndex::GameWindow;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
 	}
+
+	{
+		targetScope_ = std::make_unique<TargetScope>();
+		targetScope_->Initialize(textureManager_->LoadTexture("Assets/Texture/scope.png"), player_, camera_->GetCamera());
+	}
+
+	{
+		//ゴールイベント初期化
+		goalEvent_ = std::make_unique<GoalEvent>(camera_.get());
+	}
+
+	render_->EndFrame(false);
 }
 
 std::unique_ptr<BaseScene> GameScene::Update()
@@ -108,7 +129,6 @@ std::unique_ptr<BaseScene> GameScene::Update()
 
 	//ワイヤ出せる範囲をチェック
 	CheckPlayerWireField();
-
 
 	// EnemyManagerにキー入力を渡す
 	if (enemyManager_)
@@ -130,15 +150,25 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		object->Update(deltaTime);
 	}
 
+	//targetScope
+	targetScope_->Update(deltaTime, commonData->keyManager_.get());
 
 	//オブジェクト間でのコリジョンチェック
 	CheckAllCollision();
 	physicsEngine_.Update(deltaTime);
 
-	if (keys_[Key::Reverse])
+	if (keys_[Key::Debug])
 	{
 		return std::make_unique<GameScene>();
 	}
+
+	if(keys_[Key::DebugClear])
+	{
+		
+	}
+
+	goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_);
+	goalEvent_->Update(deltaTime);
 
 	return nullptr;
 }
@@ -154,6 +184,9 @@ void GameScene::Draw()
 
 	tileMap_->Draw(render_);
 	enemyManager_->Draw(render_);
+
+
+	targetScope_->Draw(render_);
 
 	render_->Draw(postEffect_.get());
 }
@@ -210,7 +243,9 @@ void GameScene::CheckPlayerWireField()
 		if (object.get() == player_ || object.get() == wire_.get())continue;
 		if (CollisionChecker(wire_.get(), object.get()))
 		{
-			player_->AddTargets(object.get());
+			if (object->GetCollider()->GetSelf() & ColliderMask::ENEMY) {
+				player_->AddTargets(object.get());
+			}
 		}
 	}
 	for (auto& enemy : enemyManager_->GetAllEnemyObjects())

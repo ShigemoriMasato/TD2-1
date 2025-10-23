@@ -67,8 +67,8 @@ void DrawResource::Initialize(ShapeType type) {
 	int vertexCount = 0;
 	int indexCount = 0;
 
-	int vertical = 16;
-	int horizontal = 32;
+	int vertical = 8;
+	int horizontal = 16;
 	float radius = 0.5f;
 
 	float theta;
@@ -229,11 +229,9 @@ void DrawResource::DrawReady() {
 		((color_ >> 8) & 0xff) / 255.0f,
 		((color_ >> 0) & 0xff) / 255.0f
 	};
-	material_->uvTransform = {
-		textureScale_.x * cosf(textureRotate_), -textureScale_.y * sinf(textureRotate_), 0.0f, 0.0f,
-		textureScale_.x * sinf(textureRotate_), textureScale_.y * cosf(textureRotate_), 0.0f, 0.0f,
-		texturePos_.x, texturePos_.y, 1.0f, 0.0f,
-	};
+	material_->uvTransform = MakeScaleMatrix(Vector3(textureScale_.x, textureScale_.y, 1.0f)) *
+		MakeRotationMatrix(Vector3(0.0f, 0.0f, textureRotate_)) *
+		MakeTranslationMatrix(Vector3(texturePos_.x, texturePos_.y, 0.0f));
 
 	//Matrix
 	Matrix4x4 worldMat = GetWorldMatrix(scale_, rotate_, position_);
