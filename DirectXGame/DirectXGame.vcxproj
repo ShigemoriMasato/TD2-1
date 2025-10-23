@@ -96,6 +96,7 @@
     <ClCompile Include="AppSource\Game\Physics\PhysicsEngine.cpp" />
     <ClCompile Include="AppSource\Game\Physics\PhysicsActor.cpp" />
     <ClCompile Include="Engine\Render\Resource\MPResource.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\TitleScene.cpp" />
     <ClCompile Include="AppSource\Common\SceneChange\SceneChange.cpp" />
     <ClCompile Include="AppSource\Game\Player\TargetScope.cpp" />
   </ItemGroup>
@@ -191,6 +192,7 @@
     <ClInclude Include="AppSource\Game\Goal\GoalEvent.h" />
     <ClInclude Include="AppSource\Common\SceneChange\SceneChange.h" />
     <ClInclude Include="AppSource\Game\Player\TargetScope.h" />
+    <ClInclude Include="AppSource\Game\Scene\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

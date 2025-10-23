@@ -76,9 +76,14 @@ void GameScene::Initialize()
 		//PostEffect初期化
 		postEffect_ = std::make_unique<PostEffectResource>();
 		postEffect_->Initialize();
-		postEffect_->SetJobs(PostEffectJob::None);
+		postEffect_->SetJobs(PostEffectJob::Fade);
 		postEffect_->input_ = OffScreenIndex::GameWindow;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
+		
+		// フェードインで開始（alpha = 1.0から0.0へ）
+		postEffect_->data_.fade.alpha = 1.0f;
+		isFadingIn_ = true;
+		fadeTimer_ = 0.0f;
 	}
 
 	{
@@ -101,6 +106,22 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	timeSlower_->Update();
 
 	float deltaTime = timeSlower_->GetDeltaTime();
+
+	// フェードイン処理
+	if (isFadingIn_) {
+		fadeTimer_ += deltaTime;
+		postEffect_->data_.fade.alpha = 1.0f - (fadeTimer_ / fadeDuration_);
+		
+		// フェードイン完了
+		if (fadeTimer_ >= fadeDuration_) {
+			postEffect_->data_.fade.alpha = 0.0f;
+			isFadingIn_ = false;
+		}
+	} else {
+		// フェード完了後もFadeジョブを設定（alpha=0.0で透明）
+		postEffect_->data_.fade.alpha = 0.0f;
+	}
+
 
 	camera_->Update(deltaTime);
 	camera_->DrawImGui();

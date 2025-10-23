@@ -16,7 +16,13 @@ struct Grayscale {
     float intensity = 0.0f; // グレースケール強度
 };
 
+struct Fade {
+    const std::string shaderFile = "Fade.PS.hlsl";
+    float alpha = 0.0f; // フェードの透明度
+};
+
 struct PostEffectData {
     Blur blur;
 	Grayscale grayscale;
+	Fade fade;
 };
