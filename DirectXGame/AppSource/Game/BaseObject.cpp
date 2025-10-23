@@ -36,7 +36,8 @@ void BaseObject::Draw(Render* render)
 
 }
 
-void BaseObject::SetActor(PhysicsEngine* physicsEngine)
+void BaseObject::SetActor(PhysicsEngine* physicsEngine, bool useGravity)
 {
 	actor_ = std::make_unique<PhysicsActor>(physicsEngine,this);
+	actor_->useGravity_ = useGravity;
 }

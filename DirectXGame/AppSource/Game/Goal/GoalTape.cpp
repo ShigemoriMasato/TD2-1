@@ -24,10 +24,7 @@ void GoalTape::Initialize(int textureHandle, float positionX, float scaleY, Phys
 		{1.0f, scaleY / 10.0f},
 	};
 
-	actor_ = std::make_unique<PhysicsActor>(engine, this);
-	actor_->useGravity_ = false;
-
-	collider_ = std::make_unique<AABBCollider>(ColliderTag::Static, ColliderMask::ITEM, ColliderMask::PLAYER, Vector3(1,1,0.01f));
+	collider_ = std::make_unique<AABBCollider>(ColliderTag::Static, ColliderMask::GOAL, ColliderMask::PLAYER, Vector3(1,1,0.01f));
 	collider_->SetTransform(&transform_);
 }
 
