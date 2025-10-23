@@ -66,7 +66,8 @@ void GameScene::Initialize()
 		//ゴールテープの作成
 		auto goalTape = std::make_unique<GoalTape>();
 		int textureHandle = textureManager_->LoadTexture("Assets/Texture/goal.png");
-		goalTape->Initialize(textureHandle, 20.0f, 20.0f, &physicsEngine_, camera_->GetCamera());
+		auto tileWorldSize = tileMap_->WorldSize();
+		goalTape->Initialize(textureHandle, tileWorldSize.x, tileWorldSize.y, &physicsEngine_, camera_->GetCamera());
 		goalTape_ = goalTape.get();
 		objects_.push_back(std::move(goalTape));
 	}
