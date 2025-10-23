@@ -100,12 +100,11 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 }
 
 //DDA（Digital Differential Analyzer）
-bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType type, Vector3* outEndPos)const
+bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType type, Vector3* outEndPos, bool includeStartTile) const
 {
 	Vector2 dir = endPos - startPos;
 	float length = dir.Length();
 	if (length <= 0.0001f) return false;
-
 	dir /= length;
 
 	const float tileWidth = size_.x;
@@ -120,35 +119,33 @@ bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType t
 	int stepX = (dir.x > 0.0f) ? 1 : (dir.x < 0.0f ? -1 : 0);
 	int stepY = (dir.y > 0.0f) ? 1 : (dir.y < 0.0f ? -1 : 0);
 
-	float tMaxX = 0.0f, tMaxY = 0.0f;
+	float tMaxX = (stepX > 0) ? ((x + 1) * tileWidth - startPos.x) / dir.x
+		: (stepX < 0) ? (x * tileWidth - startPos.x) / dir.x
+		: std::numeric_limits<float>::infinity();
+
+	float tMaxY = (stepY > 0) ? ((y + 1) * tileHeight - startPos.y) / dir.y
+		: (stepY < 0) ? (y * tileHeight - startPos.y) / dir.y
+		: std::numeric_limits<float>::infinity();
+
 	float tDeltaX = (stepX != 0) ? tileWidth / std::abs(dir.x) : std::numeric_limits<float>::infinity();
 	float tDeltaY = (stepY != 0) ? tileHeight / std::abs(dir.y) : std::numeric_limits<float>::infinity();
-
-	if (stepX > 0)
-		tMaxX = ((x + 1) * tileWidth - startPos.x) / dir.x;
-	else if (stepX < 0)
-		tMaxX = (x * tileWidth - startPos.x) / dir.x;
-	else
-		tMaxX = std::numeric_limits<float>::infinity();
-
-	if (stepY > 0)
-		tMaxY = ((y + 1) * tileHeight - startPos.y) / dir.y;
-	else if (stepY < 0)
-		tMaxY = (y * tileHeight - startPos.y) / dir.y;
-	else
-		tMaxY = std::numeric_limits<float>::infinity();
 
 	const float maxDist = length;
 	float traveled = 0.0f;
 
+	bool firstTile = true;
 	while (true)
 	{
-		TileType tile = GetTileTypeAt(x, y);
-		if (tile == type)
+		if (!firstTile || includeStartTile)
 		{
-			if (outEndPos)*outEndPos = { (float)x,(float)y,0.0f };
-			return true;
+			TileType tile = GetTileTypeAt(x, y);
+			if (tile == type)
+			{
+				if (outEndPos) *outEndPos = { (float)x, (float)y, 0.0f };
+				return true;
+			}
 		}
+		firstTile = false;
 
 		if (std::abs(x - endX) < 1 && std::abs(y - endY) < 1)
 			break;
@@ -172,6 +169,7 @@ bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType t
 
 	return false;
 }
+
 
 void TileMap::Draw(Render* render)
 {

@@ -56,19 +56,11 @@ void GameScene::Initialize()
 
 	}
 
+	//hook
 	{
 		auto handle = modelManager_->LoadModel("testBlock");
-		auto testPlayer = std::make_unique<TestPlayer>();
-		testPlayer->Initialize(modelManager_->GetModelData(handle), camera_->GetCamera());
-		testPlayer->SetKeyConfig(&keys_);
-		testPlayer->SetActor(&physicsEngine_);
-		objects_.push_back(std::move(testPlayer));
-	}
-  //hook
-  {
-    auto handle = modelManager_->LoadModel("testBlock");
 		levelLoader_.AddGameObject<Hook>(objects_, modelManager_, handle, camera_->GetCamera());
-  }
+	}
 	
 	{
 		//ゴールテープの作成
@@ -228,7 +220,8 @@ void GameScene::CheckPlayerWireField()
 		if (object.get() == player_ || object.get() == wire_.get())continue;
 		if (CollisionChecker(wire_.get(), object.get()))
 		{
-			if (object->GetCollider()->GetSelf() & ColliderMask::ENEMY) {
+			if (object->GetCollider()->GetSelf() & (ColliderMask::ENEMY | ColliderMask::HOOK))
+			{
 				player_->AddTargets(object.get());
 			}
 		}
