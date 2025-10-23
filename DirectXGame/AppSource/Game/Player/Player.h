@@ -76,7 +76,7 @@ private://パラメータ
 	float maxDashSpeed_ = 30.0f;
 
 	//dashの速度軽減率
-	const float dashRegistRate_ = 0.99f;
+	const float dashRegistRate_ = 0.97f;
 
 	//wireを再び伸ばせるまでのクールタイム
 	float wireCoolTime_ = 0.0f;
