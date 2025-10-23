@@ -11,6 +11,7 @@ enum class OffScreenIndex {
 	PostPing,
 	PostPong,
 	GameWindow,
+	Title,
 
 	MaxCount
 };

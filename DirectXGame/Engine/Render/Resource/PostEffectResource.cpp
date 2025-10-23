@@ -36,6 +36,7 @@ void PostEffectResource::Initialize() {
 
 void PostEffectResource::SetJobs(PostEffectJob jobs) {
 	this->jobs_ = static_cast<uint32_t>(jobs);
+	task_ = jobs_;
 }
 
 void PostEffectResource::SetJobs(uint32_t jobs) {
@@ -63,8 +64,13 @@ void PostEffectResource::DrawReady() {
 		psoConfig_.ps = data_.grayscale.shaderFile;
 		task_ &= ~PostEffectJob::Grayscale;
 
-	}
+	} else if (task_ & PostEffectJob::Fade) {
+		infoForGPU_->slot1.w = data_.fade.alpha;
 
+		psoConfig_.ps = data_.fade.shaderFile;
+		task_ &= ~PostEffectJob::Fade;
+	}
+	
 	psoConfig_.ps = shaderBasePath_ + psoConfig_.ps;
 	psoConfig_.vs = shaderBasePath_ + "PostEffect.VS.hlsl";
 	psoConfig_.depthStencilID = DepthStencilID::Transparent;

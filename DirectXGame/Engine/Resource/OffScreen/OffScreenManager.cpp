@@ -32,7 +32,10 @@ void OffScreenManager::Initialize(DXDevice* device, ID3D12GraphicsCommandList* c
 	clearColor[0] = 0.0f; clearColor[1] = 1.0f; clearColor[2] = 0.0f; clearColor[3] = 1.0f;
 	CreateOffScreen(1280, 720, clearColor); // GameWindow
 
-	for(int i = 4; i < maxOffScreenCount_; ++i) {
+	clearColor[0] = 0.3f; clearColor[1] = 0.5f; clearColor[2] = 0.8f; clearColor[3] = 1.0f;
+	CreateOffScreen(1280, 720, clearColor); // Title
+
+	for(int i = 5; i < maxOffScreenCount_; ++i) {
 		float clearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		CreateOffScreen(1280, 720, clearColor);
 	}

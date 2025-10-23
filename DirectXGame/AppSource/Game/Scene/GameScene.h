@@ -21,6 +21,7 @@ public:
 	void Draw() override;
 
 private://管理用メンバ変数
+
 	//シーン内全てのオブジェクトリスト
 	std::vector<std::unique_ptr<BaseObject>> objects_;
 	std::unique_ptr<CameraManager> camera_ = nullptr;
@@ -40,6 +41,11 @@ private://特定なオブジェクト
 
 private://postEffect
 	std::unique_ptr<PostEffectResource> postEffect_ = nullptr;
+	
+	// フェード処理用
+	bool isFadingIn_ = false;
+	float fadeTimer_ = 0.0f;
+	const float fadeDuration_ = 1.0f; // フェードにかける時間（秒）
 
 private://使える関数
 

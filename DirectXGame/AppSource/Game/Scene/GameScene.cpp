@@ -42,27 +42,123 @@ void GameScene::Initialize()
 		enemyManager_ = std::make_unique<EnemyManager>();
 		enemyManager_->Initialize(modelManager_, camera_->GetCamera());
 
-		// プレイヤーの初期位置
-		Vector3 playerPos = { 4.0f, 7.0f, 0.0f };
-
-		//// TrackerEnemy（プレイヤーについてくる敵）を5体配置
-		//// 敵1: プレイヤーの右側
-		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x + 5.0f, playerPos.y, 0.0f));
-
-		//// 敵2: プレイヤーの左側
-		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x - 5.0f, playerPos.y, 0.0f));
-
-		//// 敵3: プレイヤーの前方
-		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x, playerPos.y, 0.0f));
-
-		//// 敵4: プレイヤーの後方
-		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x, playerPos.y, 0.0f));
-
-		//// 敵5: プレイヤーの右前方（斜め）
-		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x + 4.0f, playerPos.y, 0.0f));
-
-		enemyManager_->SpawnEnemy("DashEnemy", Vector3(4.0f, 1.0f, 0.0f));
-
+		// ========== 選択1: バイナリデータ保存テスト（最初の実行時） ==========
+		//// 各敵を一体ずつ配置してバイナリファイルに保存
+		//
+		//// プレイヤーの初期位置
+		//Vector3 playerPos = { 4.0f, 7.0f, 0.0f };
+		//
+		//// 配置データをクリア
+		//enemyManager_->ClearEnemyPlacementData();
+		//
+		//// 1. TrackerEnemy（追跡敵）を配置
+		//{
+		//	EnemySpawnParams params;
+		//	params.position = { playerPos.x + 10.0f, playerPos.y, 0.0f };
+		//	params.rotation = { 0.0f, 0.0f, 0.0f };
+		//	params.scale = { 1.0f, 1.0f, 1.0f };
+		//	params.modelName = "testEnemy";
+		//	params.teamTag = "enemy";
+		//	params.priority = 0;
+		//	params.customParams["speed"] = 2.0f;
+		//	params.customParams["health"] = 100.0f;
+		//	params.customParams["damage"] = 10;
+		//	params.customParams["scoreValue"] = 100;
+		//	
+		//	// 配置データに登録（保存用）
+		//	enemyManager_->RegisterEnemyPlacementData("TrackerEnemy", params);
+		//	
+		//	// 実際に敵を生成
+		//	enemyManager_->SpawnEnemy("TrackerEnemy", params);
+		//}
+		//
+		//// 2. FloatEnemy（浮遊敵）を配置
+		//{
+		//	EnemySpawnParams params;
+		//	params.position = { playerPos.x - 10.0f, playerPos.y + 5.0f, 0.0f };
+		//	params.rotation = { 0.0f, 0.0f, 0.0f };
+		//	params.scale = { 1.2f, 1.2f, 1.2f };
+		//	params.modelName = "testEnemy";
+		//	params.teamTag = "enemy";
+		//	params.priority = 0;
+		//	params.customParams["speed"] = 1.5f;
+		//	params.customParams["health"] = 80.0f;
+		//	params.customParams["damage"] = 15;
+		//	params.customParams["scoreValue"] = 150;
+		//	
+		//	// 配置データに登録（保存用）
+		//	enemyManager_->RegisterEnemyPlacementData("FloatEnemy", params);
+		//	
+		//	// 実際に敵を生成
+		//	enemyManager_->SpawnEnemy("FloatEnemy", params);
+		//}
+		//
+		//// 3. DivisionEnemy（分裂敵）を配置
+		//{
+		//	EnemySpawnParams params;
+		//	params.position = { playerPos.x, playerPos.y, 15.0f };
+		//	params.rotation = { 0.0f, 0.0f, 0.0f };
+		//	params.scale = { 1.5f, 1.5f, 1.5f };
+		//	params.modelName = "testEnemy";
+		//	params.teamTag = "enemy";
+		//	params.priority = 0;
+		//	params.customParams["speed"] = 1.0f;
+		//	params.customParams["health"] = 150.0f;
+		//	params.customParams["damage"] = 20;
+		//	params.customParams["scoreValue"] = 200;
+		//	params.customParams["canDivide"] = true;
+		//	
+		//	// 配置データに登録（保存用）
+		//	enemyManager_->RegisterEnemyPlacementData("DivisionEnemy", params);
+		//	
+		//	// 実際に敵を生成（分裂コールバック付き）
+		//	enemyManager_->SetupDivisionEnemy("DivisionEnemy", params);
+		//}
+		//
+		//// 4. DashEnemy（ダッシュ敵）を配置
+		//{
+		//	EnemySpawnParams params;
+		//	params.position = { playerPos.x + 5.0f, playerPos.y - 3.0f, 0.0f };
+		//	params.rotation = { 0.0f, 0.0f, 0.0f };
+		//	params.scale = { 1.0f, 1.0f, 1.0f };
+		//	params.modelName = "testEnemy";
+		//	params.teamTag = "enemy";
+		//	params.priority = 0;
+		//	params.customParams["speed"] = 5.0f;
+		//	params.customParams["health"] = 50.0f;
+		//	params.customParams["damage"] = 25;
+		//	params.customParams["scoreValue"] = 120;
+		//	
+		//	// 配置データに登録（保存用）
+		//	enemyManager_->RegisterEnemyPlacementData("DashEnemy", params);
+		//	
+		//	// 実際に敵を生成
+		//	enemyManager_->SpawnEnemy("DashEnemy", params);
+		//}
+		//
+		//// バイナリファイルに保存（Assets/Binary/TestEnemyPlacement.bin として保存される）
+		//enemyManager_->SaveEnemyPlacement("TestEnemyPlacement");
+		
+		// ========== 選択2: バイナリデータ読み込みテスト（2回目以降の実行時） ==========
+		// 上記のコードをコメントアウトして、下記のコードを有効にすると
+		// 保存したバイナリファイルから敵配置を読み込んで自動生成できます
+		
+		
+		// 既存の敵をクリア
+		enemyManager_->ClearEnemies();
+		
+		// バイナリファイルから敵配置を読み込んで自動生成
+		bool loadSuccess = enemyManager_->LoadEnemyPlacement("TestEnemyPlacement");
+		
+		if (loadSuccess) {
+			// 読み込み成功：敵が自動的に生成されている
+			// TrackerEnemy, FloatEnemy, DivisionEnemy, DashEnemy が配置される
+		} else {
+			// 読み込み失敗：ファイルが見つからない等
+			// デフォルトの敵配置にフォールバック
+			enemyManager_->SpawnEnemy("DashEnemy", Vector3(4.0f, 1.0f, 0.0f));
+		}
+		
 	}
 
 	{
@@ -89,9 +185,14 @@ void GameScene::Initialize()
 		//PostEffect初期化
 		postEffect_ = std::make_unique<PostEffectResource>();
 		postEffect_->Initialize();
-		postEffect_->SetJobs(PostEffectJob::None);
+		postEffect_->SetJobs(PostEffectJob::Fade);
 		postEffect_->input_ = OffScreenIndex::GameWindow;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
+		
+		// フェードインで開始（alpha = 1.0から0.0へ）
+		postEffect_->data_.fade.alpha = 1.0f;
+		isFadingIn_ = true;
+		fadeTimer_ = 0.0f;
 	}
 }
 
@@ -102,6 +203,22 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	timeSlower_->Update();
 
 	float deltaTime = timeSlower_->GetDeltaTime();
+
+	// フェードイン処理
+	if (isFadingIn_) {
+		fadeTimer_ += deltaTime;
+		postEffect_->data_.fade.alpha = 1.0f - (fadeTimer_ / fadeDuration_);
+		
+		// フェードイン完了
+		if (fadeTimer_ >= fadeDuration_) {
+			postEffect_->data_.fade.alpha = 0.0f;
+			isFadingIn_ = false;
+		}
+	} else {
+		// フェード完了後もFadeジョブを設定（alpha=0.0で透明）
+		postEffect_->data_.fade.alpha = 0.0f;
+	}
+
 
 	camera_->Update(deltaTime);
 	camera_->DrawImGui();
