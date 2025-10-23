@@ -25,6 +25,9 @@ void Player::UpdateIdel(float deltaTime) {
 	if (key[Key::Right]) actor_->force_.x = moveSpeed_;
 	if (key[Key::Left]) actor_->force_.x = -moveSpeed_;
 
+	if(!actor_->collidedBottom_){
+		behaviorRequest_ = Behavior::Dash;
+	}
 
 	//Behaviorリクエスト
 	if (key[Key::Action]) {
@@ -130,10 +133,6 @@ void Player::OnDash() {
 void Player::UpdateDash(float deltaTime) {
 	actor_->velocity_ *= dashRegistRate_;
 
-	//if(着地したら){
-	//	behaviorRequest_ = Behavior::Idel;
-	//}
-
 	auto& key = (*key_);
 
 	//空中でワイヤーを伸ばせるようにする
@@ -142,8 +141,8 @@ void Player::UpdateDash(float deltaTime) {
 	}
 
 	//velocityの微調整をできるようにする
-	if (key[Key::Right]) actor_->velocity_.x += dashMoveSpeed_ * deltaTime;
-	if (key[Key::Left]) actor_->velocity_.x -= dashMoveSpeed_ * deltaTime;
+	if (key[Key::Right]) actor_->force_.x += dashMoveSpeed_ * deltaTime;
+	if (key[Key::Left]) actor_->force_.x -= dashMoveSpeed_ * deltaTime;
 
 	//地面についたら
 	if (actor_->collidedBottom_) {
