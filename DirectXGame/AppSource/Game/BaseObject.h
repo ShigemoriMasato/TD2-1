@@ -28,6 +28,7 @@ public:
 	PhysicsActor* GetActor() { return actor_.get(); }
 	Transform* GetTransform() { return &transform_; }
 	void SetActor(PhysicsEngine* physicsEngine);
+	void SetPosition(const Vector3& position) { transform_.position = position; }
 protected://オブジェクトプロパティ
 	Transform transform_;
 	std::unique_ptr<PhysicsActor> actor_ = nullptr;

@@ -3,11 +3,11 @@
 #include "../Enemy/EnemyManager.h"
 #include "../Enemy/EnemySpawnParams.h"
 #include "../Collision/Collision.h"
+#include "../Hook/Hook.h"
 
 #include <Tools/FPS/FPSObserver.h>
 #include <cmath>
 #include <algorithm>
-#include "../Player/TestPlayer.h"
 
 void GameScene::Initialize()
 {
@@ -19,7 +19,7 @@ void GameScene::Initialize()
 	{
 		auto handle = modelManager_->LoadModel("testBlock");
 		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
-		levelLoader_.LoadLevel("Assets/Map/test.json", *tileMap_);
+		levelLoader_.LoadLevel("Assets/Map/level1.json", *tileMap_);
 		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_->GetCamera());
 	}
 
@@ -43,27 +43,7 @@ void GameScene::Initialize()
 		enemyManager_ = std::make_unique<EnemyManager>();
 		enemyManager_->Initialize(modelManager_, camera_->GetCamera());
 
-		// プレイヤーの初期位置
-		Vector3 playerPos = { 4.0f, 7.0f, 0.0f };
-
-		//// TrackerEnemy（プレイヤーについてくる敵）を5体配置
-		//// 敵1: プレイヤーの右側
-		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x + 5.0f, playerPos.y, 0.0f));
-
-		//// 敵2: プレイヤーの左側
-		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x - 5.0f, playerPos.y, 0.0f));
-
-		//// 敵3: プレイヤーの前方
-		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x, playerPos.y, 0.0f));
-
-		//// 敵4: プレイヤーの後方
-		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x, playerPos.y, 0.0f));
-
-		//// 敵5: プレイヤーの右前方（斜め）
-		//enemyManager_->SpawnEnemy("TrackerEnemy", Vector3(playerPos.x + 4.0f, playerPos.y, 0.0f));
-
-		enemyManager_->SpawnEnemy("DashEnemy", Vector3(4.0f, 1.0f, 0.0f));
-
+		levelLoader_.AddEnemy(*enemyManager_);
 	}
 
 	{
@@ -84,7 +64,12 @@ void GameScene::Initialize()
 		testPlayer->SetActor(&physicsEngine_);
 		objects_.push_back(std::move(testPlayer));
 	}
-
+  //hook
+  {
+    auto handle = modelManager_->LoadModel("testBlock");
+		levelLoader_.AddGameObject<Hook>(objects_, modelManager_, handle, camera_->GetCamera());
+  }
+	
 	{
 		//ゴールテープの作成
 		auto goalTape = std::make_unique<GoalTape>();
