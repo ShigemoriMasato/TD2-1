@@ -25,7 +25,6 @@ void TrackerEnemy::Initialize(ModelData* modelData, Camera* camera) {
 
 	isActive_ = true;
 	isAlive_ = true;
-	isDead_ = false;
 
 	// 初期Transform設定をModelResourceに反映
 	if (modelResource_) {
@@ -75,7 +74,6 @@ void TrackerEnemy::Draw(Render* render) {
 void TrackerEnemy::Die() {
 	if (!isAlive_) return;
 
-	isDead_ = true;
 	isAlive_ = false;  // 生存フラグをfalseに
 	// isActive_はそのまま（削除処理はEnemyManagerが行う）
 	

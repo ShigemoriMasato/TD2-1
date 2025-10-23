@@ -17,7 +17,9 @@ public:
     void AddGameObject(std::vector<std::unique_ptr<BaseObject>>& gameObjects,
         ModelManager* modelManager,
         int modelHandle,
-        Camera* camera);
+        Camera* camera,
+        PhysicsEngine* physicsEngine = nullptr,
+        bool useGravity = true);
 
     void AddEnemy(EnemyManager& enemyManager);
 private:
@@ -60,7 +62,9 @@ inline void LevelLoader::AddGameObject(
     std::vector<std::unique_ptr<BaseObject>>& gameObjects,
     ModelManager* modelManager,
     int modelHandle,
-    Camera* camera)
+    Camera* camera,
+    PhysicsEngine* physicsEngine,
+    bool useGravity)
 {
     const std::string targetType = T::TypeName();
 
@@ -84,6 +88,8 @@ inline void LevelLoader::AddGameObject(
                     auto gameObject = std::make_unique<T>();
                     gameObject->Initialize(modelManager->GetModelData(modelHandle), camera);
                     gameObject->SetPosition({ worldX, worldY ,0.0f });
+                    if(physicsEngine)
+                        gameObject->SetActor(physicsEngine, useGravity);
 
                     gameObjects.push_back(std::move(gameObject));
                 }

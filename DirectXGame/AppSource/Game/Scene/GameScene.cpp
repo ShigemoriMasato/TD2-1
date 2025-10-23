@@ -4,6 +4,7 @@
 #include "../Enemy/EnemySpawnParams.h"
 #include "../Collision/Collision.h"
 #include "../Hook/Hook.h"
+#include "../Item/Coin.h"
 
 #include <Tools/FPS/FPSObserver.h>
 #include <cmath>
@@ -60,8 +61,9 @@ void GameScene::Initialize()
 	{
 		auto handle = modelManager_->LoadModel("testBlock");
 		levelLoader_.AddGameObject<Hook>(objects_, modelManager_, handle, camera_->GetCamera());
+		levelLoader_.AddGameObject<Coin>(objects_, modelManager_, handle, camera_->GetCamera(), &physicsEngine_, false);
 	}
-	
+
 	{
 		//ゴールテープの作成
 		auto goalTape = std::make_unique<GoalTape>();
@@ -79,7 +81,7 @@ void GameScene::Initialize()
 		postEffect_->SetJobs(PostEffectJob::Fade);
 		postEffect_->input_ = OffScreenIndex::GameWindow;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
-		
+
 		// フェードインで開始（alpha = 1.0から0.0へ）
 		postEffect_->data_.fade.alpha = 1.0f;
 		isFadingIn_ = true;
@@ -108,20 +110,23 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	float deltaTime = timeSlower_->GetDeltaTime();
 
 	// フェードイン処理
-	if (isFadingIn_) {
+	if (isFadingIn_)
+	{
 		fadeTimer_ += deltaTime;
 		postEffect_->data_.fade.alpha = 1.0f - (fadeTimer_ / fadeDuration_);
-		
+
 		// フェードイン完了
-		if (fadeTimer_ >= fadeDuration_) {
+		if (fadeTimer_ >= fadeDuration_)
+		{
 			postEffect_->data_.fade.alpha = 0.0f;
 			isFadingIn_ = false;
 		}
-	} else {
+	}
+	else
+	{
 		// フェード完了後もFadeジョブを設定（alpha=0.0で透明）
 		postEffect_->data_.fade.alpha = 0.0f;
 	}
-
 
 	camera_->Update(deltaTime);
 	camera_->DrawImGui();
@@ -144,26 +149,33 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	}
 
 	//オブジェクト更新
-	for (auto& object : objects_) {
+	for (auto& object : objects_)
+	{
 
 		object->Update(deltaTime);
 	}
 
+	objects_.erase(std::remove_if(objects_.begin(), objects_.end(), [](auto& object)
+		{
+			return object->IsDead();
+		}), objects_.end());
+
 	//targetScope
 	targetScope_->Update(deltaTime, commonData->keyManager_.get());
 
+
+	physicsEngine_.Update(deltaTime);
 	//オブジェクト間でのコリジョンチェック
 	CheckAllCollision();
-	physicsEngine_.Update(deltaTime);
 
 	if (keys_[Key::Debug])
 	{
 		return std::make_unique<GameScene>();
 	}
 
-	if(keys_[Key::DebugClear])
+	if (keys_[Key::DebugClear])
 	{
-		
+
 	}
 
 	goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_);
@@ -203,19 +215,22 @@ void GameScene::CheckAllCollision()
 		auto selfB = objBColider->GetSelf();
 		auto maskB = objAColider->GetMask();
 
-		if (!(selfA & maskB) || !(selfB & maskA))continue;
+		if ((selfA & maskB) && (selfB & maskA))continue;
 		pair.first->OnCollision(pair.second);
 		pair.second->OnCollision(pair.first);
 	}
 
 	// 敵とプレイヤーの当たり判定を手動でチェック
-	if (enemyManager_ && player_) {
+	if (enemyManager_ && player_)
+	{
 		auto enemies = enemyManager_->GetAllEnemyObjects();
-		for (auto* enemy : enemies) {
+		for (auto* enemy : enemies)
+		{
 			if (!enemy || !enemy->GetCollider()) continue;
 
 			// プレイヤーのコライダーと敵のコライダーで判定
-			if (Collision::CheckCollision(*player_->GetCollider(), *enemy->GetCollider())) {
+			if (Collision::CheckCollision(*player_->GetCollider(), *enemy->GetCollider()))
+			{
 				// マスクチェック
 				auto* playerCollider = player_->GetCollider();
 				auto* enemyCollider = enemy->GetCollider();
@@ -225,10 +240,10 @@ void GameScene::CheckAllCollision()
 				auto selfEnemy = enemyCollider->GetSelf();
 				auto maskEnemy = enemyCollider->GetMask();
 
-				if ((selfPlayer & maskEnemy) && (selfEnemy & maskPlayer)) {
-					player_->OnCollision(enemy);
-					enemy->OnCollision(player_);
-				}
+				if ((selfPlayer & maskEnemy) && (selfEnemy & maskPlayer))continue;
+				player_->OnCollision(enemy);
+				enemy->OnCollision(player_);
+
 			}
 		}
 

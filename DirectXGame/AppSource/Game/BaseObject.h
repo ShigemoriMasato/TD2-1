@@ -20,19 +20,20 @@ public:
 	virtual void Draw(Render* render);
 
 	//配列から消すかどうかのフラグ
-	virtual bool Finalize() { return false; }
+	bool IsDead() const { return !isAlive_; }
 
 	virtual void OnCollision(BaseObject* other){}
 
 	Collider* GetCollider()const { return collider_.get(); }
 	PhysicsActor* GetActor() { return actor_.get(); }
 	Transform* GetTransform() { return &transform_; }
-	void SetActor(PhysicsEngine* physicsEngine);
+	void SetActor(PhysicsEngine* physicsEngine,bool useGravity = true);
 	void SetPosition(const Vector3& position) { transform_.position = position; }
 protected://オブジェクトプロパティ
 	Transform transform_;
 	std::unique_ptr<PhysicsActor> actor_ = nullptr;
 	std::unique_ptr<Collider> collider_;
+	bool isAlive_ = true;
 protected://描画に必要なリソース
 	std::unique_ptr<ModelResource> modelResource_;
 

@@ -26,7 +26,11 @@ Player::Player(TimeSlower* slower, PhysicsEngine* phEngine) {
 	collider_ = std::make_unique<SphereCollider>(
 		ColliderTag::Dynamic,
 		ColliderMask::PLAYER,
-		ColliderMask::ENEMY | ColliderMask::ITEM | ColliderMask::HOOK);
+		ColliderMask::ENEMY | 
+		ColliderMask::GOAL | 
+		ColliderMask::HOOK | 
+		ColliderMask::COIN);
+
 	collider_->SetTransform(&transform_);
 	collider_->SetSize(Vector3(1.0f, 1.0f, 1.0f));
 
@@ -70,12 +74,12 @@ void Player::Draw(Render* render)
 	BaseObject::Draw(render);
 	if (wire_)
 		wire_->Draw(render);
-	modelResource_->color_ = 0xffffffff;
+
 }
 
 void Player::OnCollision(BaseObject* other)
 {
-	modelResource_->color_ = 0xff0000ff;
+
 }
 
 Vector3 Player::GetInputDirection()

@@ -21,7 +21,6 @@ void DivisionEnemy::Initialize(ModelData* modelData, Camera* camera)
 
 	isActive_ = true;
 	isAlive_ = true;
-	isDead_ = false;
 
 	// 初期Transform設定をModelResourceに反映
 	if (modelResource_) {
@@ -62,7 +61,6 @@ void DivisionEnemy::Die()
 {
 	if (!isAlive_) return;
 
-	isDead_ = true;
 	isAlive_ = false;  // 生存フラグをfalseに
 	// isActive_はそのまま（削除処理はEnemyManagerが行う）
 

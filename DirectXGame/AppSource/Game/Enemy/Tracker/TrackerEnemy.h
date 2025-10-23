@@ -25,10 +25,6 @@ public:
 	/// @param position 位置
 	void SetPosition(const Vector3& position);
 
-	/// @brief 共通インターフェース：死亡状態を取得
-	/// @return 死亡フラグ
-	bool IsDead() const override { return isDead_; }
-
 	/// @brief 追跡速度を設定
 	/// @param speed 追跡速度
 	void SetTrackingSpeed(float speed) { trackingSpeed_ = speed; }
@@ -40,9 +36,6 @@ public:
 private:
 	// 追跡速度
 	float trackingSpeed_ = 1.0f;
-	
-	// 死亡フラグ
-	bool isDead_ = false;
 	
 	// HP
 	int hp_ = 3;

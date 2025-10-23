@@ -68,20 +68,23 @@ Vector3 TileMap::GetWorldPos(int x, int y) const
 
 void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData, Camera* camera)
 {
-	int index = 0;
-
 	mpResource_->Initialize(modelData, tiles_.width * tiles_.height);
 	MPResource* resource = mpResource_.get();
 	for (int y = 0; y < tiles_.height; ++y)
 	{
 		for (int x = 0; x < tiles_.width; ++x)
 		{
-			if (GetTileInfoAt(x, y) == TileType::Solid)
+			int index = x + y * tiles_.width;
+			if (GetTileInfoAt(x, y) != TileType::Solid)
+			{
+				resource->color_[index] = 0x80808000;
+				continue;
+			}
+			else
 			{
 				resource->camera_ = camera;
-				resource->position_[index] = GetWorldPos(x,y);
-				resource->color_[index] = 0x80808080;
-				index++;
+				resource->position_[index] = GetWorldPos(x, y);
+				resource->color_[index] = 0x808080FF;
 			}
 		}
 	}
