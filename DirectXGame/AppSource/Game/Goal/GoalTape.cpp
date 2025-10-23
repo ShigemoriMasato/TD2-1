@@ -8,12 +8,11 @@ GoalTape::GoalTape() {
 GoalTape::~GoalTape() {
 }
 
-void GoalTape::Initialize(TextureManager* textureManager, float positionX, float scaleY, PhysicsEngine* engine, Camera* camera) {
-	int textureHandle = textureManager->LoadTexture("Assets/Texture/goal.png");
+void GoalTape::Initialize(int textureHandle, float positionX, float scaleY, PhysicsEngine* engine, Camera* camera) {
 	drawResource_->textureHandle_ = textureHandle;
 
-	transform_.scale = { 1.0f, 40.0f, 1.0f };
-	transform_.position = { positionX, 10.0f, 0.0f };
+	transform_.scale = { 1.0f, scaleY, 1.0f };
+	transform_.position = { positionX, scaleY / 2.0f - 0.5f, 0.0f };
 	drawResource_->position_ = transform_.position;
 	drawResource_->scale_ = transform_.scale;
 	drawResource_->camera_ = camera;
@@ -21,8 +20,8 @@ void GoalTape::Initialize(TextureManager* textureManager, float positionX, float
 	drawResource_->texcoord_ = {
 		{0.0f, 0.0f},
 		{1.0f, 0.0f},
-		{0.0f, transform_.scale.y / 10.0f},
-		{1.0f, transform_.scale.y / 10.0f},
+		{0.0f, scaleY / 10.0f},
+		{1.0f, scaleY / 10.0f},
 	};
 
 	actor_ = std::make_unique<PhysicsActor>(engine, this);

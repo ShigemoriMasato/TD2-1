@@ -67,8 +67,8 @@ void DrawResource::Initialize(ShapeType type) {
 	int vertexCount = 0;
 	int indexCount = 0;
 
-	int vertical = 16;
-	int horizontal = 32;
+	int vertical = 8;
+	int horizontal = 16;
 	float radius = 0.5f;
 
 	float theta;

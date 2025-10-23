@@ -9,7 +9,7 @@ public:
 	GoalTape();
 	~GoalTape();
 
-	void Initialize(TextureManager* textureManager, float positionX, float scaleY, PhysicsEngine* engine, Camera* camera);
+	void Initialize(int textureHandle, float positionX, float scaleY, PhysicsEngine* engine, Camera* camera);
 	void Update(float deltaTime) override;
 	void Draw(Render* render) override;
 

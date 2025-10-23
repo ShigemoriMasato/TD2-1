@@ -83,6 +83,7 @@
     <ClCompile Include="AppSource\Game\Goal\GoalTape.cpp" />
     <ClCompile Include="AppSource\Game\Goal\GoalEvent.cpp" />
     <ClCompile Include="AppSource\Common\SceneChange\SceneChange.cpp" />
+    <ClCompile Include="AppSource\Game\Player\TargetScope.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="AppSource\Game\Goal\GoalTape.h" />
     <ClInclude Include="AppSource\Game\Goal\GoalEvent.h" />
     <ClInclude Include="AppSource\Common\SceneChange\SceneChange.h" />
+    <ClInclude Include="AppSource\Game\Player\TargetScope.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

@@ -10,6 +10,16 @@ class Player : public BaseObject
 {
 public:
 
+	enum class Behavior {
+		Idle,			//待機(着地)
+		Forcus,			//狙いを定める
+		Extend,			//伸ばす
+		Shrink,			//縮める
+		Dash,			//ダッシュ
+	};
+
+public:
+
 	Player(TimeSlower* slower, PhysicsEngine* phEngine);
 	~Player();
 
@@ -33,16 +43,9 @@ public:
 	Vector2 GetVelocity() const { 
 		return actor_ ? actor_->velocity_ : Vector2{0.0f, 0.0f};
 	}
-private:
-
-	enum class Behavior
-	{
-		Idle,			//待機(着地)
-		Forcus,			//狙いを定める
-		Extend,			//伸ばす
-		Shrink,			//縮める
-		Dash,			//ダッシュ
-	};
+	Behavior GetBehavior() const { return behavior_; }
+	Vector3 GetDirection() const { return direction; }
+	Vector3 GetTargetPos() const { return targetPos_; }
 
 private://状態変数
 
@@ -78,6 +81,9 @@ private://パラメータ
 	//wireを再び伸ばせるまでのクールタイム
 	float wireCoolTime_ = 0.0f;
 	const float maxWireCoolTime_ = 0.5f;
+
+	//wireを伸ばしている方向
+	Vector3 direction = { 0.0f, 0.0f, 0.0f };
 
 	//? ImGui用 debug
 	std::unordered_map<Behavior, std::string> behMap = {

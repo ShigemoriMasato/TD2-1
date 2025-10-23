@@ -37,7 +37,7 @@ void GameScene::Initialize()
 
 	//Cameraの初期化
 	camera_->Initialize(&player_->GetTransform()->position);
-	camera_->SetOffset({ 0.0f, 5.0f, -30.0f });
+	camera_->SetOffset({ 0.0f, 5.0f, -40.0f });
 
 	{
 		enemyManager_ = std::make_unique<EnemyManager>();
@@ -88,7 +88,8 @@ void GameScene::Initialize()
 	{
 		//ゴールテープの作成
 		auto goalTape = std::make_unique<GoalTape>();
-		goalTape->Initialize(textureManager_, 20.0f, 20.0f, &physicsEngine_, camera_->GetCamera());
+		int textureHandle = textureManager_->LoadTexture("Assets/Texture/goal.png");
+		goalTape->Initialize(textureHandle, 20.0f, 20.0f, &physicsEngine_, camera_->GetCamera());
 		goalTape_ = goalTape.get();
 		objects_.push_back(std::move(goalTape));
 	}
@@ -100,6 +101,11 @@ void GameScene::Initialize()
 		postEffect_->SetJobs(PostEffectJob::None);
 		postEffect_->input_ = OffScreenIndex::GameWindow;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
+	}
+
+	{
+		targetScope_ = std::make_unique<TargetScope>();
+		targetScope_->Initialize(textureManager_->LoadTexture("Assets/Texture/scope.png"), player_, camera_->GetCamera());
 	}
 
 	{
@@ -144,6 +150,9 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		object->Update(deltaTime);
 	}
 
+	//targetScope
+	targetScope_->Update(deltaTime, commonData->keyManager_.get());
+
 	//オブジェクト間でのコリジョンチェック
 	CheckAllCollision();
 	physicsEngine_.Update(deltaTime);
@@ -158,7 +167,7 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		
 	}
 
-	goalEvent_->SetClear(player_->GetTransform()->position > goalX_);
+	goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_);
 	goalEvent_->Update(deltaTime);
 
 	return nullptr;
@@ -175,6 +184,9 @@ void GameScene::Draw()
 
 	tileMap_->Draw(render_);
 	enemyManager_->Draw(render_);
+
+
+	targetScope_->Draw(render_);
 
 	render_->Draw(postEffect_.get());
 }
@@ -231,7 +243,9 @@ void GameScene::CheckPlayerWireField()
 		if (object.get() == player_ || object.get() == wire_.get())continue;
 		if (CollisionChecker(wire_.get(), object.get()))
 		{
-			player_->AddTargets(object.get());
+			if (object->GetCollider()->GetSelf() & ColliderMask::ENEMY) {
+				player_->AddTargets(object.get());
+			}
 		}
 	}
 	for (auto& enemy : enemyManager_->GetAllEnemyObjects())

@@ -14,6 +14,8 @@ TimeSlower::~TimeSlower() {
 void TimeSlower::Update() {
 	float trueDelta = fps_->GetDeltatime();
 
+	trueDelta = std::min(trueDelta, 0.1f);
+
 	//スロウモーションにする
 	if (timer_ > 0.0f) {
 		timer_ -= trueDelta;

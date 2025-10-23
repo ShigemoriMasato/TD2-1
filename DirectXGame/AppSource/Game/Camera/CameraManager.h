@@ -28,6 +28,10 @@ public:
 	void SetScale(float ratio);
 	void SetDebug(bool debug);
 
+private://関数
+
+
+
 private:// 座行計算用変数
 
 	Vector3* targetPos_ = nullptr;

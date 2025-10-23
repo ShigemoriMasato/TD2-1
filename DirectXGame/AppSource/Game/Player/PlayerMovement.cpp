@@ -49,6 +49,8 @@ void Player::UpdateForcus(float deltaTime) {
 	Vector3 inputDirection = GetInputDirection();
 	BaseObject* selectedTarget = nullptr;
 
+	targetPos_ = {};
+
 	if (inputDirection.Length() > 0.1f) {
 		selectedTarget = SelectTargetByDirection(inputDirection);
 
