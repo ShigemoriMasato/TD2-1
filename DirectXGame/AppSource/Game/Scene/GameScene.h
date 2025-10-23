@@ -36,6 +36,7 @@ private://パラメータ変数
 
 	std::unique_ptr<TimeSlower> timeSlower_ = nullptr;
 
+
 private://特定なオブジェクト
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 	Player* player_ = nullptr;
@@ -48,11 +49,14 @@ private://イベント
 
 private://postEffect
 	std::unique_ptr<PostEffectResource> postEffect_ = nullptr;
+	bool isFadingIn_ = false;
+	float fadeTimer_ = 0.0f;
+	float fadeDuration_ = 1.0f;
 	float goalX_ = 20.0f;		//どこからがゴールか
 
 private://使える関数
 
-void CheckAllCollision();
-void CheckPlayerWireField();
+	void CheckAllCollision();
+	void CheckPlayerWireField();
 };
 

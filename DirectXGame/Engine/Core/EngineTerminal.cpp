@@ -1,5 +1,6 @@
 #include "EngineTerminal.h"
 #include <Scene/Engine/ShaderEditScene.h>
+#include <Game/Scene/TitleScene.h>
 #include <Game/Scene/GameScene.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -78,7 +79,7 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 
 	switch (mode_) {
 	case BootMode::Game:
-		sceneManager_ = std::make_unique<SceneManager>(std::make_unique<GameScene>(), this);
+		sceneManager_ = std::make_unique<SceneManager>(std::make_unique<TitleScene>(), this);
 		break;
 	case BootMode::ShaderEdit:
 		sceneManager_ = std::make_unique<SceneManager>(std::make_unique<ShaderEditScene>(), this);
