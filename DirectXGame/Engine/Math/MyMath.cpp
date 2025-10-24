@@ -730,6 +730,15 @@ Vector3 MyMath::lerp(const Vector3& a, const Vector3& b, float t)
 	);
 }
 
+Quaternion MyMath::lerp(const Quaternion& a, const Quaternion& b, float t) {
+	return Quaternion(
+		lerp(a.x, b.x, t),
+		lerp(a.y, b.y, t),
+		lerp(a.z, b.z, t),
+		lerp(a.w, b.w, t)
+	);
+}
+
 float MyMath::EaseIn(float a, float b, float t)
 {
 	return a + (b - a) * t * t * t; // Cubic ease-in

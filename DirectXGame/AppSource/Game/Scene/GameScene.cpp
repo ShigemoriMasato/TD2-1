@@ -19,7 +19,7 @@ void GameScene::Initialize()
 
 	//タイルマップ初期化
 	{
-		auto handle = modelManager_->LoadModel("testBlock");
+		auto handle = modelManager_->LoadModel("Cube");
 		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
 		levelLoader_.LoadLevel("Assets/Map/level1.json", *tileMap_);
 		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_->GetCamera());
@@ -28,7 +28,7 @@ void GameScene::Initialize()
 	//プレイヤー初期化
 	{
 		auto player = std::make_unique<Player>(timeSlower_.get(), &physicsEngine_);
-		auto handle = modelManager_->LoadModel("testBlock");
+		auto handle = modelManager_->LoadModel("Player");
 		physicsEngine_;
 		player->Initialize(modelManager_->GetModelData(handle), camera_->GetCamera());
 		player->SetKeyConfig(&keys_);
@@ -111,6 +111,9 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	timeSlower_->Update();
 
 	float deltaTime = timeSlower_->GetDeltaTime();
+
+	//Modelアニメーション用デルタタイムの更新
+	ModelResource::deltatime = deltaTime;
 
 	// フェードイン処理
 	if (isFadingIn_)

@@ -55,6 +55,7 @@ void ModelResource::Initialize(ModelData* modelData) {
 
 	dxDevice_->GetDevice()->CreateShaderResourceView(matrixResource_.Get(), &srvDesc, matrixCPUHandle);
 
+	animation = modelData->animation_;
 
 	materialResource_.Attach(CreateBufferResource(dxDevice_->GetDevice(), sizeof(Material)));
 	materialResource_->Map(0, nullptr, (void**)&material_);
@@ -68,12 +69,15 @@ void ModelResource::Initialize(ModelData* modelData) {
 void ModelResource::DrawReady() {
 
 	material_->color = {
+		((color_ >> 24) & 0xff) / 255.0f,
 		((color_ >> 16) & 0xff) / 255.0f,
 		((color_ >> 8) & 0xff) / 255.0f,
-		(color_ & 0xff) / 255.0f,
 		1.0f
 	};
 
+	animationTime += deltatime;
+	float tmp = std::fmod(animationTime, animation.duration);
+	animationTime = tmp;
 	DrawReadyNode(node_, Matrix::MakeIdentity4x4());
 }
 
@@ -92,12 +96,19 @@ ModelResource::NodeTransform ModelResource::ConvertNodeToTransform(const Node& n
 void ModelResource::DrawReadyNode(NodeTransform node, const Matrix4x4& parentMatrix) {
 
 	Matrix4x4 worldMatrix = Matrix::MakeScaleMatrix(scale_) * Matrix::MakeRotationMatrix(rotate_) * Matrix::MakeTranslationMatrix(position_);
-	Matrix4x4 localMatrix = Matrix::MakeScaleMatrix(node.scale) * Matrix::MakeRotationMatrix(node.rotate) * Matrix::MakeTranslationMatrix(node.translate);
+	
+	NodeAnimation& rootNodeAnimation = animation.nodeAnimations[node.name];
+	Vector3 translate = CalculateValue(rootNodeAnimation.translate, animationTime);
+	Quaternion rotate = CalculateValue(rootNodeAnimation.rotate, animationTime);
+	Vector3 scale = CalculateValue(rootNodeAnimation.scale, animationTime);
+	Matrix4x4 animationMatrix = MakeScaleMatrix(scale) * rotate.ToMatrix() * MakeTranslationMatrix(translate);
 
-	matrix_[node.nodeIndex].world = parentMatrix * node.localMatrix * localMatrix * worldMatrix;
+	Matrix4x4 localMatrix = parentMatrix * animationMatrix * node.localMatrix;
+
+	matrix_[node.nodeIndex].world = localMatrix * worldMatrix;
 	matrix_[node.nodeIndex].wvp = matrix_[node.nodeIndex].world * camera_->GetVPMatrix();
 
-	for(auto& child : node.children) {
-		DrawReadyNode(child, parentMatrix * node.localMatrix * localMatrix);
+	for (auto& child : node.children) {
+		DrawReadyNode(child, localMatrix);
 	}
 }

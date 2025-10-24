@@ -28,6 +28,11 @@ void OffScreenManager::Initialize(DXDevice* device, ID3D12GraphicsCommandList* c
 			continue;
 		}
 
+		if (i == int(OffScreenIndex::GameWindow)) {
+			float clearColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+			CreateOffScreen(1280, 720, clearColor);
+			continue;
+		}
 		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		CreateOffScreen(1280, 720, clearColor);
 	}

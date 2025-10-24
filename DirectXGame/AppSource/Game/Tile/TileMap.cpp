@@ -77,7 +77,7 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 			int index = x + y * tiles_.width;
 			if (GetTileInfoAt(x, y) != TileType::Solid)
 			{
-				resource->color_[index] = 0x80808000;
+				resource->color_[index] = 0xffffff00;
 				continue;
 			}
 			else
@@ -90,16 +90,11 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 	}
 
 	//画像のリソースの先頭をセット
-	//int handle = textureManager->LoadTexture("Assets/Texture/Mapchip/Block01.png");
-	//textureManager->LoadTexture("Assets/Texture/Mapchip/Block02.png");
-	//textureManager->LoadTexture("Assets/Texture/Mapchip/Block03.png");
-	//textureManager->LoadTexture("Assets/Texture/Mapchip/Block04.png");
-	//その他読み込み
-	//
-	//mpResource_->textureStartIndex_ = handle;
+	int handle = textureManager->LoadTexture("Assets/Texture/Mapchip/Normal.png");
 
-	//今はとりあえずwhite1x1とかを入れとく
-	mpResource_->textureStartIndex_ = 0;
+	//その他の画像を読み込む。handleは取得する必要無し。読み込むだけ
+	
+	mpResource_->textureStartIndex_ = handle;
 }
 
 //DDA（Digital Differential Analyzer）
