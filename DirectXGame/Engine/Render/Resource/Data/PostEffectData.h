@@ -16,9 +16,19 @@ struct Grayscale {
     float intensity = 0.0f; // グレースケール強度
 };
 
+enum class FadeType : int {
+    Black = 0,      // ブラックフェード
+ White = 1,// ホワイトフェード
+    Radial = 2,     // 放射状フェード
+    Wipe = 3,       // ワイプフェード
+    Dissolve = 4,   // ディゾルブフェード
+};
+
 struct Fade {
     const std::string shaderFile = "Fade.PS.hlsl";
-    float alpha = 0.0f; // フェードの透明度
+    float alpha = 0.0f;     // フェードの透明度 (0.0 - 1.0)
+    FadeType type = FadeType::Black;  // フェードのタイプ
+    Vector3 color = { 0.0f, 0.0f, 0.0f };  // フェードカラー（White時は{1,1,1}）
 };
 
 struct PostEffectData {

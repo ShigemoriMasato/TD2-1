@@ -71,7 +71,7 @@ void ModelResource::DrawReady() {
 		((color_ >> 16) & 0xff) / 255.0f,
 		((color_ >> 8) & 0xff) / 255.0f,
 		(color_ & 0xff) / 255.0f,
-		((color_ >> 24) & 0xff) / 255.0f
+		1.0f
 	};
 
 	DrawReadyNode(node_, Matrix::MakeIdentity4x4());
