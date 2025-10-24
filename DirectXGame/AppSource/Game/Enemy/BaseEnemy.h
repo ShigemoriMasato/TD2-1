@@ -31,9 +31,6 @@ public:
 	// 共通インターフェース：キー入力を注入
 	virtual void InjectInput(const std::unordered_map<Key, bool>& keys) { keys_ = keys; }
 
-	// 共通インターフェース：死亡状態を取得
-	virtual bool IsDead() const { return !isAlive_; }
-
 	// 敵固有の設定を行う（Factory パターンで使用）
 	virtual void Configure(const EnemySpawnParams& params) {}
 
@@ -43,7 +40,6 @@ public:
 protected:
 	Vector3 playerPosition_ = { 0.0f, 0.0f, 0.0f };
 	bool isActive_ = true;  // 処理対象フラグ（更新・描画するかどうか）
-	bool isAlive_ = true;   // 生存フラグ（ゲーム的な生死状態）
 	std::unordered_map<Key, bool> keys_;
 };
 

@@ -26,7 +26,6 @@ void SplitEnemy::Initialize(ModelData* modelData, Camera* camera) {
 
 	isActive_ = true;
 	isAlive_ = true;
-	isDead_ = false;
 
 	// 初期Transform設定をModelResourceに反映
 	if (modelResource_) {
@@ -78,7 +77,6 @@ void SplitEnemy::Draw(Render* render) {
 void SplitEnemy::Die() {
 	if (!isAlive_) return;
 
-	isDead_ = true;
 	isAlive_ = false;  // 生存フラグをfalseに
 
 }

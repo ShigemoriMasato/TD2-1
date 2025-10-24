@@ -10,7 +10,7 @@ void Wire::Initialize(ModelData* modelData, Camera* camera) {
 	collider_ = std::make_unique<SphereCollider>(
 		ColliderTag::Dynamic, 
 		ColliderMask::WIRE,
-		ColliderMask::ENEMY | ColliderMask::ITEM, 
+		ColliderMask::ENEMY | ColliderMask::GOAL, 
 		5.0f);
 	collider_->SetTransform(&transform_);
 }

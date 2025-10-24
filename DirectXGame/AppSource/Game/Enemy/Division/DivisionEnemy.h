@@ -39,10 +39,6 @@ public:
 	/// @param keys キー入力状態
 	void SetKeys(const std::unordered_map<Key, bool>& keys) { keys_ = keys; }
 
-	/// @brief 共通インターフェース：死亡状態を取得
-	/// @return 死亡フラグ
-	bool IsDead() const override { return isDead_; }
-
 	/// @brief 位置を設定
 	/// @param position 位置
 	void SetPosition(const Vector3& position);
@@ -54,9 +50,6 @@ public:
 private:
 	// 分裂可能フラグ（trueなら死亡時に分裂、falseなら分裂しない）
 	bool canDivide_ = true;
-
-	// 死亡フラグ
-	bool isDead_ = false;
 
 	// 分裂時のコールバック関数
 	DivisionCallback divisionCallback_ = nullptr;

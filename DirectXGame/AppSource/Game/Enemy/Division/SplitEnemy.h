@@ -32,10 +32,6 @@ public:
 	/// @param keys キー入力状態
 	void SetKeys(const std::unordered_map<Key, bool>& keys) { keys_ = keys; }
 
-	/// @brief 共通インターフェース：死亡状態を取得
-	/// @return 死亡フラグ
-	bool IsDead() const override { return isDead_; }
-
 	/// @brief 敵固有の設定を行う
 	/// @param params スポーンパラメータ
 	void Configure(const EnemySpawnParams& params) override;
@@ -47,9 +43,6 @@ private:
 	// 移動方向（左右どちらに移動するか）
 	float moveDirection_ = 1.0f; // 1.0f = 右, -1.0f = 左
 	
-	// 死亡フラグ
-	bool isDead_ = false;
-
 	// 生存時間（左の敵用）
 	float lifeTime_ = 0.0f;
 	
