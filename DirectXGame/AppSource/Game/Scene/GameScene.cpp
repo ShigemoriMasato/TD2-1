@@ -9,6 +9,7 @@
 #include <cmath>
 #include <algorithm>
 
+
 void GameScene::Initialize()
 {
 	camera_ = std::make_unique<CameraManager>();
@@ -61,7 +62,7 @@ void GameScene::Initialize()
 		auto handle = modelManager_->LoadModel("testBlock");
 		levelLoader_.AddGameObject<Hook>(objects_, modelManager_, handle, camera_->GetCamera());
 	}
-	
+
 	{
 		//ゴールテープの作成
 		auto goalTape = std::make_unique<GoalTape>();
@@ -79,9 +80,11 @@ void GameScene::Initialize()
 		postEffect_->SetJobs(PostEffectJob::Fade);
 		postEffect_->input_ = OffScreenIndex::GameWindow;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
-		
-		// フェードインで開始（alpha = 1.0から0.0へ）
+
+		// 放射状フェードインで開始（alpha = 1.0から0.0へ）
 		postEffect_->data_.fade.alpha = 1.0f;
+		postEffect_->data_.fade.type = FadeType::Dissolve;
+		postEffect_->data_.fade.color = { 1.0f, 1.0f, 1.0f };  // 白に変更
 		isFadingIn_ = true;
 		fadeTimer_ = 0.0f;
 	}
@@ -111,17 +114,19 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	if (isFadingIn_) {
 		fadeTimer_ += deltaTime;
 		postEffect_->data_.fade.alpha = 1.0f - (fadeTimer_ / fadeDuration_);
-		
+
 		// フェードイン完了
 		if (fadeTimer_ >= fadeDuration_) {
 			postEffect_->data_.fade.alpha = 0.0f;
 			isFadingIn_ = false;
+			// フェード完了後はジョブをクリアしてエフェクトをオフにする
+			postEffect_->SetJobs(PostEffectJob::None);
 		}
+
 	} else {
 		// フェード完了後もFadeジョブを設定（alpha=0.0で透明）
 		postEffect_->data_.fade.alpha = 0.0f;
 	}
-
 
 	camera_->Update(deltaTime);
 	camera_->DrawImGui();
@@ -161,9 +166,9 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		return std::make_unique<GameScene>();
 	}
 
-	if(keys_[Key::DebugClear])
+	if (keys_[Key::DebugClear])
 	{
-		
+
 	}
 
 	goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_);
@@ -256,5 +261,6 @@ void GameScene::CheckPlayerWireField()
 		}
 	}
 }
+
 
 

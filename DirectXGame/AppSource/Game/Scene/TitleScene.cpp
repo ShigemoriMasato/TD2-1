@@ -13,6 +13,8 @@ void TitleScene::Initialize()
 		
 		// タイトルシーンは最初から見えている状態で開始（alpha = 0.0）
 		postEffect_->data_.fade.alpha = 0.0f;
+		postEffect_->data_.fade.type = FadeType::Black;
+		postEffect_->data_.fade.color = { 0.0f, 0.0f, 0.0f };
 		// 常にFadeジョブを設定（alpha値で制御）
 		postEffect_->SetJobs(PostEffectJob::Fade);
 	}
@@ -33,6 +35,9 @@ std::unique_ptr<BaseScene> TitleScene::Update()
 	if (!isFading_ && keys[Key::Action]) {
 		isFading_ = true;
 		fadeTimer_ = 0.0f;
+		
+		// ディゾルブフェードを使用
+		postEffect_->data_.fade.type = FadeType::Dissolve;
 	}
 
 	// フェードアウト処理（シーン遷移時）

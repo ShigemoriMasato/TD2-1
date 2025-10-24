@@ -88,7 +88,7 @@ void MPResource::DrawReady() {
 			((color_[i] >> 24) & 0xff) / 255.0f,
 			((color_[i] >> 16) & 0xff) / 255.0f,
 			((color_[i] >> 8) & 0xff) / 255.0f,
-			(color_[i] & 0xff) / 255.0f
+			1.0f
 		};
 
 		particleData_[i].textureIndex = textureIndex_[i];
