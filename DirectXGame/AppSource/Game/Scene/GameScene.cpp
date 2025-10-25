@@ -10,6 +10,7 @@
 #include <cmath>
 #include <algorithm>
 
+
 void GameScene::Initialize()
 {
 	camera_ = std::make_unique<CameraManager>();
@@ -18,7 +19,7 @@ void GameScene::Initialize()
 
 	//タイルマップ初期化
 	{
-		auto handle = modelManager_->LoadModel("testBlock");
+		auto handle = modelManager_->LoadModel("Cube");
 		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
 		levelLoader_.LoadLevel("Assets/Map/level1.json", *tileMap_);
 		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_->GetCamera());
@@ -27,7 +28,7 @@ void GameScene::Initialize()
 	//プレイヤー初期化
 	{
 		auto player = std::make_unique<Player>(timeSlower_.get(), &physicsEngine_);
-		auto handle = modelManager_->LoadModel("testBlock");
+		auto handle = modelManager_->LoadModel("Player");
 		physicsEngine_;
 		player->Initialize(modelManager_->GetModelData(handle), camera_->GetCamera());
 		player->SetKeyConfig(&keys_);
@@ -84,6 +85,8 @@ void GameScene::Initialize()
 
 		// フェードインで開始（alpha = 1.0から0.0へ）
 		postEffect_->data_.fade.alpha = 1.0f;
+		postEffect_->data_.fade.type = FadeType::Dissolve;
+		postEffect_->data_.fade.color = { 1.0f, 1.0f, 1.0f };  // 白に変更
 		isFadingIn_ = true;
 		fadeTimer_ = 0.0f;
 	}
@@ -109,6 +112,9 @@ std::unique_ptr<BaseScene> GameScene::Update()
 
 	float deltaTime = timeSlower_->GetDeltaTime();
 
+	//Modelアニメーション用デルタタイムの更新
+	ModelResource::deltatime = deltaTime;
+
 	// フェードイン処理
 	if (isFadingIn_)
 	{
@@ -116,14 +122,15 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		postEffect_->data_.fade.alpha = 1.0f - (fadeTimer_ / fadeDuration_);
 
 		// フェードイン完了
-		if (fadeTimer_ >= fadeDuration_)
-		{
+		if (fadeTimer_ >= fadeDuration_){
 			postEffect_->data_.fade.alpha = 0.0f;
 			isFadingIn_ = false;
+			// フェード完了後はジョブをクリアしてエフェクトをオフにする
+			postEffect_->SetJobs(PostEffectJob::None);
 		}
-	}
-	else
-	{
+
+	} else {
+
 		// フェード完了後もFadeジョブを設定（alpha=0.0で透明）
 		postEffect_->data_.fade.alpha = 0.0f;
 	}
@@ -271,5 +278,6 @@ void GameScene::CheckPlayerWireField()
 		}
 	}
 }
+
 
 

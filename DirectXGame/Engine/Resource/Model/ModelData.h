@@ -6,6 +6,7 @@
 #include <Resource/Texture/TextureManager.h>
 #include <Math/MyMath.h>
 #include <Render/Resource/DrawResource.h>
+#include "ModelAnimation.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -47,6 +48,8 @@ public:
 	std::unordered_map<std::string, IndexResource> GetIndexResource() const { return indexBufferViews_; }
 	std::vector<ModelMaterial> GetMaterials() const { return material_; }
 	int GetNodeCount() const { return nodeCount_; }
+
+	Animation animation_{};
 
 protected:
 

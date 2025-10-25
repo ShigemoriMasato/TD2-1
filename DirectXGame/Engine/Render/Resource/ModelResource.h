@@ -57,6 +57,8 @@ public:
 
 	PSOConfig psoConfig_{};
 
+	static inline float deltatime = 0.0166f;
+
 private:
 
 	NodeTransform ConvertNodeToTransform(const Node& node);
@@ -74,4 +76,7 @@ private:
 
 	static DXDevice* dxDevice_;
 	static SRVManager* srvManager_;
+
+	Animation animation;
+	float animationTime;
 };

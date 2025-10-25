@@ -12,6 +12,7 @@
     <ClCompile Include="AppSource\Game\Collision\Collision.cpp" />
     <ClCompile Include="AppSource\Game\Enemy\Division\DivisionEnemy.cpp" />
     <ClCompile Include="AppSource\Game\Camera\CameraManager.cpp" />
+    <ClCompile Include="AppSource\Game\Item\Coin.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
     <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp" />
@@ -85,7 +86,8 @@
     <ClCompile Include="AppSource\Game\Scene\TitleScene.cpp" />
     <ClCompile Include="AppSource\Common\SceneChange\SceneChange.cpp" />
     <ClCompile Include="AppSource\Game\Player\TargetScope.cpp" />
-    <ClCompile Include="AppSource\Game\Item\Coin.cpp" />
+    <ClCompile Include="AppSource\StageSelect\Scene\SelectScene.cpp" />
+    <ClCompile Include="Engine\Resource\Model\ModelAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -101,6 +103,7 @@
     <ClInclude Include="AppSource\Game\Collision\Collision.h" />
     <ClInclude Include="AppSource\Game\Enemy\Division\DivisionEnemy.h" />
     <ClInclude Include="AppSource\Game\Camera\CameraManager.h" />
+    <ClInclude Include="AppSource\Game\Item\Coin.h" />
     <ClInclude Include="Engine\Render\Resource\Data\PostEffectData.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
     <ClInclude Include="Engine\Resource\Audio\AudioManager.h" />
@@ -179,8 +182,9 @@
     <ClInclude Include="AppSource\Game\Goal\GoalEvent.h" />
     <ClInclude Include="AppSource\Common\SceneChange\SceneChange.h" />
     <ClInclude Include="AppSource\Game\Player\TargetScope.h" />
+    <ClInclude Include="AppSource\StageSelect\Scene\SelectScene.h" />
     <ClInclude Include="AppSource\Game\Scene\TitleScene.h" />
-    <ClInclude Include="AppSource\Game\Item\Coin.h" />
+    <ClInclude Include="Engine\Resource\Model\ModelAnimation.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

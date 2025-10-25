@@ -13,6 +13,18 @@ enum class OffScreenIndex {
 	GameWindow,
 	Title,
 
+	//ステージのスクショ
+	Level1 = 20,
+	Level2,
+	Level3,
+	Level4,
+	Level5,
+	Level6,
+	Level7,
+	Level8,
+	Level9,
+	Level10,
+
 	MaxCount
 };
 
@@ -45,6 +57,6 @@ private:
 	SRVManager* srvManager_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
 
-	const int maxOffScreenCount_ = 32;
+	const int maxOffScreenCount_ = static_cast<int>(OffScreenIndex::MaxCount);
 };
 

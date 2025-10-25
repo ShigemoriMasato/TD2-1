@@ -121,6 +121,7 @@ namespace MyMath {
 	/// <returns></returns>
 	uint32_t lerp(uint32_t a, uint32_t b, float t);
 	Vector3 lerp(const Vector3& a, const Vector3& b, float t);
+	Quaternion lerp(const Quaternion& a, const Quaternion& b, float t);
 
 	float EaseIn(float a, float b, float t);
 	Vector3 EaseIn(Vector3 a, Vector3 b, float t);
