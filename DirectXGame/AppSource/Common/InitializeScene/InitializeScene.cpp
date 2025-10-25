@@ -8,11 +8,12 @@ void InitializeScene::Initialize() {
 }
 
 std::unique_ptr<BaseScene> InitializeScene::Update() {
-	ImGui::Begin("StageSelect");
-	auto gpuHandle = offScreenManager_->GetOffScreenData(OffScreenIndex::Level1)->GetTextureGPUHandle();
-	ImGui::Image(ImTextureID(gpuHandle.ptr), ImVec2(720, 415));
-	ImGui::End();
-	return nullptr;
+	////ぶっちゃけもうImGui使わないけど一応デバッグとして残す
+	//ImGui::Begin("StageSelect");
+	//auto gpuHandle = offScreenManager_->GetOffScreenData(OffScreenIndex::Level1)->GetTextureGPUHandle();
+	//ImGui::Image(ImTextureID(gpuHandle.ptr), ImVec2(720, 415));
+	//ImGui::End();
+	return std::make_unique<TitleScene>();
 }
 
 void InitializeScene::Draw() {
