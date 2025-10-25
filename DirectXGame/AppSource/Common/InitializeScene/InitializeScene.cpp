@@ -36,6 +36,8 @@ void InitializeScene::CreateStageTexture() {
 		sceneManager_->Draw();
 		sceneList_.push_back(std::move(sceneManager_));
 	}
+
+	commonData->isCreateTexture = false;
 }
 
 void InitializeScene::LoadAllResources() {
