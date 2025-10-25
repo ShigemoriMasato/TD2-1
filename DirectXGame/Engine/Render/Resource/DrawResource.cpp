@@ -60,6 +60,9 @@ void DrawResource::Initialize(uint32_t vertexNum, uint32_t indexNum, bool useMat
 		psoConfig_.rootID = RootSignatureID::NonMatrix;
 		psoConfig_.vs = "NonMatrix3d.VS.hlsl";
 	}
+
+	//defaultでWhite1x1をセット
+	SetTextureHandle(0);
 }
 
 void DrawResource::Initialize(ShapeType type) {
@@ -299,4 +302,17 @@ ID3D12Resource* DrawResource::GetParticleDataResource() const {
 		return matrixResource.Get();
 	}
 	return nullptr;
+}
+
+void DrawResource::SetTextureHandle(int handle) {
+	textureHandle_ = textureManager_->GetTextureData(handle)->GetTextureGPUHandle();
+}
+
+void DrawResource::SetTextureHandle(std::string filePath) {
+	int handle = textureManager_->LoadTexture(filePath);
+	textureHandle_ = textureManager_->GetTextureData(handle)->GetTextureGPUHandle();
+}
+
+void DrawResource::SetTextureHandle(D3D12_GPU_DESCRIPTOR_HANDLE handle) {
+	textureHandle_ = handle;
 }

@@ -41,6 +41,13 @@ void GameScene::Initialize()
 	camera_->Initialize(&player_->GetTransform()->position);
 	camera_->SetOffset({ 0.0f, 5.0f, -40.0f });
 
+	if (commonData->isCreateTexture) {
+		Vector2 size = tileMap_->WorldSize();
+		//zの1.4倍は適当。画像に異常があるようなら変更して
+		camera_->SetOffset({ size.x / 2.0f, size.y / 2.0f, -size.x * 1.4f });
+		camera_->FinishCalculation();
+	}
+
 	{
 		enemyManager_ = std::make_unique<EnemyManager>();
 		enemyManager_->Initialize(modelManager_, camera_->GetCamera());
@@ -81,6 +88,10 @@ void GameScene::Initialize()
 		postEffect_->Initialize();
 		postEffect_->input_ = OffScreenIndex::GameWindow;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
+		if (commonData->isCreateTexture) {
+			int index = int(OffScreenIndex::Level1) + int(commonData->nextLevelIndex_);
+			postEffect_->output_ = OffScreenIndex(index);
+		}
 
 		// グリッドトランジションでフェードイン（progress = 1.0から0.0へ）
 		postEffect_->data_.gridTransition.progress = 1.0f;
@@ -91,6 +102,9 @@ void GameScene::Initialize()
 		
 		isFadingIn_ = true;
 		fadeTimer_ = 0.0f;
+		if (commonData->isCreateTexture) {
+			fadeTimer_ = fadeDuration_;
+		}
 	}
 
 	{

@@ -54,6 +54,15 @@ void CameraManager::DrawImGui() {
 	ImGui::End();
 }
 
+void CameraManager::FinishCalculation() {
+	pcalculate = 1.0f;
+	ocalculate = 1.0f;
+	scalculate = 1.0f;
+	transform_.position = *targetPos_ + targetOffset_;
+	transform_.scale = targetScale_;
+	offset_ = targetOffset_;
+}
+
 Camera* CameraManager::GetCamera() {
 	return isDebug_ ? debugCamera_.get() : camera_.get();
 }

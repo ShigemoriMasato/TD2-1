@@ -5,6 +5,12 @@
 #include <map>
 #include <optional>
 
+enum class LevelIndex {
+    Level1,
+    Level2,
+    Level3
+};
+
 using Json = nlohmann::json;
 class LevelLoader
 {
@@ -22,6 +28,9 @@ public:
         bool useGravity = true);
 
     void AddEnemy(EnemyManager& enemyManager);
+
+    static std::unordered_map<LevelIndex, std::string> GetLevelFileMap() { return levelFileMap_; };
+
 private:
     Json levelData;
 	std::string filePath_;
@@ -30,6 +39,8 @@ private:
 	int worldHeight_;
     int tileWidth_;
     int tileHeight_;
+
+    static std::unordered_map<LevelIndex, std::string> levelFileMap_;
 
 private:
     std::unique_ptr<Logger> logger_;

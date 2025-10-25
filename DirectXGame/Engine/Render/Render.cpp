@@ -198,12 +198,12 @@ void Render::Draw(DrawResource* resource) {
     if (resource->GetParticleDataResource()) {
         commandList->SetGraphicsRootConstantBufferView(1, resource->GetParticleDataResource()->GetGPUVirtualAddress());
         //Texture
-        commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
+        commandList->SetGraphicsRootDescriptorTable(2, resource->GetTextureHandle());
         //Lightのポインタを設定
         commandList->SetGraphicsRootConstantBufferView(3, resource->GetLightResource()->GetGPUVirtualAddress());
     } else {
         //Texture
-        commandList->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
+        commandList->SetGraphicsRootDescriptorTable(1, resource->GetTextureHandle());
         //Lightのポインタを設定
         commandList->SetGraphicsRootConstantBufferView(2, resource->GetLightResource()->GetGPUVirtualAddress());
     }
@@ -345,6 +345,9 @@ void Render::Draw(PostEffectResource* resource) {
     resource->psoConfig_.isSwapChain = nextWindow == OffScreenIndex::SwapChain;
     resource->SimpleDrawReady();
     draw(nextWindow, inputIndex);
+
+    //RTVをもともと設定されていたものに戻す
+    PreDraw(preOffScreenIndex, false);
 }
 
 void Render::PostDraw(ImGuiWrapper* imguiRap) {

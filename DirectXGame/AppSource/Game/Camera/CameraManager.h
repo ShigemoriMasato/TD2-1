@@ -21,6 +21,8 @@ public:
 	void Update(float deltaTime);
 	void DrawImGui();
 
+	void FinishCalculation();
+
 	Camera* GetCamera();
 
 	void SetForcusTarget(Vector3* targetPos);

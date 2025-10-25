@@ -14,7 +14,7 @@ enum class OffScreenIndex {
 	Title,
 
 	//ステージのスクショ
-	Level1 = 20,
+	Level1,
 	Level2,
 	Level3,
 	Level4,

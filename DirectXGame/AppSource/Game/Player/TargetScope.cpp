@@ -15,7 +15,7 @@ TargetScope::~TargetScope() {
 }
 
 void TargetScope::Initialize(int textureHandle, Player* player, Camera* camera) {
-	scope_->textureHandle_ = textureHandle;
+	scope_->SetTextureHandle(textureHandle);
 	playerPosition_ = &player->GetTransform()->position;
 	scope_->scale_ = { 8.0f,8.0f,1.0f };
 	scope_->camera_ = camera;

@@ -1,5 +1,8 @@
 #pragma once
 #include <Scene/Data/BaseScene.h>
+#include <map>
+#include <string>
+#include <Scene/SceneManager.h>
 
 class SelectScene : public BaseScene {
 public:
@@ -13,6 +16,9 @@ public:
 
 private:
 
+	static inline bool firstLoad_ = false;
 
+	std::map<int, std::string> stageMap_;
+	std::unique_ptr<SceneManager> sceneManager_;
 
 };
