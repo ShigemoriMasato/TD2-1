@@ -1,19 +1,16 @@
 #pragma once
-#include <cstdint>
 #include <wrl.h>
-#include <d3d12.h>
-#include <Core/DXDevice.h>
 #include <Transform/Transform.h>
-#include <vector>
 #include <Core/PSO/PSOConfig.h>
 #include <Core/DXCommonFunction.h>
 #include <Resource/SRVManager.h>
+#include <Resource/Texture/TextureManager.h>
 #include <Math/MyMath.h>
 
 class BaseResource {
 public:
 
-	static void StaticInitialize(DXDevice* device, SRVManager* srvManager) { dxDevice_ = device; srvManager_ = srvManager; }
+	static void StaticInitialize(DXDevice* device, SRVManager* srvManager, TextureManager* textureManager);
 
 	BaseResource() = default;
 	virtual ~BaseResource() = default;
@@ -42,6 +39,7 @@ protected:
 
 	static DXDevice* dxDevice_;
 	static SRVManager* srvManager_;
+	static TextureManager* textureManager_;
 
 	//Matrixに関する奴
 	Matrix4x4 worldMatrix_ = Matrix::MakeIdentity4x4();

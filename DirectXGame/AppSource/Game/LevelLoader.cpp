@@ -3,6 +3,10 @@
 #include <fstream>
 #include <typeinfo>
 
+std::unordered_map<LevelIndex, std::string> LevelLoader::levelFileMap_ = {
+	{LevelIndex::Level1,"level1.json"}
+};
+
 LevelLoader::LevelLoader()
 {
 	logger_ = std::make_unique<Logger>();

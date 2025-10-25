@@ -1,7 +1,7 @@
 #include "EngineTerminal.h"
 #include <Scene/Engine/ShaderEditScene.h>
-#include <Game/Scene/TitleScene.h>
-#include <Game/Scene/GameScene.h>
+#include <Common/InitializeScene/InitializeScene.h>
+#include <Scene/SceneManager.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -57,10 +57,6 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 	render_ = std::make_unique<Render>(dxDevice_.get());
 	srvManager_ = std::make_unique<SRVManager>(dxDevice_.get(), 4096);
 
-	BaseResource::StaticInitialize(dxDevice_.get(), srvManager_.get());
-	ParticleResource::StaticInitialize(dxDevice_.get(), srvManager_.get());
-	ModelResource::StaticInitialize(dxDevice_.get(), srvManager_.get());
-
 	textureManager_ = std::make_unique<TextureManager>();
 	textureManager_->Initialize(dxDevice_.get(), render_->GetCommandList(), srvManager_.get());
 	modelManager_ = std::make_unique<ModelManager>(textureManager_.get(), dxDevice_.get());
@@ -77,17 +73,20 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 
 	textureManager_->LoadTexture("Assets/Texture/white1x1.png");
 
+	fpsObserver_ = std::make_unique<FPSObserver>(true, 60.0);
+
+	BaseResource::StaticInitialize(dxDevice_.get(), srvManager_.get(), textureManager_.get());
+	ParticleResource::StaticInitialize(dxDevice_.get(), srvManager_.get(), textureManager_.get());
+	ModelResource::StaticInitialize(dxDevice_.get(), srvManager_.get());
+
 	switch (mode_) {
 	case BootMode::Game:
-		sceneManager_ = std::make_unique<SceneManager>(std::make_unique<TitleScene>(), this);
+		sceneManager_ = std::make_unique<SceneManager>(std::make_unique<InitializeScene>(), this);
 		break;
 	case BootMode::ShaderEdit:
 		sceneManager_ = std::make_unique<SceneManager>(std::make_unique<ShaderEditScene>(), this);
 		break;
 	}
-
-	fpsObserver_ = std::make_unique<FPSObserver>(true, 60.0);
-
 }
 
 // =========================- MainLoop -===============================

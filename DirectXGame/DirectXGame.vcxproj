@@ -67,6 +67,7 @@
     <ClCompile Include="AppSource\Game\Hook\Hook.cpp" />
     <ClCompile Include="AppSource\Game\Goal\GoalTape.cpp" />
     <ClCompile Include="AppSource\Game\Goal\GoalEvent.cpp" />
+    <ClCompile Include="AppSource\Common\InitializeScene\InitializeScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RasterizerShelf.cpp" />
     <ClCompile Include="Engine\Core\PSO\Shelf\RootSignatureShelf.cpp" />
@@ -102,6 +103,7 @@
     <ClCompile Include="AppSource\Common\SceneChange\SceneChange.cpp" />
     <ClCompile Include="AppSource\Game\Player\TargetScope.cpp" />
     <ClCompile Include="AppSource\StageSelect\Scene\SelectScene.cpp" />
+    <ClCompile Include="StageBoard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -124,6 +126,7 @@
     <ClInclude Include="Engine\Render\Resource\Data\BaseResource.h" />
     <ClInclude Include="Engine\Core\EngineTerminal.h" />
     <ClInclude Include="Engine\Resource\Model\ModelAnimation.h" />
+    <ClInclude Include="Engine\Scene\Data\SceneTools.h" />
     <ClInclude Include="Engine\Tools\Binary\BinaryManager.h" />
     <ClInclude Include="Engine\Tools\Binary\Data\BinaryInput.h" />
     <ClInclude Include="Engine\Tools\Binary\Data\BinaryOutput.h" />
@@ -199,6 +202,8 @@
     <ClInclude Include="AppSource\Game\Player\TargetScope.h" />
     <ClInclude Include="AppSource\StageSelect\Scene\SelectScene.h" />
     <ClInclude Include="AppSource\Game\Scene\TitleScene.h" />
+    <ClInclude Include="AppSource\Common\InitializeScene\InitializeScene.h" />
+    <ClInclude Include="StageBoard.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

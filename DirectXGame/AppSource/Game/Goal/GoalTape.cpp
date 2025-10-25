@@ -9,7 +9,7 @@ GoalTape::~GoalTape() {
 }
 
 void GoalTape::Initialize(int textureHandle, float positionX, float scaleY, PhysicsEngine* engine, Camera* camera) {
-	drawResource_->textureHandle_ = textureHandle;
+	drawResource_->SetTextureHandle(textureHandle);
 
 	transform_.scale = { 1.0f, scaleY, 1.0f };
 	transform_.position = { positionX, scaleY / 2.0f - 0.5f, 0.0f };
