@@ -55,7 +55,7 @@ struct ModelParticleData final
 	Matrix4x4 world;
 	Vector4 color;
 	int textureIndex;
-	Vector3 padding;
+	Vector3 worldPos;
 };
 
 struct MatrixData final

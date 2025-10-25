@@ -136,11 +136,15 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 		return;
 	}
 
+
+
 	for (auto* tile : collisionTiles_)
 	{
 		if (!tile)continue;
 		const auto& tileSize = tile->Size();
 		const auto& worldSize = tile->MapSize();
+
+		actor->collidedTop_ = actor->collidedBottom_ = actor->collidedLeft_ = actor->collidedRight_ = false;
 
 		//水平方向から(右)
 		if (dis.x > 0.0f)
@@ -157,6 +161,8 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 				newPos.x = tileX * tileSize.x - objHalfSize.x;
 				actor->velocity_.x = 0.0f;
 				actor->collidedRight_ = true;
+				if (!actor->prevCollidedRight_)
+					tile->TriggerWaveAtWorldPos(newPos);
 			}
 			else
 			{
@@ -175,8 +181,7 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 		//左方向
 		else if (dis.x < 0.0f)
 		{
-			auto leftTopX = newPos.x;
-			auto tileX = TileXIndex(leftTopX, tileSize.x);
+			auto tileX = TileXIndex(newPos.x, tileSize.x);
 			auto tileY = TileYIndex(objPos.y, tileSize.y, worldSize.y);
 			auto tileTypeTop = tile->GetTileTypeAt(tileX, tileY);
 
@@ -188,6 +193,8 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 				newPos.x = tileX * tileSize.x + objHalfSize.x;
 				actor->velocity_.x = 0.0f;
 				actor->collidedLeft_ = true;
+				if (!actor->prevCollidedLeft_)
+					tile->TriggerWaveAtWorldPos(newPos);
 			}
 			else
 			{
@@ -221,6 +228,8 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 				newPos.y = (worldSize.y - 1 - tileY) * tileSize.y + objHalfSize.y;
 				actor->velocity_.y = 0.0f;
 				actor->collidedBottom_ = true;
+				if (!actor->prevCollidedBottom_)
+					tile->TriggerWaveAtWorldPos(newPos);
 			}
 			else
 			{
@@ -257,11 +266,18 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 				newPos.y = (worldSize.y - 1 - tileY) * tileSize.y - objHalfSize.y;
 				actor->velocity_.y = 0.0f;
 				actor->collidedTop_ = true;
+				if (!actor->prevCollidedTop_)
+					tile->TriggerWaveAtWorldPos(newPos);
 			}
 
 		}
 
+		actor->prevCollidedTop_ = actor->collidedTop_;
+		actor->prevCollidedBottom_ = actor->collidedBottom_;
+		actor->prevCollidedLeft_ = actor->collidedLeft_;
+		actor->prevCollidedRight_ = actor->collidedRight_;
 	}
+
 	if (actor->collidedBottom_)
 	{
 		actor->velocity_.x *= friction_;
@@ -270,6 +286,7 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 	{
 		actor->velocity_.y *= friction_;
 	}
+
 	//速度処理完了してから位置を更新
 	transform->position += Vector3(newPos) - objPos;
 	actor->velocity_.x = std::clamp(actor->velocity_.x, -maxSpeed_, maxSpeed_);

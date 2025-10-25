@@ -23,6 +23,8 @@ void TileMap::LoadMap(TileInfo&& tiles)
 	mapSize_.y = static_cast<float>(tiles_.height);
 	physicsEngine_->SetWorldBounds(AABB({ 0,0,0 }, Vector3(WorldSize())));
 
+	MPResource* resource = mpResource_.get();
+	resource->InitializeTileTexture(tiles_.width, tiles_.height);
 }
 
 TileType TileMap::GetTileInfoAt(int x, int y) const
@@ -77,7 +79,6 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 			int index = x + y * tiles_.width;
 			if (GetTileInfoAt(x, y) != TileType::Solid)
 			{
-				resource->color_[index] = 0x80808000;
 				continue;
 			}
 			else
@@ -173,28 +174,37 @@ bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType t
 	return false;
 }
 
+void TileMap::TriggerWaveAtTile(int tileX, int tileY, float radius, float intensity)
+{
+	if (tileX < 0 || tileX >= tiles_.width || tileY < 0 || tileY >= tiles_.height)
+	{
+		return;
+	}
 
-void TileMap::Draw(Render* render)
+	if (mpResource_)
+	{
+		mpResource_->SetWaveSource(tileX, tileY, radius, intensity, 0.5f);
+	}
+}
+
+void TileMap::TriggerWaveAtWorldPos(const Vector2& worldPos, float radius, float intensity)
+{
+	int tileX = static_cast<int>(std::floor(worldPos.x / size_.x));
+	int tileY = static_cast<int>(std::floor(worldPos.y / size_.y));
+	
+	TriggerWaveAtTile(tileX, tileY, radius, intensity);
+}
+
+void TileMap::Draw(Render* render, float deltaTime)
 {
 	if (size_.x <= 0 || size_.y <= 0)
 	{
 		return;
 	}
 
-	/* for (size_t y = 0; y < mapSize_.y; ++y){
-		 for (size_t x = 0; x < mapSize_.x; ++x){
-			 size_t index = x + y * size_t(mapSize_.x);
+	auto commdandList = render->GetCommandList();
 
-			 if (index < tiles_.type.size() && tiles_.type[index] != TileType::Empty)
-			 {
-				 const auto& tileInfo = tiles_.type[index];
+	mpResource_->DispatchTileDiffusion(commdandList, deltaTime);
 
-				 tileInfo.model->position_ = Vector3(x * size_.x, y * size_.y, 0.0f);
-
-				 render->Draw(tileInfo.model.get());
-			 }
-
-		 }
-	 }*/
 	render->Draw(mpResource_.get());
 }

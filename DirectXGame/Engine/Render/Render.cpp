@@ -292,6 +292,10 @@ void Render::Draw(MPResource* resource) {
     commandList->SetGraphicsRootDescriptorTable(0, resource->GetParticleDataGPUHandle());
 	//Texture
 	commandList->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureData(resource->textureStartIndex_)->GetTextureGPUHandle());
+    
+    commandList->SetGraphicsRootDescriptorTable(2, resource->GetCurrentTileSRV());
+
+    commandList->SetGraphicsRootConstantBufferView(3, resource->waveBuffer_.Get()->GetGPUVirtualAddress());
 
     commandList->DrawIndexedInstanced(indexNum, resource->GetInstanceNum(), 0, 0, 0);
 }

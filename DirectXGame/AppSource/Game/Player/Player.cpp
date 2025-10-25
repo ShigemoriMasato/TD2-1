@@ -85,7 +85,7 @@ void Player::OnCollision(BaseObject* other)
 Vector3 Player::GetInputDirection()
 {
 	if (!key_) return direction;
-
+	direction = { 0.0f,0.0f,0.0f };
 	if ((*key_)[Key::Up]) direction.y += 1.0f;
 	if ((*key_)[Key::Down]) direction.y -= 1.0f;
 	if ((*key_)[Key::Left]) direction.x -= 1.0f;
@@ -117,7 +117,7 @@ BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
 		//許容角度内にいるか
 		if (angle > allowAngle) {
 			//ターゲットとプレイヤーの間に障害物がないか
-			if (!tileMap_->HasTile(this->transform_.position, target->GetTransform()->position, TileType::Solid)) {
+			if (!tileMap_->HasTile(this->transform_.position, target->GetTransform()->position, TileType::Solid),true) {
 
 				//一番ターゲットが狙いやすいと思われるオブジェクトを選ぶ
 				float distance = (target->GetTransform()->position - transform_.position).Length();

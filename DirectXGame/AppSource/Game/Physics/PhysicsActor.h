@@ -32,6 +32,10 @@ public:
 	bool collidedLeft_ = false;
 	bool collidedRight_ = false;
 
+	bool prevCollidedTop_ = false;
+	bool prevCollidedBottom_ = false;
+	bool prevCollidedLeft_ = false;
+	bool prevCollidedRight_ = false;
 public://debug用
 
 	static std::unique_ptr<Logger> logger_;
