@@ -31,8 +31,17 @@ struct Fade {
     Vector3 color = { 0.0f, 0.0f, 0.0f };  // フェードカラー（White時は{1,1,1}）
 };
 
+struct GridTransition {
+    const std::string shaderFile = "GridTransition.PS.hlsl";
+    float progress = 0.0f;      // 遷移の進行度 (0.0 - 1.0)
+    float gridSize = 16.0f;     // グリッドのサイズ（1辺のタイル数）
+    float fadeColor = 0.0f;     // フェード色 (0=黒, 1=白)
+    float pattern = 0.0f;       // パターン (0=波紋状, 1=ランダム, 2=左から右)
+};
+
 struct PostEffectData {
     Blur blur;
 	Grayscale grayscale;
 	Fade fade;
+    GridTransition gridTransition;
 };

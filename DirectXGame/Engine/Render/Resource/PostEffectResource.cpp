@@ -80,6 +80,15 @@ void PostEffectResource::DrawReady() {
 
 		psoConfig_.ps = data_.fade.shaderFile;
 		task_ &= ~PostEffectJob::Fade;
+	} else if (task_ & PostEffectJob::GridTransition) {
+		// slot1: progress, gridSize, fadeColor, pattern
+		infoForGPU_->slot1.x = data_.gridTransition.progress;
+		infoForGPU_->slot1.y = data_.gridTransition.gridSize;
+		infoForGPU_->slot1.z = data_.gridTransition.fadeColor;
+		infoForGPU_->slot1.w = data_.gridTransition.pattern;
+
+		psoConfig_.ps = data_.gridTransition.shaderFile;
+		task_ &= ~PostEffectJob::GridTransition;
 	}
 	
 	psoConfig_.ps = shaderBasePath_ + psoConfig_.ps;
