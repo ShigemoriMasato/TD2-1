@@ -11,12 +11,11 @@ void TitleScene::Initialize()
 		postEffect_->input_ = OffScreenIndex::Title;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
 		
-		// タイトルシーンは最初から見えている状態で開始（alpha = 0.0）
-		postEffect_->data_.fade.alpha = 0.0f;
-		postEffect_->data_.fade.type = FadeType::Black;
-		postEffect_->data_.fade.color = { 0.0f, 0.0f, 0.0f };
-		// 常にFadeジョブを設定（alpha値で制御）
-		postEffect_->SetJobs(PostEffectJob::Fade);
+		// グリッドトランジション初期化
+		postEffect_->data_.gridTransition.progress = 0.0f;
+		postEffect_->data_.gridTransition.gridSize = 16.0f;  // 16x16グリッド
+		postEffect_->data_.gridTransition.fadeColor = 0.0f;  // 黒にフェード
+		postEffect_->data_.gridTransition.pattern = 0.0f;    // 波紋状パターン（外→内）
 	}
 
 	// フェード状態の初期化
@@ -31,30 +30,28 @@ std::unique_ptr<BaseScene> TitleScene::Update()
 	// キー状態を取得
 	auto keys = commonData->keyManager_->GetKeyStates();
 
-	// スペースキー（Actionキー）でフェードアウト開始
+	// スペースキー（Actionキー）でグリッドトランジション開始
 	if (!isFading_ && keys[Key::Action]) {
 		isFading_ = true;
 		fadeTimer_ = 0.0f;
-		
-		// ディゾルブフェードを使用
-		postEffect_->data_.fade.type = FadeType::Dissolve;
 	}
 
-	// フェードアウト処理（シーン遷移時）
+	// グリッドトランジション処理（シーン遷移時）
 	if (isFading_) {
 		fadeTimer_ += deltaTime;
-		postEffect_->data_.fade.alpha = fadeTimer_ / fadeDuration_;
+		postEffect_->data_.gridTransition.progress = fadeTimer_ / fadeDuration_;
 		
-		// フェード中は毎フレームFadeジョブを設定
-		postEffect_->SetJobs(PostEffectJob::Fade);
+		// グリッドトランジションジョブを設定
+		postEffect_->SetJobs(PostEffectJob::GridTransition);
 
-		// フェードアウト完了でゲームシーンへ
+		// トランジション完了でゲームシーンへ
 		if (fadeTimer_ >= fadeDuration_) {
 			return std::make_unique<GameScene>();
 		}
 	} else {
-		// フェードしていない時もFadeジョブを設定（alpha=0.0で透明）
-		postEffect_->SetJobs(PostEffectJob::Fade);
+		// トランジションしていない時は通常描画
+		postEffect_->data_.gridTransition.progress = 0.0f;
+		postEffect_->SetJobs(PostEffectJob::None);
 	}
 
 	return std::unique_ptr<BaseScene>();

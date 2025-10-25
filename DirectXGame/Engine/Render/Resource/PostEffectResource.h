@@ -18,6 +18,7 @@ enum class PostEffectJob : uint32_t {
 	Blur = 1 << 0,
 	Grayscale = 1 << 1,
 	Fade = 1 << 2,
+	GridTransition = 1 << 3,
 
 };
 
