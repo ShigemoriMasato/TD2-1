@@ -61,7 +61,13 @@ public:
 
     void SetModelData(TextureManager* textureManager, ModelData* modelData, Camera* camera);
     bool HasTile(const Vector3& startPos, const Vector3& endPos, TileType type,Vector3* outEndPos = nullptr,bool includeStartTile = false)const;
-    void Draw(Render* render);
+    
+
+    void TriggerWaveAtTile(int tileX, int tileY, float radius = 5.0f, float intensity = 1.0f);
+    void TriggerWaveAtWorldPos(const Vector2& worldPos, float radius = 5.0f, float intensity = 1.0f);
+
+    void Update(float deltaTime);
+    void Draw(Render* render,float deltaTime);
 private:
     Vector2 size_ = {1.0f,1.0f};
     Vector2 mapSize_;
@@ -71,6 +77,16 @@ private:
 
     bool isDraw_ = false;
 
+    struct WaveInfo
+    {
+        Vector2 waveStartPos;
+        float radius;
+        float speed;
+        float time;
+        bool isActive;
+    };
+
+    WaveInfo wave_;
+
     PhysicsEngine* physicsEngine_ = nullptr;
 };
-

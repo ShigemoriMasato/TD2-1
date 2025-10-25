@@ -154,7 +154,7 @@ std::unique_ptr<BaseScene> GameScene::Update()
 
 		enemyManager_->Update(deltaTime);
 	}
-
+	//tileMap_->Update(deltaTime);
 	//オブジェクト更新
 	for (auto& object : objects_)
 	{
@@ -200,7 +200,7 @@ void GameScene::Draw()
 		object->Draw(render_);
 	}
 
-	tileMap_->Draw(render_);
+	tileMap_->Draw(render_, timeSlower_->GetDeltaTime());
 	enemyManager_->Draw(render_);
 
 

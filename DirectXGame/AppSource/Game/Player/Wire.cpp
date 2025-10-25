@@ -26,7 +26,7 @@ void Wire::Update(float deltaTime) {
 		leftDistance -= extendSpeed_ * deltaTime;
 
 		//距離が0.2以下になったら伸ばし切ったこととする
-		if (leftDistance <= 0.2f) {
+		if (leftDistance < 0.01f) {
 			endPos_ = targetPos_;
 			isExtending_ = false;
 		}
@@ -43,6 +43,13 @@ void Wire::Update(float deltaTime) {
 	if (!isVisible_) {
 		endPos_ = *startPos_;
 	}
+
+
+	ImGui::Begin("Wire");
+	ImGui::Text("startPos x:%f y%f", startPos_->x, startPos_->y);
+	ImGui::Text("endPos x:%f y%f", endPos_.x, endPos_.y);
+	ImGui::Text("isExtending:%d", isExtending_);
+	ImGui::End();
 
 }
 

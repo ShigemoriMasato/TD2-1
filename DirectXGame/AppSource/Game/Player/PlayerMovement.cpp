@@ -79,7 +79,7 @@ void Player::UpdateForcus(float deltaTime) {
 			//スロウモーション終了(補完あり)
 			timeSlower_->EndSlow(true);
 			//着地したらIdleに行くはずなのでとりあえずDashに投げる
-			behaviorRequest_ = Behavior::Dash;
+			behaviorRequest_ = Behavior::Idle;
 
 		}
 
