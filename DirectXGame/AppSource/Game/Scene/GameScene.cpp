@@ -79,8 +79,8 @@ void GameScene::Initialize()
 		int textureHandle = textureManager_->LoadTexture("Assets/Texture/goal.png");
 		auto tileWorldSize = tileMap_->WorldSize();
 		goalTape->Initialize(textureHandle, tileWorldSize.x, tileWorldSize.y, &physicsEngine_, camera_->GetCamera());
-		goalTape_ = goalTape.get();
-		objects_.push_back(std::move(goalTape));
+		goalTape_ = std::move(goalTape);
+		goalX_ = tileWorldSize.x;
 	}
 
 	{
@@ -115,7 +115,7 @@ void GameScene::Initialize()
 
 	{
 		//ゴールイベント初期化
-		goalEvent_ = std::make_unique<GoalEvent>(camera_.get());
+		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_);
 	}
 
 	render_->EndFrame(false);
