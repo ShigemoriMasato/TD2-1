@@ -2,13 +2,9 @@
 #include "Wire.h"
 #include "../Tile/TileMap.h"
 
-namespace {
-	//debug用
-	const float wireTime = 0.5f;
-	float wireTimer = 0.0f;
-}
-
 void Player::OnIdel() {
+	transform_.rotation = {};
+	rotateSpeed_ = 0.0f;
 
 	actor_->useGravity_ = true;
 	wire_->SetStartPositionPtr(&transform_.position);
@@ -82,7 +78,6 @@ void Player::UpdateForcus(float deltaTime) {
 			behaviorRequest_ = Behavior::Idle;
 
 		}
-
 	}
 
 }
@@ -90,7 +85,6 @@ void Player::UpdateForcus(float deltaTime) {
 void Player::OnExtend() {
 	actor_->velocity_ = {};
 	actor_->useGravity_ = false;
-	wireTimer = wireTime;
 }
 
 void Player::UpdateExtend(float deltaTime) {
@@ -105,6 +99,7 @@ void Player::UpdateExtend(float deltaTime) {
 
 void Player::OnShrink() {
 	targetDir_ = (targetPos_ - transform_.position).Normalize();
+	rotateSpeed_ = rotateMaxSpeed_;
 }
 
 void Player::UpdateShrink(float deltaTime) {
@@ -148,4 +143,12 @@ void Player::UpdateDash(float deltaTime) {
 	if (actor_->collidedBottom_) {
 		behaviorRequest_ = Behavior::Idle;
 	}
+}
+
+void Player::OnClear() {
+	rotateSpeed_ = rotateMaxSpeed_ / 2.0f;
+}
+
+void Player::UpdateClear(float deltaTime) {
+	actor_->velocity_ = { 5.0f, 0.0f };
 }

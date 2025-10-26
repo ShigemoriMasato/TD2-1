@@ -15,8 +15,6 @@ public:
 
 	bool GetClear() const { return isClear_; }
 
-	void OnCollision(BaseObject* other) override;
-
 private:
 
 	std::unique_ptr<DrawResource> drawResource_ = nullptr;

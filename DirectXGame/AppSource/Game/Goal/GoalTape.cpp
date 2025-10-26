@@ -24,7 +24,7 @@ void GoalTape::Initialize(int textureHandle, float positionX, float scaleY, Phys
 		{1.0f, scaleY / 10.0f},
 	};
 
-	collider_ = std::make_unique<AABBCollider>(ColliderTag::Static, ColliderMask::GOAL, ColliderMask::PLAYER, Vector3(1,1,0.01f));
+	collider_ = std::make_unique<AABBCollider>(ColliderTag::Static, ColliderMask::GOAL, ColliderMask::GOAL, Vector3(1,1,0.01f));
 	collider_->SetTransform(&transform_);
 }
 
@@ -34,10 +34,4 @@ void GoalTape::Update(float deltaTime) {
 
 void GoalTape::Draw(Render* render) {
 	render->Draw(drawResource_.get());
-}
-
-void GoalTape::OnCollision(BaseObject* other) {
-	if (other->GetCollider()->GetSelf() == ColliderMask::PLAYER) {
-		isClear_ = true;
-	}
 }

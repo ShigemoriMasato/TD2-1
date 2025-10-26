@@ -1,11 +1,12 @@
 #pragma once
 #include "../Camera/CameraManager.h"
+#include "../Player/Player.h"
 
 class BaseScene;
 class GoalEvent {
 public:
 
-	GoalEvent(CameraManager* camera);
+	GoalEvent(CameraManager* camera, Player* player);
 	~GoalEvent();
 
 	void SetClear(bool isClear) { isClear_ = isClear; }
@@ -17,6 +18,7 @@ private:
 	void ClearUpdate(float deltatime);
 
 	CameraManager* camera_ = nullptr;
+	Player* player_ = nullptr;
 
 	bool isClear_ = false;
 	bool preIsClear_ = false;
