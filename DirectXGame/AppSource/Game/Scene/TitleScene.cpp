@@ -54,6 +54,7 @@ void TitleScene::Initialize()
 	{
 		titleTextureHandle_ = textureManager_->LoadTexture("Assets/Texture/TitleScene/title.png");
 		spaceStartTextureHandle_ = textureManager_->LoadTexture("Assets/Texture/TitleScene/spaceStart.png");
+		backgroundTextureHandle_ = textureManager_->LoadTexture("Assets/Texture/TitleScene/titleBackGround.png");
 	}
 
 	// タイトルロゴの初期化
@@ -91,6 +92,23 @@ void TitleScene::Initialize()
 		// 初期状態は透明
 		spaceStart_->color_ = 0x00ffffff;
 	}
+
+	/// 背景の初期化
+	{
+		background_ = std::make_unique<DrawResource>();
+		background_->Initialize(ShapeType::Plane);
+		background_->SetTextureHandle(backgroundTextureHandle_);
+		background_->camera_ = uiCamera_.get();
+		
+		// 画面全体を覆うように配置
+		background_->position_ = { 0.0f, 0.0f, 100.0f };  // Z+で手前に配置
+		background_->scale_ = { 1280.0f, 720.0f, 1.0f };
+		background_->rotate_ = { 0.0f, 0.0f, 0.0f };
+		
+		background_->color_ = 0xffffffff;
+	}
+
+
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update()
@@ -218,6 +236,7 @@ void TitleScene::Draw()
 	render_->PreDraw(OffScreenIndex::Title);
 
 	// UI描画
+	render_->Draw(background_.get());
 	render_->Draw(titleLogo_.get());
 	render_->Draw(spaceStart_.get());
 

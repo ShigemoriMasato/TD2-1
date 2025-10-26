@@ -123,7 +123,7 @@ BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
 
 
 		//ターゲットとプレイヤーの間に障害物がないか
-		//if (!tileMap_->HasTile(this->transform_.position, target->GetTransform()->position, TileType::Solid))
+		if (!tileMap_->HasTile(this->transform_.position, target->GetTransform()->position, TileType::Solid))
 		{
 			//許容角度内にいるか
 			if (angle > allowAngle)
