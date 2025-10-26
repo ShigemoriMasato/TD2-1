@@ -29,14 +29,17 @@ void CameraManager::Update(float deltaTime) {
 	ocalculate = std::min(ocalculate + deltaTime, 1.0f);
 	scalculate = std::min(scalculate + deltaTime, 1.0f);
 
-	Vector3 pos = lerp(transform_.position, *targetPos_, pcalculate);
-	transform_.scale = lerp(transform_.scale, targetScale_, scalculate);
-	offset_ = lerp(offset_, targetOffset_, ocalculate);
+	const float followSpeed = 8.0f;
+	float t = 1.0f - std::exp(-followSpeed * deltaTime);
 
-	transform_.position = pos + offset_;
+	transform_.position = lerp(transform_.position, *targetPos_ + targetOffset_, t);
+	transform_.scale = lerp(transform_.scale, targetScale_, t);
+	offset_ = lerp(offset_, targetOffset_, t);
 
 	camera_->SetTransform(transform_);
 	camera_->MakeMatrix();
+
+
 
 	if (isDebug_) {
 		debugCamera_->Update();

@@ -72,30 +72,38 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 {
 	mpResource_->Initialize(modelData, tiles_.width * tiles_.height);
 	MPResource* resource = mpResource_.get();
+
+
+	//画像のリソースの先頭をセット
+	int blockHandle = textureManager->LoadTexture("Assets/Texture/Mapchip/Normal.png");
+	//int trapHandle = textureManager->LoadTexture("Assets/Texture/Mapchip/trap.png");
 	for (int y = 0; y < tiles_.height; ++y)
 	{
 		for (int x = 0; x < tiles_.width; ++x)
 		{
 			int index = x + y * tiles_.width;
-			if (GetTileInfoAt(x, y) != TileType::Solid)
+			TileType type = GetTileInfoAt(x, y);
+			if (type == TileType::Empty)
 			{
 				continue;
 			}
-			else
+			if(type == TileType::Solid)
 			{
 				resource->camera_ = camera;
 				resource->position_[index] = GetWorldPos(x, y);
-				resource->color_[index] = 0x808080FF;
 			}
+		/*	if (type == TileType::Trap)
+			{
+				resource->camera_ = camera;
+                resource->position_[index] = GetWorldPos(x, y);
+				resource->textureIndex_[index] = trapHandle;
+			}*/
 		}
 	}
 
-	//画像のリソースの先頭をセット
-	int handle = textureManager->LoadTexture("Assets/Texture/Mapchip/Normal.png");
-
 	//その他の画像を読み込む。handleは取得する必要無し。読み込むだけ
 	
-	mpResource_->textureStartIndex_ = handle;
+	mpResource_->textureStartIndex_ = blockHandle;
 }
 
 //DDA（Digital Differential Analyzer）
