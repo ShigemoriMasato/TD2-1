@@ -4,7 +4,7 @@
 #include <Math/MyString.h>
 
 void InitializeScene::Initialize() {
-	LoadAllResources();
+	//LoadAllResources();
 }
 
 std::unique_ptr<BaseScene> InitializeScene::Update() {
