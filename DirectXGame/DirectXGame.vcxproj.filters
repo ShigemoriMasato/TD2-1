@@ -89,7 +89,7 @@
     <ClCompile Include="AppSource\StageSelect\Scene\SelectScene.cpp" />
     <ClCompile Include="Engine\Resource\Model\ModelAnimation.cpp" />
     <ClCompile Include="AppSource\Common\InitializeScene\InitializeScene.cpp" />
-    <ClCompile Include="StageBoard.cpp" />
+    <ClCompile Include="AppSource\Game\ScoreManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -188,8 +188,8 @@
     <ClInclude Include="AppSource\Game\Scene\TitleScene.h" />
     <ClInclude Include="Engine\Resource\Model\ModelAnimation.h" />
     <ClInclude Include="AppSource\Common\InitializeScene\InitializeScene.h" />
-    <ClInclude Include="StageBoard.h" />
     <ClInclude Include="Engine\Scene\Data\SceneTools.h" />
+    <ClInclude Include="AppSource\Game\ScoreManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

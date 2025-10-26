@@ -103,7 +103,7 @@
     <ClCompile Include="AppSource\Common\SceneChange\SceneChange.cpp" />
     <ClCompile Include="AppSource\Game\Player\TargetScope.cpp" />
     <ClCompile Include="AppSource\StageSelect\Scene\SelectScene.cpp" />
-    <ClCompile Include="StageBoard.cpp" />
+    <ClCompile Include="AppSource\Game\ScoreManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -203,7 +203,7 @@
     <ClInclude Include="AppSource\StageSelect\Scene\SelectScene.h" />
     <ClInclude Include="AppSource\Game\Scene\TitleScene.h" />
     <ClInclude Include="AppSource\Common\InitializeScene\InitializeScene.h" />
-    <ClInclude Include="StageBoard.h" />
+    <ClInclude Include="AppSource\Game\ScoreManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
