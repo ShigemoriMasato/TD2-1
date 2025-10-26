@@ -65,7 +65,7 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources[2] = { nullptr, nullptr };
 	D3D12_RESOURCE_STATES resourcestates_[2] = { D3D12_RESOURCE_STATE_PRESENT,D3D12_RESOURCE_STATE_PRESENT };
-	float clearColor_[4] = { 0.1f,0.1f,0.1f,1.0f };
+	float clearColor_[4] = { 0.0f,0.0f,0.0f,1.0f };
 	OffScreenIndex offScreenHandle_ = OffScreenIndex::SwapChain;
 
 	bool isFrameFirst_ = true;	//PreDrawが初回かどうか
