@@ -1,15 +1,18 @@
 #include "MPResource.h"
 
-MPResource::MPResource() {
+MPResource::MPResource()
+{
 
 }
 
-MPResource::~MPResource() {
+MPResource::~MPResource()
+{
 }
 
-void MPResource::Initialize(ModelData* modelData, int instanceNum) {
+void MPResource::Initialize(ModelData* modelData, int instanceNum)
+{
 	psoConfig_ = PSOConfig{};
-	
+
 	logger_ = std::make_unique<Logger>();
 	logger_->RegistLogFile("MPResource");
 
@@ -22,7 +25,7 @@ void MPResource::Initialize(ModelData* modelData, int instanceNum) {
 
 	vertexBufferView = *modelData->GetVertexResource().begin()->second.bufferView;
 	indexBufferView = *modelData->GetIndexResource().begin()->second.bufferView;
-	
+
 	//particleData
 	particleDataResource.Attach(CreateBufferResource(device, sizeof(ModelParticleData) * instanceNum));
 	particleDataResource->Map(0, nullptr, reinterpret_cast<void**>(&particleData_));
@@ -30,12 +33,13 @@ void MPResource::Initialize(ModelData* modelData, int instanceNum) {
 	waveBuffer_.Attach(CreateBufferResource(device, sizeof(WaveParams)));
 	waveBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&waveData_));
 
-	for (int i = 0; i < instanceNum; ++i) {
+	for (int i = 0; i < instanceNum; ++i)
+	{
 		particleData_[i].world = MakeIdentity4x4();
 		particleData_[i].wvp = MakeIdentity4x4();
 		particleData_[i].color = { 1.0f,1.0f,1.0f,1.0f };
 		particleData_[i].textureIndex = 0;
-        particleData_[i].worldPos = { 0.0f,0.0f,0.0f };
+		particleData_[i].worldPos = { 0.0f,0.0f,0.0f };
 	}
 
 	color_.resize(instanceNum, 0xffffffff);
@@ -67,30 +71,37 @@ void MPResource::Initialize(ModelData* modelData, int instanceNum) {
 	instanceNum_ = instanceNum;
 }
 
-void MPResource::Initialize(ModelManager* manager, int modelHandle, int instanceNum) {
+void MPResource::Initialize(ModelManager* manager, int modelHandle, int instanceNum)
+{
 	auto modelData = manager->GetModelData(modelHandle);
-	if (!modelData) {
+	if (!modelData)
+	{
 		return;
 	}
 	Initialize(modelData, instanceNum);
 }
 
-void MPResource::DrawReady() {
+void MPResource::DrawReady()
+{
 	//particleData
 	Matrix4x4 bill = MakeIdentity4x4();
-	if (billboard_) {
+	if (billboard_)
+	{
 		// ビルボード
 		bill = Inverse(camera_->GetTranformMatrix());
-		for (int i = 0; i < 3; ++i) {
+		for (int i = 0; i < 3; ++i)
+		{
 			bill.m[3][i] = 0.0f;
 		}
 	}
 
 	//各行列の作成
-	for (uint32_t i = 0; i < instanceNum_; ++i) {
+	for (uint32_t i = 0; i < instanceNum_; ++i)
+	{
 		particleData_[i].world = MakeScaleMatrix(scale_[i]) * MakeRotationMatrix(rotate_[i]) * bill * MakeTranslationMatrix(position_[i]);
 
-		if (camera_) {
+		if (camera_)
+		{
 			particleData_[i].wvp = particleData_[i].world * camera_->GetVPMatrix();
 		}
 
@@ -113,13 +124,13 @@ void MPResource::DrawReady() {
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE MPResource::GetCurrentTileSRV() const
-{ 
-	return tilePing_ ? texA.srvGpuHandle : texB.srvGpuHandle; 
+{
+	return tilePing_ ? texA.srvGpuHandle : texB.srvGpuHandle;
 }
 
 void MPResource::InitComputPSO()
 {
-	auto device =dxDevice_->GetDevice();
+	auto device = dxDevice_->GetDevice();
 
 	CD3DX12_DESCRIPTOR_RANGE1 srvRange;
 	srvRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0
@@ -165,12 +176,12 @@ void MPResource::InitComputPSO()
 	//includeに対応するための設定を行っておく
 	hr = dxcUtils->CreateDefaultIncludeHandler(&includeHandler);
 	assert(SUCCEEDED(hr));
-	
+
 	auto tileCS = CompileShader(L"Assets/Shader/TileEffectCS.hlsl", L"cs_6_0", dxcUtils.Get(), dxcCompiler.Get(), includeHandler.Get(), logger_.get());
 
 	D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.pRootSignature = rootSignature_.Get();
-	psoDesc.CS = { tileCS->GetBufferPointer(), tileCS ->GetBufferSize()};
+	psoDesc.CS = { tileCS->GetBufferPointer(), tileCS->GetBufferSize() };
 	psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
 	device->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(&PSO_));
@@ -182,7 +193,7 @@ void MPResource::InitializeTileTexture(int mapW, int mapH)
 	mapHeight_ = mapH;
 
 	auto device = dxDevice_->GetDevice();
-	
+
 	texA = CreateTexture2DWithUAVSRV(
 		device,
 		srvManager_,
@@ -248,8 +259,8 @@ void MPResource::DispatchTileDiffusion(ID3D12GraphicsCommandList* cmdList, float
 	consts32[5] = waveSourceConsts_.mapW;
 	consts32[6] = waveSourceConsts_.mapH;
 	u.f = waveSourceConsts_.time;     consts32[7] = u.i;
-	u.f = waveSourceConsts_.waveStartTime;consts32[8] = u.i;
-	u.f = waveSourceConsts_.waveActiveDuration;consts32[9] = u.i;
+	u.f = waveSourceConsts_.waveStartTime; consts32[8] = u.i;
+	u.f = waveSourceConsts_.waveActiveDuration; consts32[9] = u.i;
 
 	cmdList->SetComputeRoot32BitConstants(2, 10, consts32, 0);
 
@@ -280,7 +291,7 @@ void MPResource::DispatchTileDiffusion(ID3D12GraphicsCommandList* cmdList, float
 void MPResource::SetWaveSource(int x, int y, float radius, float intensity, float falloff, float duration)
 {
 	waveData_->color = { 1,0,1,1 };
-	waveData_->gMapWorldSize ={(float)mapWidth_,(float)mapHeight_};
+	waveData_->gMapWorldSize = { (float)mapWidth_,(float)mapHeight_ };
 	waveSourceConsts_.waveX = x;
 	waveSourceConsts_.waveY = y;
 	waveSourceConsts_.radius = radius;
@@ -296,11 +307,11 @@ void MPResource::SetWaveSource(int x, int y, float radius, float intensity, floa
 }
 
 MPResource::TileTexture2DViews MPResource::CreateTexture2DWithUAVSRV(
-	ID3D12Device* device, 
-	SRVManager* srvManager, 
-	UINT width, UINT height, 
-	DXGI_FORMAT format, 
-	D3D12_RESOURCE_FLAGS flags, 
+	ID3D12Device* device,
+	SRVManager* srvManager,
+	UINT width, UINT height,
+	DXGI_FORMAT format,
+	D3D12_RESOURCE_FLAGS flags,
 	D3D12_RESOURCE_STATES initialState)
 {
 	TileTexture2DViews result = {};
