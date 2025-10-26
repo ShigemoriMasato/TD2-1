@@ -42,7 +42,7 @@ std::vector<std::string> SerchFilePathsAddChild(const fs::path& directory, const
     std::vector<std::string> result;
 
     if (!fs::exists(directory) || !fs::is_directory(directory)) {
-        throw std::runtime_error("Invalid directory: " + directory.string());
+        return {};
     }
 
     for (const auto& entry : fs::recursive_directory_iterator(directory)) {
