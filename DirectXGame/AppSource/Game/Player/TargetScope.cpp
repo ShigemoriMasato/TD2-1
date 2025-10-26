@@ -3,8 +3,25 @@
 #include <numbers>
 
 TargetScope::TargetScope() {
-	scope_ = std::make_unique<DrawResource>();
-	scope_->Initialize(ShapeType::Plane);
+	scopeTop_ = std::make_unique<DrawResource>();
+	scopeTop_->Initialize(ShapeType::Plane);
+	scopeTop_->localPos_ = {
+		{3.0f, 0.1f, 0.0f},
+		{10.0f, 0.1f, 0.0f},
+		{3.0f, -0.1f, 0.0f},
+		{10.0f, -0.1f, 0.0f},
+	};
+	scopeTop_->texcoord_ = {
+		{0.0f, 0.0f},
+		{2.0f, 0.0f},
+		{0.0f, 1.0f},
+		{2.0f, 1.0f},
+	};
+
+	scopeBelow_ = std::make_unique<DrawResource>();
+	scopeBelow_->Initialize(ShapeType::Plane);
+	scopeBelow_->localPos_ = scopeTop_->localPos_;
+	scopeBelow_->texcoord_ = scopeTop_->texcoord_;
 
 	sphere_ = std::make_unique<DrawResource>();
 	sphere_->Initialize(ShapeType::Sphere);
@@ -15,10 +32,11 @@ TargetScope::~TargetScope() {
 }
 
 void TargetScope::Initialize(int textureHandle, Player* player, Camera* camera) {
-	scope_->SetTextureHandle(textureHandle);
 	playerPosition_ = &player->GetTransform()->position;
-	scope_->scale_ = { 8.0f,8.0f,1.0f };
-	scope_->camera_ = camera;
+	scopeTop_->camera_ = camera;
+	scopeBelow_->camera_ = camera;
+	scopeTop_->SetTextureHandle(textureHandle);
+	scopeBelow_->SetTextureHandle(textureHandle);
 	sphere_->scale_ = { 1.3f,1.3f,0.5f };
 	sphere_->camera_ = camera;
 	player_ = player;
@@ -27,77 +45,30 @@ void TargetScope::Initialize(int textureHandle, Player* player, Camera* camera) 
 void TargetScope::Update(float deltaTime, KeyManager* keyManager) {
 	if (player_->GetBehavior() == Player::Behavior::Forcus) {
 
-		//プレイヤーの方向を取得
-		auto key = keyManager->GetKeyStates();
-		Vector2 direction = { 0.0f, 0.0f };
-		float rotate = 0.0f;
+		Vector3 dir = (player_->GetDirection()).Normalize();
+		float angle = std::atan2f(dir.y, dir.x);
+		
+		scopeTop_->rotate_.z = angle + std::numbers::pi_v<float> / 8.0f;
+		scopeBelow_->rotate_.z = angle - std::numbers::pi_v<float> / 8.0f;
 
-		if ((key)[Key::Up]) direction.y += 1.0f;
-		if ((key)[Key::Down]) direction.y -= 1.0f;
-		if ((key)[Key::Left]) direction.x -= 1.0f;
-		if ((key)[Key::Right]) direction.x += 1.0f;
+		scopeTop_->position_ = *playerPosition_;
+		scopeBelow_->position_ = *playerPosition_;
 
-		//raddiunに直す
-		if (direction.Length() > 0.1f) {
-			scope_->color_ = 0xffffffff;
-			
-			if (direction.x == 1) {
-				if (direction.y == 1) {
-					rotate = 0.25f;
-				} else if (direction.y == -1) {
-					rotate = 1.75f;
-				} else {
-					rotate = 0.0f;
-				}
-			} else if (direction.x == -1) {
-				if (direction.y == 1) {
-					rotate = 0.75f;
-				} else if (direction.y == -1) {
-					rotate = 1.25f;
-				} else {
-					rotate = 1.0f;
-				}
-			} else {
-				if (direction.y == 1) {
-					rotate = 0.5f;
-				} else if (direction.y == -1) {
-					rotate = 1.5f;
-				} else {
-					rotate = 0.0f;
-				}
-			}
-
-			rotate *= std::numbers::pi_v<float>; //ラジアンに変換
-
-			scope_->position_ = *playerPosition_;
-			scope_->rotate_ = { 0.0f, 0.0f, rotate };
-
-			scope_->SetWorldMatrix(MakeScaleMatrix(scope_->scale_) * MakeTranslationMatrix(offset_) * MakeRotationMatrix(scope_->rotate_) * MakeTranslationMatrix(scope_->position_));
-
-			sphere_->color_ = 0xd02060ff;
-			sphere_->position_ = player_->GetTargetPos();
-
-			if(sphere_->position_.Length() < 0.1f) {
-				sphere_->color_ = 0;
-			}
-
-		} else {
-			scope_->color_ = 0;
-			sphere_->color_ = 0;
-		}
-
+		scopeTop_->color_ = 0xffffffff;
+		scopeBelow_->color_ = 0xffffffff;
 	} else {
-		scope_->color_ = 0;
-		sphere_->color_ = 0;
+		scopeTop_->color_ = 0;
+		scopeBelow_->color_ = 0;
 	}
 
-	ImGui::Begin("Scope");
-	ImGui::DragFloat3("Offset", &offset_.x, 0.01f);
-	ImGui::DragFloat3("Scale", &scope_->scale_.x, 0.01f);
-	ImGui::End();
+	scopeTop_->texturePos_.x -= deltaTime / 2.0f;
+	scopeBelow_->texturePos_.x -= deltaTime / 2.0f;
 }
 
 void TargetScope::Draw(Render* render) {
-	render->Draw(scope_.get());
-	render->Draw(sphere_.get());
+	if (player_->GetBehavior() == Player::Behavior::Forcus) {
+		render->Draw(scopeTop_.get());
+		render->Draw(scopeBelow_.get());
+		render->Draw(sphere_.get());
+	}
 }

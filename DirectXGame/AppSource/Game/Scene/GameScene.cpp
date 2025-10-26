@@ -115,7 +115,7 @@ void GameScene::Initialize()
 
 	{
 		//ゴールイベント初期化
-		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_);
+		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_, postEffect_.get());
 	}
 
 	render_->EndFrame(false);
@@ -227,7 +227,7 @@ void GameScene::Initialize(std::string levelName)
 
 	{
 		//ゴールイベント初期化
-		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_);
+		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_, postEffect_.get());
 	}
 
 	render_->EndFrame(false);
@@ -316,6 +316,12 @@ std::unique_ptr<BaseScene> GameScene::Update()
 
 	goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_);
 	goalEvent_->Update(deltaTime);
+
+	//ゴールの処理が終わったら
+	if(goalEvent_->IsChangeScene()){
+		//とりあえず今は初期化
+		return std::make_unique<GameScene>();
+	}
 
 	return nullptr;
 }

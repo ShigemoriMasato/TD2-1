@@ -16,7 +16,8 @@ public:
 
 private:
 
-	std::unique_ptr<DrawResource> scope_ = nullptr;
+	std::unique_ptr<DrawResource> scopeTop_ = nullptr;
+	std::unique_ptr<DrawResource> scopeBelow_ = nullptr;
 	std::unique_ptr<DrawResource> sphere_ = nullptr;
 
 	Vector3* playerPosition_ = nullptr;
