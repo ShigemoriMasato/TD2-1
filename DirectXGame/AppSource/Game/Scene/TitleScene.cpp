@@ -1,5 +1,6 @@
 #include "TitleScene.h"
 #include "GameScene.h"
+#include <cmath>
 
 void TitleScene::Initialize()
 {
@@ -21,6 +22,11 @@ void TitleScene::Initialize()
 	// フェード状態の初期化
 	isFading_ = false;
 	fadeTimer_ = 0.0f;
+
+	// アニメーション用タイマーの初期化
+	totalTime_ = 0.0f;
+	titleLogoAnimTime_ = 0.0f;
+	spaceStartAnimTime_ = 0.0f;
 
 	// UI用カメラの初期化（Orthographic投影）
 	// 画面中央が原点(0,0)になる座標系
@@ -57,11 +63,17 @@ void TitleScene::Initialize()
 		titleLogo_->SetTextureHandle(titleTextureHandle_);
 		titleLogo_->camera_ = uiCamera_.get();
 		
+		// 初期位置を保存
+		titleLogoInitialPos_ = { 0.0f, 160.0f, 0.0f };
+		
 		// 画面中央上部に配置（原点は画面中央）
-		titleLogo_->position_ = { 0.0f, 160.0f, 0.0f };  // Y+で上方向
+		// アニメーション開始位置（上方にオフセット）
+		titleLogo_->position_ = { titleLogoInitialPos_.x, titleLogoInitialPos_.y + titleLogoSlideDistance_, titleLogoInitialPos_.z };
 		titleLogo_->scale_ = { 760.0f, 270.0f, 1.0f };
 		titleLogo_->rotate_ = { 0.0f, 0.0f, 0.0f };
-		titleLogo_->color_ = 0xffffffff;
+		
+		// 初期状態は透明
+		titleLogo_->color_ = 0x00ffffff;
 	}
 
 	// Space Startテキストの初期化
@@ -75,13 +87,24 @@ void TitleScene::Initialize()
 		spaceStart_->position_ = { 0.0f, -160.0f, 0.0f };  // Y-で下方向
 		spaceStart_->scale_ = { 633.0f, 66.0f, 1.0f };
 		spaceStart_->rotate_ = { 0.0f, 0.0f, 0.0f };
-		spaceStart_->color_ = 0xffffffff;
+		
+		// 初期状態は透明
+		spaceStart_->color_ = 0x00ffffff;
 	}
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update()
 {
 	float deltaTime = fpsObserver_->GetDeltatime();
+
+	// 総経過時間の更新
+	totalTime_ += deltaTime;
+
+	// UIアニメーションの更新（フェード中でない場合のみ）
+	if (!isFading_) {
+		UpdateTitleLogoAnimation(deltaTime);
+		UpdateSpaceStartAnimation(deltaTime);
+	}
 
 	// キー状態を取得
 	auto keys = commonData->keyManager_->GetKeyStates();
@@ -92,25 +115,102 @@ std::unique_ptr<BaseScene> TitleScene::Update()
 		fadeTimer_ = 0.0f;
 	}
 
-	// グリッドトランジション処理（シーン遷移時）
-	if (isFading_) {
-		fadeTimer_ += deltaTime;
-		postEffect_->data_.gridTransition.progress = fadeTimer_ / fadeDuration_;
-		
-		// グリッドトランジションジョブを設定
-		postEffect_->SetJobs(PostEffectJob::GridTransition);
+	// フェード処理の更新
+	UpdateFade(deltaTime);
 
-		// トランジション完了でゲームシーンへ
-		if (fadeTimer_ >= fadeDuration_) {
-			return std::make_unique<GameScene>();
-		}
+	// トランジション完了でゲームシーンへ
+	if (isFading_ && fadeTimer_ >= fadeDuration_) {
+		return std::make_unique<GameScene>();
+	}
+
+	return std::unique_ptr<BaseScene>();
+}
+
+void TitleScene::UpdateTitleLogoAnimation(float deltaTime)
+{
+	titleLogoAnimTime_ += deltaTime;
+
+	// フェードイン & スライドダウン（最初の1.2秒）
+	if (titleLogoAnimTime_ <= titleLogoFadeDuration_) {
+		float t = titleLogoAnimTime_ / titleLogoFadeDuration_;
+		float easedT = EaseOutCubic(t);
+		
+		// スライドダウン
+		float slideOffset = titleLogoSlideDistance_ * (1.0f - easedT);
+		titleLogo_->position_.y = titleLogoInitialPos_.y + slideOffset;
+		
+		// フェードイン
+		uint8_t alpha = static_cast<uint8_t>(255.0f * easedT);
+		titleLogo_->color_ = (alpha << 24) | 0x00ffffff;
+	}
+	else {
+		// フェードイン完了後は浮遊アニメーション
+		float floatTime = titleLogoAnimTime_ - titleLogoFadeDuration_;
+		float floatOffset = std::sin(floatTime * titleLogoFloatSpeed_) * titleLogoFloatAmplitude_;
+		
+		titleLogo_->position_.y = titleLogoInitialPos_.y + floatOffset;
+		titleLogo_->color_ = 0xffffffff;
+	}
+}
+
+void TitleScene::UpdateSpaceStartAnimation(float deltaTime)
+{
+	spaceStartAnimTime_ += deltaTime;
+
+	// 遅延時間中は非表示
+	if (spaceStartAnimTime_ < spaceStartDelayTime_) {
+		spaceStart_->color_ = 0x00ffffff;
+		return;
+	}
+
+	float effectiveTime = spaceStartAnimTime_ - spaceStartDelayTime_;
+
+	// フェードイン（遅延後から0.8秒）
+	if (effectiveTime <= spaceStartFadeDuration_) {
+		float t = effectiveTime / spaceStartFadeDuration_;
+		float easedT = EaseOutCubic(t);
+		
+		uint8_t alpha = static_cast<uint8_t>(255.0f * easedT);
+		spaceStart_->color_ = (alpha << 24) | 0x00ffffff;
+	}
+	else {
+		// フェードイン完了後はパルスアニメーション
+		float pulseTime = effectiveTime - spaceStartFadeDuration_;
+		float pulse = EaseInOutSine(std::fmod(pulseTime * spaceStartPulseSpeed_, 1.0f));
+		
+		// パルス（最小〜最大の間で振動）
+		float alpha = spaceStartPulseMin_ + (spaceStartPulseMax_ - spaceStartPulseMin_) * pulse;
+		uint8_t alphaValue = static_cast<uint8_t>(255.0f * alpha);
+		spaceStart_->color_ = (alphaValue << 24) | 0x00ffffff;
+	}
+}
+
+void TitleScene::UpdateFade(float deltaTime)
+{
+	if (isFading_) {
+		// フェードタイマーを進める
+		fadeTimer_ += deltaTime;
+		float progress = std::min(fadeTimer_ / fadeDuration_, 1.0f);
+		
+		// ポストエフェクトの進行度を更新
+		postEffect_->data_.gridTransition.progress = progress;
+		postEffect_->SetJobs(PostEffectJob::GridTransition);
 	} else {
 		// トランジションしていない時は通常描画
 		postEffect_->data_.gridTransition.progress = 0.0f;
 		postEffect_->SetJobs(PostEffectJob::None);
 	}
+}
 
-	return std::unique_ptr<BaseScene>();
+float TitleScene::EaseOutCubic(float t)
+{
+	float f = t - 1.0f;
+	return f * f * f + 1.0f;
+}
+
+float TitleScene::EaseInOutSine(float t)
+{
+	return -(std::cos(3.14159265358979323846f * t) - 1.0f) / 2.0f;
 }
 
 void TitleScene::Draw()
@@ -121,6 +221,6 @@ void TitleScene::Draw()
 	render_->Draw(titleLogo_.get());
 	render_->Draw(spaceStart_.get());
 
-	render_->Draw(postEffect_.get());
 
+	render_->Draw(postEffect_.get());
 }
