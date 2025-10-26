@@ -22,15 +22,16 @@ void (Player::*Player::behaviorOn[])() = {
 	&Player::OnClear,
 };
 
-Player::Player(TimeSlower* slower, PhysicsEngine* phEngine) {
+Player::Player(TimeSlower* slower, PhysicsEngine* phEngine)
+{
 	timeSlower_ = slower;
 	actor_ = std::make_unique<PhysicsActor>(phEngine, this);
 	collider_ = std::make_unique<SphereCollider>(
 		ColliderTag::Dynamic,
 		ColliderMask::PLAYER,
-		ColliderMask::ENEMY | 
-		ColliderMask::GOAL | 
-		ColliderMask::HOOK | 
+		ColliderMask::ENEMY |
+		ColliderMask::GOAL |
+		ColliderMask::HOOK |
 		ColliderMask::COIN);
 
 	collider_->SetTransform(&transform_);
@@ -43,8 +44,9 @@ Player::~Player()
 {
 }
 
-void Player::Initialize(ModelData* modelData, Camera* camera) {
-	BaseObject::Initialize(modelData,camera);
+void Player::Initialize(ModelData* modelData, Camera* camera)
+{
+	BaseObject::Initialize(modelData, camera);
 
 	behaviorRequest_ = Behavior::Idle;
 }
@@ -111,7 +113,7 @@ BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
 	BaseObject* selectTarget = nullptr;
 	float bestScore = -1.0f;
 	const float allowAngle = std::cos(0.125f * std::numbers::pi_v<float>);	//判定をとりうる範囲(これより値が小さければターゲットとして選定する)
-	
+
 	for (auto target : targets_)
 	{
 		if (!target) continue;
@@ -119,11 +121,13 @@ BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
 		Vector3 targetToPlayer = (target->GetTransform()->position - transform_.position);
 		float angle = MyMath::dot(direction, targetToPlayer.Normalize());
 
-		//許容角度内にいるか
-		if (angle > allowAngle) {
-			//ターゲットとプレイヤーの間に障害物がないか
-			if (!tileMap_->HasTile(this->transform_.position, target->GetTransform()->position, TileType::Solid),true) {
 
+		//ターゲットとプレイヤーの間に障害物がないか
+		//if (!tileMap_->HasTile(this->transform_.position, target->GetTransform()->position, TileType::Solid))
+		{
+			//許容角度内にいるか
+			if (angle > allowAngle)
+			{
 				//一番ターゲットが狙いやすいと思われるオブジェクトを選ぶ
 				float distance = (target->GetTransform()->position - transform_.position).Length();
 				float distanceScore = 1.0f / (distance + 0.1f);
@@ -131,7 +135,8 @@ BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
 
 				float totalScore = distanceScore * 0.4f + angleScore * 0.6f;
 
-				if (totalScore > bestScore) {
+				if (totalScore > bestScore)
+				{
 					bestScore = totalScore;
 					selectTarget = target;
 				}

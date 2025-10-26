@@ -120,7 +120,7 @@ void Player::UpdateShrink(float deltaTime) {
 
 void Player::OnDash() {
 	//↓仮置き(斜め45度くらいで吹っ飛ばす)
-	actor_->force_ = targetDir_ * dashPower_;
+	//actor_->force_ = targetDir_ * dashPower_;
 
 	actor_->useGravity_ = true;
 }
@@ -136,8 +136,8 @@ void Player::UpdateDash(float deltaTime) {
 	}
 
 	//velocityの微調整をできるようにする
-	if (key[Key::Right]) actor_->force_.x += dashMoveSpeed_ * deltaTime;
-	if (key[Key::Left]) actor_->force_.x -= dashMoveSpeed_ * deltaTime;
+	if (key[Key::Right]) actor_->force_.x = dashMoveSpeed_ * deltaTime;
+	if (key[Key::Left]) actor_->force_.x = -dashMoveSpeed_ * deltaTime;
 
 	//地面についたら
 	if (actor_->collidedBottom_) {

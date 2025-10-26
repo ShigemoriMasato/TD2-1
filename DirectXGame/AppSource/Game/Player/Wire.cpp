@@ -20,24 +20,28 @@ void Wire::Update(float deltaTime) {
 	transform_.position = *startPos_;
 	if (isExtending_) {
 
-		Vector3 direction = (targetPos_ - endPos_).Normalize();
-		float leftDistance = (targetPos_ - endPos_).Length();
+		Vector3 direction = (targetPos_ - *startPos_).Normalize();
+		float currentDistance = (endPos_ - *startPos_).Length();
+		float totalDistance = (targetPos_ - *startPos_).Length();
 		//現在距離から進ませる
-		leftDistance -= extendSpeed_ * deltaTime;
+		currentDistance += extendSpeed_ * deltaTime;
 
-		//距離が0.2以下になったら伸ばし切ったこととする
-		if (leftDistance < 0.01f) {
+
+		if (currentDistance >= totalDistance - 0.001f)
+		{
 			endPos_ = targetPos_;
 			isExtending_ = false;
 		}
-
-		endPos_ = *startPos_ + direction * (initDistance_ - leftDistance);
-
-		//伸びすぎて戻って来た時対策
-		if (isExtending_ && (targetPos_ - endPos_).Length() > (targetPos_ - preEndPos_).Length()) {
-			endPos_ = targetPos_;
-			isExtending_ = false;
+		else
+		{
+			endPos_ = *startPos_ + direction * currentDistance;
 		}
+		if ((endPos_ - *startPos_).Length() < 1.0f)
+		{
+			isExtending_ = false;
+			endPos_ = targetPos_;
+		}
+
 	}
 
 	if (!isVisible_) {
@@ -54,7 +58,9 @@ void Wire::Update(float deltaTime) {
 }
 
 void Wire::Draw(Render* render) {
-	drawResource_->localPos_ = { *startPos_, endPos_ };
+	drawResource_->localPos_[0] = {*startPos_};
+	drawResource_->localPos_[1] = { endPos_ };
+
 	render->Draw(drawResource_.get());
 }
 
