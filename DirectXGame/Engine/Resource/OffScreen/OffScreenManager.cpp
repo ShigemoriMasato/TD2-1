@@ -23,7 +23,7 @@ void OffScreenManager::Initialize(DXDevice* device, ID3D12GraphicsCommandList* c
 	for(int i = 0; i < maxOffScreenCount_; ++i) {
 
 		if (i == static_cast<int>(OffScreenIndex::Title)) {
-			float clearColor[4] = { 0.3f, 0.5f, 0.7f, 1.0f };
+			float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 			CreateOffScreen(1280, 720, clearColor);
 			continue;
 		}
