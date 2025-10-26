@@ -20,6 +20,16 @@ public:
 	void EndSlow(bool calculate);
 
 	float GetDeltaTime() { return deltaTime_; }
+	
+	/// <summary>
+	/// スローモーション中かどうか
+	/// </summary>
+	bool IsSlowMotion() const { return timeRate_ < 1.0f; }
+	
+	/// <summary>
+	/// スローモーションの強度を取得 (0.0=通常, 1.0=最大スロー)
+	/// </summary>
+	float GetSlowIntensity() const { return 1.0f - timeRate_; }
 
 private:
 

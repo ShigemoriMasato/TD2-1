@@ -54,10 +54,19 @@ private://postEffect
 	float fadeTimer_ = 0.0f;
 	float fadeDuration_ = 1.0f;
 	float goalX_ = 20.0f;		//どこからがゴールか
+	
+	// スローモーションエフェクトのパラメータ（強度を上げる）
+	float slowMotionChromaticAberration_ = 0.8f;   // 色収差強度（0.3→0.8）
+	float slowMotionVignetteStrength_ = 0.85f;     // ビネット強度（0.6→0.85）
+	float slowMotionSaturationMin_ = 0.3f;         // 最小彩度（0.5→0.3でより強い効果）
 
 private://使える関数
 
 	void CheckAllCollision();
 	void CheckPlayerWireField();
+	
+	// ポストエフェクト関連の関数
+	void UpdateFadeIn(float deltaTime);
+	void UpdateSlowMotionEffect();
 };
 
