@@ -42,6 +42,8 @@ CommonData::CommonData() {
 
 	keyManager_->SetKey(Key::DebugClear, DIK_F2, KeyState::Trigger);
 
+
+	scoreManager_ = std::make_unique<ScoreManager>();
 }
 
 CommonData::~CommonData() {

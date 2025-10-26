@@ -30,6 +30,6 @@ private:
 
 	std::unique_ptr<BinaryManager> binaryManager_;
 	std::vector<int> scores_;
-	const std::string saveFile = "data.sav";
+	const std::string saveFile = "score.sav";
 };
 
