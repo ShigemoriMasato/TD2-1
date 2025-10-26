@@ -76,7 +76,8 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 
 	//画像のリソースの先頭をセット
 	int blockHandle = textureManager->LoadTexture("Assets/Texture/Mapchip/Normal.png");
-	//int trapHandle = textureManager->LoadTexture("Assets/Texture/Mapchip/trap.png");
+	int trapHandle = textureManager->LoadTexture("Assets/Texture/Mapchip/trap.png");
+
 	for (int y = 0; y < tiles_.height; ++y)
 	{
 		for (int x = 0; x < tiles_.width; ++x)
@@ -87,41 +88,41 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 			{
 				continue;
 			}
-			if(type == TileType::Solid)
+			if (type == TileType::Solid)
 			{
 				resource->camera_ = camera;
 				resource->position_[index] = GetWorldPos(x, y);
 			}
-		/*	if (type == TileType::Trap)
+			if (type == TileType::Trap)
 			{
 				resource->camera_ = camera;
-                resource->position_[index] = GetWorldPos(x, y);
-				resource->textureIndex_[index] = trapHandle;
-			}*/
+				resource->position_[index] = GetWorldPos(x, y);
+				resource->color_[index] = 0x800080ff;
+			}
 		}
 	}
 
 	//その他の画像を読み込む。handleは取得する必要無し。読み込むだけ
-	
+
 	mpResource_->textureStartIndex_ = blockHandle;
 }
 
 //DDA（Digital Differential Analyzer）
-bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType type, Vector3* outEndPos, bool includeStartTile) const
+bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType type, Vector3* outEndPos) const
 {
 	Vector2 dir = (endPos - startPos).Normalize();
-	
+
 	const float tileWidth = size_.x;
 	const float tileHeight = size_.y;
 
 	int x = static_cast<int>(std::floor(startPos.x / tileWidth));
-	int y = static_cast<int>(std::floor(mapSize_.y - 1 - startPos.y / tileHeight));
+	int y = static_cast<int>(std::floor(startPos.y / tileHeight));
 
 	int endX = static_cast<int>(std::floor(endPos.x / tileWidth));
-	int endY = static_cast<int>(std::floor(mapSize_.y - 1 - endPos.y / tileHeight));
+	int endY = static_cast<int>(std::floor(endPos.y / tileHeight));
 
 	int stepX = (dir.x > 0.0f) ? 1 : (dir.x < 0.0f ? -1 : 0);
-	int stepY = (dir.y > 0.0f) ? 1 : (dir.y < 0.0f ? -1 : 0);
+	int stepY = (dir.y > 0.0f) ? 1 : (dir.y > 0.0f ? -1 : 0);
 
 	float tMaxX = (stepX > 0) ? ((x + 1) * tileWidth - startPos.x) / dir.x
 		: (stepX < 0) ? (x * tileWidth - startPos.x) / dir.x
@@ -140,18 +141,18 @@ bool TileMap::HasTile(const Vector3& startPos, const Vector3& endPos, TileType t
 	bool firstTile = true;
 	while (true)
 	{
-		if (!firstTile || includeStartTile)
+		if (!firstTile)
 		{
-			TileType tile = GetTileTypeAt(x, y);
+			TileType tile = GetTileTypeAt(x, int(mapSize_.y - 1 - y));
 			if (tile == type)
 			{
-				if (outEndPos) *outEndPos = GetWorldPos(x,y);
+				if (outEndPos) *outEndPos = GetWorldPos(x, int(mapSize_.y - 1 - y));
 				return true;
 			}
 		}
 		firstTile = false;
 
-		if (std::abs(x - endX) < 1 && std::abs(y - endY) < 1)
+		if (x == endX && y == endY)
 			break;
 
 		if (tMaxX < tMaxY)
@@ -191,7 +192,7 @@ void TileMap::TriggerWaveAtWorldPos(const Vector2& worldPos, float radius, float
 {
 	int tileX = static_cast<int>(std::floor(worldPos.x / size_.x));
 	int tileY = static_cast<int>(std::floor(worldPos.y / size_.y));
-	
+
 	TriggerWaveAtTile(tileX, tileY, radius, intensity);
 }
 

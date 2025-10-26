@@ -21,7 +21,7 @@ void GameScene::Initialize()
 	{
 		auto handle = modelManager_->LoadModel("Cube");
 		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
-		levelLoader_.LoadLevel("Assets/Map/level1.json", *tileMap_);
+		levelLoader_.LoadLevel("Assets/Map/level2.json", *tileMap_);
 		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_->GetCamera());
 	}
 
