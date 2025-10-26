@@ -102,7 +102,7 @@
     <ClCompile Include="AppSource\Game\Scene\TitleScene.cpp" />
     <ClCompile Include="AppSource\Common\SceneChange\SceneChange.cpp" />
     <ClCompile Include="AppSource\Game\Player\TargetScope.cpp" />
-    <ClCompile Include="AppSource\StageSelect\Scene\SelectScene.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\SelectScene.cpp" />
     <ClCompile Include="AppSource\Game\ScoreManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -200,7 +200,7 @@
     <ClInclude Include="AppSource\Game\Goal\GoalEvent.h" />
     <ClInclude Include="AppSource\Common\SceneChange\SceneChange.h" />
     <ClInclude Include="AppSource\Game\Player\TargetScope.h" />
-    <ClInclude Include="AppSource\StageSelect\Scene\SelectScene.h" />
+    <ClInclude Include="AppSource\Game\Scene\SelectScene.h" />
     <ClInclude Include="AppSource\Game\Scene\TitleScene.h" />
     <ClInclude Include="AppSource\Common\InitializeScene\InitializeScene.h" />
     <ClInclude Include="AppSource\Game\ScoreManager.h" />
