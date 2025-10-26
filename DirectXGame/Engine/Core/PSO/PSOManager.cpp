@@ -22,6 +22,7 @@ PSOManager::PSOManager(ID3D12Device* device, Logger* logger) {
 }
 
 PSOManager::~PSOManager() {
+#ifdef SH_RELEASE
 	//ここを変更する場合はverを変更し、読み込みのコードは削除せず新しく追加すること
 	binaryManager_->RegistOutput(float(1.0f), "ver");
 	for (const auto& [config, pso] : psoMap_) {
@@ -39,6 +40,13 @@ PSOManager::~PSOManager() {
 	}
 
 	binaryManager_->Write("UsedPSOConfig.bin");
+
+	return;
+#endif
+
+	for(const auto& [config, pso] : psoMap_) {
+		pso->Release();
+	}
 }
 
 void PSOManager::Initialize() {
