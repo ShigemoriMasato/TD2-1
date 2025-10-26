@@ -111,8 +111,8 @@ void Player::UpdateShrink(float deltaTime) {
 
 	float tarlen = targetPos_.Length();
 	float plalen = transform_.position.Length();
-	//playerがtarlenに一定以上近くなったらダッシュに切り替え
-	if (plalen > tarlen - 0.5f && plalen < tarlen + 0.5f) {
+	//playerがtarlenに一定以上近くなったり、スペースを押したらダッシュに切り替え
+	if ((plalen > tarlen - 0.5f && plalen < tarlen + 0.5f) || (*key_)[Key::Action]) {
 		wire_->Shrinked();
 		behaviorRequest_ = Behavior::Dash;
 	}

@@ -90,6 +90,7 @@
     <ClCompile Include="Engine\Resource\Model\ModelAnimation.cpp" />
     <ClCompile Include="AppSource\Common\InitializeScene\InitializeScene.cpp" />
     <ClCompile Include="AppSource\Game\ScoreManager.cpp" />
+    <ClCompile Include="AppSource\Game\BackGround\BackGround.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -190,6 +191,7 @@
     <ClInclude Include="AppSource\Common\InitializeScene\InitializeScene.h" />
     <ClInclude Include="Engine\Scene\Data\SceneTools.h" />
     <ClInclude Include="AppSource\Game\ScoreManager.h" />
+    <ClInclude Include="AppSource\Game\BackGround\BackGround.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

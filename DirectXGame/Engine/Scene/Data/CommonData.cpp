@@ -27,6 +27,7 @@ CommonData::CommonData() {
 	keyManager_->SetKey(Key::Action, DIK_SPACE, KeyState::Hold);
 	keyManager_->SetKey(Key::Action, DIK_J, KeyState::Hold);
 	keyManager_->SetKey(Key::Action, DIK_Z, KeyState::Hold);
+	keyManager_->SetButton(Key::Action, XBoxController::kA, KeyState::Hold);
 	
 	keyManager_->SetKey(Key::Correct, DIK_RETURN, KeyState::Trigger);
 	keyManager_->SetKey(Key::Correct, DIK_SPACE, KeyState::Trigger);

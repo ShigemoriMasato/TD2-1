@@ -42,6 +42,10 @@ void Wire::Update(float deltaTime) {
 			endPos_ = targetPos_;
 		}
 
+	} else {
+		if (isVisible_ && endPos_ != targetPos_) {
+			isVisible_ = true;
+		}
 	}
 
 	if (!isVisible_) {
