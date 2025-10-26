@@ -1,5 +1,5 @@
 #include "TitleScene.h"
-#include "GameScene.h"
+#include "SelectScene.h"
 #include <cmath>
 
 void TitleScene::Initialize()
@@ -138,7 +138,7 @@ std::unique_ptr<BaseScene> TitleScene::Update()
 
 	// トランジション完了でゲームシーンへ
 	if (isFading_ && fadeTimer_ >= fadeDuration_) {
-		return std::make_unique<GameScene>();
+		return std::make_unique<SelectScene>();
 	}
 
 	return std::unique_ptr<BaseScene>();

@@ -4,7 +4,8 @@
 #include <typeinfo>
 
 std::unordered_map<LevelIndex, std::string> LevelLoader::levelFileMap_ = {
-	{LevelIndex::Level1,"level1.json"}
+	{LevelIndex::Level1,"level1.json"},
+	{LevelIndex::Level2,"level2.json"}
 };
 
 LevelLoader::LevelLoader()

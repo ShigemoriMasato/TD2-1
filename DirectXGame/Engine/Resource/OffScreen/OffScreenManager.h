@@ -12,6 +12,7 @@ enum class OffScreenIndex {
 	PostPong,
 	GameWindow,
 	Title,
+	Select,  // セレクトシーン用
 
 	//ステージのスクショ
 	Level1,

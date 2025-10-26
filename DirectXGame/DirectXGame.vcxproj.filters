@@ -86,7 +86,7 @@
     <ClCompile Include="AppSource\Game\Scene\TitleScene.cpp" />
     <ClCompile Include="AppSource\Common\SceneChange\SceneChange.cpp" />
     <ClCompile Include="AppSource\Game\Player\TargetScope.cpp" />
-    <ClCompile Include="AppSource\StageSelect\Scene\SelectScene.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\SelectScene.cpp" />
     <ClCompile Include="Engine\Resource\Model\ModelAnimation.cpp" />
     <ClCompile Include="AppSource\Common\InitializeScene\InitializeScene.cpp" />
     <ClCompile Include="AppSource\Game\ScoreManager.cpp" />
@@ -185,7 +185,7 @@
     <ClInclude Include="AppSource\Game\Goal\GoalEvent.h" />
     <ClInclude Include="AppSource\Common\SceneChange\SceneChange.h" />
     <ClInclude Include="AppSource\Game\Player\TargetScope.h" />
-    <ClInclude Include="AppSource\StageSelect\Scene\SelectScene.h" />
+    <ClInclude Include="AppSource\Game\Scene\SelectScene.h" />
     <ClInclude Include="AppSource\Game\Scene\TitleScene.h" />
     <ClInclude Include="Engine\Resource\Model\ModelAnimation.h" />
     <ClInclude Include="AppSource\Common\InitializeScene\InitializeScene.h" />

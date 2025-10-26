@@ -21,7 +21,12 @@ void GameScene::Initialize()
 	{
 		auto handle = modelManager_->LoadModel("Cube");
 		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
-		levelLoader_.LoadLevel("Assets/Map/level2.json", *tileMap_);
+		
+		// commonData->nextLevelIndex_を使用して正しいレベルファイルを読み込む
+		auto levelMap = LevelLoader::GetLevelFileMap();
+		std::string levelFileName = levelMap[commonData->nextLevelIndex_];
+		levelLoader_.LoadLevel("Assets/Map/" + levelFileName, *tileMap_);
+		
 		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_->GetCamera());
 	}
 
@@ -444,8 +449,3 @@ void GameScene::CheckPlayerWireField()
 		}
 	}
 }
-
-
-
-
-
