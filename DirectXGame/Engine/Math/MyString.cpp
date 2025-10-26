@@ -7,7 +7,7 @@ std::vector<std::string> SearchFiles(const fs::path& directory, const std::strin
     std::vector<std::string> contents;
 
     if (!fs::exists(directory) || !fs::is_directory(directory)) {
-        throw std::runtime_error("Invalid directory: " + directory.string());
+        return {};
     }
 
     for (const auto& entry : fs::directory_iterator(directory)) {
@@ -25,7 +25,7 @@ std::vector<std::string> SearchFileNames(const fs::path& directory) {
     std::vector<std::string> contents;
 
     if (!fs::exists(directory) || !fs::is_directory(directory)) {
-        throw std::runtime_error("Invalid directory: " + directory.string());
+        return {};
     }
 
     for (const auto& entry : fs::directory_iterator(directory)) {
