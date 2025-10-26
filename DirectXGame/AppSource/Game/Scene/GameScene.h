@@ -20,6 +20,7 @@ class GameScene : public BaseScene
 public:
 
 	void Initialize() override;
+	void Initialize(std::string levelName);
 	std::unique_ptr<BaseScene> Update() override;
 	void Draw() override;
 
