@@ -4,20 +4,22 @@
 #include <algorithm>
 #include <Game/Physics/PhysicsEngine.h>
 
-void (Player::* Player::behaviorUpdate[])(float) = {
+void (Player::*Player::behaviorUpdate[])(float) = {
 	&Player::UpdateIdel,
 	&Player::UpdateForcus,
 	&Player::UpdateExtend,
 	&Player::UpdateShrink,
 	&Player::UpdateDash,
+	& Player::UpdateClear,
 };
 
-void (Player::* Player::behaviorOn[])() = {
+void (Player::*Player::behaviorOn[])() = {
 	&Player::OnIdel,
 	&Player::OnForcus,
 	&Player::OnExtend,
 	&Player::OnShrink,
 	&Player::OnDash,
+	&Player::OnClear,
 };
 
 Player::Player(TimeSlower* slower, PhysicsEngine* phEngine)
@@ -53,6 +55,9 @@ void Player::Update(float deltaTime)
 {
 	//更新
 	modelResource_->position_ = transform_.position;
+
+	transform_.rotation.z = std::fmodf(transform_.rotation.z + rotateSpeed_ * deltaTime, std::numbers::pi_v<float> * 2.0f);
+	modelResource_->rotate_ = transform_.rotation;
 
 	RequestBehavior();
 	(this->*behaviorUpdate[static_cast<int>(behavior_)])(deltaTime);

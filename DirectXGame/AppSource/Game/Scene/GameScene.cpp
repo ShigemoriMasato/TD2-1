@@ -79,8 +79,8 @@ void GameScene::Initialize()
 		int textureHandle = textureManager_->LoadTexture("Assets/Texture/goal.png");
 		auto tileWorldSize = tileMap_->WorldSize();
 		goalTape->Initialize(textureHandle, tileWorldSize.x, tileWorldSize.y, &physicsEngine_, camera_->GetCamera());
-		goalTape_ = goalTape.get();
-		objects_.push_back(std::move(goalTape));
+		goalTape_ = std::move(goalTape);
+		goalX_ = tileWorldSize.x;
 	}
 
 	{
@@ -115,7 +115,7 @@ void GameScene::Initialize()
 
 	{
 		//ゴールイベント初期化
-		goalEvent_ = std::make_unique<GoalEvent>(camera_.get());
+		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_);
 	}
 
 	render_->EndFrame(false);
@@ -189,8 +189,8 @@ void GameScene::Initialize(std::string levelName)
 		int textureHandle = textureManager_->LoadTexture("Assets/Texture/goal.png");
 		auto tileWorldSize = tileMap_->WorldSize();
 		goalTape->Initialize(textureHandle, tileWorldSize.x, tileWorldSize.y, &physicsEngine_, camera_->GetCamera());
-		goalTape_ = goalTape.get();
-		objects_.push_back(std::move(goalTape));
+		goalTape_ = std::move(goalTape);
+		goalX_ = tileWorldSize.x;
 	}
 
 	{
@@ -227,7 +227,7 @@ void GameScene::Initialize(std::string levelName)
 
 	{
 		//ゴールイベント初期化
-		goalEvent_ = std::make_unique<GoalEvent>(camera_.get());
+		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_);
 	}
 
 	render_->EndFrame(false);
@@ -301,6 +301,8 @@ std::unique_ptr<BaseScene> GameScene::Update()
 
 	//targetScope
 	targetScope_->Update(deltaTime, commonData->keyManager_.get());
+	//goalTape
+	goalTape_->Update(deltaTime);
 
 
 	physicsEngine_.Update(deltaTime);
@@ -310,11 +312,6 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	if (keys_[Key::Debug])
 	{
 		return std::make_unique<GameScene>();
-	}
-
-	if (keys_[Key::DebugClear])
-	{
-
 	}
 
 	goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_);
@@ -337,6 +334,7 @@ void GameScene::Draw()
 
 
 	targetScope_->Draw(render_);
+	goalTape_->Draw(render_);
 
 	render_->Draw(postEffect_.get());
 }

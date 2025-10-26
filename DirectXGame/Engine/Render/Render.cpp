@@ -308,7 +308,7 @@ void Render::Draw(PostEffectResource* resource) {
     resource->psoConfig_.isSwapChain = false;
 
     //描画関数
-    auto draw = [&, this](OffScreenIndex to, OffScreenIndex in) {
+    auto draw = [&resource, this](OffScreenIndex to, OffScreenIndex in) {
         PreDraw(to);
 
         auto vertexBufferView = resource->GetVertexBufferView();

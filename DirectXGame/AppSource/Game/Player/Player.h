@@ -16,6 +16,7 @@ public:
 		Extend,			//伸ばす
 		Shrink,			//縮める
 		Dash,			//ダッシュ
+		Clear			//ゲームクリアしたときの挙動
 	};
 
 public:
@@ -33,6 +34,7 @@ public:
 	void AddTargets(BaseObject* target) { targets_.push_back(target); }
 	void SetKeyConfig(std::unordered_map<Key, bool>* keyConfig) { key_ = keyConfig; }
 	void SetTileMap(const TileMap* tileMap) { tileMap_ = tileMap; }
+	void SetIsClear() { behaviorRequest_ = Behavior::Clear; }
 
 	// 速度操作用のアクセッサ
 	void AddVelocity(const Vector2& velocity) { 
@@ -62,7 +64,7 @@ private://パラメータ
 	//移動速度
 	const float moveSpeed_ = 20.0f;
 	//ダッシュ中のキーによる移動速度
-	const float dashMoveSpeed_ = 8.0f;
+	const float dashMoveSpeed_ = 10.0f;
 
 	//重力
 	const float gravity_ = -9.8f;
@@ -82,6 +84,9 @@ private://パラメータ
 	float wireCoolTime_ = 0.0f;
 	const float maxWireCoolTime_ = 0.5f;
 
+	const float rotateMaxSpeed_ = -20.0f;
+	float rotateSpeed_ = 0.0f;
+
 	//wireを伸ばしている方向
 	Vector3 direction = { 0.0f, 0.0f, 0.0f };
 
@@ -91,7 +96,8 @@ private://パラメータ
 		{Behavior::Forcus, "Forcus"},
 		{Behavior::Extend, "Extend"},
 		{Behavior::Shrink, "Shrink"},
-		{Behavior::Dash, "Dash"}
+		{Behavior::Dash, "Dash"},
+		{Behavior::Clear, "Clear"},
 	};
 
 private:
@@ -128,6 +134,10 @@ private://メンバ関数
     //プレイヤーダッシュ
     void OnDash();
     void UpdateDash(float deltaTime);
+
+	//ゲームクリア時の挙動
+	void OnClear();
+	void UpdateClear(float deltaTime);
 
 private://ワイヤー関連
 	Vector3 GetInputDirection();

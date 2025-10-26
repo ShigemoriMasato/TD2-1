@@ -376,13 +376,6 @@ void PhysicsEngine::ApplyWorldBounds(PhysicsActor* actor, float deltaTime)
 		objPos.x = worldBounds_->min.x;
 		actor->collidedLeft_ = true;
 	}
-	//右方向
-	if (objPos.x > worldBounds_->max.x - objHalfSize.x)
-	{
-		actor->velocity_.x = 0.0f;
-		objPos.x = worldBounds_->max.x - objHalfSize.x;
-		actor->collidedRight_ = true;
-	}
 	//上方向
 	if (objPos.y > worldBounds_->max.y)
 	{
