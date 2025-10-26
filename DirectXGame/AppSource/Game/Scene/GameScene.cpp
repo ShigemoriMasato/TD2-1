@@ -244,28 +244,9 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	//Modelアニメーション用デルタタイムの更新
 	ModelResource::deltatime = deltaTime;
 
-	// フェードイン処理
-	if (isFadingIn_)
-	{
-		fadeTimer_ += deltaTime;
-		// 1.0から0.0へ減少
-		postEffect_->data_.gridTransition.progress = 1.0f - (fadeTimer_ / fadeDuration_);
-
-		// フェードイン完了
-		if (fadeTimer_ >= fadeDuration_){
-			postEffect_->data_.gridTransition.progress = 0.0f;
-			isFadingIn_ = false;
-			// フェード完了後はジョブをクリアしてエフェクトをオフにする
-			postEffect_->SetJobs(PostEffectJob::None);
-		} else {
-			postEffect_->SetJobs(PostEffectJob::GridTransition);
-		}
-
-	} else {
-
-		// フェード完了後もFadeジョブを設定（alpha=0.0で透明）
-		postEffect_->data_.fade.alpha = 0.0f;
-	}
+	// ポストエフェクトの更新
+	UpdateFadeIn(deltaTime);
+	UpdateSlowMotionEffect();
 
 	camera_->Update(deltaTime);
 	camera_->DrawImGui();
@@ -324,6 +305,55 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	}
 
 	return nullptr;
+}
+
+void GameScene::UpdateFadeIn(float deltaTime)
+{
+	if (!isFadingIn_) return;
+
+	fadeTimer_ += deltaTime;
+	// 1.0から0.0へ減少
+	postEffect_->data_.gridTransition.progress = 1.0f - (fadeTimer_ / fadeDuration_);
+
+	// フェードイン完了
+	if (fadeTimer_ >= fadeDuration_)
+	{
+		postEffect_->data_.gridTransition.progress = 0.0f;
+		isFadingIn_ = false;
+		postEffect_->SetJobs(PostEffectJob::None);
+	}
+	else
+	{
+		postEffect_->SetJobs(PostEffectJob::GridTransition);
+	}
+}
+
+void GameScene::UpdateSlowMotionEffect()
+{
+	// フェードイン中はスローモーションエフェクトを適用しない
+	if (isFadingIn_) return;
+
+	// スローモーション中のポストエフェクト
+	if (timeSlower_->IsSlowMotion())
+	{
+		// スローモーションの強度を取得（より強い効果にする）
+		float intensity = timeSlower_->GetSlowIntensity();
+		
+		// 強度を増幅（0.7 → 1.0に近づける）
+		intensity = std::min(intensity * 1.5f, 1.0f);
+
+		postEffect_->data_.slowMotion.chromaticAberration = slowMotionChromaticAberration_ * intensity;
+		postEffect_->data_.slowMotion.vignetteStrength = slowMotionVignetteStrength_ * intensity;
+		postEffect_->data_.slowMotion.saturation = 1.0f - ((1.0f - slowMotionSaturationMin_) * intensity);
+		postEffect_->data_.slowMotion.intensity = intensity;
+
+		postEffect_->SetJobs(PostEffectJob::SlowMotion);
+	}
+	else
+	{
+		// 通常時はエフェクトなし
+		postEffect_->SetJobs(PostEffectJob::None);
+	}
 }
 
 void GameScene::Draw()
@@ -414,6 +444,8 @@ void GameScene::CheckPlayerWireField()
 		}
 	}
 }
+
+
 
 
 

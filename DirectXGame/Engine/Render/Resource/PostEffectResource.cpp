@@ -89,6 +89,15 @@ void PostEffectResource::DrawReady() {
 
 		psoConfig_.ps = data_.gridTransition.shaderFile;
 		task_ &= ~PostEffectJob::GridTransition;
+	} else if (task_ & PostEffectJob::SlowMotion) {
+		// slot1: chromaticAberration, vignetteStrength, saturation, intensity
+		infoForGPU_->slot1.x = data_.slowMotion.chromaticAberration;
+		infoForGPU_->slot1.y = data_.slowMotion.vignetteStrength;
+		infoForGPU_->slot1.z = data_.slowMotion.saturation;
+		infoForGPU_->slot1.w = data_.slowMotion.intensity;
+
+		psoConfig_.ps = data_.slowMotion.shaderFile;
+		task_ &= ~PostEffectJob::SlowMotion;
 	}
 	
 	psoConfig_.ps = shaderBasePath_ + psoConfig_.ps;

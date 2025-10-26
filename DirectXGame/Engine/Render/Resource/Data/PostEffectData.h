@@ -39,9 +39,18 @@ struct GridTransition {
     float pattern = 0.0f;       // パターン (0=波紋状, 1=ランダム, 2=左から右)
 };
 
+struct SlowMotion {
+    const std::string shaderFile = "SlowMotion.PS.hlsl";
+    float chromaticAberration = 0.0f;  // 色収差強度 (0.0 - 1.0)
+    float vignetteStrength = 0.0f;     // ビネット強度 (0.0 - 1.0)
+    float saturation = 1.0f;           // 彩度 (0.0=モノクロ, 1.0=通常)
+    float intensity = 0.0f;            // 全体の強度 (0.0 - 1.0)
+};
+
 struct PostEffectData {
     Blur blur;
 	Grayscale grayscale;
 	Fade fade;
     GridTransition gridTransition;
+    SlowMotion slowMotion;
 };
