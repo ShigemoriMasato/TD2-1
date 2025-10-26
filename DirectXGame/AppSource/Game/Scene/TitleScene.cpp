@@ -54,7 +54,7 @@ void TitleScene::Initialize()
 	{
 		titleLogo_ = std::make_unique<DrawResource>();
 		titleLogo_->Initialize(ShapeType::Plane);
-		titleLogo_->textureHandle_ = titleTextureHandle_;
+		titleLogo_->SetTextureHandle(titleTextureHandle_);
 		titleLogo_->camera_ = uiCamera_.get();
 		
 		// 画面中央上部に配置（原点は画面中央）
@@ -68,7 +68,7 @@ void TitleScene::Initialize()
 	{
 		spaceStart_ = std::make_unique<DrawResource>();
 		spaceStart_->Initialize(ShapeType::Plane);
-		spaceStart_->textureHandle_ = spaceStartTextureHandle_;
+		spaceStart_->SetTextureHandle(spaceStartTextureHandle_);
 		spaceStart_->camera_ = uiCamera_.get();
 		
 		// 画面中央下部に配置（原点は画面中央）
