@@ -44,10 +44,12 @@ private:
 	// UI用DrawResource
 	std::unique_ptr<DrawResource> titleLogo_ = nullptr;
 	std::unique_ptr<DrawResource> spaceStart_ = nullptr;
+	std::unique_ptr<DrawResource> background_ = nullptr;
 
 	// テクスチャハンドル
 	int titleTextureHandle_ = 0;
 	int spaceStartTextureHandle_ = 0;
+	int backgroundTextureHandle_ = 0;
 
 	// アニメーション用パラメータ
 	float totalTime_ = 0.0f; // 総経過時間
