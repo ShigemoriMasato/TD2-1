@@ -136,8 +136,6 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 		return;
 	}
 
-
-
 	for (auto* tile : collisionTiles_)
 	{
 		if (!tile)continue;
@@ -190,26 +188,12 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 
 			if (tileTypeTop == TileType::Solid || tileTypeBottom == TileType::Solid)
 			{
-				newPos.x = tileX * tileSize.x + objHalfSize.x;
+				newPos.x = (tileX + 1) * tileSize.x ;
 				actor->velocity_.x = 0.0f;
 				actor->collidedLeft_ = true;
 				if (!actor->prevCollidedLeft_)
 					tile->TriggerWaveAtWorldPos(newPos);
 			}
-			else
-			{
-				auto widthLeft = newPos.x - tileX * tileSize.x - objHalfSize.x;
-				auto heightLeft = GetTileHeightAtWidth(widthLeft, tileTypeBottom, tileSize);
-				if (heightLeft > 0.0f)
-				{
-					if (newPos.y < (tileYBottom + 1) * tileSize.y + objHalfSize.y + heightLeft)
-					{
-						newPos.y = (tileYBottom + 1) * tileSize.y + objHalfSize.y + heightLeft;
-						actor->collidedBottom_ = true;
-					}
-				}
-			}
-
 		}
 
 		//下方向
@@ -231,33 +215,14 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 				if (!actor->prevCollidedBottom_)
 					tile->TriggerWaveAtWorldPos(newPos);
 			}
-			else
-			{
-				auto widthLeft = newPos.x - tileX * tileSize.x - objHalfSize.x;
-				auto widthRight = newPos.x + objHalfSize.x - (tileXRight + 1) * tileSize.x;
-				auto heightLeft = GetTileHeightAtWidth(widthLeft, tileTypeLeft, tileSize);
-				auto heightRight = GetTileHeightAtWidth(widthRight, tileTypeRight, tileSize);
-				auto height = std::max(heightLeft, heightRight);
-
-				if (height > 0.0f)
-				{
-					if (newPos.y < (worldSize.y - 1 - tileY) * tileSize.y + objHalfSize.y + height)
-					{
-						newPos.y = (worldSize.y - 1 - tileY) * tileSize.y + objHalfSize.y + height;
-						actor->velocity_.y = 0.0f;
-						actor->collidedBottom_ = true;
-					}
-				}
-			}
 		}
 		else if (dis.y > 0.0f)
 		{
 			auto topLeftY = newPos.y;
 			auto tileY = TileYIndex(topLeftY, tileSize.y, worldSize.y);
-
 			auto tileX = TileXIndex(objPos.x, tileSize.x);
-			auto tileTypeLeft = tile->GetTileTypeAt(tileX, tileY);
 
+			auto tileTypeLeft = tile->GetTileTypeAt(tileX, tileY);
 			auto tileXRight = TileXIndex(objPos.x + objHalfSize.x - epsilon, tileSize.x);
 			auto tileTypeRight = tile->GetTileTypeAt(tileXRight, tileY);
 
@@ -269,7 +234,6 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 				if (!actor->prevCollidedTop_)
 					tile->TriggerWaveAtWorldPos(newPos);
 			}
-
 		}
 
 		actor->prevCollidedTop_ = actor->collidedTop_;
@@ -469,5 +433,5 @@ int PhysicsEngine::TileXIndex(float x, float size)
 
 int PhysicsEngine::TileYIndex(float y, float size, float worldY)
 {
-	return static_cast<int>(std::floor((worldY - 1.0f - y) / size));
+	return static_cast<int>(std::floor((worldY - 1.0f) - (y / size)));
 }
