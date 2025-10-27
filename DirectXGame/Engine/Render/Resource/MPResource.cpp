@@ -290,7 +290,23 @@ void MPResource::DispatchTileDiffusion(ID3D12GraphicsCommandList* cmdList, float
 
 void MPResource::SetWaveSource(int x, int y, float radius, float intensity, float falloff, float duration)
 {
-	waveData_->color = { 1,0,1,1 };
+	constexpr Vector4 colorTable[] = {
+		{0.5f, 0.7f, 1.0f, 1.0f},
+		{0.8f, 0.4f, 0.4f, 1.0f},
+		{0.4f, 0.8f, 0.4f, 1.0f},
+		{0.9f, 0.9f, 0.5f, 1.0f},
+		{0.6f, 0.5f, 0.9f, 1.0f},
+		{0.3f, 0.6f, 0.6f, 1.0f},
+		{0.9f, 0.6f, 0.2f, 1.0f},
+		{0.7f, 0.7f, 0.7f, 1.0f},
+		{0.2f, 0.4f, 0.8f, 1.0f},
+		{0.6f, 0.9f, 0.9f, 1.0f} 
+	};
+	constexpr int colorCount = sizeof(colorTable) / sizeof(colorTable[0]);
+	std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
+	int randomIndex = std::rand() % colorCount;
+	waveData_->color = colorTable[randomIndex];
 	waveData_->gMapWorldSize = { (float)mapWidth_,(float)mapHeight_ };
 	waveSourceConsts_.waveX = x;
 	waveSourceConsts_.waveY = y;
