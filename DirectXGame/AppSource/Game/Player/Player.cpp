@@ -121,7 +121,7 @@ BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
 		Vector3 targetToPlayer = (target->GetTransform()->position - transform_.position);
 		float angle = MyMath::dot(direction, targetToPlayer.Normalize());
 
-
+		target->SetColor(0xffffffff);
 		//ターゲットとプレイヤーの間に障害物がないか
 		if (!tileMap_->HasTile(this->transform_.position, target->GetTransform()->position, TileType::Solid))
 		{
@@ -139,6 +139,7 @@ BaseObject* Player::SelectTargetByDirection(const Vector3& direction)
 				{
 					bestScore = totalScore;
 					selectTarget = target;
+					selectTarget->SetColor(0x803333ff);
 				}
 			}
 		}

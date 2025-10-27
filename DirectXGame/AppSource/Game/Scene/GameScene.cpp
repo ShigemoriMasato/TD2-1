@@ -72,7 +72,7 @@ void GameScene::Initialize()
 
 	//hook
 	{
-		auto handle = modelManager_->LoadModel("testBlock");
+		auto handle = modelManager_->LoadModel("hook");
 		auto coinHandle = modelManager_->LoadModel("coin");
 		levelLoader_.AddGameObject<Hook>(objects_, modelManager_, handle, camera_->GetCamera());
 		levelLoader_.AddGameObject<Coin>(objects_, modelManager_, coinHandle, camera_->GetCamera(), &physicsEngine_, false);
@@ -183,9 +183,10 @@ void GameScene::Initialize(std::string levelName)
 
 	//hook
 	{
-		auto handle = modelManager_->LoadModel("testBlock");
+		auto handle = modelManager_->LoadModel("hook");
+		auto coinHandle = modelManager_->LoadModel("coin");
 		levelLoader_.AddGameObject<Hook>(objects_, modelManager_, handle, camera_->GetCamera());
-		levelLoader_.AddGameObject<Coin>(objects_, modelManager_, handle, camera_->GetCamera(), &physicsEngine_, false);
+		levelLoader_.AddGameObject<Coin>(objects_, modelManager_, coinHandle, camera_->GetCamera(), &physicsEngine_, false);
 	}
 
 	{

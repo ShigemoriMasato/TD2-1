@@ -70,14 +70,13 @@ void Player::UpdateForcus(float deltaTime) {
 			timeSlower_->EndSlow(false);
 			//ワイヤーを投げる
 			behaviorRequest_ = Behavior::Extend;
-
+			selectedTarget->SetColor(0xffffffff);
 		} else {
 
 			//スロウモーション終了(補完あり)
 			timeSlower_->EndSlow(true);
 			//着地したらIdleに行くはずなのでとりあえずDashに投げる
 			behaviorRequest_ = Behavior::Idle;
-
 		}
 	}
 
