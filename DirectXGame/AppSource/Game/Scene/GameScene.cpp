@@ -21,12 +21,12 @@ void GameScene::Initialize()
 	{
 		auto handle = modelManager_->LoadModel("Cube");
 		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
-		
+
 		// commonData->nextLevelIndex_を使用して正しいレベルファイルを読み込む
 		auto levelMap = LevelLoader::GetLevelFileMap();
 		std::string levelFileName = levelMap[commonData->nextLevelIndex_];
 		levelLoader_.LoadLevel("Assets/Map/" + levelFileName, *tileMap_);
-		
+
 		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_->GetCamera());
 	}
 
@@ -103,9 +103,9 @@ void GameScene::Initialize()
 		postEffect_->data_.gridTransition.progress = 1.0f;
 		postEffect_->data_.gridTransition.gridSize = 16.0f;  // 16x16グリッド
 		postEffect_->data_.gridTransition.fadeColor = 0.0f;  // 白からフェードイン
-		postEffect_->data_.gridTransition.pattern = 0.0f;    // ランダムパターン
+		postEffect_->data_.gridTransition.pattern = 4.0f;    // ランダムパターン
 		postEffect_->SetJobs(PostEffectJob::GridTransition);
-		
+
 		isFadingIn_ = true;
 		fadeTimer_ = 0.0f;
 		if (commonData->isCreateTexture) {
@@ -326,8 +326,7 @@ void GameScene::UpdateFadeIn(float deltaTime)
 		postEffect_->data_.gridTransition.progress = 0.0f;
 		isFadingIn_ = false;
 		postEffect_->SetJobs(PostEffectJob::None);
-	}
-	else
+	} else
 	{
 		postEffect_->SetJobs(PostEffectJob::GridTransition);
 	}
@@ -343,7 +342,7 @@ void GameScene::UpdateSlowMotionEffect()
 	{
 		// スローモーションの強度を取得（より強い効果にする）
 		float intensity = timeSlower_->GetSlowIntensity();
-		
+
 		// 強度を増幅（0.7 → 1.0に近づける）
 		intensity = std::min(intensity * 1.5f, 1.0f);
 
@@ -353,8 +352,7 @@ void GameScene::UpdateSlowMotionEffect()
 		postEffect_->data_.slowMotion.intensity = intensity;
 
 		postEffect_->SetJobs(PostEffectJob::SlowMotion);
-	}
-	else
+	} else
 	{
 		// 通常時はエフェクトなし
 		postEffect_->SetJobs(PostEffectJob::None);

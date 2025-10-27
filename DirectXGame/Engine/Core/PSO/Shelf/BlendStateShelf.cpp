@@ -15,7 +15,7 @@ BlendStateShelf::BlendStateShelf() {
 	alphaBlend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 	alphaBlend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	//すべての色を取り込む
-	alphaBlend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	alphaBlend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_RED | D3D12_COLOR_WRITE_ENABLE_BLUE | D3D12_COLOR_WRITE_ENABLE_GREEN;
 	blendStates_[int(BlendStateID::Normal)] = alphaBlend;
 
 	//AddBlend
@@ -30,7 +30,7 @@ BlendStateShelf::BlendStateShelf() {
 	addBlend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 	addBlend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	//すべての色を取り込む
-	addBlend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	addBlend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_RED | D3D12_COLOR_WRITE_ENABLE_BLUE | D3D12_COLOR_WRITE_ENABLE_GREEN;
 	blendStates_[int(BlendStateID::Add)] = addBlend;
 
 	//SubtractBlend
@@ -45,7 +45,7 @@ BlendStateShelf::BlendStateShelf() {
 	subtractBlend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 	subtractBlend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	//すべての色を取り込む
-	subtractBlend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	subtractBlend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_RED | D3D12_COLOR_WRITE_ENABLE_BLUE | D3D12_COLOR_WRITE_ENABLE_GREEN;
 	blendStates_[int(BlendStateID::Subtract)] = subtractBlend;
 
 	//MultiplyBlend
@@ -60,7 +60,7 @@ BlendStateShelf::BlendStateShelf() {
 	multiplyBlend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 	multiplyBlend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	//すべての色を取り込む
-	multiplyBlend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	multiplyBlend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_RED | D3D12_COLOR_WRITE_ENABLE_BLUE | D3D12_COLOR_WRITE_ENABLE_GREEN;
 	blendStates_[int(BlendStateID::Multiply)] = multiplyBlend;
 
 	//ScreenBlend
@@ -75,7 +75,7 @@ BlendStateShelf::BlendStateShelf() {
 	screenBlend.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 	screenBlend.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	//すべての色を取り込む
-	screenBlend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	screenBlend.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_RED | D3D12_COLOR_WRITE_ENABLE_BLUE | D3D12_COLOR_WRITE_ENABLE_GREEN;
 	blendStates_[int(BlendStateID::Screen)] = screenBlend;
 
 }

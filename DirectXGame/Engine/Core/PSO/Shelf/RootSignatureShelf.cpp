@@ -43,6 +43,17 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
     staticSampler[0].ShaderRegister = 0;    //レジスタ番号0
     staticSampler[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;    //PixelShaderで使う
 
+    // PostEffect用のCLAMPモードサンプラー
+    D3D12_STATIC_SAMPLER_DESC clampSampler[1] = {};
+    clampSampler[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+    clampSampler[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;  // CLAMPに変更
+    clampSampler[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;  // CLAMPに変更
+    clampSampler[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;  // CLAMPに変更
+    clampSampler[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+    clampSampler[0].MaxLOD = D3D12_FLOAT32_MAX;
+    clampSampler[0].ShaderRegister = 0;
+    clampSampler[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
     //ありあり
     {
         //RootSignature作成
@@ -232,21 +243,21 @@ RootSignatureShelf::RootSignatureShelf(ID3D12Device* device) {
         D3D12_ROOT_PARAMETER rootParameters[2] = {};
 
         //InfoForGPU
-		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;        //CBVを使う
+		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;   //CBVを使う
 		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;     //PixelShaderで使う
-		rootParameters[0].Descriptor.ShaderRegister = 0;                        //レジスタ番号0とバインド
+		rootParameters[0].Descriptor.ShaderRegister = 0;        //レジスタ番号0とバインド
 
         //Texture
-        rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
-        rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
+     rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//テーブルを使う
+  rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
         rootParameters[1].DescriptorTable.pDescriptorRanges = textureDescriptor;	//テーブルの中身
         rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(textureDescriptor);	//テーブルの数
 
-        descriptionRootSignature.pParameters = rootParameters;                  //ルートパラメータ配列へのポインタ
+  descriptionRootSignature.pParameters = rootParameters;    //ルートパラメータ配列へのポインタ
         descriptionRootSignature.NumParameters = _countof(rootParameters);      //配列の長さ
 
-        descriptionRootSignature.pStaticSamplers = staticSampler;              //StaticSamplerの配列へのポインタ
-        descriptionRootSignature.NumStaticSamplers = _countof(staticSampler);   //配列の長さ
+      descriptionRootSignature.pStaticSamplers = clampSampler;        // CLAMPサンプラーを使用
+        descriptionRootSignature.NumStaticSamplers = _countof(clampSampler);   //配列の長さ
 
         CreateRootSignature(descriptionRootSignature, RootSignatureID::PostEffect, device);
     }
