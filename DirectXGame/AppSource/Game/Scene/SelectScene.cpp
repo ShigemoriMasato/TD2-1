@@ -64,9 +64,9 @@ void SelectScene::Initialize() {
 		stagePreview1_->SetTextureHandle(offScreenManager_->GetOffScreenData(OffScreenIndex::Level1)->GetTextureGPUHandle());
 		stagePreview1_->camera_ = uiCamera_.get();
 		
-		// 左側に配置、16:9の比率で表示（480x270のサイズ）
-		stagePreview1_->position_ = { -300.0f, 0.0f, 50.0f };
-		stagePreview1_->scale_ = { 480.0f, 270.0f, 1.0f };
+		// 左側に配置、16:9の比率で表示（400x225のサイズに縮小して3つ並べる）
+		stagePreview1_->position_ = { -400.0f, 0.0f, 50.0f };
+		stagePreview1_->scale_ = { 400.0f, 225.0f, 1.0f };
 		stagePreview1_->rotate_ = { 0.0f, 0.0f, 0.0f };
 		stagePreview1_->color_ = 0xffffffff;
 	}
@@ -79,11 +79,26 @@ void SelectScene::Initialize() {
 		stagePreview2_->SetTextureHandle(offScreenManager_->GetOffScreenData(OffScreenIndex::Level2)->GetTextureGPUHandle());
 		stagePreview2_->camera_ = uiCamera_.get();
 		
-		// 右側に配置、16:9の比率で表示（480x270のサイズ）
-		stagePreview2_->position_ = { 300.0f, 0.0f, 50.0f };
-		stagePreview2_->scale_ = { 480.0f, 270.0f, 1.0f };
+		// 中央に配置、16:9の比率で表示（400x225のサイズ）
+		stagePreview2_->position_ = { 0.0f, 0.0f, 50.0f };
+		stagePreview2_->scale_ = { 400.0f, 225.0f, 1.0f };
 		stagePreview2_->rotate_ = { 0.0f, 0.0f, 0.0f };
 		stagePreview2_->color_ = 0xffffffff;
+	}
+
+	// ステージ3プレビューの初期化
+	{
+		stagePreview3_ = std::make_unique<DrawResource>();
+		stagePreview3_->Initialize(ShapeType::Plane);
+		// ステージ3のオフスクリーンテクスチャを設定（16:9の比率を維持）
+		stagePreview3_->SetTextureHandle(offScreenManager_->GetOffScreenData(OffScreenIndex::Level3)->GetTextureGPUHandle());
+		stagePreview3_->camera_ = uiCamera_.get();
+		
+		// 右側に配置、16:9の比率で表示（400x225のサイズ）
+		stagePreview3_->position_ = { 400.0f, 0.0f, 50.0f };
+		stagePreview3_->scale_ = { 400.0f, 225.0f, 1.0f };
+		stagePreview3_->rotate_ = { 0.0f, 0.0f, 0.0f };
+		stagePreview3_->color_ = 0xffffffff;
 	}
 }
 
@@ -107,16 +122,28 @@ std::unique_ptr<BaseScene> SelectScene::Update() {
 	if (!isFadingOut_) {
 		// 選択されたステージを強調表示
 		if (selectedStageIndex_ == 0) {
-			stagePreview1_->scale_ = { 500.0f, 281.25f, 1.0f };  // 少し大きく
+			stagePreview1_->scale_ = { 420.0f, 236.25f, 1.0f };  // 少し大きく
 			stagePreview1_->color_ = 0xffffffff;  // 白
-			stagePreview2_->scale_ = { 480.0f, 270.0f, 1.0f };  // 通常サイズ
+			stagePreview2_->scale_ = { 400.0f, 225.0f, 1.0f };  // 通常サイズ
 			stagePreview2_->color_ = 0x808080ff;  // グレー（暗く）
+			stagePreview3_->scale_ = { 400.0f, 225.0f, 1.0f };  // 通常サイズ
+			stagePreview3_->color_ = 0x808080ff;  // グレー（暗く）
+		}
+		else if (selectedStageIndex_ == 1) {
+			stagePreview1_->scale_ = { 400.0f, 225.0f, 1.0f };  // 通常サイズ
+			stagePreview1_->color_ = 0x808080ff;  // グレー（暗く）
+			stagePreview2_->scale_ = { 420.0f, 236.25f, 1.0f };  // 少し大きく
+			stagePreview2_->color_ = 0xffffffff;  // 白
+			stagePreview3_->scale_ = { 400.0f, 225.0f, 1.0f };  // 通常サイズ
+			stagePreview3_->color_ = 0x808080ff;  // グレー（暗く）
 		}
 		else {
-			stagePreview1_->scale_ = { 480.0f, 270.0f, 1.0f };  // 通常サイズ
+			stagePreview1_->scale_ = { 400.0f, 225.0f, 1.0f };  // 通常サイズ
 			stagePreview1_->color_ = 0x808080ff;  // グレー（暗く）
-			stagePreview2_->scale_ = { 500.0f, 281.25f, 1.0f };  // 少し大きく
-			stagePreview2_->color_ = 0xffffffff;  // 白
+			stagePreview2_->scale_ = { 400.0f, 225.0f, 1.0f };  // 通常サイズ
+			stagePreview2_->color_ = 0x808080ff;  // グレー（暗く）
+			stagePreview3_->scale_ = { 420.0f, 236.25f, 1.0f };  // 少し大きく
+			stagePreview3_->color_ = 0xffffffff;  // 白
 		}
 	}
 
@@ -166,10 +193,10 @@ void SelectScene::ProcessInput() {
 	static bool prevKeyRight = false;
 
 	if (keys[Key::Left] && !prevKeyLeft) {
-		selectedStageIndex_ = (selectedStageIndex_ - 1 + 2) % 2;  // 0と1を循環
+		selectedStageIndex_ = (selectedStageIndex_ - 1 + (int)LevelIndex::kNumLevels) % (int)LevelIndex::kNumLevels;  // 0, 1, 2を循環
 	}
 	if (keys[Key::Right] && !prevKeyRight) {
-		selectedStageIndex_ = (selectedStageIndex_ + 1) % 2;  // 0と1を循環
+		selectedStageIndex_ = (selectedStageIndex_ + 1) % (int)LevelIndex::kNumLevels;  // 0, 1, 2を循環
 	}
 
 	prevKeyLeft = keys[Key::Left];
@@ -191,7 +218,11 @@ std::unique_ptr<BaseScene> SelectScene::CheckSceneTransition() {
 		auto levelMap = LevelLoader::GetLevelFileMap();
 		std::string levelName;
 		
-		if (selectedStageIndex_ == 0) {
+		if (selectedStageIndex_ == (int)LevelIndex::Level0) {
+			levelName = levelMap[LevelIndex::Level0];
+			commonData->nextLevelIndex_ = LevelIndex::Level0;
+		}
+		else if (selectedStageIndex_ == (int)LevelIndex::Level1) {
 			levelName = levelMap[LevelIndex::Level1];
 			commonData->nextLevelIndex_ = LevelIndex::Level1;
 		}
@@ -220,6 +251,9 @@ void SelectScene::Draw() {
 	
 	// ステージ2プレビュー描画
 	render_->Draw(stagePreview2_.get());
+
+	// ステージ3プレビュー描画
+	render_->Draw(stagePreview3_.get());
 
 	render_->Draw(postEffect_.get());
 }

@@ -40,6 +40,7 @@ void Player::UpdateForcus(float deltaTime) {
 	if(actor_->collidedBottom_) {
 		actor_->velocity_ = {};
 	}
+	actor_->velocity_ *= dashRegistRate_;
 
 	auto& key = (*key_);
 

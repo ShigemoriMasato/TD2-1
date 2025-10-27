@@ -4,6 +4,7 @@
 #include <typeinfo>
 
 std::unordered_map<LevelIndex, std::string> LevelLoader::levelFileMap_ = {
+	{LevelIndex::Level0,"level0.json"},
 	{LevelIndex::Level1,"level1.json"},
 	{LevelIndex::Level2,"level2.json"}
 };
@@ -30,13 +31,13 @@ void LevelLoader::LoadLevel(const std::string& filePath, TileMap& tileMap)
 	worldWidth_ = levelData.value("width", 0);
 	worldHeight_ = levelData.value("height", 0);
 	tileWidth_ = levelData.value("tilewidth", 0);
-    tileHeight_ = levelData.value("tileheight", 0);
+	tileHeight_ = levelData.value("tileheight", 0);
 
 	TileInfo tiles;
 	tiles.width = worldWidth_;
 	tiles.height = worldHeight_;
 	tiles.tileWidth = tileWidth_;
-    tiles.tileHeight = tileHeight_;
+	tiles.tileHeight = tileHeight_;
 
 	tiles.type.reserve(worldWidth_ * worldHeight_);
 
@@ -69,7 +70,7 @@ void LevelLoader::AddEnemy(EnemyManager& enemyManager)
 				float y = std::ceil(obj["y"].get<float>());
 
 				float worldX = x / tileWidth_;
-				float worldY = (worldHeight_ - 1 - y / tileHeight_) ;
+				float worldY = (worldHeight_ - 1 - y / tileHeight_);
 
 				if (className == "FloatEnemy")
 				{
