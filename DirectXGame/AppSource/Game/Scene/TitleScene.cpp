@@ -11,7 +11,7 @@ void TitleScene::Initialize()
 		postEffect_->Initialize();
 		postEffect_->input_ = OffScreenIndex::Title;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
-		
+
 		// グリッドトランジション初期化
 		postEffect_->data_.gridTransition.progress = 0.0f;
 		postEffect_->data_.gridTransition.gridSize = 16.0f;  // 16x16グリッド
@@ -40,7 +40,7 @@ void TitleScene::Initialize()
 		desc.nearClip = 0.0f;
 		desc.farClip = 1000.0f;
 		uiCamera_->SetProjectionMatrix(desc);
-		
+
 		// カメラのトランスフォームを設定（UI用なので位置は原点）
 		Transform cameraTransform{};
 		cameraTransform.position = { 0.0f, 0.0f, 0.0f };
@@ -63,16 +63,16 @@ void TitleScene::Initialize()
 		titleLogo_->Initialize(ShapeType::Plane);
 		titleLogo_->SetTextureHandle(titleTextureHandle_);
 		titleLogo_->camera_ = uiCamera_.get();
-		
+
 		// 初期位置を保存
 		titleLogoInitialPos_ = { 0.0f, 160.0f, 0.0f };
-		
+
 		// 画面中央上部に配置（原点は画面中央）
 		// アニメーション開始位置（上方にオフセット）
 		titleLogo_->position_ = { titleLogoInitialPos_.x, titleLogoInitialPos_.y + titleLogoSlideDistance_, titleLogoInitialPos_.z };
 		titleLogo_->scale_ = { 760.0f, 270.0f, 1.0f };
 		titleLogo_->rotate_ = { 0.0f, 0.0f, 0.0f };
-		
+
 		// 初期状態は透明
 		titleLogo_->color_ = 0x00ffffff;
 	}
@@ -83,12 +83,12 @@ void TitleScene::Initialize()
 		spaceStart_->Initialize(ShapeType::Plane);
 		spaceStart_->SetTextureHandle(spaceStartTextureHandle_);
 		spaceStart_->camera_ = uiCamera_.get();
-		
+
 		// 画面中央下部に配置（原点は画面中央）
 		spaceStart_->position_ = { 0.0f, -160.0f, 0.0f };  // Y-で下方向
 		spaceStart_->scale_ = { 633.0f, 66.0f, 1.0f };
 		spaceStart_->rotate_ = { 0.0f, 0.0f, 0.0f };
-		
+
 		// 初期状態は透明
 		spaceStart_->color_ = 0x00ffffff;
 	}
@@ -99,12 +99,12 @@ void TitleScene::Initialize()
 		background_->Initialize(ShapeType::Plane);
 		background_->SetTextureHandle(backgroundTextureHandle_);
 		background_->camera_ = uiCamera_.get();
-		
+
 		// 画面全体を覆うように配置
 		background_->position_ = { 0.0f, 0.0f, 100.0f };  // Z+で手前に配置
 		background_->scale_ = { 1280.0f, 720.0f, 1.0f };
 		background_->rotate_ = { 0.0f, 0.0f, 0.0f };
-		
+
 		background_->color_ = 0xffffffff;
 	}
 
@@ -152,20 +152,19 @@ void TitleScene::UpdateTitleLogoAnimation(float deltaTime)
 	if (titleLogoAnimTime_ <= titleLogoFadeDuration_) {
 		float t = titleLogoAnimTime_ / titleLogoFadeDuration_;
 		float easedT = EaseOutCubic(t);
-		
+
 		// スライドダウン
 		float slideOffset = titleLogoSlideDistance_ * (1.0f - easedT);
 		titleLogo_->position_.y = titleLogoInitialPos_.y + slideOffset;
-		
+
 		// フェードイン
 		uint8_t alpha = static_cast<uint8_t>(255.0f * easedT);
 		titleLogo_->color_ = (alpha << 24) | 0x00ffffff;
-	}
-	else {
+	} else {
 		// フェードイン完了後は浮遊アニメーション
 		float floatTime = titleLogoAnimTime_ - titleLogoFadeDuration_;
 		float floatOffset = std::sin(floatTime * titleLogoFloatSpeed_) * titleLogoFloatAmplitude_;
-		
+
 		titleLogo_->position_.y = titleLogoInitialPos_.y + floatOffset;
 		titleLogo_->color_ = 0xffffffff;
 	}
@@ -187,15 +186,14 @@ void TitleScene::UpdateSpaceStartAnimation(float deltaTime)
 	if (effectiveTime <= spaceStartFadeDuration_) {
 		float t = effectiveTime / spaceStartFadeDuration_;
 		float easedT = EaseOutCubic(t);
-		
+
 		uint8_t alpha = static_cast<uint8_t>(255.0f * easedT);
 		spaceStart_->color_ = (alpha << 24) | 0x00ffffff;
-	}
-	else {
+	} else {
 		// フェードイン完了後はパルスアニメーション
 		float pulseTime = effectiveTime - spaceStartFadeDuration_;
 		float pulse = EaseInOutSine(std::fmod(pulseTime * spaceStartPulseSpeed_, 1.0f));
-		
+
 		// パルス（最小〜最大の間で振動）
 		float alpha = spaceStartPulseMin_ + (spaceStartPulseMax_ - spaceStartPulseMin_) * pulse;
 		uint8_t alphaValue = static_cast<uint8_t>(255.0f * alpha);
@@ -209,7 +207,7 @@ void TitleScene::UpdateFade(float deltaTime)
 		// フェードタイマーを進める
 		fadeTimer_ += deltaTime;
 		float progress = std::min(fadeTimer_ / fadeDuration_, 1.0f);
-		
+
 		// ポストエフェクトの進行度を更新
 		postEffect_->data_.gridTransition.progress = progress;
 		postEffect_->SetJobs(PostEffectJob::GridTransition);

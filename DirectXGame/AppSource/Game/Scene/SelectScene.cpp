@@ -152,7 +152,7 @@ void SelectScene::UpdateFadeOut(float deltaTime) {
 	postEffect_->data_.gridTransition.progress = progress;
 	postEffect_->data_.gridTransition.gridSize = 16.0f;
 	postEffect_->data_.gridTransition.fadeColor = 0.0f;  // 黒にフェード
-	postEffect_->data_.gridTransition.pattern = 0.0f;    // 波紋状パターン
+	postEffect_->data_.gridTransition.pattern = 4.0f;    // 波紋状パターン
 	postEffect_->SetJobs(PostEffectJob::GridTransition);
 }
 
