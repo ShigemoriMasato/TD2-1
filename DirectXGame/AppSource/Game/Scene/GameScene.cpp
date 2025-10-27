@@ -130,15 +130,19 @@ void GameScene::Initialize(std::string levelName)
 		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_, postEffect_.get());
 	}
 
+	{
+		//背景の装飾
+		backGround_ = std::make_unique<BackGround>();
+		backGround_->Initialize(camera_->GetCamera());
+	}
+
 	//BGMの再生
 	if (!commonData->isCreateTexture) {
-		if (!audio_->IsPlay(commonData->bgmPlayHandle_)) {
-			int soundHandle = audio_->Load("BGM/Game.mp3");
+		int soundHandle = audio_->Load("BGM/Game.mp3");
 
-			if (commonData->bgmPlayHandle_ / 10 != soundHandle) {
-				audio_->Stop(commonData->bgmPlayHandle_);
-				commonData->bgmPlayHandle_ = audio_->Play(soundHandle, true);
-			}
+		if (commonData->bgmPlayHandle_ / 10 != soundHandle) {
+			audio_->Stop(commonData->bgmPlayHandle_);
+			commonData->bgmPlayHandle_ = audio_->Play(soundHandle, true);
 		}
 	}
 
@@ -196,7 +200,8 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	targetScope_->Update(deltaTime, commonData->keyManager_.get());
 	//goalTape
 	goalTape_->Update(deltaTime);
-
+	//backGround
+	backGround_->Update(deltaTime);
 
 	physicsEngine_.Update(deltaTime);
 	//オブジェクト間でのコリジョンチェック
@@ -269,6 +274,9 @@ void GameScene::UpdateSlowMotionEffect()
 void GameScene::Draw()
 {
 	render_->PreDraw(OffScreenIndex::GameWindow);
+
+	//一番最初に背景を描画する
+	backGround_->Draw(render_);
 
 	for (auto& object : objects_)
 	{

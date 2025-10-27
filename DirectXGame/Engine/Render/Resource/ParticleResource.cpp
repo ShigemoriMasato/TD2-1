@@ -77,13 +77,13 @@ void ParticleResource::Initialize(uint32_t vertexNum, uint32_t indexNum, uint32_
 	vertexNum_ = vertexNum;
 	indexNum_ = indexNum;
 	instanceNum_ = instanceNum;
+
+	psoConfig_.vs = "Particle.VS.hlsl";
+	psoConfig_.ps = "Particle.PS.hlsl";
 }
 
 void ParticleResource::DrawReady() {
 	//InputLayout
-	localPos_.resize(vertexNum_);
-	texcoord_.resize(vertexNum_);
-	normal_.resize(vertexNum_);
 	for (uint32_t i = 0; i < vertexNum_; ++i) {
 		vertex_[i].position = { localPos_[i].x, localPos_[i].y, localPos_[i].z, 1.0f };
 		vertex_[i].texcoord = texcoord_[i];
@@ -124,8 +124,6 @@ void ParticleResource::DrawReady() {
 
 	psoConfig_.rootID = RootSignatureID::Particle;
 	psoConfig_.inputLayoutID = InputLayoutID::Default;
-	psoConfig_.vs = "Particle.VS.hlsl";
-	psoConfig_.ps = "Particle.PS.hlsl";
 }
 
 D3D12_INDEX_BUFFER_VIEW ParticleResource::GetIndexBufferView() const {

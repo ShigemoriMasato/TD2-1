@@ -1,4 +1,5 @@
 #include "ModelResource.h"
+#include "ModelParticle.h"
 
 DXDevice* ModelResource::dxDevice_ = nullptr;
 SRVManager* ModelResource::srvManager_ = nullptr;

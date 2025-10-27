@@ -34,7 +34,7 @@ struct EnemyPlacementData {
 		: position{ 0.0f, 0.0f, 0.0f }
 		, rotation{ 0.0f, 0.0f, 0.0f }
 		, scale{ 1.0f, 1.0f, 1.0f }
-		, modelName("testEnemy")
+		, modelName("Enemy")
 		, teamTag("enemy")
 		, priority(0)
 		, customFloat1(0.0f)
@@ -77,7 +77,7 @@ public:
 	/// @param position 位置
 	/// @param modelName モデル名
 	/// @return 生成に成功したかどうか
-	bool SpawnEnemy(const std::string& enemyType, const Vector3& position, const std::string& modelName = "testEnemy");
+	bool SpawnEnemy(const std::string& enemyType, const Vector3& position, const std::string& modelName = "Enemy");
 
 	/// @brief 敵にプレイヤーの位置を設定
 	/// @param playerPos プレイヤーの位置
@@ -134,7 +134,7 @@ private:
 	EnemyFactory enemyFactory_;
 
 	// 分裂用のモデル名（デフォルト）
-	std::string divisionModelName_ = "testEnemy";
+	std::string divisionModelName_ = "Enemy";
 
 	// バイナリマネージャー（敵配置データの保存・読み込み用）
 	std::unique_ptr<BinaryManager> binaryManager_;

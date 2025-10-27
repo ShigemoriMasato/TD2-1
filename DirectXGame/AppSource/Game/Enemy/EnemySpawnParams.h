@@ -12,7 +12,7 @@ struct EnemySpawnParams {
 	Vector3 scale = { 1.0f, 1.0f, 1.0f };
 	
 	// モデル設定
-	std::string modelName = "testEnemy";
+	std::string modelName = "Enemy";
 	
 	// ゲーム設定
 	std::string teamTag = "enemy";  // チーム識別子

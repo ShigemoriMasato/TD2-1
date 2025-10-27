@@ -350,6 +350,21 @@ void Render::Draw(PostEffectResource* resource) {
     PreDraw(preOffScreenIndex, false);
 }
 
+void Render::Draw(ModelParticle* resource) {
+    resource->DrawReady();
+
+	commandList->IASetVertexBuffers(0, 1, &resource->GetVertexBufferView());
+	commandList->IASetIndexBuffer(&resource->GetIndexBufferView());
+    psoEditor_->SetPSOConfig(resource->psoConfig_);
+    psoEditor_->Setting(commandList.Get());
+    //ParticleDataのポインタを設定
+    commandList->SetGraphicsRootDescriptorTable(1, resource->GetParticleDataGpuHandle());
+    //Texture
+    commandList->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureData(resource->textureHandle)->GetTextureGPUHandle());
+    uint32_t indexNum = resource->GetIndexNum();
+    commandList->DrawIndexedInstanced(indexNum, resource->instance_, 0, 0, 0);
+}
+
 void Render::PostDraw(ImGuiWrapper* imguiRap) {
     if (offScreenHandle_ != OffScreenIndex::SwapChain) {
         ResetResourceBarrier();

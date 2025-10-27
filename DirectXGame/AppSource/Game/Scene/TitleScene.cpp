@@ -137,6 +137,8 @@ std::unique_ptr<BaseScene> TitleScene::Update()
 
 	// スペースキー（Actionキー）でグリッドトランジション開始
 	if (!isFading_ && keys[Key::Action]) {
+		int se = audio_->Load("start.mp3");
+		audio_->Play(se, false);
 		isFading_ = true;
 		fadeTimer_ = 0.0f;
 	}

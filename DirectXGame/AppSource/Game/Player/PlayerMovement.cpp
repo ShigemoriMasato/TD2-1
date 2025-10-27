@@ -174,6 +174,8 @@ void Player::UpdateDash(float deltaTime) {
 
 void Player::OnClear() {
 	rotateSpeed_ = rotateMaxSpeed_ / 2.0f;
+	int clear = audio_->Load("clear.mp3");
+	audio_->Play(clear, false);
 }
 
 void Player::UpdateClear(float deltaTime) {

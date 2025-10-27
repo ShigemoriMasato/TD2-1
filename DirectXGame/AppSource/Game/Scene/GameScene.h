@@ -12,6 +12,7 @@
 #include "../Goal/GoalTape.h"
 #include "../Goal/GoalEvent.h"
 #include "../Player/TargetScope.h"
+#include "../BackGround/BackGround.h"
 #include <Game/FPS/TimeSlower.h>
 
 class Player;
@@ -44,6 +45,7 @@ private://特定なオブジェクト
 	std::unique_ptr<Wire> wire_ = nullptr;
 	std::unique_ptr<GoalTape> goalTape_ = nullptr;
 	std::unique_ptr<TargetScope> targetScope_ = nullptr;
+	std::unique_ptr<BackGround> backGround_ = nullptr;
 
 private://イベント
 	std::unique_ptr<GoalEvent> goalEvent_ = nullptr;

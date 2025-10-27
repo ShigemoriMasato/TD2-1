@@ -91,6 +91,7 @@
     <ClCompile Include="AppSource\Common\InitializeScene\InitializeScene.cpp" />
     <ClCompile Include="AppSource\Game\ScoreManager.cpp" />
     <ClCompile Include="AppSource\Game\BackGround\BackGround.cpp" />
+    <ClCompile Include="Engine\Render\Resource\ModelParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -192,11 +193,9 @@
     <ClInclude Include="Engine\Scene\Data\SceneTools.h" />
     <ClInclude Include="AppSource\Game\ScoreManager.h" />
     <ClInclude Include="AppSource\Game\BackGround\BackGround.h" />
+    <ClInclude Include="Engine\Render\Resource\ModelParticle.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Assets\Shader\TileEffectCS.hlsl" />
   </ItemGroup>
 </Project>

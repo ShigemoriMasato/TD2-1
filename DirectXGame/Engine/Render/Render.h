@@ -6,6 +6,7 @@
 #include <Render/Resource/ParticleResource.h>
 #include <Render/Resource/MPResource.h>
 #include <Render/Resource/PostEffectResource.h>
+#include <Render/Resource/ModelParticle.h>
 #include <Resource/Texture/TextureManager.h>
 #include <Resource/OffScreen/OffScreenManager.h>
 #include <Render/ImGuiWrapper.h>
@@ -25,6 +26,7 @@ public:
 	void Draw(ParticleResource* resource);
 	void Draw(MPResource* resource);
 	void Draw(PostEffectResource* resource);
+	void Draw(ModelParticle* resource);
 	void PostDraw(ImGuiWrapper* imguiRap);
 
 	void EndFrame(bool swapchainPresent);

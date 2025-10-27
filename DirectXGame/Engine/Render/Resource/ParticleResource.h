@@ -70,5 +70,5 @@ private:
 	uint32_t instanceNum_ = 0;
 
 
-	bool billboard_ = true;
+	bool billboard_ = false;
 };

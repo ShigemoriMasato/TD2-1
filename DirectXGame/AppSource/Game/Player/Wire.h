@@ -42,7 +42,7 @@ private://Wire情報
 	Vector3 targetPos_ = {};
 
 	//伸ばす速度
-	const float extendSpeed_ = 30.0f;
+	const float extendSpeed_ = 3.0f;
 	//伸ばし始めたときの距離
 	float initDistance_ = 0.0f;
 	//伸ばしているか
