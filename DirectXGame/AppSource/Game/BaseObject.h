@@ -29,6 +29,7 @@ public:
 	Transform* GetTransform() { return &transform_; }
 	void SetActor(PhysicsEngine* physicsEngine,bool useGravity = true);
 	void SetPosition(const Vector3& position) { transform_.position = position; }
+	void SetColor(uint32_t color) { modelResource_->color_ = color; }
 protected://オブジェクトプロパティ
 	Transform transform_;
 	std::unique_ptr<PhysicsActor> actor_ = nullptr;
