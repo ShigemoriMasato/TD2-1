@@ -18,6 +18,8 @@ public:
 	LevelIndex nextLevelIndex_ = LevelIndex::Level1;
 	bool isCreateTexture = false;
 
+	int bgmPlayHandle_ = -1;
+
 private:
 
 };

@@ -13,112 +13,9 @@
 
 void GameScene::Initialize()
 {
-	camera_ = std::make_unique<CameraManager>();
-
-	timeSlower_ = std::make_unique<TimeSlower>(fpsObserver_);
-
-	//タイルマップ初期化
-	{
-		auto handle = modelManager_->LoadModel("Cube");
-		tileMap_ = std::make_unique<TileMap>(&physicsEngine_);
-		levelLoader_.LoadLevel("Assets/Map/level2.json", *tileMap_);
-		tileMap_->SetModelData(textureManager_, modelManager_->GetModelData(handle), camera_->GetCamera());
-	}
-
-	//プレイヤー初期化
-	{
-		auto player = std::make_unique<Player>(timeSlower_.get(), &physicsEngine_);
-		auto handle = modelManager_->LoadModel("Player");
-		physicsEngine_;
-		player->Initialize(modelManager_->GetModelData(handle), camera_->GetCamera());
-		player->SetKeyConfig(&keys_);
-		player->SetTileMap(tileMap_.get());
-		player_ = player.get();
-		objects_.push_back(std::move(player));
-	}
-
-	//Cameraの初期化
-	camera_->Initialize(&player_->GetTransform()->position);
-	camera_->SetOffset({ 0.0f, 0.0f, -40.0f });
-
-	if (commonData->isCreateTexture) {
-		Vector2 size = tileMap_->WorldSize();
-		//zの1.4倍は適当。画像に異常があるようなら変更して
-		camera_->SetOffset({ size.x / 2.0f, size.y / 2.0f, -size.x * 1.4f });
-		camera_->FinishCalculation();
-	}
-
-	{
-		enemyManager_ = std::make_unique<EnemyManager>();
-		enemyManager_->Initialize(modelManager_, camera_->GetCamera());
-
-		levelLoader_.AddEnemy(*enemyManager_);
-	}
-
-	{
-		//ワイヤー初期化
-		//ワイヤーの描画をプレイヤーに任せているので、オブジェクトリストに追加されない
-		wire_ = std::make_unique<Wire>();
-		auto handle = modelManager_->LoadModel("testWire");
-		wire_->Initialize(modelManager_->GetModelData(handle), camera_->GetCamera());
-		player_->SetWire(wire_.get());
-
-	}
-
-	//hook
-	{
-		auto handle = modelManager_->LoadModel("testBlock");
-		auto coinHandle = modelManager_->LoadModel("coin");
-		levelLoader_.AddGameObject<Hook>(objects_, modelManager_, handle, camera_->GetCamera());
-		levelLoader_.AddGameObject<Coin>(objects_, modelManager_, coinHandle, camera_->GetCamera(), &physicsEngine_, false);
-	}
-
-	{
-		//ゴールテープの作成
-		auto goalTape = std::make_unique<GoalTape>();
-		int textureHandle = textureManager_->LoadTexture("Assets/Texture/goal.png");
-		auto tileWorldSize = tileMap_->WorldSize();
-		goalTape->Initialize(textureHandle, tileWorldSize.x, tileWorldSize.y, &physicsEngine_, camera_->GetCamera());
-		goalTape_ = std::move(goalTape);
-		goalX_ = tileWorldSize.x;
-	}
-
-	{
-		//PostEffect初期化
-		postEffect_ = std::make_unique<PostEffectResource>();
-		postEffect_->Initialize();
-		postEffect_->input_ = OffScreenIndex::GameWindow;
-		postEffect_->output_ = OffScreenIndex::SwapChain;
-		if (commonData->isCreateTexture) {
-			int index = int(OffScreenIndex::Level1) + int(commonData->nextLevelIndex_);
-			postEffect_->output_ = OffScreenIndex(index);
-		}
-
-		// グリッドトランジションでフェードイン（progress = 1.0から0.0へ）
-		postEffect_->data_.gridTransition.progress = 1.0f;
-		postEffect_->data_.gridTransition.gridSize = 16.0f;  // 16x16グリッド
-		postEffect_->data_.gridTransition.fadeColor = 0.0f;  // 白からフェードイン
-		postEffect_->data_.gridTransition.pattern = 0.0f;    // ランダムパターン
-		postEffect_->SetJobs(PostEffectJob::GridTransition);
-		
-		isFadingIn_ = true;
-		fadeTimer_ = 0.0f;
-		if (commonData->isCreateTexture) {
-			fadeTimer_ = fadeDuration_;
-		}
-	}
-
-	{
-		targetScope_ = std::make_unique<TargetScope>();
-		targetScope_->Initialize(textureManager_->LoadTexture("Assets/Texture/scope.png"), player_, camera_->GetCamera());
-	}
-
-	{
-		//ゴールイベント初期化
-		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_, postEffect_.get());
-	}
-
-	render_->EndFrame(false);
+	//CommonDataから次のレベル名を取得して初期化
+	auto file = levelLoader_.GetLevelFileMap();
+	Initialize(file[commonData->nextLevelIndex_]);
 }
 
 void GameScene::Initialize(std::string levelName)
@@ -228,6 +125,16 @@ void GameScene::Initialize(std::string levelName)
 	{
 		//ゴールイベント初期化
 		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_, postEffect_.get());
+	}
+
+	//BGMの再生
+	if (!audio_->IsPlay(commonData->bgmPlayHandle_)) {
+		int soundHandle = audio_->Load("BGM/Normal.mp3");
+
+		if (commonData->bgmPlayHandle_ / 10 != soundHandle) {
+			audio_->Stop(commonData->bgmPlayHandle_);
+			commonData->bgmPlayHandle_ = audio_->Play(soundHandle, true);
+		}
 	}
 
 	render_->EndFrame(false);

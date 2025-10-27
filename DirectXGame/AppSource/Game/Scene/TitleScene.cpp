@@ -108,7 +108,15 @@ void TitleScene::Initialize()
 		background_->color_ = 0xffffffff;
 	}
 
+	//BGMの再生
+	if (!audio_->IsPlay(commonData->bgmPlayHandle_)) {
+		int soundHandle = audio_->Load("BGM/Normal.mp3");
 
+		if (commonData->bgmPlayHandle_ / 10 != soundHandle) {
+			audio_->Stop(commonData->bgmPlayHandle_);
+			commonData->bgmPlayHandle_ = audio_->Play(soundHandle, true);
+		}
+	}
 }
 
 std::unique_ptr<BaseScene> TitleScene::Update()
