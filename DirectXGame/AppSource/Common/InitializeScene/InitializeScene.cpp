@@ -49,7 +49,9 @@ void InitializeScene::Initialize() {
 
 
 	int game = audio_->Load("BGM/Game.mp3");
-	audio_->SetVolume(game, 0.5f);
+	audio_->SetVolume(game, 1.0f);
+	int slow = audio_->Load("slow.mp3");
+	audio_->SetVolume(slow, 1.0f);
 }
 
 std::unique_ptr<BaseScene> InitializeScene::Update() {

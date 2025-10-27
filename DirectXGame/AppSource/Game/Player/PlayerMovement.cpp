@@ -49,7 +49,7 @@ void Player::UpdateIdel(float deltaTime) {
 
 void Player::OnForcus() {
 	int slow = audio_->Load("slow.mp3");
-	slowSE_ = audio_->Play(slow, false);
+	audio_->Play(slow, false);
 	timeSlower_->StartSlow(currentSlowTime_);
 }
 
@@ -98,15 +98,12 @@ void Player::UpdateForcus(float deltaTime) {
 			timeSlower_->EndSlow(true);
 			//着地したらIdleに行くはずなのでとりあえずDashに投げる
 			behaviorRequest_ = Behavior::Dash;
-
-			rotateSpeed_ = rotateMaxSpeed_;
 		}
 	}
 
 }
 
 void Player::OnExtend() {
-	audio_->Stop(slowSE_);
 
 	int shoot = audio_->Load("shoot.mp3");
 	audio_->Play(shoot, false);

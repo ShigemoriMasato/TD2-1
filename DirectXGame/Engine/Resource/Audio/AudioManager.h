@@ -44,6 +44,7 @@ private:
 	const std::string basePath = "Assets/Audio/";
 
 	std::vector<std::unique_ptr<AudioData>> audioData_{};
+	std::vector<std::string> audioNames_{};
 
 };
 

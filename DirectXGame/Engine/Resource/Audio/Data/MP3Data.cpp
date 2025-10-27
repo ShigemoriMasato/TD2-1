@@ -82,6 +82,7 @@ void MP3Data::Load(std::filesystem::path filepath) {
 int MP3Data::Play(IXAudio2* xAudio, bool isLoop) {
 	IXAudio2SourceVoice* pSourceVoice{ nullptr };
 	xAudio->CreateSourceVoice(&pSourceVoice, &wfex_);
+	pSourceVoice->SetVolume(volume_);
 
 	XAUDIO2_BUFFER buffer{ 0 };
 	buffer.pAudioData = pBuffer_;
@@ -92,6 +93,7 @@ int MP3Data::Play(IXAudio2* xAudio, bool isLoop) {
 	// 再生する
 	HRESULT hr = pSourceVoice->SubmitSourceBuffer(&buffer);
 	assert(SUCCEEDED(hr));
+
 
 	hr = pSourceVoice->Start();
 	assert(SUCCEEDED(hr));

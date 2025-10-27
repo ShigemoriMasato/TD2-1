@@ -125,14 +125,15 @@ void GameScene::Initialize(std::string levelName) {
 		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_, postEffect_.get());
 	}
 
-	//BGMの再生
-	int soundHandle = audio_->Load("BGM/Game.mp3");
+	if (!commonData->isCreateTexture) {
+		//BGMの再生
+		int soundHandle = audio_->Load("BGM/Game.mp3");
 
-	if (commonData->bgmPlayHandle_ / 10 != soundHandle || !audio_->IsPlay(commonData->bgmPlayHandle_)) {
-		audio_->Stop(commonData->bgmPlayHandle_);
-		commonData->bgmPlayHandle_ = audio_->Play(soundHandle, true);
+		if (commonData->bgmPlayHandle_ / 10 != soundHandle || !audio_->IsPlay(commonData->bgmPlayHandle_)) {
+			audio_->Stop(commonData->bgmPlayHandle_);
+			commonData->bgmPlayHandle_ = audio_->Play(soundHandle, true);
+		}
 	}
-
 
 	render_->EndFrame(false);
 }

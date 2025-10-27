@@ -115,9 +115,8 @@ private:
 	const TileMap* tileMap_ = nullptr;
 
 private://Sound
-	int slowSE_ = -1;
 	float walkSeTimer_ = 0.0f;
-	float walkCoolTime_ = 0.7f;
+	float walkCoolTime_ = 0.4f;
 
 private://メンバ関数
 	//ビヘイビアリクエスト
