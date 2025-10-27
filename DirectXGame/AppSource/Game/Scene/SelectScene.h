@@ -58,9 +58,10 @@ private:
 	// ステージプレビュー用DrawResource
 	std::unique_ptr<DrawResource> stagePreview1_ = nullptr;
 	std::unique_ptr<DrawResource> stagePreview2_ = nullptr;
+	std::unique_ptr<DrawResource> stagePreview3_ = nullptr;
 
 	// ステージ選択
-	int selectedStageIndex_ = 0;  // 0: Level1, 1: Level2
+	int selectedStageIndex_ = 0;  // 0: Level1, 1: Level2, 2: Level3
 	bool isStageSelected_ = false;  // スペースキーで決定されたかどうか
 
 	// テクスチャハンドル
