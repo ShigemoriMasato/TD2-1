@@ -304,7 +304,7 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	goalEvent_->Update(deltaTime);
 
 	//ゴールの処理が終わったら
-	if(goalEvent_->IsChangeScene()){
+	if(goalEvent_->IsChangeScene() || player_->IsDead()){
 		//とりあえず今は初期化
 		return std::make_unique<GameScene>();
 	}
