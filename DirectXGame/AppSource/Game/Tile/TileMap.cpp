@@ -97,7 +97,7 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 			{
 				resource->camera_ = camera;
 				resource->position_[index] = GetWorldPos(x, y);
-				resource->color_[index] = 0x800080ff;
+				resource->textureIndex_[index] = 1;
 			}
 		}
 	}
