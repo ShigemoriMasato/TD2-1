@@ -80,6 +80,11 @@ private://パラメータ
 	//dashの速度軽減率
 	const float dashRegistRate_ = 0.97f;
 
+	//スローモーションの最大連続稼働時間
+	const float maxSlowTime_ = 3.0f;
+	//スローモーションの現在の稼働時間
+	float currentSlowTime_ = 0.0f;
+
 	//wireを再び伸ばせるまでのクールタイム
 	float wireCoolTime_ = 0.0f;
 	const float maxWireCoolTime_ = 0.5f;
@@ -108,6 +113,12 @@ private:
 
 	TimeSlower* timeSlower_ = nullptr;
 	const TileMap* tileMap_ = nullptr;
+
+private://Sound
+	int slowSE_ = -1;
+	float walkSeTimer_ = 0.0f;
+	float walkCoolTime_ = 0.7f;
+
 private://メンバ関数
 	//ビヘイビアリクエスト
 	void RequestBehavior();

@@ -13,6 +13,10 @@ public:
 	BaseObject();
 	virtual ~BaseObject();
 
+	static void SetAudioManager(AudioManager* audioManager) {
+		audio_ = audioManager;
+	}
+
 	virtual void Initialize(ModelData* modelData, Camera* camera);
 
 	virtual void Update(float deltaTime) = 0;
@@ -36,6 +40,9 @@ protected://オブジェクトプロパティ
 	bool isAlive_ = true;
 protected://描画に必要なリソース
 	std::unique_ptr<ModelResource> modelResource_;
+
+protected://カスの引数
+	static AudioManager* audio_;
 
 public://debug用
 	static std::unique_ptr<Logger> logger_;

@@ -2,6 +2,7 @@
 #include <typeinfo>
 
 std::unique_ptr<Logger> BaseObject::logger_ = nullptr;
+AudioManager* BaseObject::audio_ = nullptr;
 
 BaseObject::BaseObject() {
 }

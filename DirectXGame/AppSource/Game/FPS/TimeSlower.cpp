@@ -25,11 +25,11 @@ void TimeSlower::Update() {
 		}
 	}
 
-	deltaTime_ = trueDelta * timeRate_;
-
 	if (timer_ < calculateTime_) {
 		CalculateDeltaTime();
 	}
+
+	deltaTime_ = trueDelta * timeRate_;
 
 	ImGui::Begin("DeltaTime");
 	ImGui::Text("TrueDelta: %.6f", trueDelta);

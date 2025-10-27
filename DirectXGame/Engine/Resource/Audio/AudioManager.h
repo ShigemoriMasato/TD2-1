@@ -28,7 +28,7 @@ public:
 	/// <returns>再生ハンドル。流し終わるかStopを押すと破棄される</returns>
 	int Play(int soundHandle, bool isLoop);
 
-	//Volumeを変更
+	//Volumeを変更(初期値1.0f)
 	void SetVolume(int soundHandle, float volume);
 
 	//再生されているかどうか

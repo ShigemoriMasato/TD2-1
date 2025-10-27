@@ -18,11 +18,12 @@ void GameScene::Initialize()
 	Initialize(file[commonData->nextLevelIndex_]);
 }
 
-void GameScene::Initialize(std::string levelName)
-{
+void GameScene::Initialize(std::string levelName) {
 	camera_ = std::make_unique<CameraManager>();
 
 	timeSlower_ = std::make_unique<TimeSlower>(fpsObserver_);
+
+	BaseObject::SetAudioManager(audio_);
 
 	//タイルマップ初期化
 	{
@@ -48,8 +49,7 @@ void GameScene::Initialize(std::string levelName)
 	camera_->Initialize(&player_->GetTransform()->position);
 	camera_->SetOffset({ 0.0f, 5.0f, -40.0f });
 
-	if (commonData->isCreateTexture)
-	{
+	if (commonData->isCreateTexture) {
 		Vector2 size = tileMap_->WorldSize();
 		//zの1.4倍は適当。画像に異常があるようなら変更して
 		camera_->SetOffset({ size.x / 2.0f, size.y / 2.0f, -size.x * 1.4f });
@@ -96,8 +96,7 @@ void GameScene::Initialize(std::string levelName)
 		postEffect_->Initialize();
 		postEffect_->input_ = OffScreenIndex::GameWindow;
 		postEffect_->output_ = OffScreenIndex::SwapChain;
-		if (commonData->isCreateTexture)
-		{
+		if (commonData->isCreateTexture) {
 			int index = int(OffScreenIndex::Level1) + int(commonData->nextLevelIndex_);
 			postEffect_->output_ = OffScreenIndex(index);
 		}
@@ -111,8 +110,7 @@ void GameScene::Initialize(std::string levelName)
 
 		isFadingIn_ = true;
 		fadeTimer_ = 0.0f;
-		if (commonData->isCreateTexture)
-		{
+		if (commonData->isCreateTexture) {
 			fadeTimer_ = fadeDuration_;
 		}
 	}
@@ -128,14 +126,13 @@ void GameScene::Initialize(std::string levelName)
 	}
 
 	//BGMの再生
-	if (!audio_->IsPlay(commonData->bgmPlayHandle_)) {
-		int soundHandle = audio_->Load("BGM/Normal.mp3");
+	int soundHandle = audio_->Load("BGM/Game.mp3");
 
-		if (commonData->bgmPlayHandle_ / 10 != soundHandle) {
-			audio_->Stop(commonData->bgmPlayHandle_);
-			commonData->bgmPlayHandle_ = audio_->Play(soundHandle, true);
-		}
+	if (commonData->bgmPlayHandle_ / 10 != soundHandle || !audio_->IsPlay(commonData->bgmPlayHandle_)) {
+		audio_->Stop(commonData->bgmPlayHandle_);
+		commonData->bgmPlayHandle_ = audio_->Play(soundHandle, true);
 	}
+
 
 	render_->EndFrame(false);
 }
