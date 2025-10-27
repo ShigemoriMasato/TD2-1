@@ -50,9 +50,14 @@ float3 ChromaticAberrationEffect(float2 uv, float strength)
     // 各チャンネルで異なるオフセット（より大きく）
     float offset = strength * 0.015 * (1.0 + distStrength);
     
-    float r = gTexture.Sample(gSampler, uv + direction * offset * 1.2).r;
-    float g = gTexture.Sample(gSampler, uv).g;
-    float b = gTexture.Sample(gSampler, uv - direction * offset * 1.2).b;
+    // UV座標を計算し、0.0〜1.0の範囲にクランプ
+    float2 uvR = saturate(uv + direction * offset * 1.2);
+    float2 uvG = saturate(uv);
+    float2 uvB = saturate(uv - direction * offset * 1.2);
+    
+    float r = gTexture.Sample(gSampler, uvR).r;
+    float g = gTexture.Sample(gSampler, uvG).g;
+    float b = gTexture.Sample(gSampler, uvB).b;
     
     return float3(r, g, b);
 }
