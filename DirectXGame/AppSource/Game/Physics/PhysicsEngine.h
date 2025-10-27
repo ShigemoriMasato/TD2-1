@@ -45,7 +45,7 @@ private:
 	std::vector<ObjectCollision> objectCollisionInfo_; // 記録された判定を行うオブジェクト
 	std::vector<TileCollision> tileCollisionInfo_;		// 記録された判定を行うタイル
 
-	float maxSpeed_ = 20.0f;
+	float maxSpeed_ = 30.0f;
 
 	static const inline float gravity_ = -13.0f;		// 重力
 	static const inline float friction_ = 0.9f;	// 摩擦係数

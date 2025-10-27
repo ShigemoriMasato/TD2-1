@@ -13,9 +13,17 @@
 
 void GameScene::Initialize()
 {
+	//CommonDataから次のレベル名を取得して初期化
+	auto file = levelLoader_.GetLevelFileMap();
+	Initialize(file[commonData->nextLevelIndex_]);
+}
+
+void GameScene::Initialize(std::string levelName) {
 	camera_ = std::make_unique<CameraManager>();
 
 	timeSlower_ = std::make_unique<TimeSlower>(fpsObserver_);
+
+	BaseObject::SetAudioManager(audio_);
 
 	//タイルマップ初期化
 	{
@@ -44,7 +52,7 @@ void GameScene::Initialize()
 
 	//Cameraの初期化
 	camera_->Initialize(&player_->GetTransform()->position);
-	camera_->SetOffset({ 0.0f, 0.0f, -40.0f });
+	camera_->SetOffset({ 0.0f, 5.0f, -40.0f });
 
 	if (commonData->isCreateTexture) {
 		Vector2 size = tileMap_->WorldSize();
@@ -123,8 +131,9 @@ void GameScene::Initialize()
 		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_, postEffect_.get());
 	}
 
-	render_->EndFrame(false);
-}
+	if (!commonData->isCreateTexture) {
+		//BGMの再生
+		int soundHandle = audio_->Load("BGM/Game.mp3");
 
 void GameScene::Initialize(std::string levelName)
 {

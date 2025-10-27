@@ -1,10 +1,14 @@
 #include "Player.h"
 #include "Wire.h"
 #include "../Tile/TileMap.h"
+#include <Resource/Audio/AudioManager.h>
 
 void Player::OnIdel() {
 	transform_.rotation = {};
 	rotateSpeed_ = 0.0f;
+
+	//現在のスロウタイムをリセット
+	currentSlowTime_ = maxSlowTime_;
 
 	actor_->useGravity_ = true;
 	wire_->SetStartPositionPtr(&transform_.position);
@@ -21,6 +25,18 @@ void Player::UpdateIdel(float deltaTime) {
 	if (key[Key::Right]) actor_->force_.x = moveSpeed_;
 	if (key[Key::Left]) actor_->force_.x = -moveSpeed_;
 
+	//音
+	if(key[Key::Right] || key[Key::Left]) {
+		walkSeTimer_ += deltaTime;
+		if (walkSeTimer_ >= walkCoolTime_) {
+			int walk = audio_->Load("walk.mp3");
+			audio_->Play(walk, false);
+			walkSeTimer_ = 0.0f;
+		}
+	} else {
+		walkSeTimer_ = walkCoolTime_;
+	}
+
 	if(!actor_->collidedBottom_){
 		behaviorRequest_ = Behavior::Dash;
 	}
@@ -32,15 +48,19 @@ void Player::UpdateIdel(float deltaTime) {
 }
 
 void Player::OnForcus() {
-	timeSlower_->StartSlow(3.0f);
+	int slow = audio_->Load("slow.mp3");
+	audio_->Play(slow, false);
+	timeSlower_->StartSlow(currentSlowTime_);
 }
 
 void Player::UpdateForcus(float deltaTime) {
 	//地面に着地していたら慣性を消す
-	if(actor_->collidedBottom_) {
+	if (actor_->collidedBottom_) {
 		actor_->velocity_ = {};
 	}
 	actor_->velocity_ *= dashRegistRate_;
+
+	currentSlowTime_ = std::max(currentSlowTime_ - deltaTime, 0.0f);
 
 	auto& key = (*key_);
 
@@ -68,6 +88,8 @@ void Player::UpdateForcus(float deltaTime) {
 			wire_->SetEndPosition(targetPos_);
 			//スロウモーション終了(補完なし)
 			timeSlower_->EndSlow(false);
+			//現在のスロウタイムをリセット
+			currentSlowTime_ = maxSlowTime_;
 			//ワイヤーを投げる
 			behaviorRequest_ = Behavior::Extend;
 			selectedTarget->SetColor(0xffffffff);
@@ -76,13 +98,17 @@ void Player::UpdateForcus(float deltaTime) {
 			//スロウモーション終了(補完あり)
 			timeSlower_->EndSlow(true);
 			//着地したらIdleに行くはずなのでとりあえずDashに投げる
-			behaviorRequest_ = Behavior::Idle;
+			behaviorRequest_ = Behavior::Dash;
 		}
 	}
 
 }
 
 void Player::OnExtend() {
+
+	int shoot = audio_->Load("shoot.mp3");
+	audio_->Play(shoot, false);
+
 	actor_->velocity_ = {};
 	actor_->useGravity_ = false;
 }
@@ -98,6 +124,10 @@ void Player::UpdateExtend(float deltaTime) {
 }
 
 void Player::OnShrink() {
+
+	int reel = audio_->Load("reel.mp3");
+	audio_->Play(reel, false);
+
 	targetDir_ = (targetPos_ - transform_.position).Normalize();
 	rotateSpeed_ = rotateMaxSpeed_;
 }
@@ -119,9 +149,6 @@ void Player::UpdateShrink(float deltaTime) {
 }
 
 void Player::OnDash() {
-	//↓仮置き(斜め45度くらいで吹っ飛ばす)
-	//actor_->force_ = targetDir_ * dashPower_;
-
 	actor_->useGravity_ = true;
 }
 

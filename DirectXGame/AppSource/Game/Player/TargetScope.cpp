@@ -6,9 +6,9 @@ TargetScope::TargetScope() {
 	scopeTop_ = std::make_unique<DrawResource>();
 	scopeTop_->Initialize(ShapeType::Plane);
 	scopeTop_->localPos_ = {
-		{3.0f, 0.1f, 0.0f},
+		{2.0f, 0.1f, 0.0f},
 		{10.0f, 0.1f, 0.0f},
-		{3.0f, -0.1f, 0.0f},
+		{2.0f, -0.1f, 0.0f},
 		{10.0f, -0.1f, 0.0f},
 	};
 	scopeTop_->texcoord_ = {
