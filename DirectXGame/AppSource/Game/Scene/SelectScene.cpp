@@ -44,7 +44,7 @@ void SelectScene::Initialize() {
 	isWaitingAfterZoom_ = false;
 	zoomWaitTimer_ = 0.0f;
 
-	// ステージ選択の初期化（Level1が最初に選択される）
+	// ステージ選択の初期化（Level0が最初に選択される）
 	selectedStageIndex_ = 0;
 	previousStageIndex_ = 0;
 	isStageSelected_ = false;
@@ -150,86 +150,50 @@ void SelectScene::Initialize() {
 		// TODO: 説明テクスチャがあればここで設定
 	}
 
-	// ステージ1プレビューの初期化
-	{
+	// ステージプレビューの初期化
+	// OffScreenIndexのマッピング: Level1, Level2, Level3, Level4, Level5
+	const OffScreenIndex offScreenIndices[] = {
+		OffScreenIndex::Level1,
+		OffScreenIndex::Level2,
+		OffScreenIndex::Level3,
+		OffScreenIndex::Level4,
+		OffScreenIndex::Level5
+	};
 
+	// 初期配置の位置テーブル
+	const Vector3 initialPositions[] = {
+		centerPosition_,      // Stage 0: 中央（選択状態）
+		rightPosition_,       // Stage 1: 右側
+		farRightPosition_,    // Stage 2: 右遠く
+		farRightPosition_,    // Stage 4: 右遠く
+		farRightPosition_,    // Stage 3: 右遠く
+	};
+
+	for (int i = 0; i < 5; ++i) {
+		// DrawResourceの作成と初期化
 		stagePreviews_.push_back(std::make_unique<DrawResource>());
 		stagePreviews_.back()->Initialize(ShapeType::Plane);
-		stagePreviews_.back()->SetTextureHandle(offScreenManager_->GetOffScreenData(OffScreenIndex::Level1)->GetTextureGPUHandle());
+		stagePreviews_.back()->SetTextureHandle(offScreenManager_->GetOffScreenData(offScreenIndices[i])->GetTextureGPUHandle());
 		stagePreviews_.back()->camera_ = uiCamera_.get();
-
-		stagePreviews_.back()->position_ = centerPosition_;
-		stagePreviews_.back()->scale_ = selectedScale_;
 		stagePreviews_.back()->rotate_ = { 0.0f, 0.0f, 0.0f };
-		stagePreviews_.back()->color_ = selectedColor_;
 
-
+		// 最初のステージ（i == 0）は選択状態、それ以外は非選択状態
+		bool isSelected = (i == 0);
+		stagePreviews_.back()->position_ = initialPositions[i];
+		stagePreviews_.back()->scale_ = isSelected ? selectedScale_ : unselectedScale_;
+		stagePreviews_.back()->color_ = isSelected ? selectedColor_ : unselectedColor_;
 
 		// アニメーションデータの初期化
-		stageAnimations_[0].currentPosition = centerPosition_;
-		stageAnimations_[0].targetPosition = centerPosition_;
-		stageAnimations_[0].currentScale = selectedScale_;
-		stageAnimations_[0].targetScale = selectedScale_;
-		stageAnimations_[0].currentRotation = { 0.0f, 0.0f, 0.0f };
-		stageAnimations_[0].targetRotation = { 0.0f, 0.0f, 0.0f };
-		stageAnimations_[0].currentColor = selectedColor_;
-		stageAnimations_[0].targetColor = selectedColor_;
-		stageAnimations_[0].animationTimer = 0.0f;
-		stageAnimations_[0].isAnimating = false;
-
-	}
-
-	// ステージ2プレビューの初期化
-	{
-
-		stagePreviews_.push_back(std::make_unique<DrawResource>());
-		stagePreviews_.back()->Initialize(ShapeType::Plane);
-		stagePreviews_.back()->SetTextureHandle(offScreenManager_->GetOffScreenData(OffScreenIndex::Level2)->GetTextureGPUHandle());
-		stagePreviews_.back()->camera_ = uiCamera_.get();
-		stagePreviews_.back()->position_ = rightPosition_;
-		stagePreviews_.back()->scale_ = unselectedScale_;
-		stagePreviews_.back()->rotate_ = { 0.0f, 0.0f, 0.0f };
-		stagePreviews_.back()->color_ = unselectedColor_;
-
-
-		// アニメーションデータの初期化
-		stageAnimations_[1].currentPosition = rightPosition_;
-		stageAnimations_[1].targetPosition = rightPosition_;
-		stageAnimations_[1].currentScale = unselectedScale_;
-		stageAnimations_[1].targetScale = unselectedScale_;
-		stageAnimations_[1].currentRotation = { 0.0f, 0.0f, 0.0f };
-		stageAnimations_[1].targetRotation = { 0.0f, 0.0f, 0.0f };
-		stageAnimations_[1].currentColor = unselectedColor_;
-		stageAnimations_[1].targetColor = unselectedColor_;
-		stageAnimations_[1].animationTimer = 0.0f;
-		stageAnimations_[1].isAnimating = false;
-
-	}
-
-	// ステージ3プレビューの初期化
-	{
-
-		stagePreviews_.push_back(std::make_unique<DrawResource>());
-		stagePreviews_.back()->Initialize(ShapeType::Plane);
-		stagePreviews_.back()->SetTextureHandle(offScreenManager_->GetOffScreenData(OffScreenIndex::Level3)->GetTextureGPUHandle());
-		stagePreviews_.back()->camera_ = uiCamera_.get();
-		stagePreviews_.back()->position_ = farRightPosition_;
-		stagePreviews_.back()->scale_ = unselectedScale_;
-		stagePreviews_.back()->rotate_ = { 0.0f, 0.0f, 0.0f };
-		stagePreviews_.back()->color_ = unselectedColor_;
-
-		// アニメーションデータの初期化
-		stageAnimations_[2].currentPosition = farRightPosition_;
-		stageAnimations_[2].targetPosition = farRightPosition_;
-		stageAnimations_[2].currentScale = unselectedScale_;
-		stageAnimations_[2].targetScale = unselectedScale_;
-		stageAnimations_[2].currentRotation = { 0.0f, 0.0f, 0.0f };
-		stageAnimations_[2].targetRotation = { 0.0f, 0.0f, 0.0f };
-		stageAnimations_[2].currentColor = unselectedColor_;
-		stageAnimations_[2].targetColor = unselectedColor_;
-		stageAnimations_[2].animationTimer = 0.0f;
-		stageAnimations_[2].isAnimating = false;
-
+		stageAnimations_[i].currentPosition = initialPositions[i];
+		stageAnimations_[i].targetPosition = initialPositions[i];
+		stageAnimations_[i].currentScale = isSelected ? selectedScale_ : unselectedScale_;
+		stageAnimations_[i].targetScale = isSelected ? selectedScale_ : unselectedScale_;
+		stageAnimations_[i].currentRotation = { 0.0f, 0.0f, 0.0f };
+		stageAnimations_[i].targetRotation = { 0.0f, 0.0f, 0.0f };
+		stageAnimations_[i].currentColor = isSelected ? selectedColor_ : unselectedColor_;
+		stageAnimations_[i].targetColor = isSelected ? selectedColor_ : unselectedColor_;
+		stageAnimations_[i].animationTimer = 0.0f;
+		stageAnimations_[i].isAnimating = false;
 	}
 }
 
@@ -330,16 +294,9 @@ void SelectScene::UpdateZoomInEffect(float deltaTime) {
 	DrawResource* selectedStage = nullptr;
 	StageAnimationData* selectedAnimation = nullptr;
 
-
-	if (selectedStageIndex_ == 0) {
-		selectedStage = stagePreviews_[0].get();
-		selectedAnimation = &stageAnimations_[0];
-	} else if (selectedStageIndex_ == 1) {
-		selectedStage = stagePreviews_[1].get();
-		selectedAnimation = &stageAnimations_[1];
-	} else {
-		selectedStage = stagePreviews_[2].get();
-		selectedAnimation = &stageAnimations_[2];
+	if (selectedStageIndex_ >= 0 && selectedStageIndex_ < 5) {
+		selectedStage = stagePreviews_[selectedStageIndex_].get();
+		selectedAnimation = &stageAnimations_[selectedStageIndex_];
 	}
 
 	if (selectedStage && selectedAnimation) {
@@ -357,15 +314,11 @@ void SelectScene::UpdateZoomInEffect(float deltaTime) {
 	}
 
 	// 他のステージを画面外に移動
-	if (selectedStageIndex_ != 0) {
-		stagePreviews_[0]->position_.x = leftPosition_.x - (1400.0f * easedProgress);
-	}
-	if (selectedStageIndex_ != 1) {
-		stagePreviews_[1]->position_.x = (selectedStageIndex_ == 0 ? rightPosition_.x : leftPosition_.x) +
-			((selectedStageIndex_ == 0 ? 1400.0f : -1400.0f) * easedProgress);
-	}
-	if (selectedStageIndex_ != 2) {
-		stagePreviews_[1]->position_.x = rightPosition_.x + (1400.0f * easedProgress);
+	for (int i = 0; i < 5; ++i) {
+		if (i != selectedStageIndex_) {
+			float offset = (i < selectedStageIndex_) ? -1400.0f : 1400.0f;
+			stagePreviews_[i]->position_.x += offset * easedProgress * deltaTime * 60.0f;
+		}
 	}
 
 	// ズームイン完了で待機時間開始
@@ -384,12 +337,8 @@ void SelectScene::UpdateZoomWait(float deltaTime) {
 	// 選択されたステージを取得してフラッシュ効果を継続
 	DrawResource* selectedStage = nullptr;
 
-	if (selectedStageIndex_ == 0) {
-		selectedStage = stagePreviews_[0].get();
-	} else if (selectedStageIndex_ == 1) {
-		selectedStage = stagePreviews_[1].get();
-	} else {
-		selectedStage = stagePreviews_[2].get();
+	if (selectedStageIndex_ >= 0 && selectedStageIndex_ < 5) {
+		selectedStage = stagePreviews_[selectedStageIndex_].get();
 	}
 
 	// 待機中はゆっくりと明るさを脈動させる
@@ -427,7 +376,7 @@ void SelectScene::ProcessInput() {
 		// 目標値を設定してアニメーション開始
 		SetStagePreviewTargets();
 	}
-	
+
 	// 右キーが押された瞬間の処理
 	if (keys[Key::Right] && !prevKeyRight) {
 		previousStageIndex_ = selectedStageIndex_;
@@ -466,213 +415,104 @@ void SelectScene::UpdateStagePreviewAnimation(float deltaTime) {
 	// ズームイン中はステージ選択アニメーションをスキップ
 	if (isZoomingIn_) return;
 
-	// ステージ1のアニメーション更新
-	if (stageAnimations_[0].isAnimating) {
-		stageAnimations_[0].animationTimer += deltaTime;
-		float t = std::min(stageAnimations_[0].animationTimer / stageAnimationDuration_, 1.0f);
-		float easedT = EaseOutCubic(t);
+	// 全ステージのアニメーション更新（5個）
+	for (int i = 0; i < 5; ++i) {
+		if (stageAnimations_[i].isAnimating) {
+			stageAnimations_[i].animationTimer += deltaTime;
+			float t = std::min(stageAnimations_[i].animationTimer / stageAnimationDuration_, 1.0f);
+			float easedT = EaseOutCubic(t);
 
-		// 位置を補間
-		stageAnimations_[0].currentPosition.x = stageAnimations_[0].currentPosition.x +
-			(stageAnimations_[0].targetPosition.x - stageAnimations_[0].currentPosition.x) * easedT;
-		stageAnimations_[0].currentPosition.y = stageAnimations_[0].currentPosition.y +
-			(stageAnimations_[0].targetPosition.y - stageAnimations_[0].currentPosition.y) * easedT;
+			// 位置を補間
+			stageAnimations_[i].currentPosition.x = stageAnimations_[i].currentPosition.x +
+				(stageAnimations_[i].targetPosition.x - stageAnimations_[i].currentPosition.x) * easedT;
+			stageAnimations_[i].currentPosition.y = stageAnimations_[i].currentPosition.y +
+				(stageAnimations_[i].targetPosition.y - stageAnimations_[i].currentPosition.y) * easedT;
 
-		// スケールを補間
-		stageAnimations_[0].currentScale.x = stageAnimations_[0].currentScale.x +
-			(stageAnimations_[0].targetScale.x - stageAnimations_[0].currentScale.x) * easedT;
-		stageAnimations_[0].currentScale.y = stageAnimations_[0].currentScale.y +
-			(stageAnimations_[0].targetScale.y - stageAnimations_[0].currentScale.y) * easedT;
+			// スケールを補間
+			stageAnimations_[i].currentScale.x = stageAnimations_[i].currentScale.x +
+				(stageAnimations_[i].targetScale.x - stageAnimations_[i].currentScale.x) * easedT;
+			stageAnimations_[i].currentScale.y = stageAnimations_[i].currentScale.y +
+				(stageAnimations_[i].targetScale.y - stageAnimations_[i].currentScale.y) * easedT;
 
-		// カラーを補間
-		uint8_t currentR = (stageAnimations_[0].currentColor >> 24) & 0xFF;
-		uint8_t currentG = (stageAnimations_[0].currentColor >> 16) & 0xFF;
-		uint8_t currentB = (stageAnimations_[0].currentColor >> 8) & 0xFF;
-		uint8_t currentA = stageAnimations_[0].currentColor & 0xFF;
+			// カラーを補間
+			uint8_t currentR = (stageAnimations_[i].currentColor >> 24) & 0xFF;
+			uint8_t currentG = (stageAnimations_[i].currentColor >> 16) & 0xFF;
+			uint8_t currentB = (stageAnimations_[i].currentColor >> 8) & 0xFF;
+			uint8_t currentA = stageAnimations_[i].currentColor & 0xFF;
 
-		uint8_t targetR = (stageAnimations_[0].targetColor >> 24) & 0xFF;
-		uint8_t targetG = (stageAnimations_[0].targetColor >> 16) & 0xFF;
-		uint8_t targetB = (stageAnimations_[0].targetColor >> 8) & 0xFF;
-		uint8_t targetA = stageAnimations_[0].targetColor & 0xFF;
+			uint8_t targetR = (stageAnimations_[i].targetColor >> 24) & 0xFF;
+			uint8_t targetG = (stageAnimations_[i].targetColor >> 16) & 0xFF;
+			uint8_t targetB = (stageAnimations_[i].targetColor >> 8) & 0xFF;
+			uint8_t targetA = stageAnimations_[i].targetColor & 0xFF;
 
-		uint8_t newR = static_cast<uint8_t>(currentR + (targetR - currentR) * easedT);
-		uint8_t newG = static_cast<uint8_t>(currentG + (targetG - currentG) * easedT);
-		uint8_t newB = static_cast<uint8_t>(currentB + (targetB - currentB) * easedT);
-		uint8_t newA = static_cast<uint8_t>(currentA + (targetA - currentA) * easedT);
+			uint8_t newR = static_cast<uint8_t>(currentR + (targetR - currentR) * easedT);
+			uint8_t newG = static_cast<uint8_t>(currentG + (targetG - currentG) * easedT);
+			uint8_t newB = static_cast<uint8_t>(currentB + (targetB - currentB) * easedT);
+			uint8_t newA = static_cast<uint8_t>(currentA + (targetA - currentA) * easedT);
 
-		stageAnimations_[0].currentColor = (newR << 24) | (newG << 16) | (newB << 8) | newA;
+			stageAnimations_[i].currentColor = (newR << 24) | (newG << 16) | (newB << 8) | newA;
 
-		// DrawResourceに適用
-		stagePreviews_[0]->position_ = stageAnimations_[0].currentPosition;
-		stagePreviews_[0]->scale_ = stageAnimations_[0].currentScale;
-		stagePreviews_[0]->color_ = stageAnimations_[0].currentColor;
+			// DrawResourceに適用
+			stagePreviews_[i]->position_ = stageAnimations_[i].currentPosition;
+			stagePreviews_[i]->scale_ = stageAnimations_[i].currentScale;
+			stagePreviews_[i]->color_ = stageAnimations_[i].currentColor;
 
-		// アニメーション完了チェック
-		if (t >= 1.0f) {
-			stageAnimations_[0].isAnimating = false;
-			stageAnimations_[0].animationTimer = 0.0f;
-		}
-	}
-
-	// ステージ2のアニメーション更新
-	if (stageAnimations_[1].isAnimating) {
-		stageAnimations_[1].animationTimer += deltaTime;
-		float t = std::min(stageAnimations_[1].animationTimer / stageAnimationDuration_, 1.0f);
-		float easedT = EaseOutCubic(t);
-
-		// 位置を補間
-		stageAnimations_[1].currentPosition.x = stageAnimations_[1].currentPosition.x +
-			(stageAnimations_[1].targetPosition.x - stageAnimations_[1].currentPosition.x) * easedT;
-		stageAnimations_[1].currentPosition.y = stageAnimations_[1].currentPosition.y +
-			(stageAnimations_[1].targetPosition.y - stageAnimations_[1].currentPosition.y) * easedT;
-
-		// スケールを補間
-		stageAnimations_[1].currentScale.x = stageAnimations_[1].currentScale.x +
-			(stageAnimations_[1].targetScale.x - stageAnimations_[1].currentScale.x) * easedT;
-		stageAnimations_[1].currentScale.y = stageAnimations_[1].currentScale.y +
-			(stageAnimations_[1].targetScale.y - stageAnimations_[1].currentScale.y) * easedT;
-
-		// カラーを補間
-		uint8_t currentR = (stageAnimations_[1].currentColor >> 24) & 0xFF;
-		uint8_t currentG = (stageAnimations_[1].currentColor >> 16) & 0xFF;
-		uint8_t currentB = (stageAnimations_[1].currentColor >> 8) & 0xFF;
-		uint8_t currentA = stageAnimations_[1].currentColor & 0xFF;
-
-		uint8_t targetR = (stageAnimations_[1].targetColor >> 24) & 0xFF;
-		uint8_t targetG = (stageAnimations_[1].targetColor >> 16) & 0xFF;
-		uint8_t targetB = (stageAnimations_[1].targetColor >> 8) & 0xFF;
-		uint8_t targetA = stageAnimations_[1].targetColor & 0xFF;
-
-		uint8_t newR = static_cast<uint8_t>(currentR + (targetR - currentR) * easedT);
-		uint8_t newG = static_cast<uint8_t>(currentG + (targetG - currentG) * easedT);
-		uint8_t newB = static_cast<uint8_t>(currentB + (targetB - currentB) * easedT);
-		uint8_t newA = static_cast<uint8_t>(currentA + (targetA - currentA) * easedT);
-
-		stageAnimations_[1].currentColor = (newR << 24) | (newG << 16) | (newB << 8) | newA;
-
-		// DrawResourceに適用
-		stagePreviews_[1]->position_ = stageAnimations_[1].currentPosition;
-		stagePreviews_[1]->scale_ = stageAnimations_[1].currentScale;
-		stagePreviews_[1]->color_ = stageAnimations_[1].currentColor;
-
-		// アニメーション完了チェック
-		if (t >= 1.0f) {
-			stageAnimations_[1].isAnimating = false;
-			stageAnimations_[1].animationTimer = 0.0f;
-		}
-	}
-
-	// ステージ3のアニメーション更新
-	if (stageAnimations_[2].isAnimating) {
-		stageAnimations_[2].animationTimer += deltaTime;
-		float t = std::min(stageAnimations_[2].animationTimer / stageAnimationDuration_, 1.0f);
-		float easedT = EaseOutCubic(t);
-
-		// 位置を補間
-		stageAnimations_[2].currentPosition.x = stageAnimations_[2].currentPosition.x +
-			(stageAnimations_[2].targetPosition.x - stageAnimations_[2].currentPosition.x) * easedT;
-		stageAnimations_[2].currentPosition.y = stageAnimations_[2].currentPosition.y +
-			(stageAnimations_[2].targetPosition.y - stageAnimations_[2].currentPosition.y) * easedT;
-
-		// スケールを補間
-		stageAnimations_[2].currentScale.x = stageAnimations_[2].currentScale.x +
-			(stageAnimations_[2].targetScale.x - stageAnimations_[2].currentScale.x) * easedT;
-		stageAnimations_[2].currentScale.y = stageAnimations_[2].currentScale.y +
-			(stageAnimations_[2].targetScale.y - stageAnimations_[2].currentScale.y) * easedT;
-
-		// カラーを補間
-		uint8_t currentR = (stageAnimations_[2].currentColor >> 24) & 0xFF;
-		uint8_t currentG = (stageAnimations_[2].currentColor >> 16) & 0xFF;
-		uint8_t currentB = (stageAnimations_[2].currentColor >> 8) & 0xFF;
-		uint8_t currentA = stageAnimations_[2].currentColor & 0xFF;
-
-		uint8_t targetR = (stageAnimations_[2].targetColor >> 24) & 0xFF;
-		uint8_t targetG = (stageAnimations_[2].targetColor >> 16) & 0xFF;
-		uint8_t targetB = (stageAnimations_[2].targetColor >> 8) & 0xFF;
-		uint8_t targetA = stageAnimations_[2].targetColor & 0xFF;
-
-		uint8_t newR = static_cast<uint8_t>(currentR + (targetR - currentR) * easedT);
-		uint8_t newG = static_cast<uint8_t>(currentG + (targetG - currentG) * easedT);
-		uint8_t newB = static_cast<uint8_t>(currentB + (targetB - currentB) * easedT);
-		uint8_t newA = static_cast<uint8_t>(currentA + (targetA - currentA) * easedT);
-
-		stageAnimations_[2].currentColor = (newR << 24) | (newG << 16) | (newB << 8) | newA;
-
-		// DrawResourceに適用
-		stagePreviews_[2]->position_ = stageAnimations_[2].currentPosition;
-		stagePreviews_[2]->scale_ = stageAnimations_[2].currentScale;
-		stagePreviews_[2]->color_ = stageAnimations_[2].currentColor;
-
-		// アニメーション完了チェック
-		if (t >= 1.0f) {
-			stageAnimations_[2].isAnimating = false;
-			stageAnimations_[2].animationTimer = 0.0f;
+			// アニメーション完了チェック
+			if (t >= 1.0f) {
+				stageAnimations_[i].isAnimating = false;
+				stageAnimations_[i].animationTimer = 0.0f;
+			}
 		}
 	}
 }
 
 void SelectScene::SetStagePreviewTargets() {
 
-	// 選択されたステージに応じて各ステージの目標位置、スケール、カラーを設定
-	if (selectedStageIndex_ == 0) {
-		// Level1が選択された状態
-		// Stage1: 中央（選択）
-		stageAnimations_[0].targetPosition = centerPosition_;
-		stageAnimations_[0].targetScale = selectedScale_;
-		stageAnimations_[0].targetColor = selectedColor_;
 
-		// Stage2: 右側（非選択）
-		stageAnimations_[1].targetPosition = rightPosition_;
-		stageAnimations_[1].targetScale = unselectedScale_;
-		stageAnimations_[1].targetColor = unselectedColor_;
+	for (int i = 0; i < 5; ++i) {
+		int relativePos = i - selectedStageIndex_;  // 選択ステージからの相対位置
 
-		// Stage3: 最右側（画面外）
-		stageAnimations_[2].targetPosition = farRightPosition_;
-		stageAnimations_[2].targetScale = unselectedScale_;
-		stageAnimations_[2].targetColor = unselectedColor_;
-	} else if (selectedStageIndex_ == 1) {
-		// Level2が選択された状態
-		// Stage1: 左側（非選択）
-		stageAnimations_[0].targetPosition = leftPosition_;
-		stageAnimations_[0].targetScale = unselectedScale_;
-		stageAnimations_[0].targetColor = unselectedColor_;
+		// 相対位置に応じて目標値を設定
+		if (relativePos == 0) {
+			// 選択中のステージ: 中央
+			stageAnimations_[i].targetPosition = centerPosition_;
+			stageAnimations_[i].targetScale = selectedScale_;
+			stageAnimations_[i].targetColor = selectedColor_;
+		} else if (relativePos == 1) {
+			// 右隣のステージ
+			stageAnimations_[i].targetPosition = rightPosition_;
+			stageAnimations_[i].targetScale = unselectedScale_;
+			stageAnimations_[i].targetColor = unselectedColor_;
+		} else if (relativePos == -1) {
+			// 左隣のステージ
+			stageAnimations_[i].targetPosition = leftPosition_;
+			stageAnimations_[i].targetScale = unselectedScale_;
+			stageAnimations_[i].targetColor = unselectedColor_;
+		} else if (relativePos == 2) {
+			// 右2つ目のステージ
+			stageAnimations_[i].targetPosition = farRightPosition_;
+			stageAnimations_[i].targetScale = unselectedScale_;
+			stageAnimations_[i].targetColor = unselectedColor_;
+		} else if (relativePos == -2) {
+			// 左2つ目のステージ
+			stageAnimations_[i].targetPosition = farLeftPosition_;
+			stageAnimations_[i].targetScale = unselectedScale_;
+			stageAnimations_[i].targetColor = unselectedColor_;
+		} else {
+			// それ以外は画面外（さらに遠く）
+			if (relativePos > 0) {
+				stageAnimations_[i].targetPosition = { farRightPosition_.x + 700.0f * (relativePos - 2), 0.0f, 50.0f };
+			} else {
+				stageAnimations_[i].targetPosition = { farLeftPosition_.x - 700.0f * (-relativePos - 2), 0.0f, 50.0f };
+			}
+			stageAnimations_[i].targetScale = unselectedScale_;
+			stageAnimations_[i].targetColor = unselectedColor_;
+		}
 
-		// Stage2: 中央（選択）
-		stageAnimations_[1].targetPosition = centerPosition_;
-		stageAnimations_[1].targetScale = selectedScale_;
-		stageAnimations_[1].targetColor = selectedColor_;
-
-		// Stage3: 右側（非選択）
-		stageAnimations_[2].targetPosition = rightPosition_;
-		stageAnimations_[2].targetScale = unselectedScale_;
-		stageAnimations_[2].targetColor = unselectedColor_;
-	} else {
-		// Level3が選択された状態
-		// Stage1: 最左側（画面外）
-		stageAnimations_[0].targetPosition = farLeftPosition_;
-		stageAnimations_[0].targetScale = unselectedScale_;
-		stageAnimations_[0].targetColor = unselectedColor_;
-
-		// Stage2: 左側（非選択）
-		stageAnimations_[1].targetPosition = leftPosition_;
-		stageAnimations_[1].targetScale = unselectedScale_;
-		stageAnimations_[1].targetColor = unselectedColor_;
-
-		// Stage3: 中央（選択）
-		stageAnimations_[2].targetPosition = centerPosition_;
-		stageAnimations_[2].targetScale = selectedScale_;
-		stageAnimations_[2].targetColor = selectedColor_;
+		// アニメーション開始
+		stageAnimations_[i].isAnimating = true;
+		stageAnimations_[i].animationTimer = 0.0f;
 	}
-
-	// 全てのステージのアニメーションを開始
-	stageAnimations_[0].isAnimating = true;
-	stageAnimations_[0].animationTimer = 0.0f;
-
-	stageAnimations_[1].isAnimating = true;
-	stageAnimations_[1].animationTimer = 0.0f;
-
-	stageAnimations_[2].isAnimating = true;
-	stageAnimations_[2].animationTimer = 0.0f;
 }
 
 void SelectScene::StartZoomInEffect() {
@@ -682,15 +522,9 @@ void SelectScene::StartZoomInEffect() {
 	zoomInTimer_ = 0.0f;
 
 	// 選択されたステージのアニメーションデータを保存
-	if (selectedStageIndex_ == 0) {
-		stageAnimations_[0].currentScale = stagePreviews_[0]->scale_;
-		stageAnimations_[0].currentPosition = stagePreviews_[0]->position_;
-	} else if (selectedStageIndex_ == 1) {
-		stageAnimations_[1].currentScale = stagePreviews_[1]->scale_;
-		stageAnimations_[1].currentPosition = stagePreviews_[1]->position_;
-	} else {
-		stageAnimations_[2].currentScale = stagePreviews_[2]->scale_;
-		stageAnimations_[2].currentPosition = stagePreviews_[2]->position_;
+	if (selectedStageIndex_ >= 0 && selectedStageIndex_ < 5) {
+		stageAnimations_[selectedStageIndex_].currentScale = stagePreviews_[selectedStageIndex_]->scale_;
+		stageAnimations_[selectedStageIndex_].currentPosition = stagePreviews_[selectedStageIndex_]->position_;
 	}
 }
 
@@ -708,21 +542,25 @@ std::unique_ptr<BaseScene> SelectScene::CheckSceneTransition() {
 	if (isFadingOut_ && fadeOutTimer_ >= fadeOutDuration_) {
 		// 選択されたステージのレベル名を取得
 		auto levelMap = LevelLoader::GetLevelFileMap();
-		std::string levelName;
 
-		if (selectedStageIndex_ == (int)LevelIndex::Level0) {
-			levelName = levelMap[LevelIndex::Level0];
-			commonData->nextLevelIndex_ = LevelIndex::Level0;
-		} else if (selectedStageIndex_ == (int)LevelIndex::Level1) {
-			levelName = levelMap[LevelIndex::Level1];
-			commonData->nextLevelIndex_ = LevelIndex::Level1;
-		} else {
-			levelName = levelMap[LevelIndex::Level2];
-			commonData->nextLevelIndex_ = LevelIndex::Level2;
+		// LevelIndexの配列を使用して選択されたステージに対応するインデックスを取得
+		const LevelIndex levelIndices[] = {
+			LevelIndex::Level0,
+			LevelIndex::Level1,
+			LevelIndex::Level2,
+			LevelIndex::Level3,
+			LevelIndex::Level4
+		};
+
+		// 範囲チェック
+		if (selectedStageIndex_ >= 0 && selectedStageIndex_ < 5) {
+			LevelIndex selectedLevel = levelIndices[selectedStageIndex_];
+			commonData->nextLevelIndex_ = selectedLevel;
+
+			// レベル名から".json"を削除
+			std::string levelName = levelMap[selectedLevel];
+			levelName = levelName.substr(0, levelName.find(".json"));
 		}
-
-		// レベル名から".json"を削除
-		levelName = levelName.substr(0, levelName.find(".json"));
 
 		// 選択されたステージを読み込んでGameSceneを作成
 		auto gameScene = std::make_unique<GameScene>();
