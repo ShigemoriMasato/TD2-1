@@ -45,6 +45,7 @@ void SelectScene::Initialize() {
 		gradientBackground_->color_ = 0x0f1419ff;  // デフォルトカラー
 	}
 
+
 	// トランジション初期化
 	transition_ = std::make_unique<SelectSceneTransition>();
 	transition_->Initialize();
@@ -136,6 +137,7 @@ std::unique_ptr<BaseScene> SelectScene::Update() {
 		ui_->Update(deltaTime, centerPos);
 	}
 
+
 	// ステージプレビューのアニメーション更新
 	bool skipAnimation = transition_->IsZoomingIn();
 	stageCarousel_->Update(deltaTime, skipAnimation);
@@ -203,6 +205,7 @@ void SelectScene::Draw() {
 		render_->Draw(ui_->GetRightArrow());
 		render_->Draw(ui_->GetInstructionText());
 	}
+
 
 	// ポストエフェクト
 	render_->Draw(transition_->GetPostEffect());
