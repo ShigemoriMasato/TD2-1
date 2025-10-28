@@ -36,6 +36,13 @@ public:
 	void UpdateArrowTextures(bool isLeftPressed, bool isRightPressed);
 
 	/// <summary>
+	/// 矢印の表示状態を更新
+	/// </summary>
+	/// <param name="canMoveLeft">左に移動可能か</param>
+	/// <param name="canMoveRight">右に移動可能か</param>
+	void UpdateArrowVisibility(bool canMoveLeft, bool canMoveRight);
+
+	/// <summary>
 	/// 描画すべきUI要素を取得
 	/// </summary>
 	DrawResource* GetGradientBackground() const { return gradientBackground_.get(); }

@@ -10,6 +10,7 @@
 #include "SelectSceneUI/SelectSceneUI.h"
 #include "SelectSceneUI/SelectSceneTransition.h"
 #include "SelectSceneUI/SelectSceneInputHandler.h"
+#include "SelectSceneUI/BackgroundParticleEffect.h"
 #include <Render/Resource/TimerResource.h>
 
 class SelectScene : public BaseScene {
@@ -38,6 +39,9 @@ private:
 
 	// グラデーション背景（UIクラスに含まれない特殊要素）
 	std::unique_ptr<DrawResource> gradientBackground_ = nullptr;
+
+	// 背景パーティクルエフェクト
+	std::unique_ptr<BackgroundParticleEffect> backgroundParticles_ = nullptr;
 
 	// 各機能クラス
 	std::unique_ptr<StageCarousel> stageCarousel_;
