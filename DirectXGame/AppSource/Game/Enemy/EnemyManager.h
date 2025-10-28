@@ -123,6 +123,7 @@ public:
 	/// @brief 登録済みの敵配置データをクリア
 	void ClearEnemyPlacementData();
 
+	void SetActor(PhysicsEngine* physicsEngine, bool useGravity = false);
 private:
 	std::vector<std::unique_ptr<BaseEnemy>> enemies_;
 	std::vector<std::unique_ptr<BaseEnemy>> enemiesToAdd_; // 追加待ちの敵

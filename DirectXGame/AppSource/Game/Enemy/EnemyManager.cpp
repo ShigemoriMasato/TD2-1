@@ -293,3 +293,15 @@ EnemySpawnParams EnemyManager::ConvertToSpawnParams(const EnemyPlacementData& da
 
 	return params;
 }
+
+void EnemyManager::SetActor(PhysicsEngine* physicsEngine, bool useGravity) {
+	for (auto& enemy : enemies_) {
+		if(enemy)
+			enemy->SetActor(physicsEngine, useGravity);
+	}
+	for (auto& enemy : enemiesToAdd_)
+	{
+		if (enemy)
+			enemy->SetActor(physicsEngine, useGravity);
+	}
+}

@@ -7,7 +7,7 @@ void DashEnemy::Initialize(ModelData* modelData, Camera* camera) {
 
 	// コライダーの設定
 	collider_ = std::make_unique<AABBCollider>(
-		ColliderTag::Static,
+		ColliderTag::Dynamic,
 		ColliderMask::ENEMY,
 		ColliderMask::PLAYER
 	);

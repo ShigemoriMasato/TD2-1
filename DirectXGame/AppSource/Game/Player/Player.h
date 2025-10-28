@@ -30,7 +30,7 @@ public:
 
 	void SetWire(Wire* wire) { wire_ = wire; }
 	void OnCollision(BaseObject* other)override;
-
+	void OnTrap() { isAlive_ = false; }
 	void AddTargets(BaseObject* target) { targets_.push_back(target); }
 	void SetKeyConfig(std::unordered_map<Key, bool>* keyConfig) { key_ = keyConfig; }
 	void SetTileMap(const TileMap* tileMap) { tileMap_ = tileMap; }

@@ -5,6 +5,7 @@
 #include "../Collision/Collision.h"
 #include "../Hook/Hook.h"
 #include "../Item/Coin.h"
+#include "../Scene/SelectScene.h"
 
 #include <Tools/FPS/FPSObserver.h>
 #include <cmath>
@@ -48,7 +49,7 @@ void GameScene::Initialize(std::string levelName)
 
 	//Cameraの初期化
 	camera_->Initialize(&player_->GetTransform()->position);
-	camera_->SetOffset({ 0.0f, 5.0f, -40.0f });
+	camera_->SetOffset({ 0.0f, 1.0f, -40.0f });
 
 	if (commonData->isCreateTexture)
 	{
@@ -63,6 +64,7 @@ void GameScene::Initialize(std::string levelName)
 		enemyManager_->Initialize(modelManager_, camera_->GetCamera());
 
 		levelLoader_.AddEnemy(*enemyManager_);
+		enemyManager_->SetActor(&physicsEngine_, false);
 	}
 
 	{
@@ -216,9 +218,14 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	goalEvent_->Update(deltaTime);
 
 	//ゴールの処理が終わったら
-	if(goalEvent_->IsChangeScene() || player_->IsDead()){
+	if(player_->IsDead()){
 		//とりあえず今は初期化
 		return std::make_unique<GameScene>();
+	}
+
+	if (goalEvent_->IsChangeScene())
+	{
+		return std::make_unique<SelectScene>();
 	}
 
 	return nullptr;
@@ -309,6 +316,17 @@ void GameScene::CheckAllCollision()
 		if ((selfA & maskB) && (selfB & maskA))continue;
 		pair.first->OnCollision(pair.second);
 		pair.second->OnCollision(pair.first);
+	}
+
+	const auto& collisionTileInfo = physicsEngine_.GetTileCollisionInfo();
+
+	for (const auto& info : collisionTileInfo)
+	{
+		if (info.first != player_)continue;
+		if (info.second == TileType::Trap)
+		{
+			player_->OnTrap();
+		}
 	}
 
 	// 敵とプレイヤーの当たり判定を手動でチェック

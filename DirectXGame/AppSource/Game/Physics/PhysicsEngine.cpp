@@ -386,20 +386,20 @@ void PhysicsEngine::CheckTileTriggers()
 
 		//ワールド座標を取得
 		auto worldAABB = collider->GetWorldAABB();
-
+		auto objPos = worldAABB.Position();
+		auto objHalfSize = worldAABB.Size() * 0.5f;
 		std::set<TileType>triggersSet;
 
 		for (auto* tile : collisionTiles_)
 		{
 			if (!tile)continue;
 			const auto& tileSize = tile->Size();
-			const auto& tileWorldSize = tile->WorldSize();
 			constexpr float epsilon = 1e-6f;
 
-			auto startX = static_cast<int>(std::floor(worldAABB.min.x / tileSize.x));
-			auto endX = static_cast<int>(std::ceil((worldAABB.max.x - epsilon) / tileSize.x));
-			auto startY = static_cast<int>(std::floor(worldAABB.max.y / tileSize.y));
-			auto endY = static_cast<int>(std::ceil((worldAABB.min.y + epsilon) / tileSize.y));
+			auto startX = static_cast<int>(std::floor(objPos.x / tileSize.x));
+			auto endX = static_cast<int>(std::ceil((objPos.x + objHalfSize.x - epsilon) / tileSize.x));
+			auto startY = static_cast<int>(std::floor(tile->WorldSize().y - 1 - objPos.y / tileSize.y));
+			auto endY = static_cast<int>(std::ceil(tile->WorldSize().y - 1 - (objPos.y - objHalfSize.y + epsilon) / tileSize.y));
 
 			for (int x = startX; x < endX; x++)
 			{
@@ -415,7 +415,7 @@ void PhysicsEngine::CheckTileTriggers()
 					default:
 						break;
 					}
-
+					
 				}
 			}
 		}
