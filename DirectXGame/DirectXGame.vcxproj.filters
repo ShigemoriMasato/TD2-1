@@ -98,6 +98,7 @@
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.cpp" />
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneInputHandler.cpp" />
     <ClCompile Include="Engine\Render\Resource\TimerResource.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\BackgroundParticleEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -206,6 +207,7 @@
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.h" />
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneInputHandler.h" />
     <ClInclude Include="Engine\Render\Resource\TimerResource.h" />
+    <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\BackgroundParticleEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

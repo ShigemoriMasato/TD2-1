@@ -22,25 +22,29 @@ void SelectSceneInputHandler::ProcessInput(const std::unordered_map<Key, bool>& 
 
 	// 左キーが押された瞬間の処理
 	if (keys.at(Key::Left) && !prevKeyLeft_) {
-		// 移動SEを再生
-		if (audio_ && moveSoundHandle_ != -1) {
-			audio_->Play(moveSoundHandle_, false);
+		// コールバックが設定されている場合は移動可能かチェック
+		bool canMove = true;
+		if (onStageChange_) {
+			canMove = onStageChange_(-1);  // 左方向（-1）
 		}
 
-		if (onStageChange_) {
-			onStageChange_(-1);  // 左方向（-1）
+		// 移動が成功した場合のみSEを再生
+		if (canMove && audio_ && moveSoundHandle_ != -1) {
+			audio_->Play(moveSoundHandle_, false);
 		}
 	}
 
 	// 右キーが押された瞬間の処理
 	if (keys.at(Key::Right) && !prevKeyRight_) {
-		// 移動SEを再生
-		if (audio_ && moveSoundHandle_ != -1) {
-			audio_->Play(moveSoundHandle_, false);
+		// コールバックが設定されている場合は移動可能かチェック
+		bool canMove = true;
+		if (onStageChange_) {
+			canMove = onStageChange_(1);  // 右方向（+1）
 		}
 
-		if (onStageChange_) {
-			onStageChange_(1);  // 右方向（+1）
+		// 移動が成功した場合のみSEを再生
+		if (canMove && audio_ && moveSoundHandle_ != -1) {
+			audio_->Play(moveSoundHandle_, false);
 		}
 	}
 
@@ -53,8 +57,8 @@ void SelectSceneInputHandler::ProcessInput(const std::unordered_map<Key, bool>& 
 	prevKeyLeft_ = keys.at(Key::Left);
 	prevKeyRight_ = keys.at(Key::Right);
 
-	// Spaceキーでステージ決定
-	if (keys.at(Key::Action)) {
+	// Actionキーが押された瞬間にステージ決定
+	if (keys.at(Key::Action) && !prevKeyAction_) {
 		// 決定SEを再生
 		if (audio_ && confirmSoundHandle_ != -1) {
 			audio_->Play(confirmSoundHandle_, false);
@@ -64,4 +68,7 @@ void SelectSceneInputHandler::ProcessInput(const std::unordered_map<Key, bool>& 
 			onStageConfirm_();
 		}
 	}
+
+	// Actionキーの状態を保存
+	prevKeyAction_ = keys.at(Key::Action);
 }

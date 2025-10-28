@@ -45,6 +45,9 @@ void SelectScene::Initialize() {
 		gradientBackground_->color_ = 0x0f1419ff;  // デフォルトカラー
 	}
 
+	// 背景パーティクルエフェクト初期化
+	backgroundParticles_ = std::make_unique<BackgroundParticleEffect>();
+	backgroundParticles_->Initialize(uiCamera_.get(), textureManager_);
 
 	// トランジション初期化
 	transition_ = std::make_unique<SelectSceneTransition>();
@@ -70,22 +73,22 @@ void SelectScene::Initialize() {
 	inputHandler_->Initialize(audio_);
 
 	// ステージ選択変更時のコールバック設定
-	inputHandler_->SetOnStageChangeCallback([this](int direction) {
+	inputHandler_->SetOnStageChangeCallback([this](int direction) -> bool {
 		int currentIndex = stageCarousel_->GetSelectedStageIndex();
 		int newIndex = currentIndex + direction;
 
-		// ラップアラウンド処理
-		if (newIndex < 0) {
-			newIndex = (int)LevelIndex::kNumLevels - 1;
-		} else if (newIndex >= (int)LevelIndex::kNumLevels) {
-			newIndex = 0;
+		// 両端でストップ（ラップアラウンドしない）
+		if (newIndex < 0 || newIndex >= (int)LevelIndex::kNumLevels) {
+			return false;  // 範囲外の場合は移動失敗を返す
 		}
 
 		stageCarousel_->SetSelectedStageIndex(newIndex);
 
 		// 背景グリッドアニメーションをトリガー
 		transition_->TriggerBackgroundGrid();
-		});
+		
+		return true;  // 移動成功
+	});
 
 	// ステージ決定時のコールバック設定
 	inputHandler_->SetOnStageConfirmCallback([this]() {
@@ -109,6 +112,9 @@ void SelectScene::Initialize() {
 std::unique_ptr<BaseScene> SelectScene::Update() {
 
 	float deltaTime = fpsObserver_->GetDeltatime();
+
+	// 背景パーティクルの更新（常に更新）
+	backgroundParticles_->Update(deltaTime);
 
 	// トランジション処理の更新
 	if (transition_->IsFadingIn()) {
@@ -135,12 +141,20 @@ std::unique_ptr<BaseScene> SelectScene::Update() {
 	if (!transition_->IsZoomingIn() && !transition_->IsWaitingAfterZoom() && !transition_->IsFadingOut()) {
 		Vector3 centerPos = { 0.0f, 0.0f, 50.0f };
 		ui_->Update(deltaTime, centerPos);
+		
+		// 矢印の表示状態を更新（両端のステージでは対応する矢印を非表示）
+		int currentIndex = stageCarousel_->GetSelectedStageIndex();
+		bool canMoveLeft = (currentIndex > 0);
+		bool canMoveRight = (currentIndex < (int)LevelIndex::kNumLevels - 1);
+		ui_->UpdateArrowVisibility(canMoveLeft, canMoveRight);
 	}
 
 
-	// ステージプレビューのアニメーション更新
-	bool skipAnimation = transition_->IsZoomingIn();
-	stageCarousel_->Update(deltaTime, skipAnimation);
+	// ステージプレビューのアニメーション更新（ズームイン中とズーム待機中はスキップ）
+	bool skipAnimation = transition_->IsZoomingIn() || transition_->IsWaitingAfterZoom() || transition_->IsFadingOut();
+	if (!skipAnimation) {
+		stageCarousel_->Update(deltaTime, false);
+	}
 
 	// シーン遷移判定
 	return CheckSceneTransition();
@@ -187,6 +201,9 @@ void SelectScene::Draw() {
 
 	// グラデーション背景（最背面）
 	render_->Draw(gradientBackground_.get());
+
+	// 背景パーティクル（背景の上）
+	backgroundParticles_->Draw(render_);
 
 	// 選択フレーム（ステージの後ろ）
 	if (!transition_->IsZoomingIn() && !transition_->IsWaitingAfterZoom()) {

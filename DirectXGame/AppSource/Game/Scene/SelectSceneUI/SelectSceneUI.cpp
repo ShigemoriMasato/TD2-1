@@ -109,3 +109,19 @@ void SelectSceneUI::UpdateArrowTextures(bool isLeftPressed, bool isRightPressed)
 		rightArrow_->SetTextureHandle(rightArrowReleaseTextureHandle_);
 	}
 }
+
+void SelectSceneUI::UpdateArrowVisibility(bool canMoveLeft, bool canMoveRight) {
+	// 左矢印の表示/非表示（アルファ値で制御）
+	if (canMoveLeft) {
+		leftArrow_->color_ = 0xffffffff;  // 完全表示
+	} else {
+		leftArrow_->color_ = 0xffffff00;  // 完全透明（非表示）
+	}
+
+	// 右矢印の表示/非表示（アルファ値で制御）
+	if (canMoveRight) {
+		rightArrow_->color_ = 0xffffffff;  // 完全表示
+	} else {
+		rightArrow_->color_ = 0xffffff00;  // 完全透明（非表示）
+	}
+}

@@ -29,8 +29,8 @@ public:
 	/// <summary>
 	/// ステージ選択変更時のコールバックを設定
 	/// </summary>
-	/// <param name="callback">コールバック関数（direction: -1=左, +1=右）</param>
-	void SetOnStageChangeCallback(std::function<void(int direction)> callback) {
+	/// <param name="callback">コールバック関数（direction: -1=左, +1=右）戻り値: 移動が成功したかどうか</param>
+	void SetOnStageChangeCallback(std::function<bool(int direction)> callback) {
 		onStageChange_ = callback;
 	}
 
@@ -52,13 +52,14 @@ public:
 
 private:
 	// コールバック関数
-	std::function<void(int direction)> onStageChange_;
+	std::function<bool(int direction)> onStageChange_;
 	std::function<void()> onStageConfirm_;
 	std::function<void(bool, bool)> onArrowUpdate_;
 
 	// 前回のキー状態
 	bool prevKeyLeft_ = false;
 	bool prevKeyRight_ = false;
+	bool prevKeyAction_ = false;  // 決定キーの前回状態を追加
 
 	// AudioManager
 	AudioManager* audio_ = nullptr;
