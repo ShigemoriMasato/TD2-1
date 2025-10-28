@@ -93,6 +93,10 @@
     <ClCompile Include="AppSource\Game\BackGround\BackGround.cpp" />
     <ClCompile Include="Engine\Render\Resource\ModelParticle.cpp" />
     <ClCompile Include="AppSource\Game\Emitter\DeathParticle.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\StageCarousel.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneUI.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneInputHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -196,6 +200,10 @@
     <ClInclude Include="AppSource\Game\BackGround\BackGround.h" />
     <ClInclude Include="Engine\Render\Resource\ModelParticle.h" />
     <ClInclude Include="AppSource\Game\Emitter\DeathParticle.h" />
+    <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\StageCarousel.h" />
+    <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneUI.h" />
+    <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.h" />
+    <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneInputHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

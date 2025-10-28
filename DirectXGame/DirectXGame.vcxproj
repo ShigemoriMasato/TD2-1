@@ -29,6 +29,10 @@
     <ClCompile Include="AppSource\Game\Item\Coin.cpp" />
     <ClCompile Include="AppSource\Game\BackGround\BackGround.cpp" />
     <ClCompile Include="AppSource\Game\Emitter\DeathParticle.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneInputHandler.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneUI.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\StageCarousel.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
     <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Render\Resource\Data\BaseResource.cpp" />
@@ -125,6 +129,10 @@
     <ClInclude Include="AppSource\Game\Item\Coin.h" />
     <ClInclude Include="AppSource\Game\BackGround\BackGround.h" />
     <ClInclude Include="AppSource\Game\Emitter\DeathParticle.h" />
+    <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneInputHandler.h" />
+    <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.h" />
+    <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneUI.h" />
+    <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\StageCarousel.h" />
     <ClInclude Include="Engine\Render\Resource\Data\PostEffectData.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
     <ClInclude Include="Engine\Resource\Audio\AudioManager.h" />

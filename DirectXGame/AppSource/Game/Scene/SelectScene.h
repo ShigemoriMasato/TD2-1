@@ -5,6 +5,12 @@
 #include <Scene/SceneManager.h>
 #include <memory>
 
+// 新しいクラスのインクルード
+#include "SelectSceneUI/StageCarousel.h"
+#include "SelectSceneUI/SelectSceneUI.h"
+#include "SelectSceneUI/SelectSceneTransition.h"
+#include "SelectSceneUI/SelectSceneInputHandler.h"
+
 class SelectScene : public BaseScene {
 public:
 
@@ -17,140 +23,27 @@ public:
 
 private:
 
-	/// @brief フェードイン処理の更新
-	void UpdateFadeIn(float deltaTime);
-
-	/// @brief フェードアウト処理の更新
-	void UpdateFadeOut(float deltaTime);
-
-	/// @brief 入力処理
-	void ProcessInput();
-
-	/// @brief ステージプレビューのアニメーション更新
-	void UpdateStagePreviewAnimation(float deltaTime);
-
-	/// @brief ズームイン演出の更新
-	void UpdateZoomInEffect(float deltaTime);
-
-	/// @brief ズームイン後の待機時間更新
-	void UpdateZoomWait(float deltaTime);
-
-	/// @brief UI装飾の更新
-	void UpdateUIDecorations(float deltaTime);
-
-	/// @brief ステージプレビューの目標値を設定
-	void SetStagePreviewTargets();
-
-	/// @brief ズームイン演出の開始
-	void StartZoomInEffect();
-
 	/// @brief シーン遷移判定
 	/// @return 次のシーンのポインタ（遷移しない場合はnullptr）
 	std::unique_ptr<BaseScene> CheckSceneTransition();
-
-	/// @brief イージング関数（EaseOutCubic）
-	/// @param t 進行度（0.0～1.0）
-	/// @return イージング適用後の値（0.0～1.0）
-	float EaseOutCubic(float t);
-
-	/// @brief イージング関数（EaseInCubic）
-	/// @param t 進行度（0.0～1.0）
-	/// @return イージング適用後の値（0.0～1.0）
-	float EaseInCubic(float t);
 
 	static inline bool firstLoad_ = false;
 
 	std::map<int, std::string> stageMap_;
 	std::unique_ptr<SceneManager> sceneManager_;
 
-	// ポストエフェクト
-	std::unique_ptr<PostEffectResource> postEffect_ = nullptr;
-
-	// フェードイン処理用
-	bool isFadingIn_ = true;
-	float fadeInTimer_ = 0.0f;
-	const float fadeInDuration_ = 1.5f; // フェードインにかける時間（秒）
-
-	// フェードアウト処理用
-	bool isFadingOut_ = false;
-	float fadeOutTimer_ = 0.0f;
-	const float fadeOutDuration_ = 2.0f; // フェードアウトにかける時間（秒）
-
-	// ズームイン演出用
-	bool isZoomingIn_ = false;
-	float zoomInTimer_ = 0.0f;
-	const float zoomInDuration_ = 0.6f; // ズームインにかける時間（秒）
-
-	// ズーム後の待機時間用
-	bool isWaitingAfterZoom_ = false;
-	float zoomWaitTimer_ = 0.0f;
-	const float zoomWaitDuration_ = 0.8f; // ズーム完了後の待機時間（秒）
-
 	// UI用カメラ
 	std::unique_ptr<Camera> uiCamera_ = nullptr;
 
-
-	// UI装飾用DrawResource
+	// グラデーション背景（UIクラスに含まれない特殊要素）
 	std::unique_ptr<DrawResource> gradientBackground_ = nullptr;
-	std::unique_ptr<DrawResource> titleText_ = nullptr;
-	std::unique_ptr<DrawResource> selectionFrame_ = nullptr;
-	std::unique_ptr<DrawResource> leftArrow_ = nullptr;
-	std::unique_ptr<DrawResource> rightArrow_ = nullptr;
-	std::unique_ptr<DrawResource> instructionText_ = nullptr;
 
-	// ステージプレビュー用DrawResource
-	std::vector<std::unique_ptr<DrawResource>> stagePreviews_;
+	// 各機能クラス
+	std::unique_ptr<StageCarousel> stageCarousel_;
+	std::unique_ptr<SelectSceneUI> ui_;
+	std::unique_ptr<SelectSceneTransition> transition_;
+	std::unique_ptr<SelectSceneInputHandler> inputHandler_;
 
-	// ステージ選択
-	int selectedStageIndex_ = 0;  // 0: Level0, 1: Level1, 2: Level2
-	int previousStageIndex_ = 0;  // 前回選択されていたステージ
-	bool isStageSelected_ = false;  // スペースキーで決定されたかどうか
-
-	// UI装飾アニメーション用
-	float decorationTimer_ = 0.0f;
-	float arrowPulseTimer_ = 0.0f;
-
-	// イージングアニメーション用
-	struct StageAnimationData {
-		Vector3 currentPosition;  // 現在の位置
-		Vector3 targetPosition;   // 目標位置
-		Vector3 currentScale; // 現在のスケール
-		Vector3 targetScale;      // 目標スケール
-		Vector3 currentRotation;  // 現在の回転
-		Vector3 targetRotation;   // 目標回転
-		uint32_t currentColor;    // 現在のカラー
-		uint32_t targetColor;     // 目標カラー
-		float animationTimer;     // アニメーションタイマー
-		bool isAnimating;         // アニメーション中かどうか
-	};
-
-	// 5個のステージアニメーションデータ
-	std::vector<StageAnimationData> stageAnimations_ = std::vector<StageAnimationData>(5);
-
-	const float stageAnimationDuration_ = 0.4f;  // ステージアニメーションの時間（秒）
-
-	// ステージの位置定数（選択時は中央、非選択時は左右に配置）
-	const Vector3 centerPosition_ = { 0.0f, 0.0f, 50.0f };// 中央（選択時）
-	const Vector3 leftPosition_ = { -700.0f, 0.0f, 50.0f };       // 左側（非選択時）
-	const Vector3 rightPosition_ = { 700.0f, 0.0f, 50.0f };       // 右側（非選択時）
-	const Vector3 farLeftPosition_ = { -1400.0f, 0.0f, 50.0f };   // 左2つ目（画面外に近い）
-	const Vector3 farRightPosition_ = { 1400.0f, 0.0f, 50.0f };   // 右2つ目（画面外に近い）
-
-
-	// ズームイン演出用の目標値
-	const Vector3 zoomScale_ = { 1280.0f, 720.0f, 1.0f };     // 画面いっぱいのスケール
-
-	// ステージのスケールとカラーの定数
-	const Vector3 selectedScale_ = { 600.0f, 337.5f, 1.0f };    // 選択時のスケール（大きめ）
-	const Vector3 unselectedScale_ = { 400.0f, 225.0f, 1.0f };  // 非選択時のスケール
-	const uint32_t selectedColor_ = 0xffffffff;          // 選択時のカラー（明るい）
-	const uint32_t unselectedColor_ = 0x808080ff;      // 非選択時のカラー（暗い）
-
-	// テクスチャハンドル
-	int selectTextTextureHandle_ = 0;
-	int leftArrowReleaseTextureHandle_ = 0;
-	int leftArrowTriggerTextureHandle_ = 0;
-	int rightArrowReleaseTextureHandle_ = 0;
-	int rightArrowTriggerTextureHandle_ = 0;
-
+	// ステージ選択の初期化用定数
+	inline static const Vector3 kCenterPosition = { 0.0f, 0.0f, 50.0f };
 };
