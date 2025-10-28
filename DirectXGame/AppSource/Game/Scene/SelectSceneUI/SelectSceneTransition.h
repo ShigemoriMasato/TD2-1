@@ -88,6 +88,22 @@ public:
 	bool IsWaitingAfterZoom() const { return isWaitingAfterZoom_; }
 
 	/// <summary>
+	/// 背景グリッドアニメーション更新（ステージ選択変更時の演出）
+	/// </summary>
+	/// <param name="deltaTime">デルタタイム</param>
+	void UpdateBackgroundGrid(float deltaTime);
+
+	/// <summary>
+	/// 背景グリッドアニメーションを開始
+	/// </summary>
+	void TriggerBackgroundGrid();
+
+	/// <summary>
+	/// 背景グリッドアニメーション中かどうか
+	/// </summary>
+	bool IsBackgroundGridAnimating() const { return isBackgroundGridAnimating_; }
+
+	/// <summary>
 	/// ポストエフェクトリソースを取得
 	/// </summary>
 	PostEffectResource* GetPostEffect() const { return postEffect_.get(); }
@@ -97,6 +113,11 @@ private:
 	/// イージング関数（EaseInCubic）
 	/// </summary>
 	float EaseInCubic(float t);
+
+	/// <summary>
+	/// イージング関数（EaseOutCubic）
+	/// </summary>
+	float EaseOutCubic(float t);
 
 	// ポストエフェクト
 	std::unique_ptr<PostEffectResource> postEffect_;
@@ -123,4 +144,10 @@ private:
 
 	// ズームイン時のスケール
 	inline static const Vector3 kZoomScale = { 1280.0f, 720.0f, 1.0f };
+
+	// 背景グリッドアニメーション用
+	bool isBackgroundGridAnimating_ = false;
+	float backgroundGridTimer_ = 0.0f;
+	static constexpr float kBackgroundGridDuration = 0.8f;  // アニメーション時間
+	static constexpr float kBackgroundGridIntensity = 0.3f; // 最大の進行度（控えめ）
 };

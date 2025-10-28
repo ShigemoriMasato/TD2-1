@@ -29,15 +29,26 @@ void GoalEvent::Initialize() {
 	camera_->SetOffset({ 0.0f, 0.0f, -10.0f });
 	player_->SetIsClear();
 
-	postEffect_->SetJobs(PostEffectJob::GridTransition | PostEffectJob::Fade);
+	// グリッド遷移の初期設定
+	postEffect_->data_.gridTransition.progress = 0.0f;
+	postEffect_->data_.gridTransition.gridSize = 16.0f;
+	postEffect_->data_.gridTransition.fadeColor = 0.0f;  // 黒にフェード
+	postEffect_->data_.gridTransition.pattern = 1.0f;    // ランダムパターン
+
+	// 最初はエフェクトなし（クリア演出中）
+	postEffect_->SetJobs(PostEffectJob::None);
 }
 
 void GoalEvent::ClearUpdate(float deltatime) {
 	clearTimer_ += deltatime;
 
 	if (clearTimer_ >= clearWaitTime_) {
-		//シーン遷移
-		postEffect_->data_.gridTransition.progress += std::min(deltatime / 2.0f, 1.0f);
+		// クリア演出終了後、グリッド遷移を開始
+		postEffect_->SetJobs(PostEffectJob::GridTransition);
+		
+		// グリッド遷移を進める
+		postEffect_->data_.gridTransition.progress += deltatime / 2.0f;
+		postEffect_->data_.gridTransition.progress = std::min(postEffect_->data_.gridTransition.progress, 1.0f);
 	}
 
 	if(postEffect_->data_.gridTransition.progress >= 1.0f){

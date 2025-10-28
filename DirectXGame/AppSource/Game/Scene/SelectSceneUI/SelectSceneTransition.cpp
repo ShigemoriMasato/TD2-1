@@ -154,3 +154,51 @@ void SelectSceneTransition::StartFadeOut() {
 float SelectSceneTransition::EaseInCubic(float t) {
 	return t * t * t;
 }
+
+float SelectSceneTransition::EaseOutCubic(float t) {
+	return 1.0f - std::pow(1.0f - t, 3.0f);
+}
+
+void SelectSceneTransition::UpdateBackgroundGrid(float deltaTime) {
+	if (!isBackgroundGridAnimating_) return;
+
+	// タイマーを進める
+	backgroundGridTimer_ += deltaTime;
+	float progress = std::min(backgroundGridTimer_ / kBackgroundGridDuration, 1.0f);
+	
+	// EaseOutでスムーズに終わる
+	float easedProgress = EaseOutCubic(progress);
+
+	// 0から最大強度まで上がってから0に戻る（山型のカーブ）
+	float intensity = std::sin(progress * std::numbers::pi_v<float>) * kBackgroundGridIntensity;
+
+	// グリッドトランジションのパラメータを設定
+	postEffect_->data_.gridTransition.progress = intensity;
+	postEffect_->data_.gridTransition.gridSize = 20.0f;  // 細かいグリッド
+	postEffect_->data_.gridTransition.fadeColor = 0.0f;
+	postEffect_->data_.gridTransition.pattern = 0.0f;  // 波紋状パターン
+
+	// 他のエフェクトが動いていない場合のみ適用
+	if (!isFadingIn_ && !isFadingOut_ && !isZoomingIn_ && !isWaitingAfterZoom_) {
+		postEffect_->SetJobs(PostEffectJob::GridTransition);
+	}
+
+	// アニメーション完了
+	if (backgroundGridTimer_ >= kBackgroundGridDuration) {
+		isBackgroundGridAnimating_ = false;
+		backgroundGridTimer_ = 0.0f;
+		postEffect_->data_.gridTransition.progress = 0.0f;
+		postEffect_->SetJobs(PostEffectJob::None);
+	}
+}
+
+void SelectSceneTransition::TriggerBackgroundGrid() {
+	// 他のトランジション中は発動しない
+	if (isFadingIn_ || isFadingOut_ || isZoomingIn_ || isWaitingAfterZoom_) {
+		return;
+	}
+
+	// アニメーションを開始
+	isBackgroundGridAnimating_ = true;
+	backgroundGridTimer_ = 0.0f;
+}

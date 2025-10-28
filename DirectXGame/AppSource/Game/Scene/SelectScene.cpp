@@ -66,31 +66,43 @@ void SelectScene::Initialize() {
 
 	// 入力ハンドラー初期化
 	inputHandler_ = std::make_unique<SelectSceneInputHandler>();
+	inputHandler_->Initialize(audio_);
 
 	// ステージ選択変更時のコールバック設定
 	inputHandler_->SetOnStageChangeCallback([this](int direction) {
 		int currentIndex = stageCarousel_->GetSelectedStageIndex();
 		int newIndex = currentIndex + direction;
-		
+
 		// ラップアラウンド処理
 		if (newIndex < 0) {
 			newIndex = (int)LevelIndex::kNumLevels - 1;
 		} else if (newIndex >= (int)LevelIndex::kNumLevels) {
 			newIndex = 0;
 		}
-		
+
 		stageCarousel_->SetSelectedStageIndex(newIndex);
-	});
+
+		// 背景グリッドアニメーションをトリガー
+		transition_->TriggerBackgroundGrid();
+		});
 
 	// ステージ決定時のコールバック設定
 	inputHandler_->SetOnStageConfirmCallback([this]() {
 		transition_->StartZoomIn();
-	});
+		});
 
 	// 矢印テクスチャ更新のコールバック設定
 	inputHandler_->SetOnArrowUpdateCallback([this](bool isLeftPressed, bool isRightPressed) {
 		ui_->UpdateArrowTextures(isLeftPressed, isRightPressed);
-	});
+		});
+
+	// BGMの再生
+	int bgmSoundHandle = audio_->Load("BGM/Normal.mp3");
+
+	if (commonData->bgmPlayHandle_ / 10 != bgmSoundHandle) {
+		audio_->Stop(commonData->bgmPlayHandle_);
+		commonData->bgmPlayHandle_ = audio_->Play(bgmSoundHandle, true);
+	}
 }
 
 std::unique_ptr<BaseScene> SelectScene::Update() {
@@ -114,6 +126,9 @@ std::unique_ptr<BaseScene> SelectScene::Update() {
 		auto keys = commonData->keyManager_->GetKeyStates();
 		inputHandler_->ProcessInput(keys);
 	}
+
+	// 背景グリッドアニメーションの更新（常に実行）
+	transition_->UpdateBackgroundGrid(deltaTime);
 
 	// UI装飾の更新
 	if (!transition_->IsZoomingIn() && !transition_->IsWaitingAfterZoom() && !transition_->IsFadingOut()) {
