@@ -81,7 +81,7 @@ private:
 	// ズーム後の待機時間用
 	bool isWaitingAfterZoom_ = false;
 	float zoomWaitTimer_ = 0.0f;
-	const float zoomWaitDuration_ = 0.7f; // ズーム完了後の待機時間（秒）
+	const float zoomWaitDuration_ = 0.6f; // ズーム完了後の待機時間（秒）
 
 	// UI用カメラ
 	std::unique_ptr<Camera> uiCamera_ = nullptr;
