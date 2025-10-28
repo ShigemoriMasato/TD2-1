@@ -10,6 +10,7 @@
 #include "SelectSceneUI/SelectSceneUI.h"
 #include "SelectSceneUI/SelectSceneTransition.h"
 #include "SelectSceneUI/SelectSceneInputHandler.h"
+#include <Render/Resource/TimerResource.h>
 
 class SelectScene : public BaseScene {
 public:
@@ -43,6 +44,7 @@ private:
 	std::unique_ptr<SelectSceneUI> ui_;
 	std::unique_ptr<SelectSceneTransition> transition_;
 	std::unique_ptr<SelectSceneInputHandler> inputHandler_;
+
 
 	// ステージ選択の初期化用定数
 	inline static const Vector3 kCenterPosition = { 0.0f, 0.0f, 50.0f };

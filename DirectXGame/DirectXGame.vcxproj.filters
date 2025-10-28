@@ -97,6 +97,7 @@
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneUI.cpp" />
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.cpp" />
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneInputHandler.cpp" />
+    <ClCompile Include="Engine\Render\Resource\TimerResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -204,6 +205,7 @@
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneUI.h" />
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.h" />
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneInputHandler.h" />
+    <ClInclude Include="Engine\Render\Resource\TimerResource.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
