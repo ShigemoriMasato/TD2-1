@@ -109,7 +109,7 @@ void GameScene::Initialize(std::string levelName)
 		postEffect_->data_.gridTransition.progress = 1.0f;
 		postEffect_->data_.gridTransition.gridSize = 16.0f;  // 16x16グリッド
 		postEffect_->data_.gridTransition.fadeColor = 0.0f;  // 白からフェードイン
-		postEffect_->data_.gridTransition.pattern = 0.0f;    // ランダムパターン
+		postEffect_->data_.gridTransition.pattern = 4.0f;    // ランダムパターン
 		postEffect_->SetJobs(PostEffectJob::GridTransition);
 
 		isFadingIn_ = true;
