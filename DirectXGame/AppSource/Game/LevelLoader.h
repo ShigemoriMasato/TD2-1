@@ -94,8 +94,8 @@ inline void LevelLoader::AddGameObject(
             {
                 if (className == targetType)
                 {
-                    float x = std::ceil(obj["x"].get<float>());
-                    float y = std::ceil(obj["y"].get<float>());
+                    float x = std::floor(obj["x"].get<float>());
+                    float y = std::floor(obj["y"].get<float>());
 
                     float worldX = x / tileWidth_;
                     float worldY = (worldHeight_ - 1 - y / tileHeight_);
