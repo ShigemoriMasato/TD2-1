@@ -72,17 +72,28 @@ void DeathParticle::Update(float deltaTime) {
 			Vector3 dir = res_->position_[i] - *playerPos_;
 			dir = dir.Normalize();
 			speed_[i] += acceleration_ * deltaTime;
-			distance_[i] += speed_[i] * deltaTime;
+			distance_[i] -= speed_[i] * deltaTime;
 			res_->position_[i] = *playerPos_ + dir * distance_[i];
 
-			if (distance_[i] > 0.0f) {
+			if (distance_[i] < 0.0f) {
 				res_->color_[i] = 0;
 			}
 		}
 	}
 
 	if (isBoot_) {
+		for (int i = 0; i < instanceNum; ++i) {
+			if (res_->color_[i] == 0) continue;
+			Vector3 dir = res_->position_[i] - *playerPos_;
+			dir = dir.Normalize();
+			speed_[i] += acceleration_ * deltaTime;
+			distance_[i] += speed_[i] * deltaTime;
+			res_->position_[i] = *playerPos_ + dir * distance_[i];
 
+			if (distance_[i] > maxDistance_) {
+				res_->color_[i] = 0;
+			}
+		}
 	}
 }
 
