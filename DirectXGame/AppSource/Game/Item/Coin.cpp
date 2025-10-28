@@ -1,4 +1,5 @@
 #include "Coin.h"
+#include <Resource/Audio/AudioManager.h>
 
 void Coin::Initialize(ModelData* modelData, Camera* camera)
 {
@@ -8,6 +9,8 @@ void Coin::Initialize(ModelData* modelData, Camera* camera)
 		ColliderMask::COIN,
 		ColliderMask::PLAYER);
 	collider_->SetTransform(&transform_);
+	
+	soundHandle_ = audio_->Load("coin.mp3");
 }
 
 void Coin::Update(float deltaTime)
@@ -19,6 +22,7 @@ void Coin::OnCollision(BaseObject* other)
 {
 	if (other->GetCollider()->GetSelf() & ColliderMask::PLAYER)
 	{
+        audio_->Play(soundHandle_,false);
 		isAlive_ = false;
 	}
 }

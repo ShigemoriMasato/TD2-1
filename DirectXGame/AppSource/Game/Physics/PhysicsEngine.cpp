@@ -209,7 +209,7 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 
 			if (tileTypeLeft == TileType::Solid || tileTypeRight == TileType::Solid)
 			{
-				newPos.y = (worldSize.y - 1 - tileY) * tileSize.y + objHalfSize.y;
+				newPos.y = (worldSize.y - tileY) * tileSize.y;
 				actor->velocity_.y = 0.0f;
 				actor->collidedBottom_ = true;
 				if (!actor->prevCollidedBottom_)

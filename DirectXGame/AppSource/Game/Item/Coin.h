@@ -11,5 +11,7 @@ public:
     void Update(float deltaTime) override;
     void OnCollision(BaseObject* other) override;
 
+private:
+    int soundHandle_ = -1;
 };
 
