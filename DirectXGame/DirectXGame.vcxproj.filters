@@ -92,6 +92,7 @@
     <ClCompile Include="AppSource\Game\ScoreManager.cpp" />
     <ClCompile Include="AppSource\Game\BackGround\BackGround.cpp" />
     <ClCompile Include="Engine\Render\Resource\ModelParticle.cpp" />
+    <ClCompile Include="AppSource\Game\Emitter\DeathParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -194,6 +195,7 @@
     <ClInclude Include="AppSource\Game\ScoreManager.h" />
     <ClInclude Include="AppSource\Game\BackGround\BackGround.h" />
     <ClInclude Include="Engine\Render\Resource\ModelParticle.h" />
+    <ClInclude Include="AppSource\Game\Emitter\DeathParticle.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

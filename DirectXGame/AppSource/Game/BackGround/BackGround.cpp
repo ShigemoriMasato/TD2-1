@@ -5,7 +5,7 @@ using namespace MyMath;
 
 BackGround::BackGround() {
 	blocks_ = std::make_unique<ParticleResource>();
-	blocks_->Initialize(8, 36, 1000);
+	blocks_->Initialize(8, 36, width * height, true);
 
 	blocks_->localPos_ = {
 			{-0.5f, 0.5f, -0.5f}, {0.5f, 0.5f, -0.5f},
@@ -46,15 +46,21 @@ BackGround::BackGround() {
 		3, 1, 5
 	};
 
-	blocks_->psoConfig_.ps = "Game/BackGround.PS.hlsl";
+	blocks_->psoConfig_.ps = "Game/BackGroundL.PS.hlsl";
 	blocks_->psoConfig_.vs = "Game/BackGround.VS.hlsl";
-
+	blocks_->psoConfig_.rootID = RootSignatureID::LightParticle;
+	blocks_->lightData_->color = { 1.0f, 1.0f, 1.0f,1.0f };
+	blocks_->lightData_->direction = { 0.79f, 0.45f, 0.41f };
+	blocks_->lightData_->intensity = 1.0f;
 
 	postEffect_ = std::make_unique<PostEffectResource>();
 	postEffect_->Initialize();
 	postEffect_->SetJobs(PostEffectJob::Blur);
 	postEffect_->input_ = OffScreenIndex::GameWindow;
 	postEffect_->output_ = OffScreenIndex::GameWindow;
+
+	postEffect_->data_.blur.intensity = 1.0f;
+	postEffect_->data_.blur.kernelSize = 2.0f;
 }
 
 void BackGround::Initialize(Camera* camera) {
@@ -102,6 +108,11 @@ void BackGround::Update(float deltaTime) {
 	ImGui::Begin("BackGround");
 	ImGui::DragFloat("Intensity", &postEffect_->data_.blur.intensity, 0.01f);
 	ImGui::DragFloat("KernelSize", &postEffect_->data_.blur.kernelSize, 0.01f);
+	ImGui::Separator();
+	ImGui::DragFloat3("Direction", &blocks_->lightData_->direction.x, 0.01f);
+	blocks_->lightData_->direction = blocks_->lightData_->direction.Normalize();
+	ImGui::ColorEdit4("Color", &blocks_->lightData_->color.x);
+	ImGui::DragFloat("LIntensity", &blocks_->lightData_->intensity, 0.1f, 0.0f);
 	ImGui::End();
 }
 

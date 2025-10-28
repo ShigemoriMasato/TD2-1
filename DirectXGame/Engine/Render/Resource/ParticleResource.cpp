@@ -11,7 +11,7 @@ ParticleResource::ParticleResource() {
 ParticleResource::~ParticleResource() {
 }
 
-void ParticleResource::Initialize(uint32_t vertexNum, uint32_t indexNum, uint32_t instanceNum) {
+void ParticleResource::Initialize(uint32_t vertexNum, uint32_t indexNum, uint32_t instanceNum, bool isLighting) {
 	psoConfig_ = PSOConfig{};
 
 	auto device = dxDevice_->GetDevice();
@@ -70,6 +70,11 @@ void ParticleResource::Initialize(uint32_t vertexNum, uint32_t indexNum, uint32_
 		device->CreateShaderResourceView(particleDataResource.Get(), &srvDesc, matrixCPUHandle);
 	}
 
+	if (isLighting) {
+		lightResource_.Attach(CreateBufferResource(device, sizeof(DirectionalLightData)));
+		lightResource_->Map(0, nullptr, reinterpret_cast<void**>(&lightData_));
+	}
+
 	position_.resize(instanceNum);
 	rotate_.resize(instanceNum);
 	scale_.resize(instanceNum, { 1.0f, 1.0f, 1.0f });
@@ -80,6 +85,8 @@ void ParticleResource::Initialize(uint32_t vertexNum, uint32_t indexNum, uint32_
 
 	psoConfig_.vs = "Particle.VS.hlsl";
 	psoConfig_.ps = "Particle.PS.hlsl";
+	psoConfig_.rootID = RootSignatureID::Particle;
+	psoConfig_.inputLayoutID = InputLayoutID::Default;
 }
 
 void ParticleResource::DrawReady() {
@@ -122,8 +129,6 @@ void ParticleResource::DrawReady() {
 		};
 	}
 
-	psoConfig_.rootID = RootSignatureID::Particle;
-	psoConfig_.inputLayoutID = InputLayoutID::Default;
 }
 
 D3D12_INDEX_BUFFER_VIEW ParticleResource::GetIndexBufferView() const {

@@ -18,7 +18,7 @@ public:
 	ParticleResource();
 	~ParticleResource();
 
-	void Initialize(uint32_t vertexNum, uint32_t indexNum = 0, uint32_t instanceNum = 1);
+	void Initialize(uint32_t vertexNum, uint32_t indexNum = 0, uint32_t instanceNum = 1, bool isLighting = false);
 
 	void IsBillboard(bool isBillboard) {
 		billboard_ = isBillboard;
@@ -34,6 +34,7 @@ public:
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetMatrixSRVDesc() const { return matrixGPUHandle_; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetParticleDataGPUHandle() const { return particleDataGPUHandle_; }
+	ID3D12Resource* GetLightResource() const { return lightResource_.Get(); }
 
 	uint32_t GetVertexNum() const { return vertexNum_; }
 	uint32_t GetIndexNum() const { return indexNum_; }
@@ -51,6 +52,8 @@ public:		//以下描画設定項目 ---==================
 
 	std::vector<uint32_t> color_{};
 
+	DirectionalLightData* lightData_ = nullptr;
+
 	Camera* camera_ = nullptr;
 
 private:
@@ -60,6 +63,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> particleDataResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> lightResource_ = nullptr;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE matrixGPUHandle_{};
 	D3D12_GPU_DESCRIPTOR_HANDLE particleDataGPUHandle_{};

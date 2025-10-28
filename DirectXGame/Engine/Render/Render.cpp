@@ -263,6 +263,10 @@ void Render::Draw(ParticleResource* resource) {
 	commandList->SetGraphicsRootDescriptorTable(0, resource->GetParticleDataGPUHandle());
 	//Texture
 	commandList->SetGraphicsRootDescriptorTable(1, textureManager_->GetTextureData(resource->textureHandle_)->GetTextureGPUHandle());
+	//Lightのポインタを設定
+    if (resource->lightData_) {
+		commandList->SetGraphicsRootConstantBufferView(2, resource->GetLightResource()->GetGPUVirtualAddress());
+    }
 
     if (indexNum != 0) {
         //インデックスがある場合は、インデックスを設定して描画
