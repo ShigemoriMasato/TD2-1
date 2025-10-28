@@ -6,7 +6,9 @@
 std::unordered_map<LevelIndex, std::string> LevelLoader::levelFileMap_ = {
 	{LevelIndex::Level0,"level0"},
 	{LevelIndex::Level1,"level1"},
-	{LevelIndex::Level2,"level2"}
+	{LevelIndex::Level2,"level2"},
+	{LevelIndex::Level3,"level3"},
+	{LevelIndex::Level4,"level4"}
 };
 
 LevelLoader::LevelLoader()
