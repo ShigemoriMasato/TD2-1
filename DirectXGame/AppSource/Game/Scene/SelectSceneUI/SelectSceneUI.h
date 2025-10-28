@@ -63,4 +63,5 @@ private:
 	int leftArrowTriggerTextureHandle_ = 0;
 	int rightArrowReleaseTextureHandle_ = 0;
 	int rightArrowTriggerTextureHandle_ = 0;
+	int stageSelectTextureHandle_ = 0;
 };

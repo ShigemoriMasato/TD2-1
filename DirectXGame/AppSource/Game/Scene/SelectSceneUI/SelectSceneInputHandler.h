@@ -2,6 +2,9 @@
 #include <Common/KeyConfig/KeyManager.h>
 #include <functional>
 
+// 前方宣言
+class AudioManager;
+
 /// <summary>
 /// セレクトシーンの入力処理
 /// キー入力の検知とコールバック実行を担当
@@ -10,6 +13,12 @@ class SelectSceneInputHandler {
 public:
 	SelectSceneInputHandler();
 	~SelectSceneInputHandler();
+
+	/// <summary>
+	/// 初期化（AudioManagerを設定してSEを読み込む）
+	/// </summary>
+	/// <param name="audio">AudioManagerのポインタ</param>
+	void Initialize(AudioManager* audio);
 
 	/// <summary>
 	/// 入力処理
@@ -50,4 +59,11 @@ private:
 	// 前回のキー状態
 	bool prevKeyLeft_ = false;
 	bool prevKeyRight_ = false;
+
+	// AudioManager
+	AudioManager* audio_ = nullptr;
+
+	// サウンドハンドル
+	int moveSoundHandle_ = -1;    // 移動音
+	int confirmSoundHandle_ = -1; // 決定音
 };

@@ -12,6 +12,8 @@ public:
 	void SetClear(bool isClear) { isClear_ = isClear; }
 	std::unique_ptr<BaseScene> Update(float deltatime);
 	bool IsChangeScene() const { return changeScene_; }
+	bool IsClear() const { return isClear_; }
+	bool IsTransitioning() const { return isClear_ && clearTimer_ >= clearWaitTime_; }
 
 private:
 

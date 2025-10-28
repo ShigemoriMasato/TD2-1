@@ -256,6 +256,9 @@ void GameScene::UpdateSlowMotionEffect()
 	// フェードイン中はスローモーションエフェクトを適用しない
 	if (isFadingIn_) return;
 
+	// クリア演出中・トランジション中はスローモーションエフェクトを適用しない
+	if (goalEvent_->IsClear()) return;
+
 	// スローモーション中のポストエフェクト
 	if (timeSlower_->IsSlowMotion())
 	{

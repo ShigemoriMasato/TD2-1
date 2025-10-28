@@ -15,6 +15,7 @@ void SelectSceneUI::Initialize(Camera* camera, TextureManager* textureManager) {
 	leftArrowTriggerTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/TriggerA.png");
 	rightArrowReleaseTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/ReleaseD.png");
 	rightArrowTriggerTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/TriggerD.png");
+	stageSelectTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/StageSelect.png");
 
 	// グラデーション背景
 	gradientBackground_ = std::make_unique<DrawResource>();
@@ -30,7 +31,8 @@ void SelectSceneUI::Initialize(Camera* camera, TextureManager* textureManager) {
 	titleText_->camera_ = camera;
 	titleText_->position_ = { 0.0f, 280.0f, 40.0f };
 	titleText_->scale_ = { 400.0f, 60.0f, 1.0f };
-	titleText_->color_ = 0xd4dfe8ff;  // 淡い灰白色
+	titleText_->color_ = 0xffffffff;
+	titleText_->SetTextureHandle(stageSelectTextureHandle_);
 
 	// 選択フレーム
 	selectionFrame_ = std::make_unique<DrawResource>();
