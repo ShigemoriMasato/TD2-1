@@ -49,6 +49,10 @@ private:
 	std::unique_ptr<SelectSceneTransition> transition_;
 	std::unique_ptr<SelectSceneInputHandler> inputHandler_;
 
+	// スコア表示用（各ステージに対応）
+	std::vector<std::unique_ptr<TimerResource>> stageScores_;
+	std::vector<std::unique_ptr<DrawResource>> scoreLabels_;  // スコアラベル用
+
 	// グリッチエフェクト用
 	float glitchTimer_ = 0.0f;
 	float glitchInterval_ = 3.0f;           // グリッチ発生基本間隔（秒）

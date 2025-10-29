@@ -181,18 +181,17 @@ void SelectSceneTransition::UpdateBackgroundGrid(float deltaTime) {
 	postEffect_->data_.gridTransition.fadeColor = 0.0f;
 	postEffect_->data_.gridTransition.pattern = 0.0f;  // 波紋状パターン
 
-	// 他のエフェクトが動いていない場合のみ適用
-	if (!isFadingIn_ && !isFadingOut_ && !isZoomingIn_ && !isWaitingAfterZoom_) {
-		// 常時走査線とグリッドトランジションを組み合わせる
-		postEffect_->SetJobs(PostEffectJob::ConstantScanline | PostEffectJob::GridTransition);
-	}
+	// 背景グリッドアニメーション中は常にGridTransitionを使用
+	// ConstantScanlineは一時的に無効化される
+	postEffect_->SetJobs(PostEffectJob::GridTransition);
 
 	// アニメーション完了
 	if (backgroundGridTimer_ >= kBackgroundGridDuration) {
 		isBackgroundGridAnimating_ = false;
 		backgroundGridTimer_ = 0.0f;
 		postEffect_->data_.gridTransition.progress = 0.0f;
-		// 常時走査線に戻る
+		
+		// 常時走査線に戻る（グリッチは別の場所で管理）
 		postEffect_->SetJobs(PostEffectJob::ConstantScanline);
 	}
 }
