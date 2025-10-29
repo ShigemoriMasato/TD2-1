@@ -21,11 +21,11 @@ void EnemyManager::Initialize(ModelManager* modelManager, Camera* camera) {
 
 void EnemyManager::Update(float deltaTime) {
 	// 全ての敵にキー入力を設定（共通インターフェース使用）
-	for (auto& enemy : enemies_) {
-		if (enemy) {
-			enemy->InjectInput(keys_);
-		}
-	}
+	//for (auto& enemy : enemies_) {
+	//	if (enemy) {
+	//		enemy->InjectInput(keys_);
+	//	}
+	//}
 
 	// 全ての敵を更新
 	for (auto& enemy : enemies_) {

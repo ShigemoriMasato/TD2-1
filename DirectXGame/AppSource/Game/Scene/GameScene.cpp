@@ -71,15 +71,14 @@ void GameScene::Initialize(std::string levelName)
 		//ワイヤー初期化
 		//ワイヤーの描画をプレイヤーに任せているので、オブジェクトリストに追加されない
 		wire_ = std::make_unique<Wire>();
-		auto handle = modelManager_->LoadModel("testWire");
-		wire_->Initialize(modelManager_->GetModelData(handle), camera_->GetCamera());
+		wire_->Initialize(modelManager_->GetModelData(0), camera_->GetCamera());
 		player_->SetWire(wire_.get());
 
 	}
 
 	//hook
 	{
-		auto handle = modelManager_->LoadModel("hook");
+		auto handle = modelManager_->LoadModel("Enemy");
 		auto coinHandle = modelManager_->LoadModel("coin");
 		levelLoader_.AddGameObject<Hook>(objects_, modelManager_, handle, camera_->GetCamera());
 		levelLoader_.AddGameObject<Coin>(objects_, modelManager_, coinHandle, camera_->GetCamera(), &physicsEngine_, false);
