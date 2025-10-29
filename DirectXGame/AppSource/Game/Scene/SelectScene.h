@@ -49,9 +49,6 @@ private:
 	std::unique_ptr<SelectSceneTransition> transition_;
 	std::unique_ptr<SelectSceneInputHandler> inputHandler_;
 
-	// タイマー表示（テスト用）
-	std::unique_ptr<TimerResource> timer_;
-
 
 	// ステージ選択の初期化用定数
 	inline static const Vector3 kCenterPosition = { 0.0f, 0.0f, 50.0f };
