@@ -133,7 +133,7 @@ void GameScene::Initialize(std::string levelName)
 
 	{
 		//ゴールイベント初期化
-		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_, postEffect_.get());
+		goalEvent_ = std::make_unique<GoalEvent>(camera_.get(), player_, postEffect_.get(), textureManager_);
 	}
 
 	{
@@ -244,7 +244,7 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		return std::make_unique<GameScene>();
 	}
 
-	goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_);
+	goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_, time_);
 	goalEvent_->Update(deltaTime);
 
 	//死んだら

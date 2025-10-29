@@ -1,10 +1,26 @@
 #include "GoalEvent.h"
 #include <Game/Scene/GameScene.h>
 
-GoalEvent::GoalEvent(CameraManager* camera, Player* player, PostEffectResource* posteffect) {
+GoalEvent::GoalEvent(CameraManager* camera, Player* player, PostEffectResource* posteffect, TextureManager* textureManager) {
 	camera_ = camera;
 	player_ = player;
 	postEffect_ = posteffect;
+
+	plate_ = std::make_unique<DrawResource>();
+	plate_->Initialize(ShapeType::Plane);
+	plate_->camera_ = camera_->GetCamera();
+	plate_->SetTextureHandle(textureManager->LoadTexture("Assets/Texture/number/ScorePlate.png"));
+
+	for (int i = 0; i < 4; ++i) {
+		if (i == 2) {
+			scores_.emplace_back(std::make_unique<NumberPlate>());
+			scores_.back()->Initialize(textureManager, 4, true);
+			continue;
+		}
+
+		scores_.emplace_back(std::make_unique<NumberPlate>());
+		scores_.back()->Initialize(textureManager, 6, false);
+	}
 }
 
 GoalEvent::~GoalEvent() {
@@ -42,16 +58,22 @@ void GoalEvent::Initialize() {
 void GoalEvent::ClearUpdate(float deltatime) {
 	clearTimer_ += deltatime;
 
-	if (clearTimer_ >= clearWaitTime_) {
-		// クリア演出終了後、グリッド遷移を開始
-		postEffect_->SetJobs(PostEffectJob::GridTransition);
-		
-		// グリッド遷移を進める
-		postEffect_->data_.gridTransition.progress += deltatime / 2.0f;
-		postEffect_->data_.gridTransition.progress = std::min(postEffect_->data_.gridTransition.progress, 1.0f);
-	}
+	scores_[0]->Update(10000);
+	scores_[1]->Update(0);
+	scores_[2]->Update(int(clearTimer_));
+	scores_[3]->Update(finalScore_);
 
 	if(postEffect_->data_.gridTransition.progress >= 1.0f){
 		changeScene_ = true;
+	}
+}
+
+void GoalEvent::Draw(Render* render) {
+	if (!isClear_) return;
+	
+	render->Draw(plate_.get());
+
+	for (int i = 0; i < 4; ++i) {
+		scores_[i]->Draw(render);
 	}
 }
