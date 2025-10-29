@@ -15,6 +15,9 @@ public:
 
 	std::unique_ptr<ScoreManager> scoreManager_ = nullptr;
 
+	std::vector<std::vector<Vector3>> deathPoints_;
+	std::vector<int> bestScore_;
+
 	LevelIndex nextLevelIndex_ = LevelIndex::Level1;
 	bool isCreateTexture = false;
 
