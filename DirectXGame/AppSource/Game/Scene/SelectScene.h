@@ -49,6 +49,23 @@ private:
 	std::unique_ptr<SelectSceneTransition> transition_;
 	std::unique_ptr<SelectSceneInputHandler> inputHandler_;
 
+	// グリッチエフェクト用
+	float glitchTimer_ = 0.0f;
+	float glitchInterval_ = 3.0f;           // グリッチ発生基本間隔（秒）
+	float glitchIntervalVariation_ = 2.0f;  // 間隔のランダム幅（秒）
+	float glitchDuration_ = 0.0f;           // 現在のグリッチ継続時間
+	float glitchMaxDuration_ = 0.5f;        // グリッチの最大継続時間（秒）
+	bool isGlitching_ = false;              // グリッチ中かどうか
+	float nextGlitchTime_ = 0.0f;           // 次のグリッチ発生時刻
+
+	// 常時走査線用
+	float scanlineTime_ = 0.0f;             // 走査線アニメーション用タイマー
+
+	/// @brief グリッチエフェクトの更新
+	void UpdateGlitch(float deltaTime);
+
+	/// @brief 常時走査線エフェクトの更新
+	void UpdateConstantScanline(float deltaTime);
 
 	// ステージ選択の初期化用定数
 	inline static const Vector3 kCenterPosition = { 0.0f, 0.0f, 50.0f };

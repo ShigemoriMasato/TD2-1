@@ -56,7 +56,6 @@ private://特定なオブジェクト
 	std::unique_ptr<BackGround> backGround_ = nullptr;
 
 private:
-	std::unique_ptr<ClearScene> clearEvent_ = nullptr;
 	std::unique_ptr<Tutorial> tutorial_ = nullptr;
 private://Emitter
 	std::unique_ptr<DeathParticle> deathParticle_ = nullptr;
@@ -76,6 +75,10 @@ private://postEffect
 	float slowMotionChromaticAberration_ = 0.8f;   // 色収差強度（0.3→0.8）
 	float slowMotionVignetteStrength_ = 0.85f;     // ビネット強度（0.6→0.85）
 	float slowMotionSaturationMin_ = 0.3f;         // 最小彩度（0.5→0.3でより強い効果）
+
+
+	float time_ = 0.0f;
+	std::unique_ptr<NumberPlate> timer_ = nullptr;
 
 private://使える関数
 

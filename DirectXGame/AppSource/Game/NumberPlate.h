@@ -12,6 +12,7 @@ public:
 	void Draw(Render* render);
 
 	void SetPosition(Vector3 position);
+	void SetScale(Vector3 scale) { transform_.scale = scale; }
 
 private:
 

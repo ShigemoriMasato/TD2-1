@@ -35,6 +35,9 @@ void TitleScene::Initialize()
 	glitchTimer_ = 0.0f;
 	glitchDuration_ = 0.0f;
 	isGlitching_ = false;
+	
+	// 初回のグリッチ発生時刻をランダムに設定（起動後1〜3秒後に短縮）
+	nextGlitchTime_ = 1.0f + (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f;
 
 	// アニメーション用タイマーの初期化
 	totalTime_ = 0.0f;
@@ -261,33 +264,60 @@ void TitleScene::UpdateGlitch(float deltaTime)
 		// グリッチ待機中
 		glitchTimer_ += deltaTime;
 
-		// ランダムな間隔でグリッチを発生
-		// 基本間隔に±1秒のランダム性を追加
-		float randomOffset = (static_cast<float>(std::rand()) / RAND_MAX - 0.5f) * 2.0f;
-		float actualInterval = glitchInterval_ + randomOffset;
+		// 次のグリッチ発生時刻に到達したらグリッチ開始
+		if (glitchTimer_ >= nextGlitchTime_) {
 
-		if (glitchTimer_ >= actualInterval) {
 			// グリッチ開始
 			isGlitching_ = true;
 			glitchDuration_ = 0.0f;
 			glitchTimer_ = 0.0f;
 
-			// グリッチの継続時間をランダム化（0.05〜0.15秒）
-			glitchMaxDuration_ = 0.05f + (static_cast<float>(std::rand()) / RAND_MAX) * 0.1f;
+			// グリッチの継続時間をランダム化（0.2〜0.5秒に延長）
+			glitchMaxDuration_ = 0.2f + (static_cast<float>(std::rand()) / RAND_MAX) * 0.3f;
+			
+			// 次のグリッチ発生時刻を設定（基本間隔±ランダム幅）
+			float randomFactor = (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f - 1.0f;
+			nextGlitchTime_ = glitchInterval_ + (randomFactor * glitchIntervalVariation_);
+			
+			// 最低1秒は空ける
+			if (nextGlitchTime_ < 1.0f) {
+				nextGlitchTime_ = 1.0f;
+			}
+
 		}
 	} else {
 		// グリッチ中
 		glitchDuration_ += deltaTime;
 
-		// グリッチの強度を計算（最初と最後で弱く、中間で強い）
+		// グリッチの強度を計算（よりスムーズなカーブ）
 		float progress = glitchDuration_ / glitchMaxDuration_;
-		float intensity = std::sin(progress * 3.14159265358979323846f); // 0→1→0の曲線
+		
+		// より緩やかなフェードイン/アウト（smoothstep風）
+		float intensity;
+		if (progress < 0.2f) {
+			// 最初の20%でフェードイン
+			float t = progress / 0.2f;
+			intensity = t * t * (3.0f - 2.0f * t); // smoothstep
+		} else if (progress > 0.8f) {
+			// 最後の20%でフェードアウト
+			float t = (1.0f - progress) / 0.2f;
+			intensity = t * t * (3.0f - 2.0f * t); // smoothstep
+		} else {
+			// 中間60%は最大強度を維持
+			intensity = 1.0f;
+		}
 
-		// グリッチパラメータを設定
-		postEffect_->data_.glitch.intensity = intensity * 0.7f;
-		postEffect_->data_.glitch.rgbSplit = intensity * 0.8f;
-		postEffect_->data_.glitch.scanlineIntensity = intensity * 0.6f;
-		postEffect_->data_.glitch.blockIntensity = intensity * 0.5f;
+		// 強度にランダムなスパイクを追加（より不安定な感じ）
+		float randomSpike = 1.0f + (static_cast<float>(std::rand()) / RAND_MAX - 0.5f) * 0.3f;
+		intensity *= randomSpike;
+		intensity = std::min(intensity, 1.0f); // 1.0を超えないようにクランプ
+
+		// グリッチパラメータを設定（より強い効果）
+		postEffect_->data_.glitch.intensity = intensity * 0.85f;
+		postEffect_->data_.glitch.rgbSplit = intensity * 0.9f;
+		postEffect_->data_.glitch.scanlineIntensity = intensity * 0.75f;
+		postEffect_->data_.glitch.blockIntensity = intensity * 0.6f;
+
 
 		// グリッチエフェクトをセット
 		postEffect_->SetJobs(PostEffectJob::Glitch);
@@ -315,7 +345,7 @@ float TitleScene::EaseOutCubic(float t)
 
 float TitleScene::EaseInOutSine(float t)
 {
-	return -(std::cos(3.14159265358979323846f * t) - 1.0f) / 2.0f;
+	return -(std::cos(std::numbers::pi_v<float> * t) - 1.0f) / 2.0f;
 }
 
 void TitleScene::Draw()

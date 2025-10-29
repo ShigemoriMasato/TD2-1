@@ -180,8 +180,13 @@ void Player::OnClear() {
 	rotateSpeed_ = rotateMaxSpeed_ / 2.0f;
 	int clear = audio_->Load("clear.mp3");
 	audio_->Play(clear, false);
+	actor_->useGravity_ = false;
 }
 
 void Player::UpdateClear(float deltaTime) {
-	actor_->velocity_ = { 5.0f, 0.0f };
+	Vector3 dir = actor_->velocity_.Normalize();
+	float speed = actor_->velocity_.Length();
+	//段々減速する
+	speed -= 3.0f * deltaTime;
+	actor_->velocity_ = dir * speed;
 }
