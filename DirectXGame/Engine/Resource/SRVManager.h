@@ -26,5 +26,3 @@ private:
 	const uint32_t maxCount;
 
 };
-
- 

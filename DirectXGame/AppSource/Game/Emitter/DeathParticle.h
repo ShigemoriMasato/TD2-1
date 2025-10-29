@@ -19,10 +19,13 @@ private:
 
 	const int instanceNum = 200;
 
+	int count = 0;
+
 	Vector3* playerPos_;
 	float timer_;
-	bool isInited_;
-	bool isBoot_;
+	bool isInited_ = false;
+	bool isBoot_ = false;
+	bool booted_ = false;
 	std::vector<float> distance_;
 	std::vector<float> speed_;
 	const float maxDistance_ = 40.0f;

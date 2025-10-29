@@ -44,8 +44,8 @@ DeathParticle::DeathParticle(Vector3* playerPos) {
 		3, 1, 5
 	};
 
-	res_->psoConfig_.ps = "Game/BackGround.PS.hlsl";
-	res_->psoConfig_.vs = "Game/BackGround.VS.hlsl";
+	res_->psoConfig_.ps = "Game/Block.PS.hlsl";
+	res_->psoConfig_.vs = "Game/Block.VS.hlsl";
 
 }
 
@@ -63,7 +63,7 @@ void DeathParticle::Initialize() {
 		res_->position_[i] = *playerPos_ + Vector3(buff.x, buff.y, 0.0f) * std::numbers::pi_v<float>;
 	}
 
-	isBoot_ = false;
+	isInited_ = false;
 }
 
 void DeathParticle::Update(float deltaTime) {
@@ -77,7 +77,12 @@ void DeathParticle::Update(float deltaTime) {
 
 			if (distance_[i] < 0.0f) {
 				res_->color_[i] = 0;
+				++count;
 			}
+		}
+
+		if (count == instanceNum) {
+			isInited_ = false;
 		}
 	}
 
@@ -86,16 +91,35 @@ void DeathParticle::Update(float deltaTime) {
 			if (res_->color_[i] == 0) continue;
 			Vector3 dir = res_->position_[i] - *playerPos_;
 			dir = dir.Normalize();
-			speed_[i] += acceleration_ * deltaTime;
+			speed_[i] -= acceleration_ * deltaTime;
 			distance_[i] += speed_[i] * deltaTime;
 			res_->position_[i] = *playerPos_ + dir * distance_[i];
 
-			if (distance_[i] > maxDistance_) {
+			if (speed_[i] <= 0.0f) {
 				res_->color_[i] = 0;
+				--count;
 			}
+		}
+
+		if (count == 0) {
+			isBoot_ = false;
+			booted_ = true;
 		}
 	}
 }
 
 void DeathParticle::Render() {
+}
+
+void DeathParticle::Boot() {
+	isBoot_ = true;
+	count = instanceNum;
+	speed_.clear();
+	for (int i = 0; i < instanceNum; ++i) {
+		speed_.push_back(rand() % 10000 / 2000 + 3.0f);
+	}
+}
+
+bool DeathParticle::isFin() {
+	return booted_;
 }

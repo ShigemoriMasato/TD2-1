@@ -202,8 +202,6 @@ void DrawResource::Initialize(ShapeType type) {
 			}
 		}
 
-
-
 		break;
 	}
 }

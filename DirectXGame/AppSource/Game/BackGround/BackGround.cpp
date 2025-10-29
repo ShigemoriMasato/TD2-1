@@ -46,8 +46,8 @@ BackGround::BackGround() {
 		3, 1, 5
 	};
 
-	blocks_->psoConfig_.ps = "Game/BackGroundL.PS.hlsl";
-	blocks_->psoConfig_.vs = "Game/BackGround.VS.hlsl";
+	blocks_->psoConfig_.ps = "Game/BackGround.PS.hlsl";
+	blocks_->psoConfig_.vs = "Game/Block.VS.hlsl";
 	blocks_->psoConfig_.rootID = RootSignatureID::LightParticle;
 	blocks_->lightData_->color = { 1.0f, 1.0f, 1.0f,1.0f };
 	blocks_->lightData_->direction = { 0.79f, 0.45f, 0.41f };
