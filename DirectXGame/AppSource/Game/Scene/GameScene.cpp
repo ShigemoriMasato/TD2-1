@@ -250,14 +250,17 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	//死んだら
 	if (player_->IsDead()) {
 		commonData->deathPoints_[int(commonData->nextLevelIndex_)].push_back(player_->GetTransform()->position);
+		Coin::ResetScore();
 		return std::make_unique<GameScene>();
 	}
 
 	//ゴールの処理が終わったら
 	if (goalEvent_->IsChangeScene() || isExit)
 	{
+		Coin::ResetScore();
 		return std::make_unique<SelectScene>();
 	}
+	ImGui::Text("score:%d", Coin::GetScore());
 
 	return nullptr;
 }
