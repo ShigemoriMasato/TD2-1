@@ -140,6 +140,16 @@ void StageCarousel::MoveOtherStagesOffScreen(int selectedIndex, float offset) {
 	}
 }
 
+bool StageCarousel::IsAnimating() const {
+	// いずれかのステージがアニメーション中ならtrue
+	for (const auto& animation : stageAnimations_) {
+		if (animation.isAnimating) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void StageCarousel::SetStagePreviewTargets() {
 
 	for (int i = 0; i < 5; ++i) {

@@ -68,6 +68,12 @@ public:
 	/// <param name="offset">オフセット量</param>
 	void MoveOtherStagesOffScreen(int selectedIndex, float offset);
 
+	/// <summary>
+	/// いずれかのステージがアニメーション中かどうか
+	/// </summary>
+	/// <returns>アニメーション中ならtrue</returns>
+	bool IsAnimating() const;
+
 private:
 	/// <summary>
 	/// ステージプレビューの目標値を設定してアニメーション開始
