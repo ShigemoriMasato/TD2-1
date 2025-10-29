@@ -72,10 +72,10 @@ void GoalEvent::Initialize() {
 void GoalEvent::ClearUpdate(float deltatime) {
 	clearTimer_ += deltatime;
 
-	finalScore_ = 10000 + (Coin::GetScore() * 1000) + (clearTime_ * -150);
+	finalScore_ = 10000 + (Coin::GetScore()) + (clearTime_ * -150);
 
 	scores_[0]->Update(10000);
-	scores_[1]->Update(Coin::GetScore() * 1000);
+	scores_[1]->Update(Coin::GetScore());
 	scores_[2]->Update(int(clearTime_) * -150);
 	scores_[3]->Update(finalScore_);
 
