@@ -53,7 +53,7 @@ void NumberPlate::Update(int num) {
 
 	if (isTimer_) {
 		res_.back()->position_ = transform_.position;
-		res_.back()->position_.x -= transform_.scale.x + transform_.scale.x * 0.5f;
+		res_.back()->position_.x -= transform_.scale.x + transform_.scale.x * 0.8f;
 		res_.back()->rotate_ = transform_.rotation;
 		res_.back()->scale_ = transform_.scale;
 	}

@@ -102,6 +102,7 @@
     <ClCompile Include="AppSource\Game\Emitter\DeathPoint.cpp" />
     <ClCompile Include="AppSource\Game\NumberPlate.cpp" />
     <ClCompile Include="AppSource\Game\Tutorial.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\ClearScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -214,6 +215,7 @@
     <ClInclude Include="AppSource\Game\Emitter\DeathPoint.h" />
     <ClInclude Include="AppSource\Game\NumberPlate.h" />
     <ClInclude Include="AppSource\Game\Tutorial.h" />
+    <ClInclude Include="AppSource\Game\Scene\ClearScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

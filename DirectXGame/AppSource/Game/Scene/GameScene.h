@@ -19,6 +19,7 @@
 #include "../NumberPlate.h"
 #include <Game/FPS/TimeSlower.h>
 #include "../Tutorial.h"
+#include "ClearScene.h"
 
 class Player;
 class GameScene : public BaseScene
@@ -53,11 +54,9 @@ private://特定なオブジェクト
 	std::unique_ptr<GoalTape> goalTape_ = nullptr;
 	std::unique_ptr<TargetScope> targetScope_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
-	std::unique_ptr<NumberPlate> timer_ = nullptr;
 
 private:
-	float time_ = 0.0f;
-
+	std::unique_ptr<ClearScene> clearEvent_ = nullptr;
 	std::unique_ptr<Tutorial> tutorial_ = nullptr;
 private://Emitter
 	std::unique_ptr<DeathParticle> deathParticle_ = nullptr;
