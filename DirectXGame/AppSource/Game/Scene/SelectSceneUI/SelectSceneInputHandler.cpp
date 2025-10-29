@@ -59,13 +59,21 @@ void SelectSceneInputHandler::ProcessInput(const std::unordered_map<Key, bool>& 
 
 	// Actionキーが押された瞬間にステージ決定
 	if (keys.at(Key::Action) && !prevKeyAction_) {
-		// 決定SEを再生
-		if (audio_ && confirmSoundHandle_ != -1) {
-			audio_->Play(confirmSoundHandle_, false);
+		// アニメーション中でない場合のみ決定処理を実行
+		bool canConfirm = true;
+		if (isAnimating_) {
+			canConfirm = !isAnimating_();  // アニメーション中なら決定不可
 		}
 
-		if (onStageConfirm_) {
-			onStageConfirm_();
+		if (canConfirm) {
+			// 決定SEを再生
+			if (audio_ && confirmSoundHandle_ != -1) {
+				audio_->Play(confirmSoundHandle_, false);
+			}
+
+			if (onStageConfirm_) {
+				onStageConfirm_();
+			}
 		}
 	}
 

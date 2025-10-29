@@ -50,11 +50,20 @@ public:
 		onArrowUpdate_ = callback;
 	}
 
+	/// <summary>
+	/// アニメーション完了チェック用のコールバックを設定
+	/// </summary>
+	/// <param name="callback">コールバック関数（戻り値: アニメーション中ならtrue）</param>
+	void SetIsAnimatingCallback(std::function<bool()> callback) {
+		isAnimating_ = callback;
+	}
+
 private:
 	// コールバック関数
 	std::function<bool(int direction)> onStageChange_;
 	std::function<void()> onStageConfirm_;
 	std::function<void(bool, bool)> onArrowUpdate_;
+	std::function<bool()> isAnimating_;
 
 	// 前回のキー状態
 	bool prevKeyLeft_ = false;

@@ -69,6 +69,13 @@ void SelectScene::Initialize() {
 	};
 	stageCarousel_->Initialize(uiCamera_.get(), offScreenIndices, offScreenManager_);
 
+	// 前回選択されたステージインデックスを復元（nextLevelIndexから計算）
+	int lastSelectedIndex = static_cast<int>(commonData->nextLevelIndex_);
+	// 範囲チェック
+	if (lastSelectedIndex >= 0 && lastSelectedIndex < (int)LevelIndex::kNumLevels) {
+		stageCarousel_->SetSelectedStageIndex(lastSelectedIndex);
+	}
+
 	// 入力ハンドラー初期化
 	inputHandler_ = std::make_unique<SelectSceneInputHandler>();
 	inputHandler_->Initialize(audio_);
@@ -78,7 +85,7 @@ void SelectScene::Initialize() {
 		int currentIndex = stageCarousel_->GetSelectedStageIndex();
 		int newIndex = currentIndex + direction;
 
-		// 両端でストップ（ラップアラウンドしない）
+		// 両端でストップ
 		if (newIndex < 0 || newIndex >= (int)LevelIndex::kNumLevels) {
 			return false;  // 範囲外の場合は移動失敗を返す
 		}
@@ -101,6 +108,11 @@ void SelectScene::Initialize() {
 		ui_->UpdateArrowTextures(isLeftPressed, isRightPressed);
 		});
 
+	// アニメーション状態チェックのコールバック設定
+	inputHandler_->SetIsAnimatingCallback([this]() -> bool {
+		return stageCarousel_->IsAnimating();
+		});
+
 	// BGMの再生
 	int bgmSoundHandle = audio_->Load("BGM/Normal.mp3");
 
@@ -116,7 +128,7 @@ std::unique_ptr<BaseScene> SelectScene::Update() {
 
 	// 背景パーティクルの更新（常に更新）
 	backgroundParticles_->Update(deltaTime);
-
+	
 
 
 	// トランジション処理の更新
