@@ -13,6 +13,7 @@
 #include "../Goal/GoalEvent.h"
 #include "../Player/TargetScope.h"
 #include "../BackGround/BackGround.h"
+#include "../Emitter/DeathParticle.h"
 #include <Game/FPS/TimeSlower.h>
 
 class Player;
@@ -40,7 +41,6 @@ private://パラメータ変数
 
 	std::unique_ptr<TimeSlower> timeSlower_ = nullptr;
 
-
 private://特定なオブジェクト
 	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
 	Player* player_ = nullptr;
@@ -48,6 +48,10 @@ private://特定なオブジェクト
 	std::unique_ptr<GoalTape> goalTape_ = nullptr;
 	std::unique_ptr<TargetScope> targetScope_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
+
+private://Emitter
+	std::unique_ptr<DeathParticle> deathParticle_ = nullptr;
+
 
 private://イベント
 	std::unique_ptr<GoalEvent> goalEvent_ = nullptr;

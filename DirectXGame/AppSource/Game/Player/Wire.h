@@ -16,6 +16,7 @@ public:
 	void Draw(Render* render) override;
 
 	std::pair<Transform, float>GetCollider()const { return { transform_, 0.2f }; }
+	Vector3 GetDirection() const { return direction_; }
 
 	void SetStartPositionPtr(Vector3* startPos) { startPos_ = startPos; }
 	void SetEndPosition(const Vector3& endPos);
@@ -41,8 +42,10 @@ private://Wire情報
 	//伸ばすときの目標座標
 	Vector3 targetPos_ = {};
 
+	Vector3 direction_ = {};
+
 	//伸ばす速度
-	const float extendSpeed_ = 3.0f;
+	const float extendSpeed_ = 30.0f;
 	//伸ばし始めたときの距離
 	float initDistance_ = 0.0f;
 	//伸ばしているか

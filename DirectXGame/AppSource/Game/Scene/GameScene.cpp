@@ -137,6 +137,12 @@ void GameScene::Initialize(std::string levelName)
 		backGround_->Initialize(camera_->GetCamera());
 	}
 
+	{
+		//デスパーティクル初期化
+		deathParticle_ = std::make_unique<DeathParticle>(&player_->GetTransform()->position);
+		deathParticle_->Initialize(camera_->GetCamera());
+	}
+
 	//BGMの再生
 	if (!commonData->isCreateTexture) {
 		int soundHandle = audio_->Load("BGM/Game.mp3");
@@ -203,6 +209,8 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	goalTape_->Update(deltaTime);
 	//backGround
 	backGround_->Update(deltaTime);
+	//deathParticle
+	deathParticle_->Update(deltaTime);
 
 	physicsEngine_.Update(deltaTime);
 	//オブジェクト間でのコリジョンチェック
@@ -217,8 +225,7 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	goalEvent_->Update(deltaTime);
 
 	//ゴールの処理が終わったら
-	if(player_->IsDead()){
-		//とりあえず今は初期化
+	if (player_->IsDead()) {
 		return std::make_unique<GameScene>();
 	}
 
@@ -298,6 +305,10 @@ void GameScene::Draw()
 
 	targetScope_->Draw(render_);
 	goalTape_->Draw(render_);
+
+	if (!commonData->isCreateTexture) {
+		deathParticle_->Draw(render_);
+	}
 
 	render_->Draw(postEffect_.get());
 }
