@@ -41,8 +41,8 @@ void NumberPlate::Update(int num) {
 	if (isTimer_) {
 
 		int sec = num % 60;
-		if (digits.size() > 0)digits.push_back(sec % 10);
-		if (digits.size() > 1)digits.push_back(sec / 10);
+		digits.push_back(sec % 10);
+		digits.push_back(sec / 10);
 		int minutes = num / 60;
 		for (int i = 2; i < digit_; ++i) {
 			digits.push_back(minutes % 10);
@@ -69,7 +69,11 @@ void NumberPlate::Update(int num) {
 
 		res_[i]->rotate_ = transform_.rotation;
 		res_[i]->scale_ = transform_.scale;
-		res_[i]->SetTextureHandle(textureHandles_[digits[i]]);
+		if (i < digits.size()) {
+			res_[i]->SetTextureHandle(textureHandles_[digits[i]]);
+		} else {
+			res_[i]->SetTextureHandle(textureHandles_[0]);
+		}
 	}
 
 	if (isTimer_) {
@@ -105,4 +109,8 @@ void NumberPlate::Draw(Render* render) {
 	for (int i = 0; i < res_.size(); ++i) {
 		render->Draw(res_[i].get());
 	}
+}
+
+void NumberPlate::SetPosition(Vector3 position) {
+	transform_.position = position;
 }
