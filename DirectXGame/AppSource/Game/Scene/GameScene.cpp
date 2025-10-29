@@ -51,6 +51,10 @@ void GameScene::Initialize(std::string levelName)
 	camera_->Initialize(&player_->GetTransform()->position);
 	camera_->SetOffset({ 0.0f, 1.0f, -40.0f });
 
+	//UI用カメラ
+	uiCamera_ = std::make_unique<Camera>();
+	uiCamera_->SetProjectionMatrix(OrthographicDesc());
+
 	if (commonData->isCreateTexture)
 	{
 		Vector2 size = tileMap_->WorldSize();
@@ -89,7 +93,7 @@ void GameScene::Initialize(std::string levelName)
 		auto goalTape = std::make_unique<GoalTape>();
 		int textureHandle = textureManager_->LoadTexture("Assets/Texture/goal.png");
 		auto tileWorldSize = tileMap_->WorldSize();
-		goalTape->Initialize(textureHandle, tileWorldSize.x, tileWorldSize.y, &physicsEngine_, camera_->GetCamera());
+		goalTape->Initialize(textureHandle, tileWorldSize.x - 1.0f, tileWorldSize.y, &physicsEngine_, camera_->GetCamera());
 		goalTape_ = std::move(goalTape);
 		goalX_ = tileWorldSize.x;
 	}
@@ -148,6 +152,15 @@ void GameScene::Initialize(std::string levelName)
 		deathPoint_ = std::make_unique<DeathPoint>();
 		int handle = textureManager_->LoadTexture("Assets/Texture/Death.png");
 		deathPoint_->Initialize(commonData->deathPoints_[int(commonData->nextLevelIndex_)], handle, camera_->GetCamera());
+	}
+
+	{
+		//Timer
+		timer_ = std::make_unique<TimerResource>();
+		timer_->Initialize({120.0f, 120.0f, 1.0f}, 4, true);
+		timer_->SetPosition({ 500.0f, 100.0f, 1.0f });
+		timer_->SetSeparator({ 2 }, "Assets/Texture/number/koron.png");
+		timer_->SetCamera(uiCamera_.get());
 	}
 
 	//BGMの再生
@@ -218,6 +231,9 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	backGround_->Update(deltaTime);
 	//deathParticle
 	deathParticle_->Update(deltaTime);
+	//timer
+	time_ += deltaTime;
+	timer_->Update(static_cast<int>(time_));
 
 	physicsEngine_.Update(deltaTime);
 	//オブジェクト間でのコリジョンチェック
@@ -244,6 +260,36 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	}
 
 	return nullptr;
+}
+
+void GameScene::Draw() {
+	render_->PreDraw(OffScreenIndex::GameWindow);
+
+	//一番最初に背景を描画する
+	backGround_->Draw(render_);
+
+	for (auto& object : objects_) {
+		object->Draw(render_);
+	}
+
+	tileMap_->Draw(render_, timeSlower_->GetDeltaTime());
+	enemyManager_->Draw(render_);
+
+
+	targetScope_->Draw(render_);
+	goalTape_->Draw(render_);
+
+	if (!commonData->isCreateTexture) {
+		deathParticle_->Draw(render_);
+	}
+	deathPoint_->Draw(render_);
+
+	auto res = timer_->GetDrawResources();
+	for (auto& r : res) {
+		render_->Draw(r);
+	}
+
+	render_->Draw(postEffect_.get());
 }
 
 void GameScene::UpdateFadeIn(float deltaTime)
@@ -294,33 +340,6 @@ void GameScene::UpdateSlowMotionEffect()
 		// 通常時はエフェクトなし
 		postEffect_->SetJobs(PostEffectJob::None);
 	}
-}
-
-void GameScene::Draw()
-{
-	render_->PreDraw(OffScreenIndex::GameWindow);
-
-	//一番最初に背景を描画する
-	backGround_->Draw(render_);
-
-	for (auto& object : objects_)
-	{
-		object->Draw(render_);
-	}
-
-	tileMap_->Draw(render_, timeSlower_->GetDeltaTime());
-	enemyManager_->Draw(render_);
-
-
-	targetScope_->Draw(render_);
-	goalTape_->Draw(render_);
-
-	if (!commonData->isCreateTexture) {
-		deathParticle_->Draw(render_);
-	}
-	deathPoint_->Draw(render_);
-
-	render_->Draw(postEffect_.get());
 }
 
 void GameScene::CheckAllCollision()

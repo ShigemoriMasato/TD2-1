@@ -15,6 +15,7 @@
 #include "../BackGround/BackGround.h"
 #include "../Emitter/DeathParticle.h"
 #include "../Emitter/DeathPoint.h"
+#include <Render/Resource/TimerResource.h>
 #include <Game/FPS/TimeSlower.h>
 
 class Player;
@@ -31,6 +32,7 @@ private://管理用メンバ変数
 	//シーン内全てのオブジェクトリスト
 	std::vector<std::unique_ptr<BaseObject>> objects_;
 	std::unique_ptr<CameraManager> camera_ = nullptr;
+	std::unique_ptr<Camera> uiCamera_ = nullptr;
 	std::unordered_map<Key, bool> keys_{};
 
 	PhysicsEngine physicsEngine_;
@@ -49,6 +51,10 @@ private://特定なオブジェクト
 	std::unique_ptr<GoalTape> goalTape_ = nullptr;
 	std::unique_ptr<TargetScope> targetScope_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
+	std::unique_ptr<TimerResource> timer_ = nullptr;
+
+private:
+	float time_ = 0.0f;
 
 private://Emitter
 	std::unique_ptr<DeathParticle> deathParticle_ = nullptr;
