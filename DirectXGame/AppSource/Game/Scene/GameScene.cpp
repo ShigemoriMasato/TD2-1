@@ -150,6 +150,9 @@ void GameScene::Initialize(std::string levelName)
 		deathPoint_->Initialize(commonData->deathPoints_[int(commonData->nextLevelIndex_)], handle, camera_->GetCamera());
 	}
 
+	tutorial_ = std::make_unique<Tutorial>();
+	tutorial_->Initialize(camera_->GetCamera(),textureManager_);
+
 	//BGMの再生
 	if (!commonData->isCreateTexture) {
 		int soundHandle = audio_->Load("BGM/Game.mp3");
@@ -302,6 +305,7 @@ void GameScene::Draw()
 
 	//一番最初に背景を描画する
 	backGround_->Draw(render_);
+	if(tutorial_ && commonData->nextLevelIndex_ == LevelIndex::Level0) tutorial_->Draw(render_);
 
 	for (auto& object : objects_)
 	{

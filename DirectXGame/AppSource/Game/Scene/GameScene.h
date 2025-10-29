@@ -16,6 +16,7 @@
 #include "../Emitter/DeathParticle.h"
 #include "../Emitter/DeathPoint.h"
 #include <Game/FPS/TimeSlower.h>
+#include "../Tutorial.h"
 
 class Player;
 class GameScene : public BaseScene
@@ -49,7 +50,7 @@ private://特定なオブジェクト
 	std::unique_ptr<GoalTape> goalTape_ = nullptr;
 	std::unique_ptr<TargetScope> targetScope_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
-
+	std::unique_ptr<Tutorial> tutorial_ = nullptr;
 private://Emitter
 	std::unique_ptr<DeathParticle> deathParticle_ = nullptr;
 	std::unique_ptr<DeathPoint> deathPoint_ = nullptr;

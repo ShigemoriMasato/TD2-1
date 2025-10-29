@@ -114,6 +114,7 @@
     <ClCompile Include="AppSource\Game\Scene\SelectScene.cpp" />
     <ClCompile Include="AppSource\Game\ScoreManager.cpp" />
     <ClCompile Include="Engine\Render\Resource\ModelParticle.cpp" />
+    <ClCompile Include="AppSource\Game\Tutorial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -224,6 +225,7 @@
     <ClInclude Include="AppSource\Common\InitializeScene\InitializeScene.h" />
     <ClInclude Include="AppSource\Game\ScoreManager.h" />
     <ClInclude Include="Engine\Render\Resource\ModelParticle.h" />
+    <ClInclude Include="AppSource\Game\Tutorial.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
