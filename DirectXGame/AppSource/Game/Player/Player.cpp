@@ -37,7 +37,8 @@ Player::Player(TimeSlower* slower, PhysicsEngine* phEngine)
 	collider_->SetTransform(&transform_);
 	collider_->SetSize(Vector3(1.0f, 1.0f, 1.0f));
 
-	transform_.position = { 2.0f,1.0f,0.0f };
+
+	transform_.position = { 3.0f,1.0f,0.0f };
 }
 
 Player::~Player()
