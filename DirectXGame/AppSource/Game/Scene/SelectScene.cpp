@@ -98,6 +98,30 @@ void SelectScene::Initialize() {
 		stageCarousel_->SetSelectedStageIndex(lastSelectedIndex);
 	}
 
+	// スコア表示の初期化（5つのステージ分）
+	stageScores_.resize(5);
+	scoreLabels_.resize(5);
+	for (int i = 0; i < 5; ++i) {
+		stageScores_[i] = std::make_unique<TimerResource>();
+		// 4桁表示で初期化（スコアは0〜9999を想定）
+		stageScores_[i]->Initialize(Vector3{ 45.0f, 50.0f, 1.0f }, 7, false);
+		stageScores_[i]->SetCamera(uiCamera_.get());
+		stageScores_[i]->SetColor(0xffffffee);  // やや半透明の白
+		
+		// commonDataからスコアを読み取り、初期表示
+		int score = commonData->scoreManager_->GetScore(i);
+		stageScores_[i]->Update(score);
+
+		// スコアラベル（"SCORE"テクスチャ）の初期化
+		scoreLabels_[i] = std::make_unique<DrawResource>();
+		scoreLabels_[i]->Initialize(ShapeType::Plane);
+		scoreLabels_[i]->camera_ = uiCamera_.get();
+		scoreLabels_[i]->scale_ = { 300.0f, 50.0f, 1.0f };  // ラベルのサイズ
+		scoreLabels_[i]->color_ = 0xffffffee;  // やや半透明の白
+		scoreLabels_[i]->SetTextureHandle("Assets/Texture/score.png");
+		scoreLabels_[i]->psoConfig_.depthStencilID = DepthStencilID::Transparent;
+	}
+
 	// 入力ハンドラー初期化
 	inputHandler_ = std::make_unique<SelectSceneInputHandler>();
 	inputHandler_->Initialize(audio_);
@@ -151,12 +175,6 @@ std::unique_ptr<BaseScene> SelectScene::Update() {
 	// 背景パーティクルの更新（常に更新）
 	backgroundParticles_->Update(deltaTime);
 
-	// 常時走査線エフェクトの更新（常に更新）
-	UpdateConstantScanline(deltaTime);
-
-	// グリッチエフェクトの更新（常に更新）
-	UpdateGlitch(deltaTime);
-
 	// トランジション処理の更新
 	if (transition_->IsFadingIn()) {
 		transition_->UpdateFadeIn(deltaTime);
@@ -178,6 +196,16 @@ std::unique_ptr<BaseScene> SelectScene::Update() {
 	// 背景グリッドアニメーションの更新（常に実行）
 	transition_->UpdateBackgroundGrid(deltaTime);
 
+	// エフェクトの更新（背景グリッドの後に実行）
+	// 背景グリッドアニメーション中でない場合のみ更新
+	if (!transition_->IsBackgroundGridAnimating()) {
+		// 常時走査線の更新
+		UpdateConstantScanline(deltaTime);
+		
+		// グリッチエフェクトの更新
+		UpdateGlitch(deltaTime);
+	}
+
 	// UI装飾の更新
 	if (!transition_->IsZoomingIn() && !transition_->IsWaitingAfterZoom() && !transition_->IsFadingOut()) {
 		Vector3 centerPos = { 0.0f, 0.0f, 50.0f };
@@ -195,6 +223,40 @@ std::unique_ptr<BaseScene> SelectScene::Update() {
 	bool skipAnimation = transition_->IsZoomingIn() || transition_->IsWaitingAfterZoom() || transition_->IsFadingOut();
 	if (!skipAnimation) {
 		stageCarousel_->Update(deltaTime, false);
+	}
+
+	// スコア表示の位置を各ステージプレビューの下に配置
+	for (int i = 0; i < 5; ++i) {
+		DrawResource* stagePreview = stageCarousel_->GetStagePreview(i);
+		if (stagePreview) {
+			Vector3 scorePosition = stagePreview->position_;
+			// ステージプレビューの下
+			scorePosition.y = -250.0f;
+			// スコア表示を少し手前に配置
+			scorePosition.z = 45.0f;
+			
+			// スコアラベルの位置
+			Vector3 labelPosition = scorePosition;
+			labelPosition.x -= 220.0f;
+			scoreLabels_[i]->position_ = labelPosition;
+			
+			// 数字の位置（ラベルの右側に配置）
+			scorePosition.x += 320.0f;  // ラベルの右端から少し離す
+			stageScores_[i]->SetPosition(scorePosition);
+			
+			// 位置を反映させるために再度Updateを呼ぶ
+			int score = commonData->bestScore_[i];
+			stageScores_[i]->Update(score);
+			
+			// スコアの色をステージの選択状態に合わせる
+			if (i == stageCarousel_->GetSelectedStageIndex()) {
+				stageScores_[i]->SetColor(0xffffffee);  // 選択中は明るく
+				scoreLabels_[i]->color_ = 0xffffffee;
+			} else {
+				stageScores_[i]->SetColor(0x808080cc);  // 非選択時は暗く
+				scoreLabels_[i]->color_ = 0x808080cc;
+			}
+		}
 	}
 
 	// シーン遷移判定
@@ -237,9 +299,14 @@ std::unique_ptr<BaseScene> SelectScene::CheckSceneTransition() {
 }
 
 void SelectScene::UpdateConstantScanline(float deltaTime) {
-	// トランジション中やズーム中でない場合のみ走査線を表示
+	// トランジション中やズーム中は走査線を表示しない
 	if (transition_->IsFadingIn() || transition_->IsFadingOut() || 
 		transition_->IsZoomingIn() || transition_->IsWaitingAfterZoom()) {
+		return;
+	}
+
+	// 背景グリッドアニメーション中は走査線を表示しない
+	if (transition_->IsBackgroundGridAnimating()) {
 		return;
 	}
 
@@ -253,6 +320,22 @@ void SelectScene::UpdateGlitch(float deltaTime) {
 	if (transition_->IsFadingIn() || transition_->IsFadingOut() || 
 		transition_->IsZoomingIn() || transition_->IsWaitingAfterZoom()) {
 		isGlitching_ = false;
+		// グリッチエフェクトをリセット
+		transition_->GetPostEffect()->data_.glitch.intensity = 0.0f;
+		transition_->GetPostEffect()->data_.glitch.rgbSplit = 0.0f;
+		transition_->GetPostEffect()->data_.glitch.scanlineIntensity = 0.0f;
+		transition_->GetPostEffect()->data_.glitch.blockIntensity = 0.0f;
+		return;
+	}
+
+	// 背景グリッドアニメーション中はグリッチをスキップ
+	if (transition_->IsBackgroundGridAnimating()) {
+		isGlitching_ = false;
+		// グリッチエフェクトをリセット
+		transition_->GetPostEffect()->data_.glitch.intensity = 0.0f;
+		transition_->GetPostEffect()->data_.glitch.rgbSplit = 0.0f;
+		transition_->GetPostEffect()->data_.glitch.scanlineIntensity = 0.0f;
+		transition_->GetPostEffect()->data_.glitch.blockIntensity = 0.0f;
 		return;
 	}
 
@@ -316,10 +399,7 @@ void SelectScene::UpdateGlitch(float deltaTime) {
 		transition_->GetPostEffect()->data_.glitch.blockIntensity = intensity * 0.6f;
 
 		// 常時走査線とグリッチを組み合わせる
-		// 背景グリッドアニメーション中でなければ
-		if (!transition_->IsBackgroundGridAnimating()) {
-			transition_->GetPostEffect()->SetJobs(PostEffectJob::ConstantScanline);
-		}
+		transition_->GetPostEffect()->SetJobs(PostEffectJob::ConstantScanline);
 
 		// グリッチ終了判定
 		if (glitchDuration_ >= glitchMaxDuration_) {
@@ -358,12 +438,26 @@ void SelectScene::Draw() {
 		render_->Draw(stagePreview.get());
 	}
 
+	// スコア表示（ステージプレビューの後、UI要素の前）
+	if (!transition_->IsZoomingIn() && !transition_->IsWaitingAfterZoom() && !transition_->IsFadingOut()) {
+		// 現在選択中のステージのスコアのみ描画
+		int selectedIndex = stageCarousel_->GetSelectedStageIndex();
+		
+		// スコアラベル（"SCORE"テクスチャ）を描画
+		render_->Draw(scoreLabels_[selectedIndex].get());
+		
+		// スコアの数字を描画
+		auto scoreResources = stageScores_[selectedIndex]->GetDrawResources();
+		for (auto* resource : scoreResources) {
+			render_->Draw(resource);
+		}
+	}
+
 	// UI要素（最前面）
 	if (!transition_->IsZoomingIn() && !transition_->IsWaitingAfterZoom() && !transition_->IsFadingOut()) {
 		render_->Draw(ui_->GetTitleText());
 		render_->Draw(ui_->GetLeftArrow());
 		render_->Draw(ui_->GetRightArrow());
-		render_->Draw(ui_->GetInstructionText());
 	}
 
 
