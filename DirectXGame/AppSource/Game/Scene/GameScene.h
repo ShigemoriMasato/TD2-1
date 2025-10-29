@@ -16,6 +16,7 @@
 #include "../Emitter/DeathParticle.h"
 #include "../Emitter/DeathPoint.h"
 #include <Render/Resource/TimerResource.h>
+#include "../NumberPlate.h"
 #include <Game/FPS/TimeSlower.h>
 
 class Player;
@@ -51,7 +52,7 @@ private://特定なオブジェクト
 	std::unique_ptr<GoalTape> goalTape_ = nullptr;
 	std::unique_ptr<TargetScope> targetScope_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
-	std::unique_ptr<TimerResource> timer_ = nullptr;
+	std::unique_ptr<NumberPlate> timer_ = nullptr;
 
 private:
 	float time_ = 0.0f;

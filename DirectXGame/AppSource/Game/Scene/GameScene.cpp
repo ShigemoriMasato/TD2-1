@@ -54,6 +54,7 @@ void GameScene::Initialize(std::string levelName)
 	//UI用カメラ
 	uiCamera_ = std::make_unique<Camera>();
 	uiCamera_->SetProjectionMatrix(OrthographicDesc());
+	uiCamera_->MakeMatrix();
 
 	if (commonData->isCreateTexture)
 	{
@@ -156,11 +157,8 @@ void GameScene::Initialize(std::string levelName)
 
 	{
 		//Timer
-		timer_ = std::make_unique<TimerResource>();
-		timer_->Initialize({120.0f, 120.0f, 1.0f}, 4, true);
-		timer_->SetPosition({ 500.0f, 100.0f, 1.0f });
-		timer_->SetSeparator({ 2 }, "Assets/Texture/number/koron.png");
-		timer_->SetCamera(uiCamera_.get());
+		timer_ = std::make_unique<NumberPlate>();
+		timer_->Initialize(textureManager_, 4, true);
 	}
 
 	//BGMの再生
@@ -284,10 +282,7 @@ void GameScene::Draw() {
 	}
 	deathPoint_->Draw(render_);
 
-	auto res = timer_->GetDrawResources();
-	for (auto& r : res) {
-		render_->Draw(r);
-	}
+	timer_->Draw(render_);
 
 	render_->Draw(postEffect_.get());
 }

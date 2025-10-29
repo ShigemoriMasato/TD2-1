@@ -13,6 +13,7 @@ void TimerResource::Initialize(const Vector3& scale, int digitCount, bool isTime
 		digitResources_[i]->Initialize(ShapeType::Plane);
 		digitResources_[i]->scale_ = scale_;
 		digitResources_[i]->color_ = color_;
+		digitResources_[i]->psoConfig_.depthStencilID = DepthStencilID::Transparent;
 	}
 
 	isTimer_ = isTimer;

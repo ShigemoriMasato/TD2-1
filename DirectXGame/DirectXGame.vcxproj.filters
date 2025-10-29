@@ -100,6 +100,7 @@
     <ClCompile Include="Engine\Render\Resource\TimerResource.cpp" />
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\BackgroundParticleEffect.cpp" />
     <ClCompile Include="AppSource\Game\Emitter\DeathPoint.cpp" />
+    <ClCompile Include="AppSource\Game\NumberPlate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -210,6 +211,7 @@
     <ClInclude Include="Engine\Render\Resource\TimerResource.h" />
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\BackgroundParticleEffect.h" />
     <ClInclude Include="AppSource\Game\Emitter\DeathPoint.h" />
+    <ClInclude Include="AppSource\Game\NumberPlate.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
