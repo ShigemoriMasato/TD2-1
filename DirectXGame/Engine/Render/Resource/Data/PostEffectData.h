@@ -47,10 +47,20 @@ struct SlowMotion {
 	float intensity = 0.0f;            // 全体の強度 (0.0 - 1.0)
 };
 
+struct Glitch {
+	const std::string shaderFile = "Glitch.PS.hlsl";
+	float intensity = 0.0f;            // 全体の強度 (0.0 - 1.0)
+	float rgbSplit = 0.0f;             // RGB色収差の強度 (0.0 - 1.0)
+	float scanlineIntensity = 0.0f;    // スキャンライン強度 (0.0 - 1.0)
+	float blockIntensity = 0.0f;       // ブロックノイズ強度 (0.0 - 1.0)
+	float time = 0.0f;                 // 時間パラメータ（アニメーション用）
+};
+
 struct PostEffectData {
 	Blur blur;
 	Grayscale grayscale;
 	Fade fade;
 	GridTransition gridTransition;
 	SlowMotion slowMotion;
+	Glitch glitch;
 };

@@ -98,6 +98,21 @@ void PostEffectResource::DrawReady() {
 
 		psoConfig_.ps = data_.slowMotion.shaderFile;
 		task_ &= ~PostEffectJob::SlowMotion;
+	} else if (task_ & PostEffectJob::Glitch) {
+		// slot1: intensity, rgbSplit, scanlineIntensity, blockIntensity
+		infoForGPU_->slot1.x = data_.glitch.intensity;
+		infoForGPU_->slot1.y = data_.glitch.rgbSplit;
+		infoForGPU_->slot1.z = data_.glitch.scanlineIntensity;
+		infoForGPU_->slot1.w = data_.glitch.blockIntensity;
+		
+		// slot2: time, -, -, -
+		infoForGPU_->slot2.x = data_.glitch.time;
+		infoForGPU_->slot2.y = 0.0f;
+		infoForGPU_->slot2.z = 0.0f;
+		infoForGPU_->slot2.w = 0.0f;
+
+		psoConfig_.ps = data_.glitch.shaderFile;
+		task_ &= ~PostEffectJob::Glitch;
 	}
 	
 	psoConfig_.ps = shaderBasePath_ + psoConfig_.ps;
