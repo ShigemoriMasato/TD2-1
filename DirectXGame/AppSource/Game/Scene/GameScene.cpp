@@ -143,6 +143,13 @@ void GameScene::Initialize(std::string levelName)
 		deathParticle_->Initialize(camera_->GetCamera());
 	}
 
+	{
+		//deathPointの描画
+		deathPoint_ = std::make_unique<DeathPoint>();
+		int handle = textureManager_->LoadTexture("Assets/Texture/Death.png");
+		deathPoint_->Initialize(commonData->deathPoints_[int(commonData->nextLevelIndex_)], handle, camera_->GetCamera());
+	}
+
 	//BGMの再生
 	if (!commonData->isCreateTexture) {
 		int soundHandle = audio_->Load("BGM/Game.mp3");
@@ -224,11 +231,13 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_);
 	goalEvent_->Update(deltaTime);
 
-	//ゴールの処理が終わったら
+	//死んだら
 	if (player_->IsDead()) {
+		commonData->deathPoints_[int(commonData->nextLevelIndex_)].push_back(player_->GetTransform()->position);
 		return std::make_unique<GameScene>();
 	}
 
+	//ゴールの処理が終わったら
 	if (goalEvent_->IsChangeScene() || isExit)
 	{
 		return std::make_unique<SelectScene>();
@@ -309,6 +318,7 @@ void GameScene::Draw()
 	if (!commonData->isCreateTexture) {
 		deathParticle_->Draw(render_);
 	}
+	deathPoint_->Draw(render_);
 
 	render_->Draw(postEffect_.get());
 }

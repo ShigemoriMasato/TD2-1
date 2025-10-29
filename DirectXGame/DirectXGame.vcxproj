@@ -34,6 +34,7 @@
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.cpp" />
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneUI.cpp" />
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\StageCarousel.cpp" />
+    <ClCompile Include="AppSource\Game\Emitter\DeathPoint.cpp" />
     <ClCompile Include="Engine\Render\Resource\TimerResource.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
     <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.h" />
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneUI.h" />
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\StageCarousel.h" />
+    <ClInclude Include="AppSource\Game\Emitter\DeathPoint.h" />
     <ClInclude Include="Engine\Render\Resource\Data\PostEffectData.h" />
     <ClInclude Include="Engine\Render\Resource\TimerResource.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />

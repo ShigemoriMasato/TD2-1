@@ -333,10 +333,10 @@ void PhysicsEngine::ApplyWorldBounds(PhysicsActor* actor, float deltaTime)
 		actor->collidedLeft_ = true;
 	}
 	//上方向
-	if (objPos.y > worldBounds_->max.y)
+	if (objPos.y > worldBounds_->max.y - 1.0f)
 	{
 		actor->velocity_.y = 0.0f;
-		objPos.y = worldBounds_->max.y;
+		objPos.y = worldBounds_->max.y - 1.0f;
 		actor->collidedTop_ = true;
 	}
 	//新しい位置 - 現在位置
