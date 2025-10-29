@@ -64,7 +64,7 @@ private://パラメータ
 	//移動速度
 	const float moveSpeed_ = 45.0f;
 	//ダッシュ中のキーによる移動速度
-	const float dashMoveSpeed_ = 10.0f;
+	const float dashMoveSpeed_ = 15.0f;
 
 	//重力
 	const float gravity_ = -9.8f;

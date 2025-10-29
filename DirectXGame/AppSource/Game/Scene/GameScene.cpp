@@ -244,7 +244,7 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		return std::make_unique<GameScene>();
 	}
 
-	goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_, time_);
+	//goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_, time_);
 	goalEvent_->Update(deltaTime);
 
 	//死んだら

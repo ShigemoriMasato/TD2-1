@@ -165,8 +165,10 @@ void Player::UpdateDash(float deltaTime) {
 	}
 
 	//velocityの微調整をできるようにする
-	if (key[Key::Right]) actor_->force_.x = dashMoveSpeed_ * deltaTime;
-	if (key[Key::Left]) actor_->force_.x = -dashMoveSpeed_ * deltaTime;
+	if (key[Key::Right]) actor_->force_.x = dashMoveSpeed_;
+	if (key[Key::Left]) actor_->force_.x = -dashMoveSpeed_;
+
+	ImGui::Text("force x :%f y :%f", actor_->force_.x, actor_->force_.y);
 
 	//地面についたら
 	if (actor_->collidedBottom_) {
