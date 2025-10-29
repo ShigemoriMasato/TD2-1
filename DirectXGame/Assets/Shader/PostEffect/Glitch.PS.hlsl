@@ -76,7 +76,7 @@ PixelShaderOutput main(PixelShaderInput input)
         noiseband = step(0.95, noiseband);
         
         float scanlineEffect = (scanline * 0.3 + noiseband * 0.7) * scanlineIntensity * intensity;
-        color.rgb += scanlineEffect;
+        color.rgb *= (1.0 + scanlineEffect * 0.3);
     }
     
     // === 3. ブロックノイズエフェクト ===
@@ -121,10 +121,20 @@ PixelShaderOutput main(PixelShaderInput input)
     flicker = lerp(1.0, flicker, intensity * 0.1);
     color.rgb *= flicker;
     
-    // === 6. ビネット（グリッチ時に暗くする） ===
+    // === 6. 画面全体を暗くする（グリッチの雰囲気強化） ===
+    // グリッチ発生時に画面を暗くし、不安定な雰囲気を演出
+    float darkenAmount = intensity * 0.4f; // 最大40%暗くする
+    color.rgb *= (1.0f - darkenAmount);
+    
+    // === 7. ビネット（グリッチ時により暗くする） ===
     float2 center = uv - 0.5;
-    float vignette = 1.0 - dot(center, center) * intensity * 0.5;
+    float vignette = 1.0 - dot(center, center) * intensity * 0.8; // 強度を上げた
     color.rgb *= vignette;
+    
+    // === 8. ランダムな暗部のフラッシュ（より不気味に） ===
+    float darkFlash = noise(float2(time * 15.0, uv.x * 10.0));
+    darkFlash = step(0.97, darkFlash); // まれに発生
+    color.rgb *= lerp(1.0, 0.3, darkFlash * intensity);
     
     output.color = saturate(color);
     

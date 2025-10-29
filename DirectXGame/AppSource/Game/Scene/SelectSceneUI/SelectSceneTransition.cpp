@@ -43,13 +43,16 @@ bool SelectSceneTransition::UpdateFadeIn(float deltaTime) {
 
 	// progressを逆にして1.0→0.0にする
 	postEffect_->data_.gridTransition.progress = 1.0f - progress;
+	
+	// フェードイン中は走査線を表示しない
 	postEffect_->SetJobs(PostEffectJob::GridTransition);
 
 	// フェードイン完了
 	if (fadeInTimer_ >= kFadeInDuration) {
 		isFadingIn_ = false;
 		postEffect_->data_.gridTransition.progress = 0.0f;
-		postEffect_->SetJobs(PostEffectJob::None);
+		// フェードイン完了後は常時走査線のみ
+		postEffect_->SetJobs(PostEffectJob::ConstantScanline);
 		return true;
 	}
 
@@ -180,7 +183,8 @@ void SelectSceneTransition::UpdateBackgroundGrid(float deltaTime) {
 
 	// 他のエフェクトが動いていない場合のみ適用
 	if (!isFadingIn_ && !isFadingOut_ && !isZoomingIn_ && !isWaitingAfterZoom_) {
-		postEffect_->SetJobs(PostEffectJob::GridTransition);
+		// 常時走査線とグリッドトランジションを組み合わせる
+		postEffect_->SetJobs(PostEffectJob::ConstantScanline | PostEffectJob::GridTransition);
 	}
 
 	// アニメーション完了
@@ -188,7 +192,8 @@ void SelectSceneTransition::UpdateBackgroundGrid(float deltaTime) {
 		isBackgroundGridAnimating_ = false;
 		backgroundGridTimer_ = 0.0f;
 		postEffect_->data_.gridTransition.progress = 0.0f;
-		postEffect_->SetJobs(PostEffectJob::None);
+		// 常時走査線に戻る
+		postEffect_->SetJobs(PostEffectJob::ConstantScanline);
 	}
 }
 

@@ -56,6 +56,14 @@ struct Glitch {
 	float time = 0.0f;                 // 時間パラメータ（アニメーション用）
 };
 
+struct ConstantScanline {
+	const std::string shaderFile = "ConstantScanline.PS.hlsl";
+	float intensity = 0.3f;            // 走査線の強度 (0.0 - 1.0)
+	float speed = 1.0f;                // 走査線の移動速度
+	float lineWidth = 0.002f;          // 走査線の幅
+	float time = 0.0f;                 // 時間パラメータ（アニメーション用）
+};
+
 struct PostEffectData {
 	Blur blur;
 	Grayscale grayscale;
@@ -63,4 +71,5 @@ struct PostEffectData {
 	GridTransition gridTransition;
 	SlowMotion slowMotion;
 	Glitch glitch;
+	ConstantScanline constantScanline;
 };

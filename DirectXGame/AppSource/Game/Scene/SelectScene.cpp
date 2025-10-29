@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <Math/MyMath.h>
 #include <cmath>
+#include <cstdlib>
 
 using namespace MyMath;
 
@@ -53,6 +54,27 @@ void SelectScene::Initialize() {
 	// トランジション初期化
 	transition_ = std::make_unique<SelectSceneTransition>();
 	transition_->Initialize();
+
+	// 常時走査線の初期化
+	transition_->GetPostEffect()->data_.constantScanline.intensity = 0.25f;  // 控えめな強度
+	transition_->GetPostEffect()->data_.constantScanline.speed = 1.0f;
+	transition_->GetPostEffect()->data_.constantScanline.lineWidth = 0.002f;
+	transition_->GetPostEffect()->data_.constantScanline.time = 0.0f;
+	scanlineTime_ = 0.0f;
+
+	// グリッチエフェクトの初期化
+	transition_->GetPostEffect()->data_.glitch.intensity = 0.0f;
+	transition_->GetPostEffect()->data_.glitch.rgbSplit = 0.0f;
+	transition_->GetPostEffect()->data_.glitch.scanlineIntensity = 0.0f;
+	transition_->GetPostEffect()->data_.glitch.blockIntensity = 0.0f;
+	transition_->GetPostEffect()->data_.glitch.time = 0.0f;
+
+	// グリッチ状態の初期化
+	glitchTimer_ = 0.0f;
+	glitchDuration_ = 0.0f;
+	isGlitching_ = false;
+	// 初回のグリッチ発生時刻をランダムに設定（起動後1〜3秒後）
+	nextGlitchTime_ = 1.0f + (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f;
 
 	// UI初期化
 	ui_ = std::make_unique<SelectSceneUI>();
@@ -128,8 +150,12 @@ std::unique_ptr<BaseScene> SelectScene::Update() {
 
 	// 背景パーティクルの更新（常に更新）
 	backgroundParticles_->Update(deltaTime);
-	
 
+	// 常時走査線エフェクトの更新（常に更新）
+	UpdateConstantScanline(deltaTime);
+
+	// グリッチエフェクトの更新（常に更新）
+	UpdateGlitch(deltaTime);
 
 	// トランジション処理の更新
 	if (transition_->IsFadingIn()) {
@@ -208,6 +234,108 @@ std::unique_ptr<BaseScene> SelectScene::CheckSceneTransition() {
 	}
 
 	return nullptr;
+}
+
+void SelectScene::UpdateConstantScanline(float deltaTime) {
+	// トランジション中やズーム中でない場合のみ走査線を表示
+	if (transition_->IsFadingIn() || transition_->IsFadingOut() || 
+		transition_->IsZoomingIn() || transition_->IsWaitingAfterZoom()) {
+		return;
+	}
+
+	// 時間パラメータを更新
+	scanlineTime_ += deltaTime;
+	transition_->GetPostEffect()->data_.constantScanline.time = scanlineTime_;
+}
+
+void SelectScene::UpdateGlitch(float deltaTime) {
+	// フェード中やズーム中はグリッチを発生させない
+	if (transition_->IsFadingIn() || transition_->IsFadingOut() || 
+		transition_->IsZoomingIn() || transition_->IsWaitingAfterZoom()) {
+		isGlitching_ = false;
+		return;
+	}
+
+	// 時間パラメータを常に更新（ランダム性のため）
+	transition_->GetPostEffect()->data_.glitch.time += deltaTime;
+
+	if (!isGlitching_) {
+		// グリッチ待機中
+		glitchTimer_ += deltaTime;
+
+		// 次のグリッチ発生時刻に到達したらグリッチ開始
+		if (glitchTimer_ >= nextGlitchTime_) {
+			// グリッチ開始
+			isGlitching_ = true;
+			glitchDuration_ = 0.0f;
+			glitchTimer_ = 0.0f;
+
+			// グリッチの継続時間をランダム化（0.2〜0.5秒）
+			glitchMaxDuration_ = 0.2f + (static_cast<float>(std::rand()) / RAND_MAX) * 0.3f;
+			
+			// 次のグリッチ発生時刻を設定（基本間隔±ランダム幅）
+			float randomFactor = (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f - 1.0f;
+			nextGlitchTime_ = glitchInterval_ + (randomFactor * glitchIntervalVariation_);
+			
+			// 最低1秒は空ける
+			if (nextGlitchTime_ < 1.0f) {
+				nextGlitchTime_ = 1.0f;
+			}
+		}
+	} else {
+		// グリッチ中
+		glitchDuration_ += deltaTime;
+
+		// グリッチの強度を計算（よりスムーズなカーブ）
+		float progress = glitchDuration_ / glitchMaxDuration_;
+		
+		// より緩やかなフェードイン/アウト
+		float intensity;
+		if (progress < 0.2f) {
+			// 最初の20%でフェードイン
+			float t = progress / 0.2f;
+			intensity = t * t * (3.0f - 2.0f * t); // smoothstep
+		} else if (progress > 0.8f) {
+			// 最後の20%でフェードアウト
+			float t = (1.0f - progress) / 0.2f;
+			intensity = t * t * (3.0f - 2.0f * t); // smoothstep
+		} else {
+			// 中間60%は最大強度を維持
+			intensity = 1.0f;
+		}
+
+		// 強度にランダムなスパイクを追加
+		float randomSpike = 1.0f + (static_cast<float>(std::rand()) / RAND_MAX - 0.5f) * 0.3f;
+		intensity *= randomSpike;
+		intensity = std::min(intensity, 1.0f);
+
+		// グリッチパラメータを設定
+		transition_->GetPostEffect()->data_.glitch.intensity = intensity * 0.85f;
+		transition_->GetPostEffect()->data_.glitch.rgbSplit = intensity * 0.9f;
+		transition_->GetPostEffect()->data_.glitch.scanlineIntensity = intensity * 0.75f;
+		transition_->GetPostEffect()->data_.glitch.blockIntensity = intensity * 0.6f;
+
+		// 常時走査線とグリッチを組み合わせる
+		// 背景グリッドアニメーション中でなければ
+		if (!transition_->IsBackgroundGridAnimating()) {
+			transition_->GetPostEffect()->SetJobs(PostEffectJob::ConstantScanline);
+		}
+
+		// グリッチ終了判定
+		if (glitchDuration_ >= glitchMaxDuration_) {
+			isGlitching_ = false;
+			glitchDuration_ = 0.0f;
+
+			// グリッチエフェクトをリセット
+			transition_->GetPostEffect()->data_.glitch.intensity = 0.0f;
+			transition_->GetPostEffect()->data_.glitch.rgbSplit = 0.0f;
+			transition_->GetPostEffect()->data_.glitch.scanlineIntensity = 0.0f;
+			transition_->GetPostEffect()->data_.glitch.blockIntensity = 0.0f;
+			
+			// 常時走査線のみに戻る
+			transition_->GetPostEffect()->SetJobs(PostEffectJob::ConstantScanline);
+		}
+	}
 }
 
 void SelectScene::Draw() {
