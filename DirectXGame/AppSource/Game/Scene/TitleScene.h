@@ -50,6 +50,7 @@ private:
 	bool isGlitching_ = false;         // グリッチ中かどうか
 	float nextGlitchTime_ = 0.0f;      // 次のグリッチ発生時刻
 
+
 	// UI用カメラ
 	std::unique_ptr<Camera> uiCamera_ = nullptr;
 

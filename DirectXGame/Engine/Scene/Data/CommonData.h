@@ -25,4 +25,6 @@ public:
 
 private:
 
+	std::unique_ptr<BinaryManager> binaryManager_ = nullptr;
+	std::string saveFile = "data.sav";
 };

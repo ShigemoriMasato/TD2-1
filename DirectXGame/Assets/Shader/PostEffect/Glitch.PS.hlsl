@@ -77,6 +77,7 @@ PixelShaderOutput main(PixelShaderInput input)
         
         float scanlineEffect = (scanline * 0.3 + noiseband * 0.7) * scanlineIntensity * intensity;
         color.rgb *= (1.0 + scanlineEffect * 0.3);
+
     }
     
     // === 3. ブロックノイズエフェクト ===

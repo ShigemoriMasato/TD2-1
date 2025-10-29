@@ -122,6 +122,7 @@ void PostEffectResource::DrawReady() {
 
 		psoConfig_.ps = data_.constantScanline.shaderFile;
 		task_ &= ~PostEffectJob::ConstantScanline;
+
 	}
 	
 	psoConfig_.ps = shaderBasePath_ + psoConfig_.ps;

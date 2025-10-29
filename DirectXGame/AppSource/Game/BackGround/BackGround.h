@@ -18,7 +18,7 @@ private:
 	std::unique_ptr<ParticleResource> blocks_ = nullptr;
 	std::unique_ptr<PostEffectResource> postEffect_ = nullptr;
 
-	const float changeInterval = 5.0f;
+	const float changeInterval = 3.5f;
 	float timer = changeInterval;
 
 	const int width = 50;

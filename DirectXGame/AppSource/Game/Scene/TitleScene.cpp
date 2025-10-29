@@ -266,6 +266,7 @@ void TitleScene::UpdateGlitch(float deltaTime)
 
 		// 次のグリッチ発生時刻に到達したらグリッチ開始
 		if (glitchTimer_ >= nextGlitchTime_) {
+
 			// グリッチ開始
 			isGlitching_ = true;
 			glitchDuration_ = 0.0f;
@@ -282,6 +283,7 @@ void TitleScene::UpdateGlitch(float deltaTime)
 			if (nextGlitchTime_ < 1.0f) {
 				nextGlitchTime_ = 1.0f;
 			}
+
 		}
 	} else {
 		// グリッチ中
@@ -315,6 +317,7 @@ void TitleScene::UpdateGlitch(float deltaTime)
 		postEffect_->data_.glitch.rgbSplit = intensity * 0.9f;
 		postEffect_->data_.glitch.scanlineIntensity = intensity * 0.75f;
 		postEffect_->data_.glitch.blockIntensity = intensity * 0.6f;
+
 
 		// グリッチエフェクトをセット
 		postEffect_->SetJobs(PostEffectJob::Glitch);

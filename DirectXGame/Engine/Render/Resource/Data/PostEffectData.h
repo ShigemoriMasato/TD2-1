@@ -72,4 +72,5 @@ struct PostEffectData {
 	SlowMotion slowMotion;
 	Glitch glitch;
 	ConstantScanline constantScanline;
+
 };

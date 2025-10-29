@@ -34,6 +34,8 @@
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.cpp" />
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneUI.cpp" />
     <ClCompile Include="AppSource\Game\Scene\SelectSceneUI\StageCarousel.cpp" />
+    <ClCompile Include="AppSource\Game\Emitter\DeathPoint.cpp" />
+    <ClCompile Include="AppSource\Game\Scene\ClearScene.cpp" />
     <ClCompile Include="Engine\Render\Resource\TimerResource.cpp" />
     <ClCompile Include="Engine\Resource\Audio\Data\AudioData.cpp" />
     <ClCompile Include="Engine\Resource\Audio\AudioManager.cpp" />
@@ -113,6 +115,8 @@
     <ClCompile Include="AppSource\Game\Scene\SelectScene.cpp" />
     <ClCompile Include="AppSource\Game\ScoreManager.cpp" />
     <ClCompile Include="Engine\Render\Resource\ModelParticle.cpp" />
+    <ClCompile Include="AppSource\Game\Tutorial.cpp" />
+    <ClCompile Include="AppSource\Game\NumberPlate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -136,6 +140,8 @@
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneTransition.h" />
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\SelectSceneUI.h" />
     <ClInclude Include="AppSource\Game\Scene\SelectSceneUI\StageCarousel.h" />
+    <ClInclude Include="AppSource\Game\Emitter\DeathPoint.h" />
+    <ClInclude Include="AppSource\Game\Scene\ClearScene.h" />
     <ClInclude Include="Engine\Render\Resource\Data\PostEffectData.h" />
     <ClInclude Include="Engine\Render\Resource\TimerResource.h" />
     <ClInclude Include="Engine\Resource\Audio\Data\AudioData.h" />
@@ -222,6 +228,8 @@
     <ClInclude Include="AppSource\Common\InitializeScene\InitializeScene.h" />
     <ClInclude Include="AppSource\Game\ScoreManager.h" />
     <ClInclude Include="Engine\Render\Resource\ModelParticle.h" />
+    <ClInclude Include="AppSource\Game\Tutorial.h" />
+    <ClInclude Include="AppSource\Game\NumberPlate.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

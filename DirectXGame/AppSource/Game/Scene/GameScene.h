@@ -14,7 +14,12 @@
 #include "../Player/TargetScope.h"
 #include "../BackGround/BackGround.h"
 #include "../Emitter/DeathParticle.h"
+#include "../Emitter/DeathPoint.h"
+#include <Render/Resource/TimerResource.h>
+#include "../NumberPlate.h"
 #include <Game/FPS/TimeSlower.h>
+#include "../Tutorial.h"
+#include "ClearScene.h"
 
 class Player;
 class GameScene : public BaseScene
@@ -30,6 +35,7 @@ private://管理用メンバ変数
 	//シーン内全てのオブジェクトリスト
 	std::vector<std::unique_ptr<BaseObject>> objects_;
 	std::unique_ptr<CameraManager> camera_ = nullptr;
+	std::unique_ptr<Camera> uiCamera_ = nullptr;
 	std::unordered_map<Key, bool> keys_{};
 
 	PhysicsEngine physicsEngine_;
@@ -49,9 +55,12 @@ private://特定なオブジェクト
 	std::unique_ptr<TargetScope> targetScope_ = nullptr;
 	std::unique_ptr<BackGround> backGround_ = nullptr;
 
+private:
+	std::unique_ptr<ClearScene> clearEvent_ = nullptr;
+	std::unique_ptr<Tutorial> tutorial_ = nullptr;
 private://Emitter
 	std::unique_ptr<DeathParticle> deathParticle_ = nullptr;
-
+	std::unique_ptr<DeathPoint> deathPoint_ = nullptr;
 
 private://イベント
 	std::unique_ptr<GoalEvent> goalEvent_ = nullptr;
