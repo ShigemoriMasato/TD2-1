@@ -17,7 +17,7 @@ public:
 	/// </summary>
 	/// <param name="scale">表示するスケール</param>
 	/// <param name="digitCount">表示する桁数</param>
-	void Initialize(const Vector3& scale, int digitCount);
+	void Initialize(const Vector3& scale, int digitCount, bool isTimer);
 
 	/// <summary>
 	/// 更新処理
@@ -81,4 +81,6 @@ private:
 
 	// 最大桁数
 	static constexpr int kMaxDigits = 10;
+
+	bool isTimer_ = false;
 };

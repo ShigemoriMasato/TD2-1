@@ -14,6 +14,7 @@ CommonData::CommonData() {
 
 	auto values = binaryManager_->Read(saveFile);
 	size_t i;
+
 	for (i = 0; i < values.size() && i < levelNum; ++i) {
 		scoreManager_->SaveScore((int)i, BinaryManager::Reverse<int>(values[i]));
 	}
@@ -44,11 +45,13 @@ CommonData::~CommonData() {
 
 	for (int stageIndex = 0; stageIndex < levelNum; ++stageIndex) {
 		binaryManager_->RegistOutput(static_cast<int>(deathPoints_[stageIndex].size()), "");
+	
 		for (const auto& point : deathPoints_[stageIndex]) {
 			binaryManager_->RegistOutput(point, "");
 		}
 	}
 
+#ifdef SH_RELEASE
 	binaryManager_->Write(saveFile);
-
+#endif
 }

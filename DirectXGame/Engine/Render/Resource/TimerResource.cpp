@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cmath>
 
-void TimerResource::Initialize(const Vector3& scale, int digitCount) {
+void TimerResource::Initialize(const Vector3& scale, int digitCount, bool isTimer) {
 	scale_ = scale;
 	specifiedDigitCount_ = std::max(1, digitCount);  // 最低1桁は保証
 
@@ -13,7 +13,10 @@ void TimerResource::Initialize(const Vector3& scale, int digitCount) {
 		digitResources_[i]->Initialize(ShapeType::Plane);
 		digitResources_[i]->scale_ = scale_;
 		digitResources_[i]->color_ = color_;
+		digitResources_[i]->psoConfig_.depthStencilID = DepthStencilID::Transparent;
 	}
+
+	isTimer_ = isTimer;
 }
 
 void TimerResource::Update(int number) {
@@ -21,8 +24,15 @@ void TimerResource::Update(int number) {
 	int totalSeconds = std::max(0, number);
 
 	// 秒数を分と秒に分解
-	int minutes = totalSeconds / 60;
-	int seconds = totalSeconds % 60;
+	int minutes = 0;
+	int seconds = 0;
+	if (isTimer_) {
+		minutes = totalSeconds / 60;
+		seconds = totalSeconds % 60;
+	} else {
+		minutes = totalSeconds / 100;
+		seconds = totalSeconds % 100;
+	}
 
 	
 	int displayValue = 0;

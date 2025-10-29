@@ -31,7 +31,19 @@ void InitializeScene::Initialize() {
 	keyManager->SetKey(Key::Action, DIK_SPACE, KeyState::Hold);
 	keyManager->SetKey(Key::Action, DIK_J, KeyState::Hold);
 	keyManager->SetKey(Key::Action, DIK_Z, KeyState::Hold);
+	keyManager->SetKey(Key::Action, DIK_X, KeyState::Hold);
+	keyManager->SetKey(Key::Action, DIK_LSHIFT, KeyState::Hold);
+	keyManager->SetKey(Key::Action, DIK_RSHIFT, KeyState::Hold);
+	keyManager->SetKey(Key::Action, DIK_LCONTROL, KeyState::Hold);
+	keyManager->SetKey(Key::Action, DIK_RCONTROL, KeyState::Hold);
 	keyManager->SetButton(Key::Action, XBoxController::kA, KeyState::Hold);
+	keyManager->SetButton(Key::Action, XBoxController::kB, KeyState::Hold);
+	keyManager->SetButton(Key::Action, XBoxController::kY, KeyState::Hold);
+	keyManager->SetButton(Key::Action, XBoxController::kX, KeyState::Hold);
+	keyManager->SetButton(Key::Action, XBoxController::kRightShoulder, KeyState::Hold);
+	keyManager->SetButton(Key::Action, XBoxController::kRightTrigger, KeyState::Hold);
+	keyManager->SetButton(Key::Action, XBoxController::kLeftShoulder, KeyState::Hold);
+	keyManager->SetButton(Key::Action, XBoxController::kLeftTrigger, KeyState::Hold);
 
 	keyManager->SetKey(Key::Correct, DIK_RETURN, KeyState::Trigger);
 	keyManager->SetKey(Key::Correct, DIK_SPACE, KeyState::Trigger);

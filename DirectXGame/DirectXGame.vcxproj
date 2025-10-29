@@ -115,6 +115,7 @@
     <ClCompile Include="AppSource\Game\ScoreManager.cpp" />
     <ClCompile Include="Engine\Render\Resource\ModelParticle.cpp" />
     <ClCompile Include="AppSource\Game\Tutorial.cpp" />
+    <ClCompile Include="AppSource\Game\NumberPlate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSource\Game\BaseObject.h" />
@@ -226,6 +227,7 @@
     <ClInclude Include="AppSource\Game\ScoreManager.h" />
     <ClInclude Include="Engine\Render\Resource\ModelParticle.h" />
     <ClInclude Include="AppSource\Game\Tutorial.h" />
+    <ClInclude Include="AppSource\Game\NumberPlate.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
