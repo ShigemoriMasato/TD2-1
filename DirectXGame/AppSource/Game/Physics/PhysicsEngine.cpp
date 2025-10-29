@@ -162,19 +162,6 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 				if (!actor->prevCollidedRight_)
 					tile->TriggerWaveAtWorldPos(newPos);
 			}
-			else
-			{
-				auto widthRight = newPos.x + objHalfSize.x - tileX * tileSize.x;
-				auto heightRight = GetTileHeightAtWidth(widthRight, tileTypeBottom, tileSize);
-				if (heightRight > 0.0f)
-				{
-					if (newPos.y < (tileYBottom + 1) * tileSize.y + objHalfSize.y + heightRight)
-					{
-						newPos.y = (tileYBottom + 1) * tileSize.y + objHalfSize.y + heightRight;
-						actor->collidedBottom_ = true;
-					}
-				}
-			}
 		}
 		//左方向
 		else if (dis.x < 0.0f)
@@ -214,6 +201,11 @@ void PhysicsEngine::ResolveTileCollisions(PhysicsActor* actor, float deltaTime)
 				actor->collidedBottom_ = true;
 				if (!actor->prevCollidedBottom_)
 					tile->TriggerWaveAtWorldPos(newPos);
+			}
+			if (tileTypeLeft == TileType::Trap || tileTypeRight == TileType::Trap)
+			{
+				if (collider->GetSelf() & ColliderMask::PLAYER)
+					tileCollisionInfo_.emplace_back(actor->owner_, TileType::Trap);
 			}
 		}
 		else if (dis.y > 0.0f)
