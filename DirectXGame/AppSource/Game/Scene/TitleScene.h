@@ -19,6 +19,9 @@ private:
 	/// @brief フェード処理の更新
 	void UpdateFade(float deltaTime);
 
+	/// @brief グリッチエフェクトの更新
+	void UpdateGlitch(float deltaTime);
+
 	/// @brief タイトルロゴのアニメーション更新
 	void UpdateTitleLogoAnimation(float deltaTime);
 
@@ -37,6 +40,13 @@ private:
 	bool isFading_ = false;
 	float fadeTimer_ = 0.0f;
 	const float fadeDuration_ = 2.0f; // フェードにかける時間（秒）
+
+	// グリッチエフェクト用
+	float glitchTimer_ = 0.0f;
+	float glitchInterval_ = 2.0f;      // グリッチ発生間隔（秒）
+	float glitchDuration_ = 0.0f;      // 現在のグリッチ継続時間
+	float glitchMaxDuration_ = 0.15f;  // グリッチの最大継続時間（秒）
+	bool isGlitching_ = false;         // グリッチ中かどうか
 
 	// UI用カメラ
 	std::unique_ptr<Camera> uiCamera_ = nullptr;
