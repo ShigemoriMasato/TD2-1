@@ -49,6 +49,19 @@ void SelectScene::Initialize() {
 	backgroundParticles_ = std::make_unique<BackgroundParticleEffect>();
 	backgroundParticles_->Initialize(uiCamera_.get(), textureManager_);
 
+	// タイマーの初期化（テスト用：4桁、コロン付き）
+	{
+		timer_ = std::make_unique<TimerResource>();
+		timer_->Initialize(Vector3{ 60.0f, 60.0f, 1.0f }, 4);  // 4桁指定
+		
+		// コロンを右から2桁目に挿入（00:00の形式）
+		timer_->SetSeparator({2}, "Assets/Texture/number/koron.png");
+		
+		timer_->SetCamera(uiCamera_.get());
+		timer_->SetPosition(Vector3{ 500.0f, 280.0f, 10.0f });  // 右上に配置
+		timer_->SetColor(0xffffffff);
+	}
+
 	// トランジション初期化
 	transition_ = std::make_unique<SelectSceneTransition>();
 	transition_->Initialize();
@@ -115,6 +128,8 @@ std::unique_ptr<BaseScene> SelectScene::Update() {
 
 	// 背景パーティクルの更新（常に更新）
 	backgroundParticles_->Update(deltaTime);
+
+	timer_->Update(125);
 
 	// トランジション処理の更新
 	if (transition_->IsFadingIn()) {
@@ -223,6 +238,11 @@ void SelectScene::Draw() {
 		render_->Draw(ui_->GetInstructionText());
 	}
 
+	// タイマーの描画（テスト用）
+	auto timerResources = timer_->GetDrawResources();
+	for (auto* resource : timerResources) {
+		render_->Draw(resource);
+	}
 
 	// ポストエフェクト
 	render_->Draw(transition_->GetPostEffect());
