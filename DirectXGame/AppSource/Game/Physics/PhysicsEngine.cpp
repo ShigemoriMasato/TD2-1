@@ -412,6 +412,9 @@ void PhysicsEngine::CheckTileTriggers()
 					case TileType::Trap:
 						triggersSet.insert(tileType);
 						break;
+					case TileType::Exit:
+						triggersSet.insert(tileType);
+						break;
 					default:
 						break;
 					}

@@ -147,7 +147,7 @@ void GameScene::Initialize(std::string levelName)
 			commonData->bgmPlayHandle_ = audio_->Play(soundHandle, true);
 		}
 	}
-
+	isExit = false;
 	render_->EndFrame(false);
 }
 
@@ -223,7 +223,7 @@ std::unique_ptr<BaseScene> GameScene::Update()
 		return std::make_unique<GameScene>();
 	}
 
-	if (goalEvent_->IsChangeScene())
+	if (goalEvent_->IsChangeScene() || isExit)
 	{
 		return std::make_unique<SelectScene>();
 	}
@@ -329,6 +329,9 @@ void GameScene::CheckAllCollision()
 		if (info.second == TileType::Trap)
 		{
 			player_->OnTrap();
+		}else if (info.second == TileType::Exit)
+		{
+			isExit = true;
 		}
 	}
 

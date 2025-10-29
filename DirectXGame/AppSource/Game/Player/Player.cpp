@@ -64,6 +64,7 @@ void Player::Update(float deltaTime)
 
 	wire_->Update(deltaTime);
 
+#ifdef _DEBUG
 	ImGui::Begin("Player Debug");
 	ImGui::Text("Behavior: %d", static_cast<int>(behavior_));
 
@@ -73,6 +74,8 @@ void Player::Update(float deltaTime)
 		ImGui::Text("Target: %u", t->GetCollider()->GetSelf());
 	}
 	ImGui::End();
+#endif // 
+
 	targets_.clear();
 }
 

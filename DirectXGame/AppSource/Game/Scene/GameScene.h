@@ -34,6 +34,8 @@ private://管理用メンバ変数
 	PhysicsEngine physicsEngine_;
 	LevelLoader levelLoader_;
 	std::unique_ptr<TileMap> tileMap_ = nullptr;
+	bool isExit = false;
+
 private://パラメータ変数
 
 	std::unique_ptr<TimeSlower> timeSlower_ = nullptr;

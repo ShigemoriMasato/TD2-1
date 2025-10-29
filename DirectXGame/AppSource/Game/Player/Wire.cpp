@@ -52,13 +52,13 @@ void Wire::Update(float deltaTime) {
 		endPos_ = *startPos_;
 	}
 
-
+#ifdef _DEBUG
 	ImGui::Begin("Wire");
 	ImGui::Text("startPos x:%f y%f", startPos_->x, startPos_->y);
 	ImGui::Text("endPos x:%f y%f", endPos_.x, endPos_.y);
 	ImGui::Text("isExtending:%d", isExtending_);
 	ImGui::End();
-
+#endif
 }
 
 void Wire::Draw(Render* render) {

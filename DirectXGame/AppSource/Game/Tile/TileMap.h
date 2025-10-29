@@ -9,6 +9,7 @@ enum class TileType
     Empty = 0,      // 空
     Solid,          // 通常
     Trap,           // 罠 
+    Exit,           // 出口
     //....追加予定
     Slope_0_1,      // "/" 左: 0.0 右: 1.0
     Slope_0_0_5,    // "/" 左: 0.0 右: 0.5

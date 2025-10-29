@@ -1,6 +1,7 @@
 #include "TileMap.h"
 #include "../Physics/PhysicsEngine.h"
 #include <json.hpp>
+#include<numeric>
 
 using Json = nlohmann::json;
 
@@ -77,7 +78,7 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 	//画像のリソースの先頭をセット
 	int blockHandle = textureManager->LoadTexture("Assets/Texture/Mapchip/Normal.png");
 	int trapHandle = textureManager->LoadTexture("Assets/Texture/Mapchip/trap.png");
-
+	int exitHandle = textureManager->LoadTexture("Assets/Texture/Mapchip/exit.png");
 	for (int y = 0; y < tiles_.height; ++y)
 	{
 		for (int x = 0; x < tiles_.width; ++x)
@@ -98,6 +99,13 @@ void TileMap::SetModelData(TextureManager* textureManager, ModelData* modelData,
 				resource->camera_ = camera;
 				resource->position_[index] = GetWorldPos(x, y);
 				resource->textureIndex_[index] = 1;
+			}
+			if (type == TileType::Exit)
+			{
+				resource->camera_ = camera;
+                resource->position_[index] = GetWorldPos(x, y);
+				resource->textureIndex_[index] = 2;
+				resource->rotate_[index].y = std::numbers::pi_v<float> * 0.5f;
 			}
 		}
 	}
