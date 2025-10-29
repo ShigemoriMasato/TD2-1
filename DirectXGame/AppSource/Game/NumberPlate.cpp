@@ -31,19 +31,19 @@ void NumberPlate::Initialize(TextureManager* textureManager, int digit, bool isT
 	res_.back()->camera_ = camera_.get();
 	res_.back()->SetTextureHandle(textureManager->LoadTexture("Assets/Texture/number/minas.png"));
 
-	transform_.scale = { 0.7f, 0.7f, 1.0f };
-	transform_.position = { -4.1f, -3.7f, 20.0f };
 }
 
 void NumberPlate::Update(int num) {
 	std::vector<int> digits;
 
+	int absNum = std::abs(num);
+
 	if (isTimer_) {
 
-		int sec = num % 60;
+		int sec = absNum % 60;
 		digits.push_back(sec % 10);
 		digits.push_back(sec / 10);
-		int minutes = num / 60;
+		int minutes = absNum / 60;
 		for (int i = 2; i < digit_; ++i) {
 			digits.push_back(minutes % 10);
 			minutes /= 10;
@@ -52,8 +52,8 @@ void NumberPlate::Update(int num) {
 	} else {
 
 		for (int i = 0; i < digit_; ++i) {
-			digits.push_back(num % 10);
-			num /= 10;
+			digits.push_back(absNum % 10);
+			absNum /= 10;
 		}
 
 	}
@@ -77,8 +77,13 @@ void NumberPlate::Update(int num) {
 	}
 
 	if (isTimer_) {
+		static float buff;
+		ImGui::Begin("a");
+		ImGui::DragFloat("offset", &buff, 0.01f);
+		ImGui::End();
+
 		res_[(int)res_.size() - 1]->position_ = transform_.position;
-		res_[(int)res_.size() - 1]->position_.x -= transform_.scale.x + transform_.scale.x * 0.5f;
+		res_[(int)res_.size() - 1]->position_.x -= transform_.scale.x + 0.8f * transform_.scale.x;
 		res_[(int)res_.size() - 1]->rotate_ = transform_.rotation;
 		res_[(int)res_.size() - 1]->scale_ = transform_.scale;
 	}
@@ -97,12 +102,6 @@ void NumberPlate::Update(int num) {
 	} else {
 		res_.back()->color_ = 0x00000000;
 	}
-
-	ImGui::Begin("NumberPlate");
-	ImGui::DragFloat3("Position", &transform_.position.x, 0.01f);
-	ImGui::DragFloat3("Rotation", &transform_.rotation.x, 0.01f);
-	ImGui::DragFloat3("Scale", &transform_.scale.x, 0.01f);
-	ImGui::End();
 }
 
 void NumberPlate::Draw(Render* render) {

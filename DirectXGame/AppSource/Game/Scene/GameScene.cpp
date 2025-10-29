@@ -159,9 +159,10 @@ void GameScene::Initialize(std::string levelName)
 	tutorial_->Initialize(camera_->GetCamera(),textureManager_);
 
 	{
-		//Timer
-		clearEvent_ = std::make_unique<ClearScene>();
-		clearEvent_->Initialize(textureManager_);
+		timer_ = std::make_unique<NumberPlate>();
+		timer_->Initialize(textureManager_, 4, true);
+		timer_->SetPosition({ -4.1f, -3.7f, 20.0f });
+		timer_->SetScale({ 0.7f, 0.7f, 1.0f });
 	}
 
 	//BGMの再生
@@ -232,8 +233,9 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	backGround_->Update(deltaTime);
 	//deathParticle
 	deathParticle_->Update(deltaTime);
-	//timer
-	clearEvent_->Update(deltaTime);
+
+	time_ += deltaTime;
+	timer_->Update(int(time_));
 
 	physicsEngine_.Update(deltaTime);
 	//オブジェクト間でのコリジョンチェック
@@ -243,6 +245,8 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	{
 		return std::make_unique<GameScene>();
 	}
+
+	goalEvent_->keys_ = keys_;
 
 	goalEvent_->SetClear(player_->GetTransform()->position.x > goalX_, time_);
 	goalEvent_->Update(deltaTime);
@@ -286,7 +290,8 @@ void GameScene::Draw() {
 
 	if (!commonData->isCreateTexture) {
 		deathParticle_->Draw(render_);
-		clearEvent_->Draw(render_);
+		goalEvent_->Draw(render_);
+		timer_->Draw(render_);
 	}
 	deathPoint_->Draw(render_);
 
