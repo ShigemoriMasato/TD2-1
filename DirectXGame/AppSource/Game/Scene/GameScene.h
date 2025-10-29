@@ -14,6 +14,7 @@
 #include "../Player/TargetScope.h"
 #include "../BackGround/BackGround.h"
 #include "../Emitter/DeathParticle.h"
+#include "../Emitter/DeathPoint.h"
 #include <Game/FPS/TimeSlower.h>
 
 class Player;
@@ -51,7 +52,7 @@ private://特定なオブジェクト
 
 private://Emitter
 	std::unique_ptr<DeathParticle> deathParticle_ = nullptr;
-
+	std::unique_ptr<DeathPoint> deathPoint_ = nullptr;
 
 private://イベント
 	std::unique_ptr<GoalEvent> goalEvent_ = nullptr;
