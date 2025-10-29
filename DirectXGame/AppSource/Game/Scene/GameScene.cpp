@@ -60,7 +60,7 @@ void GameScene::Initialize(std::string levelName)
 	{
 		Vector2 size = tileMap_->WorldSize();
 		//zの1.4倍は適当。画像に異常があるようなら変更して
-		camera_->SetOffset({ size.x / 2.0f, size.y / 2.0f, -size.x * 1.4f });
+		camera_->SetOffset({ size.x / 2.0f - 4.0f , size.y / 2.0f, -size.x * 1.4f });
 		camera_->FinishCalculation();
 	}
 

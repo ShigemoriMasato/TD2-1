@@ -26,8 +26,8 @@ private:
 	std::unique_ptr<ParticleResource> boxParticles_ = nullptr;
 	
 	// パーティクルの最大数
-	static constexpr int kMaxCircleParticles = 30;
-	static constexpr int kMaxBoxParticles = 20;
+	static constexpr int kMaxCircleParticles = 90;
+	static constexpr int kMaxBoxParticles = 30;
 	
 	// パーティクルの寿命管理（円形）
 	std::vector<float> circleLifeTime_;

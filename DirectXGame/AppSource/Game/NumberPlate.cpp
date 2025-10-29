@@ -26,15 +26,36 @@ void NumberPlate::Initialize(TextureManager* textureManager, int digit, bool isT
 		res_.back()->SetTextureHandle(textureManager->LoadTexture("Assets/Texture/number/colon.png"));
 	}
 
+	res_.emplace_back(std::make_unique<DrawResource>());
+	res_.back()->Initialize(ShapeType::Plane);
+	res_.back()->camera_ = camera_.get();
+	res_.back()->SetTextureHandle(textureManager->LoadTexture("Assets/Texture/number/minas.png"));
+
 	transform_.scale = { 0.7f, 0.7f, 1.0f };
 	transform_.position = { -4.1f, -3.7f, 20.0f };
 }
 
 void NumberPlate::Update(int num) {
 	std::vector<int> digits;
-	for(int i = 0; i < digit_; ++i) {
-		digits.push_back(num % 10);
-		num /= 10;
+
+	if (isTimer_) {
+
+		int sec = num % 60;
+		digits.push_back(sec % 10);
+		digits.push_back(sec / 10);
+		int minutes = num / 60;
+		for (int i = 2; i < digit_; ++i) {
+			digits.push_back(minutes % 10);
+			minutes /= 10;
+		}
+
+	} else {
+
+		for (int i = 0; i < digit_; ++i) {
+			digits.push_back(num % 10);
+			num /= 10;
+		}
+
 	}
 
 	for (int i = 0; i < digit_; ++i) {
@@ -48,14 +69,33 @@ void NumberPlate::Update(int num) {
 
 		res_[i]->rotate_ = transform_.rotation;
 		res_[i]->scale_ = transform_.scale;
-		res_[i]->SetTextureHandle(textureHandles_[digits[i]]);
+		if (i < digits.size()) {
+			res_[i]->SetTextureHandle(textureHandles_[digits[i]]);
+		} else {
+			res_[i]->SetTextureHandle(textureHandles_[0]);
+		}
 	}
 
 	if (isTimer_) {
+		res_[(int)res_.size() - 1]->position_ = transform_.position;
+		res_[(int)res_.size() - 1]->position_.x -= transform_.scale.x + transform_.scale.x * 0.5f;
+		res_[(int)res_.size() - 1]->rotate_ = transform_.rotation;
+		res_[(int)res_.size() - 1]->scale_ = transform_.scale;
+	}
+
+	//マイナス表示
+	if (num < 0) {
 		res_.back()->position_ = transform_.position;
-		res_.back()->position_.x -= transform_.scale.x + transform_.scale.x * 0.8f;
+		if (isTimer_) {
+			res_.back()->position_.x -= (digit_ * transform_.scale.x) + 0.8f * transform_.scale.x;
+		} else {
+			res_.back()->position_.x -= digit_ * transform_.scale.x;
+		}
 		res_.back()->rotate_ = transform_.rotation;
 		res_.back()->scale_ = transform_.scale;
+		res_.back()->color_ = 0xffffffff;
+	} else {
+		res_.back()->color_ = 0x00000000;
 	}
 
 	ImGui::Begin("NumberPlate");
@@ -69,4 +109,8 @@ void NumberPlate::Draw(Render* render) {
 	for (int i = 0; i < res_.size(); ++i) {
 		render->Draw(res_[i].get());
 	}
+}
+
+void NumberPlate::SetPosition(Vector3 position) {
+	transform_.position = position;
 }

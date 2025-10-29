@@ -11,7 +11,7 @@ public:
 	void Update(int num);
 	void Draw(Render* render);
 
-	void SetSize();
+	void SetPosition(Vector3 position);
 
 private:
 

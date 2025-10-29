@@ -1,6 +1,7 @@
 #include "TitleScene.h"
 #include "SelectScene.h"
 #include <cmath>
+#include <cstdlib>
 
 void TitleScene::Initialize()
 {
@@ -17,11 +18,23 @@ void TitleScene::Initialize()
 		postEffect_->data_.gridTransition.gridSize = 16.0f;  // 16x16グリッド
 		postEffect_->data_.gridTransition.fadeColor = 0.0f;  // 黒にフェード
 		postEffect_->data_.gridTransition.pattern = 0.0f;    // 波紋状パターン（外→内）
+		
+		// グリッチエフェクト初期化
+		postEffect_->data_.glitch.intensity = 0.0f;
+		postEffect_->data_.glitch.rgbSplit = 0.0f;
+		postEffect_->data_.glitch.scanlineIntensity = 0.0f;
+		postEffect_->data_.glitch.blockIntensity = 0.0f;
+		postEffect_->data_.glitch.time = 0.0f;
 	}
 
 	// フェード状態の初期化
 	isFading_ = false;
 	fadeTimer_ = 0.0f;
+
+	// グリッチ状態の初期化
+	glitchTimer_ = 0.0f;
+	glitchDuration_ = 0.0f;
+	isGlitching_ = false;
 
 	// アニメーション用タイマーの初期化
 	totalTime_ = 0.0f;
@@ -126,6 +139,9 @@ std::unique_ptr<BaseScene> TitleScene::Update()
 	// 総経過時間の更新
 	totalTime_ += deltaTime;
 
+	// グリッチエフェクトの更新（常に更新）
+	UpdateGlitch(deltaTime);
+
 	// UIアニメーションの更新（フェード中でない場合のみ）
 	if (!isFading_) {
 		UpdateTitleLogoAnimation(deltaTime);
@@ -148,6 +164,8 @@ std::unique_ptr<BaseScene> TitleScene::Update()
 
 	// トランジション完了でゲームシーンへ
 	if (isFading_ && fadeTimer_ >= fadeDuration_) {
+		// ゲーム開始時は常にステージ1（Level0）からスタート
+		commonData->nextLevelIndex_ = LevelIndex::Level0;
 		return std::make_unique<SelectScene>();
 	}
 
@@ -221,10 +239,71 @@ void TitleScene::UpdateFade(float deltaTime)
 		// ポストエフェクトの進行度を更新
 		postEffect_->data_.gridTransition.progress = progress;
 		postEffect_->SetJobs(PostEffectJob::GridTransition);
-	} else {
-		// トランジションしていない時は通常描画
+	} else if (!isGlitching_) {
+		// トランジションしていない&グリッチ中でない時は通常描画
 		postEffect_->data_.gridTransition.progress = 0.0f;
 		postEffect_->SetJobs(PostEffectJob::None);
+	}
+}
+
+void TitleScene::UpdateGlitch(float deltaTime)
+{
+	// フェード中はグリッチを発生させない
+	if (isFading_) {
+		isGlitching_ = false;
+		return;
+	}
+
+	// 時間パラメータを常に更新（ランダム性のため）
+	postEffect_->data_.glitch.time += deltaTime;
+
+	if (!isGlitching_) {
+		// グリッチ待機中
+		glitchTimer_ += deltaTime;
+
+		// ランダムな間隔でグリッチを発生
+		// 基本間隔に±1秒のランダム性を追加
+		float randomOffset = (static_cast<float>(std::rand()) / RAND_MAX - 0.5f) * 2.0f;
+		float actualInterval = glitchInterval_ + randomOffset;
+
+		if (glitchTimer_ >= actualInterval) {
+			// グリッチ開始
+			isGlitching_ = true;
+			glitchDuration_ = 0.0f;
+			glitchTimer_ = 0.0f;
+
+			// グリッチの継続時間をランダム化（0.05〜0.15秒）
+			glitchMaxDuration_ = 0.05f + (static_cast<float>(std::rand()) / RAND_MAX) * 0.1f;
+		}
+	} else {
+		// グリッチ中
+		glitchDuration_ += deltaTime;
+
+		// グリッチの強度を計算（最初と最後で弱く、中間で強い）
+		float progress = glitchDuration_ / glitchMaxDuration_;
+		float intensity = std::sin(progress * 3.14159265358979323846f); // 0→1→0の曲線
+
+		// グリッチパラメータを設定
+		postEffect_->data_.glitch.intensity = intensity * 0.7f;
+		postEffect_->data_.glitch.rgbSplit = intensity * 0.8f;
+		postEffect_->data_.glitch.scanlineIntensity = intensity * 0.6f;
+		postEffect_->data_.glitch.blockIntensity = intensity * 0.5f;
+
+		// グリッチエフェクトをセット
+		postEffect_->SetJobs(PostEffectJob::Glitch);
+
+		// グリッチ終了判定
+		if (glitchDuration_ >= glitchMaxDuration_) {
+			isGlitching_ = false;
+			glitchDuration_ = 0.0f;
+
+			// グリッチエフェクトをリセット
+			postEffect_->data_.glitch.intensity = 0.0f;
+			postEffect_->data_.glitch.rgbSplit = 0.0f;
+			postEffect_->data_.glitch.scanlineIntensity = 0.0f;
+			postEffect_->data_.glitch.blockIntensity = 0.0f;
+			postEffect_->SetJobs(PostEffectJob::None);
+		}
 	}
 }
 

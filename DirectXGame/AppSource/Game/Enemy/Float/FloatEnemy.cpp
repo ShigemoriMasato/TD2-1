@@ -7,7 +7,7 @@ void FloatEnemy::Initialize(ModelData* modelData, Camera* camera) {
 
 	// コライダーの設定
 	collider_ = std::make_unique<AABBCollider>(
-		ColliderTag::Static,
+		ColliderTag::Dynamic,
 		ColliderMask::ENEMY,
 		ColliderMask::PLAYER
 	);
@@ -39,17 +39,17 @@ void FloatEnemy::Draw(Render* render) {
 void FloatEnemy::OnCollision(BaseObject* other) {
 	if (!other) return;
 
-	// プレイヤーとの衝突時に上向きの力を与える
-	Player* player = dynamic_cast<Player*>(other);
-	if (player) {
-		// プレイヤーに上向きの速度を加える
-		player->AddVelocity(Vector2(0.0f, floatForce_));
+	//// プレイヤーとの衝突時に上向きの力を与える
+	//Player* player = dynamic_cast<Player*>(other);
+	//if (player) {
+	//	// プレイヤーに上向きの速度を加える
+	//	player->AddVelocity(Vector2(0.0f, floatForce_));
 
-		// 視覚的フィードバック（色変更）
-		if (modelResource_) {
-			modelResource_->color_ = 0xff00ffff; // シアン色に変更
-		}
-	}
+	//	// 視覚的フィードバック（色変更）
+	//	if (modelResource_) {
+	//		modelResource_->color_ = 0xff00ffff; // シアン色に変更
+	//	}
+	//}
 }
 
 void FloatEnemy::Configure(const EnemySpawnParams& params) {
