@@ -77,15 +77,10 @@ void NumberPlate::Update(int num) {
 	}
 
 	if (isTimer_) {
-		static float buff;
-		ImGui::Begin("a");
-		ImGui::DragFloat("offset", &buff, 0.01f);
-		ImGui::End();
-
-		res_[(int)res_.size() - 1]->position_ = transform_.position;
-		res_[(int)res_.size() - 1]->position_.x -= transform_.scale.x + 0.8f * transform_.scale.x;
-		res_[(int)res_.size() - 1]->rotate_ = transform_.rotation;
-		res_[(int)res_.size() - 1]->scale_ = transform_.scale;
+		res_[(int)res_.size() - 2]->position_ = transform_.position;
+		res_[(int)res_.size() - 2]->position_.x -= transform_.scale.x + 0.85f * transform_.scale.x;
+		res_[(int)res_.size() - 2]->rotate_ = transform_.rotation;
+		res_[(int)res_.size() - 2]->scale_ = transform_.scale;
 	}
 
 	//マイナス表示

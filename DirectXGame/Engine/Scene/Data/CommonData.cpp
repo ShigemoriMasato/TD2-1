@@ -16,7 +16,7 @@ CommonData::CommonData() {
 	size_t i;
 
 	for (i = 0; i < values.size() && i < levelNum; ++i) {
-		scoreManager_->SaveScore((int)i, BinaryManager::Reverse<int>(values[i]));
+		bestScore_.push_back(BinaryManager::Reverse<int>(values[i]));
 	}
 
 	//安全装置
@@ -31,11 +31,13 @@ CommonData::CommonData() {
 		//安全装置
 		if (values.size() <= i) break;
 	}
+
+	bestScore_.resize(levelNum);
 }
 
 CommonData::~CommonData() {
 
-	auto scores = scoreManager_->GetAllScores();
+	auto scores = bestScore_;
 
 	for (int i = 0; i < scores.size(); ++i) {
 		binaryManager_->RegistOutput(scores[i], "");

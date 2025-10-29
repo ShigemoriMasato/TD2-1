@@ -262,6 +262,12 @@ std::unique_ptr<BaseScene> GameScene::Update()
 	if (goalEvent_->IsChangeScene() || isExit)
 	{
 		Coin::ResetScore();
+		int finalScore = goalEvent_->GetFinalScore();
+
+		if (commonData->bestScore_[int(commonData->nextLevelIndex_)] < finalScore) {
+			commonData->bestScore_[int(commonData->nextLevelIndex_)] = finalScore;
+		}
+
 		return std::make_unique<SelectScene>();
 	}
 	ImGui::Text("score:%d", Coin::GetScore());
@@ -291,8 +297,11 @@ void GameScene::Draw() {
 	if (!commonData->isCreateTexture) {
 		deathParticle_->Draw(render_);
 		goalEvent_->Draw(render_);
-		timer_->Draw(render_);
+
+		if (player_->GetTransform()->position.x <= goalX_)
+			timer_->Draw(render_);
 	}
+
 	deathPoint_->Draw(render_);
 
 

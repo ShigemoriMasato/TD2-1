@@ -17,6 +17,8 @@ public:
 	bool IsClear() const { return isClear_; }
 	bool IsTransitioning() const { return isClear_ && clearTimer_ >= clearWaitTime_; }
 
+	int GetFinalScore() { return finalScore_; }
+
 	std::unordered_map<Key, bool> keys_{};
 private:
 
