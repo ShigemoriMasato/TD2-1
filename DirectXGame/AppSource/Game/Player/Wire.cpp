@@ -20,26 +20,22 @@ void Wire::Update(float deltaTime) {
 	transform_.position = *startPos_;
 	if (isExtending_) {
 
-		Vector3 direction = (targetPos_ - *startPos_).Normalize();
+		direction_ = (targetPos_ - *startPos_).Normalize();
 		float currentDistance = (endPos_ - *startPos_).Length();
 		float totalDistance = (targetPos_ - *startPos_).Length();
 		//現在距離から進ませる
 		currentDistance += extendSpeed_ * deltaTime;
 
+		float leftDistance = totalDistance - currentDistance;
 
-		if (currentDistance >= totalDistance - 0.001f)
+		if (leftDistance <= 0.0f)
 		{
 			endPos_ = targetPos_;
 			isExtending_ = false;
 		}
 		else
 		{
-			endPos_ = *startPos_ + direction * currentDistance;
-		}
-		if ((endPos_ - *startPos_).Length() < 1.0f)
-		{
-			isExtending_ = false;
-			endPos_ = targetPos_;
+			endPos_ = *startPos_ + direction_ * currentDistance;
 		}
 
 	} else {
@@ -48,9 +44,6 @@ void Wire::Update(float deltaTime) {
 		}
 	}
 
-	if (!isVisible_) {
-		endPos_ = *startPos_;
-	}
 
 #ifdef _DEBUG
 	ImGui::Begin("Wire");
@@ -62,13 +55,20 @@ void Wire::Update(float deltaTime) {
 }
 
 void Wire::Draw(Render* render) {
+	if (!isVisible_) {
+		endPos_ = *startPos_;
+	}
+
 	drawResource_->localPos_[0] = {*startPos_};
 	drawResource_->localPos_[1] = { endPos_ };
+
 
 	render->Draw(drawResource_.get());
 }
 
 void Wire::SetEndPosition(const Vector3& endPos) {
+	//directionをリセット
+	direction_ = {};
 	//目標座標を設定
 	targetPos_ = endPos;
 	//startからendまでの距離

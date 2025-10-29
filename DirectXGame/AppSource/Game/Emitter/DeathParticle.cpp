@@ -3,7 +3,7 @@
 DeathParticle::DeathParticle(Vector3* playerPos) {
 	playerPos_ = playerPos;
 	res_ = std::make_unique<ParticleResource>();
-	res_->Initialize(8, 36, 200, true);
+	res_->Initialize(8, 36, instanceNum);
 
 	res_->localPos_ = {
 			{-0.5f, 0.5f, -0.5f}, {0.5f, 0.5f, -0.5f},
@@ -47,33 +47,43 @@ DeathParticle::DeathParticle(Vector3* playerPos) {
 	res_->psoConfig_.ps = "Game/Block.PS.hlsl";
 	res_->psoConfig_.vs = "Game/Block.VS.hlsl";
 
+	speed_.resize(instanceNum, 0.0f);
 }
 
-void DeathParticle::Initialize() {
+void DeathParticle::Initialize(Camera* camera) {
 	
 	const float minDistance = maxDistance_ / 3.0f;
 	const float randRange = maxDistance_ - minDistance;
 
+	res_->camera_ = camera;
+
 	for (int i = 0; i < instanceNum; ++i) {
-		Vector2 dir = {float(rand() % 2000 - 1000) / 1000.0f,
-						float(rand() % 2000 - 1000) / 1000.0f };
-		float distance = float(rand() % 10000) / minDistance + minDistance;
+		Vector3 dir = { float(rand() % 2000 - 1000),
+						float(rand() % 2000 - 1000),
+						float(rand() % 2000 - 1000) };
+		dir = dir.Normalize();
+		float distance = float(rand() % 10000) / 10000.0f * randRange + minDistance;
 		distance_.push_back(distance);
-		Vector2 buff = dir * distance;
-		res_->position_[i] = *playerPos_ + Vector3(buff.x, buff.y, 0.0f) * std::numbers::pi_v<float>;
+		Vector3 buff = dir * distance;
+		res_->position_[i] = *playerPos_ + Vector3(buff.x, buff.y, buff.z) * std::numbers::pi_v<float>;
+		res_->rotate_[i] = { rand() % 10000 / 1000.0f, rand() % 10000 / 1000.0f, rand() % 10000 / 1000.0f };
+		res_->color_[i] = 0xff;
 	}
 
 	isInited_ = false;
 }
 
 void DeathParticle::Update(float deltaTime) {
-	if (isInited_) {
+	if (!isInited_) {
 		for(int i = 0; i < instanceNum; ++i) {
+			if (res_->color_[i] == 0) continue;
+
 			Vector3 dir = res_->position_[i] - *playerPos_;
 			dir = dir.Normalize();
 			speed_[i] += acceleration_ * deltaTime;
 			distance_[i] -= speed_[i] * deltaTime;
 			res_->position_[i] = *playerPos_ + dir * distance_[i];
+			res_->rotate_[i].y += 0.1f;
 
 			if (distance_[i] < 0.0f) {
 				res_->color_[i] = 0;
@@ -82,7 +92,7 @@ void DeathParticle::Update(float deltaTime) {
 		}
 
 		if (count == instanceNum) {
-			isInited_ = false;
+			isInited_ = true;
 		}
 	}
 
@@ -90,10 +100,8 @@ void DeathParticle::Update(float deltaTime) {
 		for (int i = 0; i < instanceNum; ++i) {
 			if (res_->color_[i] == 0) continue;
 			Vector3 dir = res_->position_[i] - *playerPos_;
-			dir = dir.Normalize();
 			speed_[i] -= acceleration_ * deltaTime;
-			distance_[i] += speed_[i] * deltaTime;
-			res_->position_[i] = *playerPos_ + dir * distance_[i];
+			res_->position_[i] = *playerPos_ + dir * speed_[i];
 
 			if (speed_[i] <= 0.0f) {
 				res_->color_[i] = 0;
@@ -108,15 +116,19 @@ void DeathParticle::Update(float deltaTime) {
 	}
 }
 
-void DeathParticle::Render() {
+void DeathParticle::Draw(Render* render) {
+	render->Draw(res_.get());
 }
 
 void DeathParticle::Boot() {
+	if (isBoot_) return;
+
 	isBoot_ = true;
 	count = instanceNum;
 	speed_.clear();
 	for (int i = 0; i < instanceNum; ++i) {
-		speed_.push_back(rand() % 10000 / 2000 + 3.0f);
+		speed_[i] = float((rand() % 10000) / 2000) + 5.0f;
+		res_->color_[i] = 0xffffffff;
 	}
 }
 

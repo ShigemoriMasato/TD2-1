@@ -21,7 +21,6 @@ void Player::UpdateIdel(float deltaTime) {
 	auto& key = (*key_);
 
 	//移動
-
 	if (key[Key::Right]) actor_->force_.x = moveSpeed_;
 	if (key[Key::Left]) actor_->force_.x = -moveSpeed_;
 
@@ -139,10 +138,13 @@ void Player::UpdateShrink(float deltaTime) {
 	//velocityの固定
 	actor_->velocity_ = targetDir_ * dashPower_;
 
-	float tarlen = targetPos_.Length();
-	float plalen = transform_.position.Length();
+	Vector3 toTarget = targetPos_ - transform_.position;
+	Vector3 wireDir = wire_->GetDirection();
+
+	float dot = MyMath::dot(toTarget.Normalize(), wireDir.Normalize());
+
 	//playerがtarlenに一定以上近くなったり、スペースを押したらダッシュに切り替え
-	if ((plalen > tarlen - 0.5f && plalen < tarlen + 0.5f) || (*key_)[Key::Action]) {
+	if (dot < 0.0f || (*key_)[Key::Action]) {
 		wire_->Shrinked();
 		behaviorRequest_ = Behavior::Dash;
 	}

@@ -7,9 +7,9 @@ public:
 	DeathParticle(Vector3* playerPos);
 	~DeathParticle() = default;
 
-	void Initialize();
+	void Initialize(Camera* camera);
 	void Update(float deltaTime);
-	void Render();
+	void Draw(Render* render);
 
 	void Boot();
 
@@ -17,7 +17,7 @@ public:
 
 private:
 
-	const int instanceNum = 200;
+	const int instanceNum = 50;
 
 	int count = 0;
 
