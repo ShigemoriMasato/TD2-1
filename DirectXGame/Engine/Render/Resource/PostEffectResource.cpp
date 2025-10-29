@@ -113,6 +113,16 @@ void PostEffectResource::DrawReady() {
 
 		psoConfig_.ps = data_.glitch.shaderFile;
 		task_ &= ~PostEffectJob::Glitch;
+	} else if (task_ & PostEffectJob::ConstantScanline) {
+		// slot1: intensity, speed, lineWidth, time
+		infoForGPU_->slot1.x = data_.constantScanline.intensity;
+		infoForGPU_->slot1.y = data_.constantScanline.speed;
+		infoForGPU_->slot1.z = data_.constantScanline.lineWidth;
+		infoForGPU_->slot1.w = data_.constantScanline.time;
+
+		psoConfig_.ps = data_.constantScanline.shaderFile;
+		task_ &= ~PostEffectJob::ConstantScanline;
+
 	}
 	
 	psoConfig_.ps = shaderBasePath_ + psoConfig_.ps;

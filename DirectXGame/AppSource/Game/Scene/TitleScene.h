@@ -43,10 +43,13 @@ private:
 
 	// グリッチエフェクト用
 	float glitchTimer_ = 0.0f;
-	float glitchInterval_ = 2.0f;      // グリッチ発生間隔（秒）
+	float glitchInterval_ = 3.0f;      // グリッチ発生基本間隔（秒）- 短縮
+	float glitchIntervalVariation_ = 2.0f;  // 間隔のランダム幅（秒）- 狭める
 	float glitchDuration_ = 0.0f;      // 現在のグリッチ継続時間
-	float glitchMaxDuration_ = 0.15f;  // グリッチの最大継続時間（秒）
+	float glitchMaxDuration_ = 0.5f;   // グリッチの最大継続時間（秒）- デフォルトを長く
 	bool isGlitching_ = false;         // グリッチ中かどうか
+	float nextGlitchTime_ = 0.0f;      // 次のグリッチ発生時刻
+
 
 	// UI用カメラ
 	std::unique_ptr<Camera> uiCamera_ = nullptr;

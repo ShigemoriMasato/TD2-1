@@ -21,6 +21,7 @@ enum class PostEffectJob : uint32_t {
 	GridTransition = 1 << 3,
 	SlowMotion = 1 << 4,
 	Glitch = 1 << 5,
+	ConstantScanline = 1 << 6,  // 常時走査線エフェクト
 
 };
 
