@@ -6,6 +6,13 @@ void DeathPoint::Initialize(std::vector<Vector3> deathPoints, int textureHandle,
 
 	res_ = std::make_unique<ParticleResource>();
 	res_->Initialize(4, 6, instance);
+	size_ = 0.5f;
+	res_->localPos_ = {
+		{-size_, size_ * 2.0f, 0.0f},
+		{size_, size_ * 2.0f, 0.0f},
+		{-size_, 0.0f, 0.0f},
+		{size_, 0.0f, 0.0f}
+	};
 	res_->texcoord_ = {
 		{0.0f, 0.0f},
 		{1.0f, 0.0f},
@@ -26,7 +33,7 @@ void DeathPoint::Initialize(std::vector<Vector3> deathPoints, int textureHandle,
 	for(int i = 0; i < instance; ++i) {
 		res_->position_[i] = deathPoints[i];
 		res_->position_[i].z = -0.6f;
-		res_->color_[i] = 0x200000ff;
+		res_->color_[i] = 0xffffffff;
 	}
 
 	res_->textureHandle_ = textureHandle;
