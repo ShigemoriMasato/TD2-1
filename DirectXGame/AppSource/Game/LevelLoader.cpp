@@ -74,7 +74,7 @@ void LevelLoader::AddEnemy(EnemyManager& enemyManager)
 				float worldX = x / tileWidth_;
 				float worldY = (worldHeight_ - 1 - y / tileHeight_);
 
-				if (className == "FloatEnemy")
+				/*if (className == "FloatEnemy")
 				{
 					enemyManager.SpawnEnemy("FloatEnemy", { worldX, worldY,0.0f });
 				}
@@ -89,7 +89,7 @@ void LevelLoader::AddEnemy(EnemyManager& enemyManager)
 				if (className == "TrackerEnemy")
 				{
 					enemyManager.SpawnEnemy("TrackerEnemy", { worldX, worldY,0.0f });
-				}
+				}*/
 			}
 		}
 	}
