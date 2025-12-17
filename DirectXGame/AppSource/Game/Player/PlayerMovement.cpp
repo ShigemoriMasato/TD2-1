@@ -50,6 +50,8 @@ void Player::OnForcus() {
 	int slow = audio_->Load("slow.mp3");
 	audio_->Play(slow, false);
 	timeSlower_->StartSlow(currentSlowTime_);
+
+	inputDirection = actor_->velocity_.Normalize();
 }
 
 void Player::UpdateForcus(float deltaTime) {
@@ -65,7 +67,12 @@ void Player::UpdateForcus(float deltaTime) {
 
 	//狙い先の当たり判定をとる。
 	//ワイヤーの範囲に入ったオブジェクトチェック
-	Vector3 inputDirection = GetInputDirection();
+	Vector3 input = GetInputDirection();
+
+	if (input.Length() > 0.1f) {
+		inputDirection = input;
+	}
+
 	BaseObject* selectedTarget = nullptr;
 
 	targetPos_ = {};

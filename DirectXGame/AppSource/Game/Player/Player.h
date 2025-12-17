@@ -47,6 +47,7 @@ public:
 	}
 	Behavior GetBehavior() const { return behavior_; }
 	Vector3 GetDirection() const { return direction; }
+	Vector3 GetAimDirection() const { return inputDirection; }
 	Vector3 GetTargetPos() const { return targetPos_; }
 
 private://状態変数
@@ -60,6 +61,8 @@ private://パラメータ
 	//wireを投げた場所
 	Vector3 targetPos_ = {};
 	Vector3 targetDir_ = {};
+
+	Vector3 inputDirection = {};
 
 	//移動速度
 	const float moveSpeed_ = 45.0f;

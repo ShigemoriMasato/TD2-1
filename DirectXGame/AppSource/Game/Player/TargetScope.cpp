@@ -45,7 +45,7 @@ void TargetScope::Initialize(int textureHandle, Player* player, Camera* camera) 
 void TargetScope::Update(float deltaTime, KeyManager* keyManager) {
 	if (player_->GetBehavior() == Player::Behavior::Forcus) {
 
-		Vector3 dir = (player_->GetDirection()).Normalize();
+		Vector3 dir = (player_->GetAimDirection()).Normalize();
 		float angle = std::atan2f(dir.y, dir.x);
 		
 		scopeTop_->rotate_.z = angle + std::numbers::pi_v<float> / 8.0f;
