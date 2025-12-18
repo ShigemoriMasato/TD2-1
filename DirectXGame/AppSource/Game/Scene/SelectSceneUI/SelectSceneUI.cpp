@@ -11,10 +11,10 @@ SelectSceneUI::~SelectSceneUI() {
 void SelectSceneUI::Initialize(Camera* camera, TextureManager* textureManager) {
 
 	// テクスチャの読み込み
-	leftArrowReleaseTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/ReleaseA.png");
-	leftArrowTriggerTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/TriggerA.png");
-	rightArrowReleaseTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/ReleaseD.png");
-	rightArrowTriggerTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/TriggerD.png");
+	leftArrowReleaseTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/stick_l_left.png");
+	leftArrowTriggerTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/stick_l_left.png");
+	rightArrowReleaseTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/stick_l_right.png");
+	rightArrowTriggerTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/stick_l_right.png");
 	stageSelectTextureHandle_ = textureManager->LoadTexture("Assets/Texture/SelectScene/StageSelect.png");
 
 	// グラデーション背景
