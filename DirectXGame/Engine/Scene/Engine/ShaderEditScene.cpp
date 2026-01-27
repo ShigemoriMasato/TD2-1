@@ -70,6 +70,7 @@ void ShaderEditScene::Initialize() {
 
 std::unique_ptr<BaseScene> ShaderEditScene::Update() {
 
+#ifdef USE_IMGUI
 	ImGui::Begin("ShaderEdit");
 
 	if (ImGui::Button("Add")) {
@@ -107,6 +108,7 @@ std::unique_ptr<BaseScene> ShaderEditScene::Update() {
 
 	ImGui::End();
 
+#endif
 	return nullptr;
 }
 

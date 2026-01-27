@@ -51,10 +51,12 @@ void DeathPoint::Draw(Render* render) {
 				{size_, -size_, 0.0f}
 		};
 
+#ifdef USE_IMGUI
 		ImGui::Begin("res");
 		ImGui::DragFloat("Size", &size_, 0.01f);
 		ImGui::End();
 
 		render->Draw(res_.get());
+#endif
 	}
 }

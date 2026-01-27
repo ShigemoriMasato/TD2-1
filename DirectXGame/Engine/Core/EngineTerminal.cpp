@@ -36,10 +36,12 @@ void EngineTerminal::Initialize(int32_t windowWidth, int32_t windowHeight) {
 
 	dxDevice_->SetWindowProc([this](HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) -> LRESULT {
 
+#ifdef USE_IMGUI
 		//imguiのウィンドウプロシージャを呼ぶ
 		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
 			return true;
 		}
+#endif
 
 		switch (msg) {
 		case WM_CLOSE:

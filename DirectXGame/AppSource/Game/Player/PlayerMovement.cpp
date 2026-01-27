@@ -175,8 +175,6 @@ void Player::UpdateDash(float deltaTime) {
 	if (key[Key::Right]) actor_->force_.x = dashMoveSpeed_;
 	if (key[Key::Left]) actor_->force_.x = -dashMoveSpeed_;
 
-	ImGui::Text("force x :%f y :%f", actor_->force_.x, actor_->force_.y);
-
 	//地面についたら
 	if (actor_->collidedBottom_) {
 		behaviorRequest_ = Behavior::Idle;

@@ -219,6 +219,7 @@ void DefaultEmitter::SetParticleJobs(ParticleJob job, bool isUse) {
 
 //ImGui関連
 void DefaultEmitter::DrawImGui() {
+#ifdef USE_IMGUI
 	ImGui::PushID(id_);
 	ImGui::Begin("Emitter");
 
@@ -287,6 +288,7 @@ void DefaultEmitter::DrawImGui() {
 
 	ImGui::End();
 	ImGui::PopID();
+#endif
 }
 
 

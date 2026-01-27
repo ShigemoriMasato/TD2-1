@@ -270,7 +270,6 @@ std::unique_ptr<BaseScene> GameScene::Update()
 
 		return std::make_unique<SelectScene>();
 	}
-	ImGui::Text("score:%d", Coin::GetScore());
 
 	return nullptr;
 }

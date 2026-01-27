@@ -6,6 +6,7 @@
 Camera* ImGuiWrapper::camera_ = nullptr;
 
 void ImGuiOperator::Initialize(DXDevice* device, Render* render, SRVManager* srv) {
+#ifdef USE_IMGUI
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
@@ -17,10 +18,11 @@ void ImGuiOperator::Initialize(DXDevice* device, Render* render, SRVManager* srv
 
     ImGui_ImplDX12_Init(&initInfo);
 
-    
+#endif
 }
 
 void ImGuiOperator::StartFrame(float kClientWidth, float kClientHeight) {
+#ifdef USE_IMGUI
     ImGuiIO& io = ImGui::GetIO();
 
     ImGui_ImplDX12_NewFrame();
@@ -51,30 +53,29 @@ void ImGuiOperator::StartFrame(float kClientWidth, float kClientHeight) {
     ImGui::End();
     ImGui::PopStyleVar(2);
 
+#endif
 }
 
 void ImGuiOperator::EndFrame(ID3D12GraphicsCommandList* commandList) {
-
-#if SH_DEBUG || SH_DEVELOP
+#ifdef USE_IMGUI
 
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
-
-#else
-
-    ImGui::EndFrame();
 
 #endif
 
 }
 
 void ImGuiOperator::Finalize() {
+#ifdef USE_IMGUI
     ImGui_ImplDX12_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
+#endif
 }
 
 void ImGuiWrapper::GuizmoUpdate() {
+#ifdef USE_IMGUI
 
     if (ImGui::IsKeyPressed(ImGuiKey_T)) {
         operationType_ = ImGuizmo::TRANSLATE;
@@ -97,9 +98,11 @@ void ImGuiWrapper::GuizmoUpdate() {
             ImGuizmo::Enable(false);
         }
 	}
+#endif
 }
 
 void ImGuiWrapper::UseGuizmo(ImGuizmo::OPERATION operationType, GuizmoData& data) {
+#ifdef USE_IMGUI
 
     if (!camera_) {
         return;
@@ -123,14 +126,17 @@ void ImGuiWrapper::UseGuizmo(ImGuizmo::OPERATION operationType, GuizmoData& data
     ImGuizmo::Manipulate(viewMat, projMat, operationType, ImGuizmo::WORLD, worldMat);
 
 	std::memcpy(data.matrix->m, worldMat, sizeof(float) * 16);
+#endif
 }
 
 int ImGuiWrapper::AddItem(std::string name, Matrix4x4* matrix, Transform* transform) {
+#ifdef USE_IMGUI
     GuizmoData data;
     data.name = name;
     data.matrix = matrix;
     data.transform = transform;
     guizmoDataMap_.push_back(data);
 
+#endif
     return static_cast<int>(guizmoDataMap_.size() - 1);
 }

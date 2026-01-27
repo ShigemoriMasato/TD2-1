@@ -31,11 +31,13 @@ void TimeSlower::Update() {
 
 	deltaTime_ = trueDelta * timeRate_;
 
+#ifdef USE_IMGUI
 	ImGui::Begin("DeltaTime");
 	ImGui::Text("TrueDelta: %.6f", trueDelta);
 	ImGui::Text("DeltaTime: %.6f", deltaTime_);
 	ImGui::Text("TimeRate: %.6f", timeRate_);
 	ImGui::End();
+#endif
 }
 
 void TimeSlower::StartSlow(float time) {

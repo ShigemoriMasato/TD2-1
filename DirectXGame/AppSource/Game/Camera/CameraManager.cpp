@@ -48,6 +48,7 @@ void CameraManager::Update(float deltaTime) {
 }
 
 void CameraManager::DrawImGui() {
+#ifdef USE_IMGUI
 	ImGui::Begin("Camera");
 	ImGui::Checkbox("Debug Camera", &isDebug_);
 	ImGui::DragFloat3("Offset", &targetOffset_.x, 0.1f);
@@ -55,6 +56,7 @@ void CameraManager::DrawImGui() {
 	ImGui::DragFloat3("Rotate", &transform_.rotation.x, 0.01f);
 	ImGui::Text("Position : %.2f, %.2f, %.2f", transform_.position.x, transform_.position.y, transform_.position.z);
 	ImGui::End();
+#endif
 }
 
 void CameraManager::FinishCalculation() {

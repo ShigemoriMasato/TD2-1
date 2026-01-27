@@ -105,6 +105,7 @@ void BackGround::Update(float deltaTime) {
 		blocks_->position_[i].z = lerp(blockMap_[i / width][i % width].second, targetZ, lerpT) + 20.0f;
 	}
 
+#ifdef USE_IMGUI
 	ImGui::Begin("BackGround");
 	ImGui::DragFloat("Intensity", &postEffect_->data_.blur.intensity, 0.01f);
 	ImGui::DragFloat("KernelSize", &postEffect_->data_.blur.kernelSize, 0.01f);
@@ -114,6 +115,7 @@ void BackGround::Update(float deltaTime) {
 	ImGui::ColorEdit4("Color", &blocks_->lightData_->color.x);
 	ImGui::DragFloat("LIntensity", &blocks_->lightData_->intensity, 0.1f, 0.0f);
 	ImGui::End();
+#endif
 }
 
 void BackGround::Draw(Render* render) {
